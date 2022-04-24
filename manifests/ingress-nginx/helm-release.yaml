@@ -14,4 +14,6 @@ spec:
         name: ingress-nginx
         namespace: flux-system
       interval: 1m
-  values: {}
+  values:
+    controller:
+      watchIngressWithoutClass: true
