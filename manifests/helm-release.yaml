@@ -35,8 +35,9 @@ spec:
       hosts:
       - pi.hole
 
-    adminPassword: admin
+    adminPassword: DroaTiNSenDu
 
+    # Use sealed secret later
     admin:
       existingSecret: ""
       passwordKey: "password"
