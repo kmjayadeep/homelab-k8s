@@ -30,11 +30,6 @@ spec:
         metallb.universe.tf/loadBalancerIPs: 192.168.0.101
         metallb.universe.tf/allow-shared-ip: pihole
 
-    ingress:
-      enabled: true
-      hosts:
-      - pi.hole
-
     adminPassword: DroaTiNSenDu
 
     # Use sealed secret later
@@ -47,12 +42,11 @@ spec:
 
     adlists:
     - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-    - https://mirror1.malwaredomains.com/files/justdomains
     - http://sysctl.org/cameleon/hosts
     - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
     - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
 
     dnsmasq:
       customDnsEntries:
-      - address=/pi.hole/192.168.0.101
+      - address=/pihole.local/192.168.0.101
       - address=/andromeda.local/192.168.0.100
