@@ -52,6 +52,7 @@ spec:
     - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
     - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
 
-    customDnsEntries:
-    - address=/pi.hole/192.168.0.101
-    - address=/andromeda.local/192.168.0.100
+    dnsmasq:
+      customDnsEntries:
+      - address=/pi.hole/192.168.0.101
+      - address=/andromeda.local/192.168.0.100
