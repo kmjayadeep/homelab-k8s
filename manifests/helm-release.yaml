@@ -16,7 +16,7 @@ spec:
       interval: 1m
   values:
     persistentVolumeClaim:
-      enabled: true
+      enabled: false
 
     serviceWeb:
       type: LoadBalancer
