@@ -30,6 +30,7 @@ spec:
         metallb.universe.tf/loadBalancerIPs: 192.168.0.101
         metallb.universe.tf/allow-shared-ip: pihole
 
+    virtualHost: pihole.local
     adminPassword: DroaTiNSenDu
 
     # Use sealed secret later
