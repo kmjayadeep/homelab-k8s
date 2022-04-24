@@ -1,0 +1,54 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: pihole
+      version: '2.5.8'
+      sourceRef:
+        kind: HelmRepository
+        name: mojo2600
+        namespace: flux-system
+      interval: 1m
+  values:
+    persistentVolumeClaim:
+      enabled: true
+
+    serviceWeb:
+      loadBalancerIP: 192.168.0.101
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: 192.168.0.101
+        metallb.universe.tf/allow-shared-ip: pihole
+      type: LoadBalancer
+
+    serviceDns:
+      loadBalancerIP: 192.168.0.101
+      annotations:
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: 192.168.0.101
+        metallb.universe.tf/allow-shared-ip: pihole
+
+    ingress:
+      enabled: true
+      hosts:
+      - pi.hole
+
+    adminPassword: admin
+
+    admin:
+      existingSecret: ""
+      passwordKey: "password"
+
+    DNS1: "1.1.1.1"
+    DNS2: "1.0.0.1"
+
+    adlists:
+    - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+    - https://mirror1.malwaredomains.com/files/justdomains
+    - http://sysctl.org/cameleon/hosts
+    - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+    - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
