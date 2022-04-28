@@ -20,15 +20,15 @@ spec:
 
     serviceWeb:
       type: LoadBalancer
+      loadBalancerIP: 192.168.0.101
       annotations:
-        metallb.universe.tf/loadBalancerIPs: 192.168.0.101
-        metallb.universe.tf/allow-shared-ip: pihole
+        purelb.io/allow-shared-ip: pihole
 
     serviceDns:
       type: LoadBalancer
+      loadBalancerIP: 192.168.0.101
       annotations:
-        metallb.universe.tf/loadBalancerIPs: 192.168.0.101
-        metallb.universe.tf/allow-shared-ip: pihole
+        purelb.io/allow-shared-ip: pihole
 
     virtualHost: pihole.local
     adminPassword: DroaTiNSenDu
