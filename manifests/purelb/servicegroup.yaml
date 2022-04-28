@@ -11,5 +11,5 @@ spec:
       subnet: 192.168.0.0/24
     v6pool:
       aggregation: default
-      pool: 2a02:8109:8400:60f4::/126
+      pool: 2a02:8109:8400:60f4:e905:e1db:0-2a02:8109:8400:60f4:e905:e1db:10
       subnet: 2a02:8109:8400:60f4::/64
