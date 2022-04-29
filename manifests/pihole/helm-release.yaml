@@ -26,14 +26,12 @@ spec:
     serviceWeb:
       type: LoadBalancer
       loadBalancerIP: 192.168.0.101
-      loadBalancerIPv6: fc00:371:156:0:8000::101
       annotations:
         purelb.io/allow-shared-ip: pihole
 
     serviceDns:
       type: LoadBalancer
       loadBalancerIP: 192.168.0.101
-      loadBalancerIPv6: fc00:371:156:0:8000::101
       annotations:
         purelb.io/allow-shared-ip: pihole
 

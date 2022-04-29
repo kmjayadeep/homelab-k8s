@@ -9,3 +9,7 @@ spec:
       aggregation: default
       pool: 192.168.0.100-192.168.0.120
       subnet: 192.168.0.0/24
+    v6pool:
+      aggregation: default
+      pool: 2a02:8109:8400:60f4::/116
+      subnet: 2a02:8109:8400:60f4::/64
