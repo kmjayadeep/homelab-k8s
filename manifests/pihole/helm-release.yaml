@@ -38,11 +38,10 @@ spec:
         metallb.universe.tf/allow-shared-ip: pihole
 
     virtualHost: pihole.local
-    adminPassword: DroaTiNSenDu
 
     # Use sealed secret later
     admin:
-      existingSecret: ""
+      existingSecret: "pihole-admin"
       passwordKey: "password"
 
     DNS1: "1.1.1.1"

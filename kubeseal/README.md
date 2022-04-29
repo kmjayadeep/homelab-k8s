@@ -12,8 +12,5 @@ kubeseal --fetch-cert \
 Encrypt secret with kubeseal:
 
 ```
-Encrypt the secret with kubeseal:
-
-kubeseal --format=yaml --cert=pub-sealed-secrets.pem \
-< basic-auth.yaml > basic-auth-sealed.yaml
+cat secret.yaml| kubeseal --format=yaml --cert ../../kubeseal/pub-sealed-secrets.pem > secret-sealed.yaml
 ```
