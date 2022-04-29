@@ -9,8 +9,4 @@ data:
       protocol: layer2
       addresses:
       - 192.168.0.100-192.168.0.120
-      - fddf::/64
-    - name: ipv6-global
-      protocol: layer2
-      addresses:
       - 2a02:8109:8400:60f4::/64
