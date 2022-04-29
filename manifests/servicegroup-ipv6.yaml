@@ -1,11 +1,11 @@
 apiVersion: purelb.io/v1
 kind: ServiceGroup
 metadata:
-  name: default
+  name: ipv6-global
   namespace: purelb
 spec:
   local:
-    v4pool:
+    v6pool:
       aggregation: default
-      pool: 192.168.0.100-192.168.0.120
-      subnet: 192.168.0.0/24
+      pool: 2a02:8109:8400:60f4::/116
+      subnet: 2a02:8109:8400:60f4::/64
