@@ -21,7 +21,10 @@ spec:
       enabled: true
 
     persistentVolumeClaim:
-      enabled: false
+      enabled: true
+      storageClass: local-path
+      size: 500Mi # Doesn't matter for local-path
+      annotations: {} # Populate later for velero backup
 
     serviceWeb:
       type: LoadBalancer
@@ -39,7 +42,6 @@ spec:
 
     virtualHost: pihole.local
 
-    # Use sealed secret later
     admin:
       existingSecret: "pihole-admin"
       passwordKey: "password"
