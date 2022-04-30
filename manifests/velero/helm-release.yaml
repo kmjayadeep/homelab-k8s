@@ -18,6 +18,15 @@ spec:
 
     configuration:
       provider: aws
+
+      backupStorageLocation:
+        name: wasabi
+        provider: aws
+        bucket: andromeda.pv.backup
+        config:
+          s3Url: s3.eu-central-2.wasabisys.com
+          region: eu-central-2
+
       volumeSnapshotLocation:
         name: wasabi
         provider: aws
