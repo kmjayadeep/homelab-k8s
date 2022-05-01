@@ -30,14 +30,14 @@ spec:
         provider: aws
         bucket: andromeda.etcd.backup
         config:
-          s3Url: s3.eu-central-2.wasabisys.com
+          s3Url: https://s3.eu-central-2.wasabisys.com
           region: eu-central-2
 
       volumeSnapshotLocation:
         name: default
         provider: aws
         config:
-          s3Url: s3.eu-central-2.wasabisys.com
+          s3Url: https://s3.eu-central-2.wasabisys.com
           region: eu-central-2
 
     initContainers:
