@@ -28,7 +28,7 @@ spec:
       backupStorageLocation:
         name: default
         provider: aws
-        bucket: andromeda.etcd.backup
+        bucket: andromeda.k8s.backup
         config:
           s3Url: https://s3.eu-central-2.wasabisys.com
           region: eu-central-2
