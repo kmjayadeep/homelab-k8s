@@ -7,7 +7,5 @@ resources:
 - ns.yaml
 - rclone-secret-sealed.yaml
 - wasabi-secret-sealed.yaml
-- github.com/vmware-tanzu/helm-charts/charts/velero/crds?ref=velero-2.29.4 # Install CRDs separately
 - helm-repo.yaml
 - helm-release.yaml
-- schedule-pihole.yaml
