@@ -62,4 +62,4 @@ spec:
 
     podAnnotations:
       # Enable velero backup
-      backup.velero.io/backup-volumes=config
+      backup.velero.io/backup-volumes: config
