@@ -59,3 +59,7 @@ spec:
       customDnsEntries:
       - address=/pihole.local/192.168.0.101
       - address=/andromeda.local/192.168.0.100
+
+    podAnnotations:
+      # Enable velero backup
+      backup.velero.io/backup-volumes=config
