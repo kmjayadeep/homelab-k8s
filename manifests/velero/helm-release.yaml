@@ -16,6 +16,12 @@ spec:
       interval: 1m
   values:
 
+    deployRestic: true
+
+    credentials:
+      useSecret: true
+      existingSecret: wasabi-creds # Deployed as a sealed secret
+
     configuration:
       provider: aws
 
