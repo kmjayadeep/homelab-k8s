@@ -1,0 +1,19 @@
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: backup-pihole
+  namespace: velero
+spec:
+  schedule: "0 0/6 * * *" # Every 6 hours
+  template:
+    includedNamespaces:
+    - 'pihole'
+    includedResources: # Just deployment and pod should be enough. It includes the PVC as well. Other resources are in git already
+    - 'deployments'
+    - 'pods'
+    snapshotVolumes: true
+    ttl: 24h0m0s # Automatically delete backup CR from the cluster. Original backup in the bucket is not deleted
+    defaultVolumesToRestic: false # only backup pods which have volume names annotated to be backed up
+    metadata:
+      labels:
+        project: pihole
