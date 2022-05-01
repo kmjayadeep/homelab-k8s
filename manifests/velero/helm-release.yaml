@@ -28,7 +28,7 @@ spec:
       backupStorageLocation:
         name: wasabi
         provider: aws
-        bucket: andromeda.pv.backup
+        bucket: andromeda.etcd.backup
         config:
           s3Url: s3.eu-central-2.wasabisys.com
           region: eu-central-2
