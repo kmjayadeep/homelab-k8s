@@ -22,9 +22,8 @@ spec:
 
     persistentVolumeClaim:
       enabled: true
-      storageClass: local-path
+      storageClass: local-storage
       size: 500Mi # Doesn't matter for local-path
-      annotations: {} # Populate later for velero backup
 
     serviceWeb:
       type: LoadBalancer
