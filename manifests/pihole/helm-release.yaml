@@ -22,7 +22,7 @@ spec:
 
     persistentVolumeClaim:
       enabled: true
-      storageClass: local-storage
+      storageClass: local-path
       size: 500Mi # Doesn't matter for local-path
 
     serviceWeb:
