@@ -398,7 +398,6 @@ spec:
     matchLabels:
       component: "server"
       app: prometheus
-      release: prometheus
   replicas: 1
   template:
     metadata:
