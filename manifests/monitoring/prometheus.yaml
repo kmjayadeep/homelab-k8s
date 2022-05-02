@@ -405,11 +405,8 @@ spec:
       labels:
         component: "server"
         app: prometheus
-        release: prometheus
-        chart: prometheus-15.0.1
-        heritage: Helm
-        
-        sidecar.istio.io/inject: "false"
+      annotations:
+        backup.velero.io/backup-volumes: storage-volume
     spec:
       enableServiceLinks: true
       serviceAccountName: prometheus
@@ -431,7 +428,7 @@ spec:
           image: "prom/prometheus:v2.31.1"
           imagePullPolicy: "IfNotPresent"
           args:
-            - --storage.tsdb.retention.time=15d
+            - --storage.tsdb.retention.size=5GB
             - --config.file=/etc/config/prometheus.yml
             - --storage.tsdb.path=/data
             - --web.console.libraries=/etc/prometheus/console_libraries
@@ -480,5 +477,5 @@ spec:
           configMap:
             name: prometheus
         - name: storage-volume
-          emptyDir:
-            {}
+          persistentVolumeClaim:
+            claimName: prometheus-data

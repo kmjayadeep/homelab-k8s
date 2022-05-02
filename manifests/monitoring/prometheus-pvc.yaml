@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-data
+  namespace: monitoring
+spec:
+  storageClassName: "local-path"
+  resources:
+    requests:
+      storage: 5Gi
