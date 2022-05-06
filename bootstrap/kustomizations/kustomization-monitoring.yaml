@@ -22,6 +22,6 @@ spec:
       name: grafana
       namespace: monitoring
     - apiVersion: apps/v1
-      kind: Daemonset
+      kind: DaemonSet
       name: node-exporter
       namespace: monitoring
