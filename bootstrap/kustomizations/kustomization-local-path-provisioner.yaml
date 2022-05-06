@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: local-path-provisioner
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: infra-apps/local-path-provisioner
+  prune: true
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: server
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: local-path-provisioner
+      namespace: local-path-storage
