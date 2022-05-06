@@ -15,5 +15,9 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: metallb
+      name: controller
+      namespace: metallb-system
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      name: speaker
       namespace: metallb-system
