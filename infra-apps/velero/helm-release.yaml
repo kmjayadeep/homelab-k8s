@@ -60,7 +60,7 @@ spec:
           - 'deployments'
           - 'pods'
           snapshotVolumes: true
-          ttl: 8760h # Automatically delete backup CR from the cluster after 10 years. Original backup in the bucket is ALSO deleted
+          ttl: 87600h # Automatically delete backup CR from the cluster after 10 years. Original backup in the bucket is ALSO deleted
           defaultVolumesToRestic: false # only backup pods which have volume names annotated to be backed up
           metadata:
             labels:
