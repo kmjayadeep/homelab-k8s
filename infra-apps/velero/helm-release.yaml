@@ -28,7 +28,7 @@ spec:
       backupStorageLocation:
         name: default
         provider: aws
-        bucket: andromeda.k8s.backup
+        bucket: andromeda-k8s-backup
         config:
           s3Url: https://s3.us-west-000.backblazeb2.com
           region: eu-central-2
