@@ -20,7 +20,7 @@ spec:
 
     credentials:
       useSecret: true
-      existingSecret: wasabi-creds # Deployed as a sealed secret
+      existingSecret: b2-creds # Deployed as a sealed secret
 
     configuration:
       provider: aws
@@ -30,14 +30,14 @@ spec:
         provider: aws
         bucket: andromeda.k8s.backup
         config:
-          s3Url: https://s3.eu-central-2.wasabisys.com
+          s3Url: https://s3.us-west-000.backblazeb2.com
           region: eu-central-2
 
       volumeSnapshotLocation:
         name: default
         provider: aws
         config:
-          s3Url: https://s3.eu-central-2.wasabisys.com
+          s3Url: https://s3.us-west-000.backblazeb2.com
           region: eu-central-2
 
     initContainers:
