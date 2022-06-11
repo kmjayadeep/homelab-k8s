@@ -15,6 +15,6 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: ingress-nginx-controller
+      name: ingress-nginx-public-controller
       namespace: ingress-nginx-public
 
