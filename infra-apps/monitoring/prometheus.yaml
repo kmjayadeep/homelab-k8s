@@ -377,7 +377,6 @@ spec:
   selector:
     component: "server"
     app: prometheus
-    release: prometheus
   sessionAffinity: None
   type: "ClusterIP"
 ---
