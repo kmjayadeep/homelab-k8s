@@ -17,6 +17,9 @@ spec:
   values:
     hostname: pihole
 
+    image:
+      tag: "2022.05"
+
     dualStack:
       enabled: true
 
