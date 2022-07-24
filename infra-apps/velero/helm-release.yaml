@@ -84,7 +84,7 @@ spec:
           metadata:
             labels:
               project: prometheus
-      backup-pihole:
+      backup-syncthing:
         disabled: false
         useOwnerReferencesInBackup: false
         schedule: "0 0/6 * * *" # Every 6 hours

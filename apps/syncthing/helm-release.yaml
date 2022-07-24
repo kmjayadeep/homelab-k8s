@@ -24,3 +24,7 @@ spec:
           paths:
             - path: /
               pathType: ImplementationSpecific
+
+    podAnnotations:
+      # Enable velero backup
+      backup.velero.io/backup-volumes: config,data
