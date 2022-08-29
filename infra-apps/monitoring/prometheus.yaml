@@ -47,7 +47,8 @@ data:
     - job_name: nuc
       static_configs:
       - targets:
-        - 192.168.0.50:9100
+        - 192.168.0.50:9100 ## Node exporter from nuc
+        - 192.168.0.50:18080 ## xTodo metrics from nuc
     - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       job_name: kubernetes-nodes
       kubernetes_sd_configs:
