@@ -5,7 +5,12 @@ metadata:
   namespace: monitoring
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: ca-issuer
 spec:
+  tls:
+  - hosts:
+    - prometheus.andromeda.local
+    secretName: prometheus-cert
   rules:
   - host: prometheus.andromeda.local
     http:
