@@ -94,11 +94,11 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: ca-issuer
 spec:
-  rules:
   tls:
   - hosts:
     - grafana.andromeda.local
     secretName: prometheus-cert
+  rules:
   - host: grafana.andromeda.local
     http:
       paths:
