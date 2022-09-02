@@ -97,7 +97,7 @@ spec:
   tls:
   - hosts:
     - grafana.andromeda.local
-    secretName: prometheus-cert
+    secretName: grafana-cert
   rules:
   - host: grafana.andromeda.local
     http:
