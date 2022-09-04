@@ -26,7 +26,17 @@ metadata:
   namespace: monitoring
 data:
   alerting_rules.yml: |
-    {}
+    groups:
+    - name: Todo
+      rules:
+      - alert: LowProductivityTooLong
+        expr: rate(xtodo_todos{status="done"}[5m]) == 0
+        for: 12h
+        annotations:
+          title: 'Low productivity for too long'
+          description: 'No tasks completed in the last 12h. Productivity too low'
+        labels:
+          severity: 'normal'
   alerts: |
     {}
   prometheus.yml: |
