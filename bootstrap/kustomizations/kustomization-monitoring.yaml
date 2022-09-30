@@ -19,6 +19,10 @@ spec:
       namespace: monitoring
     - apiVersion: apps/v1
       kind: Deployment
+      name: alertmanager
+      namespace: monitoring
+    - apiVersion: apps/v1
+      kind: Deployment
       name: grafana
       namespace: monitoring
     - apiVersion: apps/v1
