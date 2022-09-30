@@ -58,7 +58,7 @@ metadata:
 spec:
   selector: 
     app: alertmanager
-  type: CluserIP  
+  type: ClusterIP
   ports:
     - port: 9093
       targetPort: 9093
