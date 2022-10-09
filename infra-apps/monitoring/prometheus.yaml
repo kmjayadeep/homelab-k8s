@@ -27,10 +27,10 @@ metadata:
 data:
   alerting_rules.yml: |
     groups:
-    - name: Todo
+    - name: Taskwarrior
       rules:
       - alert: LowProductivityTooLong
-        expr: rate(xtodo_todos{status="done"}[5m]) == 0
+        expr: rate(taskwarrior_todos{status="done"}[5m]) == 0
         for: 12h
         annotations:
           title: 'Low productivity for too long'
@@ -58,7 +58,7 @@ data:
       static_configs:
       - targets:
         - 192.168.0.50:9100 ## Node exporter from nuc
-        - 192.168.0.50:18080 ## xTodo metrics from nuc
+        - 192.168.0.50:18080 ## taskwarrior metrics from nuc
     - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       job_name: kubernetes-nodes
       kubernetes_sd_configs:
