@@ -40,7 +40,7 @@ spec:
       volumes:
       - name: config-volume
         secret:
-          name: alertmanager-config
+          secretName: alertmanager-config
       - name: templates-volume
         configMap:
           name: alertmanager-templates
