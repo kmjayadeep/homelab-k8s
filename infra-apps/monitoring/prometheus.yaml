@@ -44,6 +44,11 @@ data:
       evaluation_interval: 1m
       scrape_interval: 15s
       scrape_timeout: 10s
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+           - alertmanager:9093
     rule_files:
     - /etc/config/recording_rules.yml
     - /etc/config/alerting_rules.yml
