@@ -36,7 +36,23 @@ data:
           title: 'Low productivity for too long'
           description: 'No tasks completed in the last 12h. Productivity too low'
         labels:
-          severity: 'normal'
+          severity: normal
+    - name: DiskHealth
+      rules:
+      - alert: NodeFilesystemAlmostOutOfSpace
+        annotations:
+          description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} mounted on {{ $labels.mountpoint }} has only
+            {{ printf "%.2f" $value }}% available space left.
+          summary: Filesystem has less than 10% space left.
+        expr: |
+          (
+            node_filesystem_avail_bytes{job="nuc",fstype="ext4"} / node_filesystem_size_bytes{job="nuc",fstype="ext4"} * 100 < 10
+          and
+            node_filesystem_readonly{job="nuc",fstype="ext4"} == 0
+          )
+        for: 30m
+        labels:
+          severity: warning
   alerts: |
     {}
   prometheus.yml: |
