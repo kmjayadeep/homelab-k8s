@@ -20,7 +20,7 @@ spec:
         args:
           - "--config.file=/etc/alertmanager/config.yml"
           - "--storage.path=/alertmanager"
-          - "--web.external-url=https://alertmanager.andromeda.local"
+          - "--web.external-url=https://alertmanager-andromeda.duckdns.org"
         ports:
         - name: alertmanager
           containerPort: 9093
