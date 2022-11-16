@@ -97,9 +97,20 @@ spec:
   tls:
   - hosts:
     - grafana.andromeda.local
+    - grafana-andromeda.duckdns.org
     secretName: grafana-cert
   rules:
   - host: grafana.andromeda.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+  - host: grafana-andromeda.duckdns.org
     http:
       paths:
       - path: /
