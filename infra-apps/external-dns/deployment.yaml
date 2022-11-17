@@ -75,5 +75,6 @@ spec:
         - --provider=pihole
         # Change this to the actual address of your Pi-hole web server
         - --pihole-server=http://pihole-web.pihole.svc.cluster.local
+        - --domain-filter=andromeda.local
       securityContext:
         fsGroup: 65534 # For ExternalDNS to be able to read Kubernetes token files
