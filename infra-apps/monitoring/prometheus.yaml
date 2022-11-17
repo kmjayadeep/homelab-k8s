@@ -38,7 +38,7 @@ data:
         labels:
           severity: normal
       - alert: TooMayTasksInInbox
-        expr: taskwarrior_todos{folder="in",status="pending"}) > 10
+        expr: taskwarrior_todos{folder="in",status="pending"} > 10
         for: 6h
         annotations:
           title: 'Too many tasks in inbox'
