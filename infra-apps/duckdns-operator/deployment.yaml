@@ -16,7 +16,7 @@ spec:
       serviceAccountName: duckdns-operator
       containers:
       - name: duckdns-operator
-        image: kmjayadeep/duckdns-operator:latest
+        image: kmjayadeep/duckdns-operator:0.1
         env:
         - name: DOMAINS
           valueFrom:
