@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duckdns-operator
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: duckdns-operator
+  template:
+    metadata:
+      labels:
+        app: duckdns-operator
+    spec:
+      serviceAccountName: duckdns-operator
+      containers:
+      - name: duckdns-operator
+        image: kmjayadeep/duckdns-operator:latest
+        env:
+        - name: DOMAINS
+          valueFrom:
+            secretKeyRef:
+              name: duckdns
+              key: DOMAINS
+        - name: DUCKDNS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: duckdns
+              key: DUCKDNS_TOKEN
