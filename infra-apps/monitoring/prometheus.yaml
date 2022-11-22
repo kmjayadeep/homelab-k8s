@@ -30,15 +30,15 @@ data:
     - name: Taskwarrior
       rules:
       - alert: LowProductivityTooLong
-        expr: rate(taskwarrior_todos{status="completed"}[5m]) == 0
+        expr: sum(rate(taskwarrior_todos{status="completed"}[5m])) == 0
         for: 12h
         annotations:
           title: 'Low productivity for too long'
           description: 'No tasks completed in the last 12h. Productivity too low'
         labels:
-          severity: normal
+          severity: warning
       - alert: TooMayTasksInInbox
-        expr: taskwarrior_todos{folder="in",status="pending"} > 10
+        expr: taskwarrior_todos{folder="in",status="pending"} > 5
         for: 6h
         annotations:
           title: 'Too many tasks in inbox'
