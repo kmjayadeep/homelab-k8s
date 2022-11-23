@@ -22,19 +22,3 @@ spec:
         name: public
         controllerValue: "k8s.io/ingress-nginx-public"
       ingressClass: public
-      extraContainers:
-      - name: wireguard
-        image: dpok/wg-quick:latest
-        volumeMounts:
-        - name: wg-conf
-          mountPath: /etc/wireguard
-        securityContext:
-          sysctls:
-          - name: net.ipv4.conf.all.src_valid_mark
-            value: "1"
-          capabilities:
-            add: ["NET_ADMIN"]
-      extraVolumes:
-        - name: wg-conf
-          secret:
-            secretName: wireguard-config
