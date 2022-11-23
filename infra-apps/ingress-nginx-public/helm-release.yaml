@@ -28,6 +28,9 @@ spec:
         volumeMounts:
         - name: wg-conf
           mountPath: /etc/wireguard
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
       extraVolumes:
         - name: wg-conf
           secret:
