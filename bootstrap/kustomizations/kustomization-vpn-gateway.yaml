@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: apps/vpn-gateway
+  path: infra-apps/vpn-gateway
   prune: true
   timeout: 2m
   sourceRef:
