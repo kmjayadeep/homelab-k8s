@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard-gateway
+  namespace: vpn-gateway
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wireguard-gateway
+  template:
+    metadata:
+      labels:
+        app: wireguard-gateway
+    spec:
+      volumes:
+        - name: wireguard-config
+          secret:
+            secretName: wireguard-config
+            optional: false
+      containers:
+      - name: wireguard
+        # Requires sysctl net.ipv4.conf.all.src_valid_mark=1 to be run on the host
+        image: dpok/wg-quick:latgest
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        volumeMounts:
+        - name: wireguard-config
+          mountpath: /etc/wireguard
+          readOnly: true
