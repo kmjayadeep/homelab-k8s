@@ -22,7 +22,7 @@ spec:
       containers:
       - name: wireguard
         # Requires sysctl net.ipv4.conf.all.src_valid_mark=1 to be run on the host
-        image: dpok/wg-quick:latgest
+        image: dpok/wg-quick:latest
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
