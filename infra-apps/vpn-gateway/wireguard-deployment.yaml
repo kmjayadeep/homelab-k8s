@@ -28,5 +28,5 @@ spec:
             add: ["NET_ADMIN"]
         volumeMounts:
         - name: wireguard-config
-          mountpath: /etc/wireguard
+          mountPath: /etc/wireguard
           readOnly: true
