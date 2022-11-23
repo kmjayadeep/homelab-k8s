@@ -25,3 +25,13 @@ spec:
       ipFamilyPolicy: "RequireDualStack"
       hostPort:
         enabled: true
+      extraContainers:
+      - name: wireguard
+        image: dpok/wg-quick:latest
+        volumeMounts:
+        - name: wg-conf
+          mountPath: /etc/wireguard
+      extraVolumes:
+        - name: wg-conf
+          secret:
+            secretName: wireguard-config
