@@ -22,9 +22,6 @@ spec:
         name: public
         controllerValue: "k8s.io/ingress-nginx-public"
       ingressClass: public
-      ipFamilyPolicy: "RequireDualStack"
-      hostPort:
-        enabled: true
       extraContainers:
       - name: wireguard
         image: dpok/wg-quick:latest
