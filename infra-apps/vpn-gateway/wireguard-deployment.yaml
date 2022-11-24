@@ -30,6 +30,9 @@ spec:
       - name: netshoot
         image: nicolaka/netshoot:latest
         command: ["/bin/sleep", "3650d"]
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
       - name: wireguard
         # Requires sysctl net.ipv4.conf.all.src_valid_mark=1 to be run on the host
         image: dpok/wg-quick:latest
