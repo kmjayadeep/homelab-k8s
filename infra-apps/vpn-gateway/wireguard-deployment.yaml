@@ -20,13 +20,6 @@ spec:
             secretName: wireguard-config
             optional: false
       containers:
-      - image: tecnativa/tcp-proxy:v1.0.1
-        name: tcp-proxy
-        env:
-          - name: LISTEN
-            value: ":80" # The listen address that it will be exposed to.
-          - name: TALK
-            value: "192.168.0.102:443"
       - name: netshoot
         image: nicolaka/netshoot:latest
         command: ["/bin/sleep", "3650d"]
