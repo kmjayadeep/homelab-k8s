@@ -20,6 +20,12 @@ spec:
             secretName: wireguard-config
             optional: false
       containers:
+      - image: tecnativa/tcp-proxy:v1.0.1
+        env:
+          - name: LISTEN
+            value: ":80" # The listen address that it will be exposed to.
+          - name: TALK
+            value: "ingress-nginx-public-controller.ingress-nginx-public.svc.cluster.local:443"
       - name: wireguard
         # Requires sysctl net.ipv4.conf.all.src_valid_mark=1 to be run on the host
         image: dpok/wg-quick:latest
