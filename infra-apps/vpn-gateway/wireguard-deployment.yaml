@@ -21,6 +21,7 @@ spec:
             optional: false
       containers:
       - image: tecnativa/tcp-proxy:v1.0.1
+        name: tcp-proxy
         env:
           - name: LISTEN
             value: ":80" # The listen address that it will be exposed to.
