@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wireguard-gateway
+  name: openvpn-gateway
   namespace: vpn-gateway
 spec:
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: wireguard-gateway
+      app: openvpn-gateway
   template:
     metadata:
       labels:
-        app: wireguard-gateway
+        app: openvpn-gateway
     spec:
       volumes:
-        - name: wireguard-config
+        - name: openvpn-config
           secret:
-            secretName: wireguard-config
+            secretName: openvpn-config
             optional: false
       containers:
       - name: netshoot
@@ -27,13 +27,12 @@ spec:
           privileged: true
           capabilities:
             add: ["NET_ADMIN"]
-      - name: wireguard
-        # Requires sysctl net.ipv4.conf.all.src_valid_mark=1 to be run on the host
-        image: dpok/wg-quick:latest
+      - name: openvpn
+        image: dceschmidt/openvpn-client:latest
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:
-        - name: wireguard-config
-          mountPath: /etc/wireguard
+        - name: openvpn-config
+          mountPath: /vpn
           readOnly: true

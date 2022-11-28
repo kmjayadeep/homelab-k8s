@@ -15,5 +15,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: wireguard-gateway
+      name: openvpn-gateway
       namespace: vpn-gateway
