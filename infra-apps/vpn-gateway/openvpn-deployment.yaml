@@ -28,7 +28,7 @@ spec:
           capabilities:
             add: ["NET_ADMIN"]
       - name: openvpn
-        image: dceschmidt/openvpn-client:latest
+        image: dperson/openvpn-client:latest
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
