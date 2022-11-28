@@ -29,6 +29,8 @@ spec:
             add: ["NET_ADMIN"]
       - name: openvpn
         image: dperson/openvpn-client:latest
+        # allow route to kubernetes service ip
+        args: ["-r", "10.90.0.0/16"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
