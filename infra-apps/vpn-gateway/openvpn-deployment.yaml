@@ -27,6 +27,13 @@ spec:
           privileged: true
           capabilities:
             add: ["NET_ADMIN"]
+      - image: tecnativa/tcp-proxy:v1.0.1
+        name: tcp-proxy
+        env:
+          - name: LISTEN
+            value: ":443" # The listen address that it will be exposed to.
+          - name: TALK
+            value: "192.168.0.102:443"
       - name: openvpn
         image: dperson/openvpn-client:latest
         # allow route to kubernetes service ip and local network
