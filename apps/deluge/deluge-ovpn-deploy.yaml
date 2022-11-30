@@ -31,4 +31,7 @@ spec:
         volumeMounts:
         - name: openvpn-config
           mountPath: /etc/openvpn/custom
-          readOnly: true
+          subPath: default.ovpn
+        - name: openvpn-creds
+          mountPath: /config
+          subPath: openvpn-credentials.txt
