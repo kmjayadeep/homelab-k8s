@@ -30,8 +30,13 @@ spec:
             add: ["NET_ADMIN"]
         volumeMounts:
         - name: openvpn-config
-          mountPath: /etc/openvpn/custom
-          subPath: default.ovpn
-        - name: openvpn-config
-          mountPath: /config
-          subPath: openvpn-credentials.txt
+          mountPath: /vpn
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - cp /vpn/default.vpn /etc/openvpn/custom
+                - "&&"
+                - cp /vpn/openvpn-credentials.txt /config
