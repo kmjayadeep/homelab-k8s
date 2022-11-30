@@ -19,6 +19,22 @@ spec:
           secret:
             secretName: openvpn-config
             optional: false
+        - name: openvpn-rw
+          emptyDir: {}
+      initContainers:
+      - name: copy-vpn-config
+        image: busybox
+        volumeMounts:
+        - name: openvpn-config
+          mountPath: /vpn
+        - name: openvpn-rw
+          mountPath: /vpn-rw
+        command:
+        - /bin/sh
+        - -c
+        - >
+          cp /vpn/default.vpn /vpn-rw
+          cp /vpn/openvpn-credentials.txt /vpn-rw
       containers:
       - name: deluge-openvpn
         image: ebrianne/docker-deluge-openvpn:latest
@@ -31,18 +47,7 @@ spec:
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:
-        - name: openvpn-config
-          mountPath: /vpn
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - >
-                  mkdir -p /config;
-                  mkdir -p /etc/openvpn/custom
-                  cp /vpn/default.vpn /etc/openvpn/custom;
-                  cp /vpn/openvpn-credentials.txt /config;
-                  ls /etc/openvpn;
-                  ls /config;
+        - name: openvpn-rw
+          mountPath: /etc/openvpn/custom
+        - name: openvpn-rw
+          mountPath: /config
