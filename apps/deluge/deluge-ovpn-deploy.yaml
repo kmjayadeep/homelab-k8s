@@ -22,10 +22,13 @@ spec:
       containers:
       - name: deluge-openvpn
         image: ebrianne/docker-deluge-openvpn:latest
+        env:
+        - name: OPENVPN_PROVIDER
+          value: custom
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:
         - name: openvpn-config
-          mountPath: /config
+          mountPath: /etc/openvpn/custom
           readOnly: true
