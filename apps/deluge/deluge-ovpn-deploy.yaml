@@ -32,6 +32,6 @@ spec:
         - name: openvpn-config
           mountPath: /etc/openvpn/custom
           subPath: default.ovpn
-        - name: openvpn-creds
+        - name: openvpn-config
           mountPath: /config
           subPath: openvpn-credentials.txt
