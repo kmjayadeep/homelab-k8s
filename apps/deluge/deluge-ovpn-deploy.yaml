@@ -40,7 +40,9 @@ spec:
                 - /bin/sh
                 - -c
                 - >
-                  cp /vpn/default.vpn /etc/openvpn/custom
-                  cp /vpn/openvpn-credentials.txt /config
-                  ls /etc/openvpn
-                  ls /config
+                  mkdir -p /config;
+                  mkdir -p /etc/openvpn/custom
+                  cp /vpn/default.vpn /etc/openvpn/custom;
+                  cp /vpn/openvpn-credentials.txt /config;
+                  ls /etc/openvpn;
+                  ls /config;
