@@ -25,6 +25,8 @@ spec:
         env:
         - name: OPENVPN_PROVIDER
           value: custom
+        - name: VPN_CONFIG_SOURCE
+          value: internal
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
