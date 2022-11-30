@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deluge-openvpn
+  namespace: deluge
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: deluge-openvpn
+  template:
+    metadata:
+      labels:
+        app: deluge-openvpn
+    spec:
+      volumes:
+        - name: openvpn-config
+          secret:
+            secretName: openvpn-config
+            optional: false
+      containers:
+      - name: deluge-openvpn
+        image: ebrianne/docker-deluge-openvpn:latest
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        volumeMounts:
+        - name: openvpn-config
+          mountPath: /config
+          readOnly: true
