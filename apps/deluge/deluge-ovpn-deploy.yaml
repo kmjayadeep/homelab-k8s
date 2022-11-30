@@ -39,6 +39,8 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - cp /vpn/default.vpn /etc/openvpn/custom
-                - "&&"
-                - cp /vpn/openvpn-credentials.txt /config
+                - >
+                  cp /vpn/default.vpn /etc/openvpn/custom
+                  cp /vpn/openvpn-credentials.txt /config
+                  ls /etc/openvpn
+                  ls /config
