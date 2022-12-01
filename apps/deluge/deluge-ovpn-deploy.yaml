@@ -19,6 +19,21 @@ spec:
           secret:
             secretName: openvpn-config
             optional: false
+        - name: openvpn-rw
+          emptyDir: {}
+      initContainers:
+      - name: copy-vpn-config
+        image: busybox
+        volumeMounts:
+        - name: openvpn-config
+          mountPath: /vpn
+        - name: openvpn-rw
+          mountPath: /vpn-rw
+        command:
+        - /bin/sh
+        - -c
+        - >
+          cp /vpn/ /vpn-rw -r
       containers:
       - name: deluge-openvpn
         image: binhex/arch-delugevpn:2.1.1-1-02
@@ -33,5 +48,5 @@ spec:
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:
-        - name: openvpn-config
+        - name: openvpn-rw
           mountPath: /config/openvpn
