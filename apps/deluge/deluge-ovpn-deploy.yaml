@@ -19,35 +19,19 @@ spec:
           secret:
             secretName: openvpn-config
             optional: false
-        - name: openvpn-rw
-          emptyDir: {}
-      initContainers:
-      - name: copy-vpn-config
-        image: busybox
-        volumeMounts:
-        - name: openvpn-config
-          mountPath: /vpn
-        - name: openvpn-rw
-          mountPath: /vpn-rw
-        command:
-        - /bin/sh
-        - -c
-        - >
-          cp /vpn/default.vpn /vpn-rw
-          cp /vpn/openvpn-credentials.txt /vpn-rw
       containers:
       - name: deluge-openvpn
-        image: ebrianne/docker-deluge-openvpn:latest
+        image: binhex/arch-delugevpn:2.1.1-1-02
         env:
-        - name: OPENVPN_PROVIDER
+        - name: VPN_CLIENT
+          value: openvpn
+        - name: VPN_ENABLED
+          value: yes
+        - name: VPN_PROV
           value: custom
-        - name: VPN_CONFIG_SOURCE
-          value: internal
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:
-        - name: openvpn-rw
-          mountPath: /etc/openvpn/custom
-        - name: openvpn-rw
-          mountPath: /config
+        - name: openvpn-config
+          mountPath: /config/openvpn
