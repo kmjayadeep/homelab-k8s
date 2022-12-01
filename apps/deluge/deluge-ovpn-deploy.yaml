@@ -21,6 +21,9 @@ spec:
             optional: false
         - name: openvpn-rw
           emptyDir: {}
+        - name: deluge-data
+          persistentVolumeClaim:
+            claimName: deluge-data
       initContainers:
       - name: copy-vpn-config
         image: busybox
@@ -53,3 +56,5 @@ spec:
         volumeMounts:
         - name: openvpn-rw
           mountPath: /config/openvpn
+        - name: deluge-data
+          mountPath: /data
