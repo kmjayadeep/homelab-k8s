@@ -18,12 +18,6 @@ spec:
             secretName: openvpn-config
             optional: false
       containers:
-      - name: netshoot
-        image: nicolaka/netshoot:latest
-        command: ["/bin/sleep", "3650d"]
-        securityContext:
-          capabilities:
-            add: ["NET_ADMIN"]
       - image: tecnativa/tcp-proxy:v1.0.1
         name: tcp-proxy
         env:
