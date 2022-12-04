@@ -4,8 +4,6 @@ metadata:
   name: openvpn-gateway
   namespace: vpn-gateway
 spec:
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: openvpn-gateway
