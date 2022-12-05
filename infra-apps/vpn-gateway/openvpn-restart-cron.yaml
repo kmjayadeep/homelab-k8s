@@ -1,0 +1,58 @@
+# Restart the vpn container Everyday
+# So if something happens to vpn, i won't be locked out with no access
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: restart-deploy
+  namespace: vpn-gateway
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: restart-deploy
+  namespace: vpn-gateway
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "patch", "list", "watch", "delete"] 
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: restart-deploy
+  namespace: vpn-gateway
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: restart-deploy
+subjects:
+  - kind: ServiceAccount
+    name: restart-deploy
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: restart-deploy
+  namespace: vpn-gateway
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "0 0 * * *" # Everyday midnight
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          serviceAccountName: restart-deploy
+          restartPolicy: Never
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl
+              command:
+                - 'kubectl'
+                - 'rollout'
+                - 'restart'
+                - 'deploy'
+                - 'openvpn-gateway'
