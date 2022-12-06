@@ -31,13 +31,15 @@ subjects:
   - kind: ServiceAccount
     name: restart-deploy
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: restart-deploy
   namespace: vpn-gateway
 spec:
   concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   schedule: "0 0 * * *" # Everyday midnight
   jobTemplate:
     spec:
