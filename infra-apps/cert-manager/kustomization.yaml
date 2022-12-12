@@ -6,4 +6,3 @@ namespace: cert-manager
 resources:
   - ca-secret-sealed.yaml
   - helm-release.yaml
-  - cluster-issuer.yaml
