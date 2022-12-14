@@ -16,8 +16,8 @@ spec:
       - op: replace
         path: /spec/addresses
         value:
-        - 116.203.51.197
-        - 2a01:4f8:1c1e:9a76::/64
+        - 116.203.51.197/32
+        - 2a01:4f8:1c0c:a01d::1/128
     target:
       kind: IPAddressPool
       name: main-pool
