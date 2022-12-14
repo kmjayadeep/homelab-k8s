@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: apps/pihole
+  path: clusters/common/apps/pihole
   prune: true
   timeout: 2m
   sourceRef:

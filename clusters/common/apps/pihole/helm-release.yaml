@@ -27,15 +27,15 @@ spec:
 
     serviceWeb:
       type: LoadBalancer
-      loadBalancerIP: 192.168.0.101
-      loadBalancerIPv6: 2a02:8109:8400:60f4::101
+      loadBalancerIP:   # Override in env specific configs
+      loadBalancerIPv6: # Override in env specific configs
       annotations:
         metallb.universe.tf/allow-shared-ip: pihole
 
     serviceDns:
       type: LoadBalancer
-      loadBalancerIP: 192.168.0.101
-      loadBalancerIPv6: 2a02:8109:8400:60f4::101
+      loadBalancerIP:   # Override in env specific configs
+      loadBalancerIPv6: # Override in env specific configs
       annotations:
         metallb.universe.tf/allow-shared-ip: pihole
 
