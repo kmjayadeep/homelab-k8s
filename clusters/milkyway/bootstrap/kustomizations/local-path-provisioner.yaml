@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: infra-apps/local-path-provisioner
+  path: clusters/common/infra-apps/local-path-provisioner
   prune: true
   timeout: 2m
   sourceRef:
