@@ -20,3 +20,13 @@ spec:
       kind: DaemonSet
       name: restic
       namespace: velero
+  patches:
+  - patch: |
+      op: 'add'
+      path: spec/values/configuration
+      value:
+        restoreOnlyMode: true
+    target:
+      kind: HelmRelease
+      name: velero
+      namespace: velero
