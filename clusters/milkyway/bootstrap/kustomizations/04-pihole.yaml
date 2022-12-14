@@ -26,5 +26,5 @@ spec:
         - address=/milkyway.local/116.203.51.197
     target:
       kind: HelmRelease
-      name: velero
-      namespace: velero
+      name: pihole
+      namespace: pihole
