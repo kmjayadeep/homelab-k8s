@@ -22,10 +22,9 @@ spec:
       namespace: velero
   patches:
   - patch: |
-      - op: 'add'
-        path: spec/values/configuration
-        value:
-          restoreOnlyMode: true
+      - op: 'replace'
+        path: /spec/values/configuration/restoreOnlyMode
+        value: true
     target:
       kind: HelmRelease
       name: velero
