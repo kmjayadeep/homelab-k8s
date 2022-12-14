@@ -17,4 +17,15 @@ spec:
       kind: Deployment
       name: ingress-nginx-controller
       namespace: ingress-nginx
-
+  patches:
+  - patch: |
+      # We only have ipv6 external IPs available in hetzner
+      - op: 'replace'
+        path: /spec/values/controller/service
+        value:
+          ipFamilies:
+          - IPv6
+    target:
+      kind: HelmRelease
+      name: ingress-nginx
+      namespace: ingress-nginx
