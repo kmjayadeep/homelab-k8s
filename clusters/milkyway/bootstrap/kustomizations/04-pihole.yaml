@@ -17,3 +17,14 @@ spec:
       kind: Deployment
       name: pihole
       namespace: pihole
+  patches:
+  - patch: |
+      - op: 'replace'
+        path: /spec/values/dnsmasq/customDnsEntries
+        value:
+        - address=/pihole.local/116.203.51.197
+        - address=/milkyway.local/116.203.51.197
+    target:
+      kind: HelmRelease
+      name: velero
+      namespace: velero
