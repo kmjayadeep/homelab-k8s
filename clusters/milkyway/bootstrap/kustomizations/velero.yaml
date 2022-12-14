@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: infra-apps/velero
+  path: clusters/common/infra-apps/velero
   prune: true
   timeout: 2m
   sourceRef:
