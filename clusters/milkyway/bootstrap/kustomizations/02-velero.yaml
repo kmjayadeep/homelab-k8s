@@ -23,10 +23,13 @@ spec:
       name: restic
       namespace: velero
   patches:
-  - patch: |
-      - op: 'replace'
-        path: /spec/values/configuration/restoreOnlyMode
-        value: true
+  - patch: |-
+      spec:
+        values:
+          configuration:
+            backupStorageLocation:
+              bucket: milkyway-k8s-backup
+
     target:
       kind: HelmRelease
       name: velero
