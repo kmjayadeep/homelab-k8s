@@ -8,6 +8,8 @@ spec:
   path: clusters/bases/infra-apps/metrics-server
   prune: true
   timeout: 2m
+  dependsOn:
+    - name: calico # Need cni first
   sourceRef:
     kind: GitRepository
     name: flux-system
