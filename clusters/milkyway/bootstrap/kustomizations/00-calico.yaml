@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: clusters/common/infra-apps/calico
+  path: clusters/bases/infra-apps/calico
   prune: true
   timeout: 2m
   sourceRef:
