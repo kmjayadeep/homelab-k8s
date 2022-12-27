@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: clusters/common/infra-apps/cert-manager
+  path: clusters/milkyway/infra/cert-manager
   prune: true
   timeout: 2m
   sourceRef:
@@ -29,7 +29,7 @@ spec:
   dependsOn:
     - name: cert-manager
   interval: 15m
-  path: clusters/common/infra-apps/cert-manager-clusterissuer
+  path: clusters/bases/infra-apps/cert-manager-clusterissuer
   prune: true
   timeout: 2m
   sourceRef:
