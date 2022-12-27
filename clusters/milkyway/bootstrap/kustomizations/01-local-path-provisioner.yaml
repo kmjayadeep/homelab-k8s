@@ -8,6 +8,8 @@ spec:
   path: clusters/common/infra-apps/local-path-provisioner
   prune: true
   timeout: 2m
+  dependsOn:
+    - name: calico # Need cni first
   sourceRef:
     kind: GitRepository
     name: flux-system

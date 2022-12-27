@@ -5,23 +5,14 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: clusters/common/infra-apps/metallb
+  path: clusters/milkyway/infra/metallb
   prune: true
   timeout: 2m
+  dependsOn:
+    - name: calico # Need cni first
   sourceRef:
     kind: GitRepository
     name: flux-system
-  patches:
-  - patch: |
-      - op: replace
-        path: /spec/addresses
-        value:
-        - 116.203.51.197/32
-        - 2a01:4f8:1c0c:a01d::/64
-    target:
-      kind: IPAddressPool
-      name: main-pool
-      namespace: metallb-system
   validation: server
   healthChecks:
     - apiVersion: apps/v1
