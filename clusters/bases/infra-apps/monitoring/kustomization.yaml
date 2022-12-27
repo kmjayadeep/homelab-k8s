@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: monitoring
+
+resources:
+  - ./alertmanager-ingress.yaml
+  - ./alertmanager-template.yaml
+  - ./alertmanager.yaml
+  - ./grafana.yaml
+  - ./node-exporter.yaml
+  - ./prometheus-ingress.yaml
+  - ./prometheus-pvc.yaml
+  - ./prometheus.yaml

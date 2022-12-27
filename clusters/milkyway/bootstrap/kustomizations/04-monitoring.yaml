@@ -5,9 +5,11 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: clusters/common/infra-apps/monitoring
+  path: clusters/bases/infra-apps/monitoring
   prune: true
   timeout: 2m
+  dependsOn:
+    - name: sealed-secrets # need dashboards and alertmanager unsealed
   sourceRef:
     kind: GitRepository
     name: flux-system
