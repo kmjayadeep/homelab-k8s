@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: clusters/bases/infra-apps/monitoring
+  path: clusters/milkyway/infra/monitoring
   prune: true
   timeout: 2m
   dependsOn:
