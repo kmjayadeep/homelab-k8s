@@ -22,30 +22,13 @@ spec:
       useSecret: true
       existingSecret: b2-creds # Deployed as a sealed secret
 
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
-
-    restic:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits:
-          cpu: 500m
-          memory: 512Mi
-
     configuration:
       provider: aws
 
       backupStorageLocation:
         name: default
         provider: aws
-        bucket: andromeda-k8s-backup
+        bucket: "" # Override in env specific config
         config:
           s3Url: https://s3.us-west-000.backblazeb2.com
           region: eu-central-2
