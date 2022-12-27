@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  values:
+    serviceWeb:
+      loadBalancerIP: 116.203.51.197
+      loadBalancerIPv6: 2a01:4f8:1c0c:a01d::1
+
+    serviceDns:
+      loadBalancerIP: 116.203.51.197
+      loadBalancerIPv6: 2a01:4f8:1c0c:a01d::1
+
+    dnsmasq:
+      customDnsEntries:
+      - address=/pihole.local/116.203.51.197
+      - address=/andromeda.local/116.203.51.197

@@ -5,9 +5,11 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: clusters/common/apps/pihole
+  path: clusters/milkyway/apps/pihole
   prune: true
   timeout: 2m
+  dependsOn:
+    - name: sealed-secrets # need pihole creds unsealed
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -15,16 +17,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: pihole
-      namespace: pihole
-  patches:
-  - patch: |
-      - op: 'replace'
-        path: /spec/values/dnsmasq/customDnsEntries
-        value:
-        - address=/pihole.local/116.203.51.197
-        - address=/milkyway.local/116.203.51.197
-    target:
-      kind: HelmRelease
       name: pihole
       namespace: pihole
