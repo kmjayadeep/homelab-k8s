@@ -4,11 +4,9 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
-  - ./alertmanager-ingress.yaml
   - ./alertmanager-template.yaml
   - ./alertmanager.yaml
   - ./grafana.yaml
   - ./node-exporter.yaml
-  - ./prometheus-ingress.yaml
   - ./prometheus-pvc.yaml
   - ./prometheus.yaml
