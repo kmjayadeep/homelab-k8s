@@ -17,7 +17,8 @@ spec:
   values:
     controller:
       service:
-        loadBalancerIP:  # Set in env specific patches
+        # Don't expose directly, expose through vpn
+        type: ClusterIP
       ingressClassResource:
         name: public
         controllerValue: "k8s.io/ingress-nginx-public"
