@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: infra-apps/duckdns
+  path: clusters/milkyway/infra/duckdns
   prune: true
   timeout: 2m
   sourceRef:
