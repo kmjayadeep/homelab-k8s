@@ -4,8 +4,9 @@ metadata:
   name: deluge
   namespace: flux-system
 spec:
+  suspend: true # Disable for now until nginx is fixed
   interval: 15m
-  path: apps/deluge
+  path: clusters/bases/apps/deluge
   prune: true
   timeout: 2m
   sourceRef:
