@@ -4,3 +4,6 @@ resources:
   - ../../../bases/infra-apps/monitoring
   - ./alertmanager-secret-sealed.yaml
   - ./grafana-dashboards.yaml
+  - ./alertmanager-ingress.yaml
+  - ./grafana-ingress.yaml
+  - ./prometheus-ingress.yaml

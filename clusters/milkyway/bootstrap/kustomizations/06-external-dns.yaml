@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
-  path: infra-apps/external-dns
+  path: clusters/bases/infra-apps/external-dns
   prune: true
   timeout: 2m
   sourceRef:
