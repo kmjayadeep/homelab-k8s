@@ -11,6 +11,6 @@ resources:
 - ./ns-monitoring.yaml
 - ./ns-metallb-system.yaml
 - ./ns-pihole.yaml
-- ./ns-syncthing.yaml
+- ./ns-psuite.yaml
 - ./ns-velero.yaml
 - ./ns-vpn-gateway.yaml
