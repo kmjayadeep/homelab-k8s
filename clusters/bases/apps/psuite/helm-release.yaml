@@ -1,0 +1,35 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: psuite
+  namespace: psuite
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: syncthing
+      version: '0.1.0'
+      sourceRef:
+        kind: HelmRepository
+        name: syncthing
+        namespace: flux-system
+      interval: 1m
+  values:
+    storageClassName: local-path
+
+    hostname: psuite-milkyway
+
+    ingress:
+      enabled: true
+      hosts:
+      - host: syncthing.andromeda.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+      - host: syncthing-andromeda.duckdns.org
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    podAnnotations: {}
+      # Enable velero backup later
+      # backup.velero.io/backup-volumes: config,data
