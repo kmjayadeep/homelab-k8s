@@ -4,7 +4,6 @@ metadata:
   name: psuite
   namespace: flux-system
 spec:
-  suspend: true # Disable for now until nginx is fixed
   interval: 15m
   path: clusters/milkyway/apps/psuite
   prune: true
