@@ -6,7 +6,7 @@ metadata:
 spec:
   suspend: true # Disable for now until nginx is fixed
   interval: 15m
-  path: clusters/bases/apps/psuite
+  path: clusters/milkyway/apps/psuite
   prune: true
   timeout: 2m
   sourceRef:
@@ -16,5 +16,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: syncthing
+      name: psuite
       namespace: psuite
