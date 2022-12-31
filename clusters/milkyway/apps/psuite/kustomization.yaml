@@ -3,3 +3,6 @@ kind: Kustomization
 resources:
   - ../../../bases/apps/psuite
   - ./restic-secret-sealed.yaml
+
+patchesStrategicMerge:
+  - service.yaml
