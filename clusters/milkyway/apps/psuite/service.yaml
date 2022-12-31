@@ -6,5 +6,7 @@ metadata:
   annotations:
     metallb.universe.tf/allow-shared-ip: pihole
 spec:
+  ipFamilyPolicy: RequireDualStack
   ipFamilies:
-  - DualStack
+  - IPv4
+  - IPv6
