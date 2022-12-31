@@ -3,10 +3,6 @@ kind: Service
 metadata:
   name: psuite
   namespace: psuite
-  annotations:
-    metallb.universe.tf/allow-shared-ip: pihole
 spec:
-  ipFamilyPolicy: RequireDualStack
   ipFamilies:
-  - IPv4
   - IPv6
