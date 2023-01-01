@@ -5,4 +5,4 @@ metadata:
   namespace: psuite
 spec:
   ipFamilies:
-  - IPV6
+  - IPv6
