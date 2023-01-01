@@ -5,4 +5,4 @@ resources:
   - ./restic-secret-sealed.yaml
 
 patchesStrategicMerge:
-  - service.yaml
+  - ./service-discovery.yaml
