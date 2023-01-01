@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: psuite-sync-tcp
+  name: psuite
   namespace: psuite
 spec:
-  ipFamilies:
-  - IPV6
+  type: ClusterIP
