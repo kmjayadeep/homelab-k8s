@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: psuite-sync-udp
+  namespace: psuite
+  annotations:
+    metallb.universe.tf/allow-shared-ip: pihole
+spec:
+  loadBalancerIP: 116.203.51.197

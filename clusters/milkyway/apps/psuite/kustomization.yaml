@@ -5,4 +5,5 @@ resources:
   - ./restic-secret-sealed.yaml
 
 patchesStrategicMerge:
-  - ./service-discovery.yaml
+  - ./service-sync-tcp.yaml
+  - ./service-sync-udp.yaml
