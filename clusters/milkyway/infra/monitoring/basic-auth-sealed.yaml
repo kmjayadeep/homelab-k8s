@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: basic-auth
+  namespace: ingress-nginx
+spec:
+  encryptedData:
+    auth: AgCal9ZEDEb1n/OYN0XvMbt5NazGqII9jAnebTlQSwyMRex0kJVkdlu5fs6u/HfFvWhbmHg4sU58+VPywINZWtsO/qOSU6JyWF72YMvWxmFx5to2AHFFIXrsQLOuuVop3/45F75AyFyqwJM8Gs3tfB0mZBozOmVsWXL+BeM3meNncKaIiW9zhoBsx59seEWPxY09nsQ7vDE8MfW2TcveTIG2b5vm+9yht3gBHCwLqJowDIJAdRsKhcAxG5Tbml9/fqIs4voDyjvcHI/9MflmCsWevNURuAtrAwgjDRXlBUa5YMYO8ER4p9GMdoi212nU/E/5zw+YmBeBmahuRUUlFOIfTvlqFE+7Ba3Wjj0sJxDF1NMhZ86h4Yqy9THY2AW9GTFkZ0fzZydTiHkeDfyO5V3PIW9gaUA5fjrHsrPqVyQmQ2VvJWm2VAxJvlaN2Qe+vRfjZ+WXyCWTlKDVrsBv2rZE9vftnLT1WeOpeoaXGecDCeJ5hdiDNk7d2KROSQKiHeOFiQV8bAGL1Kb2AJVG6SuCxRSilzC8fI81QHPoimIolsfK7rSrAkzI63jCmyogYWkfKuHMQwRgbtVkUC7ZOoj56RogmJPaDXk+gwXeCWlfa714esdZPy3dPhXX0L84wMMg819TMw3Dd3S5c9WG/4FK/8aMaAbFOyy/NhG8bpJJKgbwxjLJNz1j5QaM2f5wSQy4uugTwS/cf9FgmfdPp8GqOu/ykhljSwpT0BMIfSapqa1uVxWYBwgV5icUFA==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: basic-auth
+      namespace: ingress-nginx
+

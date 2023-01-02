@@ -6,13 +6,17 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: ca-issuer
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
 spec:
   tls:
   - hosts:
-    - alertmanager.andromeda.local
+    - alertmanager.milkyway.local
+    - alertmanager.milkyway.jayadeep.me
     secretName: alertmanager-cert
   rules:
-  - host: alertmanager.andromeda.local
+  - host: alertmanager.milkyway.jayadeep.me
     http:
       paths:
       - path: /
@@ -22,23 +26,7 @@ spec:
             name: alertmanager
             port:
               number: 9093
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: alertmanager-ingress-public
-  namespace: monitoring
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: ca-issuer
-spec:
-  ingressClassName: public
-  tls:
-  - hosts:
-    - alertmanager-andromeda.duckdns.org
-    secretName: alertmanager-cert-public
-  rules:
-  - host: alertmanager-andromeda.duckdns.org
+  - host: alertmanager.milkyway.local
     http:
       paths:
       - path: /
