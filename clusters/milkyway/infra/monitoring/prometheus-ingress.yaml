@@ -9,11 +9,11 @@ metadata:
 spec:
   tls:
   - hosts:
-    - prometheus.andromeda.local
-    - prometheus-andromeda.duckdns.org
+    - prometheus.milkyway.jayadeep.me
+    - prometheus.milkyway.local
     secretName: prometheus-cert
   rules:
-  - host: prometheus.andromeda.local
+  - host: prometheus.milkyway.local
     http:
       paths:
       - path: /
@@ -23,7 +23,7 @@ spec:
             name: prometheus
             port:
               number: 9090
-  - host: prometheus-andromeda.duckdns.org
+  - host: prometheus.milkyway.jayadeep.me
     http:
       paths:
       - path: /

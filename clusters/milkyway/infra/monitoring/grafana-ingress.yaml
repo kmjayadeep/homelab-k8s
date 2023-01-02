@@ -9,11 +9,11 @@ metadata:
 spec:
   tls:
   - hosts:
-    - grafana.andromeda.local
-    - grafana-andromeda.duckdns.org
+    - grafana.milkyway.jayadeep.me
+    - grafana.milkyway.local
     secretName: grafana-cert
   rules:
-  - host: grafana.andromeda.local
+  - host: grafana.milkyway.local
     http:
       paths:
       - path: /
@@ -23,7 +23,7 @@ spec:
             name: grafana
             port:
               number: 3000
-  - host: grafana-andromeda.duckdns.org
+  - host: grafana.milkyway.jayadeep.me
     http:
       paths:
       - path: /

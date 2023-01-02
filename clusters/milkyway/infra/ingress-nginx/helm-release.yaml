@@ -7,5 +7,4 @@ spec:
   values:
     controller:
       service:
-        ipFamilies:
-          - IPv6
+        loadBalancerIP: 116.203.51.197
