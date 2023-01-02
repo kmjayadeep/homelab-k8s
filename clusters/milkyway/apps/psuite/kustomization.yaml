@@ -9,3 +9,4 @@ patchesStrategicMerge:
   - ./service-discovery.yaml
   - ./service-sync-tcp.yaml
   - ./service-sync-udp.yaml
+  - ./ingress.yaml
