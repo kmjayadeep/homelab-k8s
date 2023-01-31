@@ -1,0 +1,21 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: metrics-server
+  namespace: flux-system
+spec:
+  interval: 15m
+  path: clusters/bases/infra-apps/metrics-server
+  prune: true
+  timeout: 2m
+  dependsOn:
+    - name: calico # Need cni first
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: server
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: metrics-server
+      namespace: kube-system
