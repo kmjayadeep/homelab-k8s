@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: basic-auth
+  namespace: monitoring
+spec:
+  encryptedData:
+    auth: AgATUpuhdLbfl4Uvhs6QMYgLnFxXFg/E0JNh5rEGIFyjDtzqJkPD7qMAj3NI1/HZdkKCx5GTMjPxj6YOPviI4aljABVq00Pt3Byj33fnaDrohcbiKkOuMyno5m1ba3SMPqQLae50lJrIsMds8jIGPtiyWKIls+KvaoYrhQvIu9ASbDg05x8Qfdhoq6Ljm42j63JsbhxqmKeOIcJCdcN1SPyrQbDAmIoJzmDZqndpWbSSr4qnbiAOvRL6W7mJ1U9l1mDaO3CK5wQ07Op3fRf9qs1FxzFTLqUi88cqVjlWfOjBoIjw4+TPUnKoDScs5d6EWXZznJpCYFSyKHNNOOnqBLeEewTt4hDYERr8wLlSE6kNPebeQvDQXFz9wWs7LT1bKmJ43kgaRaKnPuX5RPUb3RCAmSb0chM0jO7+Z94aeV1DLhKBul+ZVx1HaBicWMKzBTSIKb2NoyzVkC8FQUThbMRKvPllMAO+SbSSbB0my7G2FS1BcFJKY5Cxj53lZmsoEgppgKIRbxjoFJLTAe4an3V/AmfdfpxmZRfkK7yZ2V4Lsc3Smq/vSP0qrNHTFm6WNQKxElqLEHxyzVWEHcSkuS3cyf3YuPWTEuvb9N92PkqKIAwnFSmEtdKtHb6XZhuM6cExLb2oxfMwhV0SdlfSuuG8YtDRBsuw102o4K9hW9YAbccD7pKjOh0l6V24kY1XhimdzP3F+KWPxaMYHdGMVZT8T8cAeAJ6rDfIXO0b4OOUzBvhlRpYXwlJBJXedA==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: basic-auth
+      namespace: monitoring
+

@@ -1,0 +1,35 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: velero
+  namespace: velero
+spec:
+  values:
+    deployRestic: true
+
+    # Hetzner doesn't have much resources, so restrict
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+    restic:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+    # Override bucket name
+    configuration:
+      backupStorageLocation:
+        bucket: milkyway-k8s-backup
+
+    schedules:
+      backup-syncthing:
+        disabled: true # Disable for now, until the new notes system is in place

@@ -4,9 +4,8 @@ metadata:
   name: metallb
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
-  path: clusters/milkyway/infra/metallb
+  path: clusters/andromeda/infra/metallb
   prune: true
   timeout: 2m
   dependsOn:

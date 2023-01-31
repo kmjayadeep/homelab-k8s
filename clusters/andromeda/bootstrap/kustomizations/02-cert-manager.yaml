@@ -29,7 +29,7 @@ spec:
   dependsOn:
     - name: cert-manager
   interval: 15m
-  path: clusters/milkyway/infra/cert-manager-clusterissuer
+  path: clusters/andromeda/infra/cert-manager-clusterissuer
   prune: true
   timeout: 2m
   sourceRef:

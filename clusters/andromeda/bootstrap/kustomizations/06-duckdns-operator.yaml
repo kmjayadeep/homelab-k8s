@@ -4,9 +4,8 @@ metadata:
   name: duckdns-operator
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
-  path: clusters/milkyway/infra/duckdns-operator
+  path: clusters/andromeda/infra/duckdns-operator
   prune: true
   timeout: 2m
   sourceRef:

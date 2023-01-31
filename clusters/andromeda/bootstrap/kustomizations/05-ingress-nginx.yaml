@@ -4,9 +4,8 @@ metadata:
   name: ingress-nginx
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
-  path: clusters/milkyway/infra/ingress-nginx
+  path: clusters/andromeda/infra/ingress-nginx
   prune: true
   timeout: 2m
   dependsOn:
