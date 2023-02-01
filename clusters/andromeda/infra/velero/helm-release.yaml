@@ -7,7 +7,7 @@ spec:
   values:
     deployRestic: true
 
-    # Hetzner doesn't have much resources, so restrict
+    # Homelab doesn't have much resources, so restrict
     resources:
       requests:
         cpu: 100m
@@ -28,7 +28,7 @@ spec:
     # Override bucket name
     configuration:
       backupStorageLocation:
-        bucket: milkyway-k8s-backup
+        bucket: andromeda-k8s-backup
 
     schedules:
       backup-syncthing:

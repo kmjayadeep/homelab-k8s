@@ -4,9 +4,8 @@ metadata:
   name: velero
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
-  path: clusters/milkyway/infra/velero
+  path: clusters/andromeda/infra/velero
   prune: true
   timeout: 2m
   sourceRef:
@@ -22,21 +21,4 @@ spec:
     - apiVersion: apps/v1
       kind: DaemonSet
       name: restic
-      namespace: velero
-  patches:
-  - patch: |-
-      apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      metadata:
-        name: velero
-        namespace: velero
-      spec:
-        values:
-          configuration:
-            backupStorageLocation:
-              bucket: milkyway-k8s-backup
-
-    target:
-      kind: HelmRelease
-      name: velero
       namespace: velero
