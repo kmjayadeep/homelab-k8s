@@ -4,9 +4,8 @@ metadata:
   name: psuite
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
-  path: clusters/milkyway/apps/psuite
+  path: clusters/andromeda/apps/psuite
   prune: true
   timeout: 2m
   sourceRef:
