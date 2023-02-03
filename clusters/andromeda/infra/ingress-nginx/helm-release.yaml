@@ -8,7 +8,7 @@ spec:
     controller:
       service:
         annotations:
-          metallb.universe.tf/loadBalancerIPs: "192.168.0.100:2a02:8109:8400:60f4::"
+          metallb.universe.tf/loadBalancerIPs: "192.168.0.100,2a02:8109:8400:60f4::"
         ipFamilyPolicy: PreferDualStack
         ipFamilies:
         - IPv4
