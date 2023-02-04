@@ -10,6 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
+        namespace: flux-system
       version: "44.3.1"
   interval: 1h0m0s
   install:
