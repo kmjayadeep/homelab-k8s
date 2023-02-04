@@ -4,6 +4,7 @@ metadata:
   name: monitoring
   namespace: flux-system
 spec:
+  suspend: true
   interval: 15m
   path: clusters/milkyway/infra/monitoring
   prune: true

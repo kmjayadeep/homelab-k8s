@@ -4,9 +4,8 @@ metadata:
   name: monitoring
   namespace: flux-system
 spec:
-  suspend: true
   interval: 15m
-  path: clusters/milkyway/infra/monitoring
+  path: clusters/bases/infra/monitoring
   prune: true
   timeout: 2m
   dependsOn:
@@ -18,17 +17,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: prometheus
-      namespace: monitoring
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: alertmanager
-      namespace: monitoring
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: grafana
-      namespace: monitoring
-    - apiVersion: apps/v1
-      kind: DaemonSet
-      name: node-exporter
+      name: kube-prometheus-stack-operator
       namespace: monitoring
