@@ -8,5 +8,5 @@ spec:
     grafana:
       ingress:
         hosts:
-        - grafana.milkyway.local
-        - grafana.milkyway.jayadeep.me 
+        - grafana.andromeda.local
+        - grafana.andromeda.jayadeep.me 
