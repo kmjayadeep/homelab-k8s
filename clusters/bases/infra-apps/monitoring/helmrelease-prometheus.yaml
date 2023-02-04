@@ -18,20 +18,19 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    global:
-      alertmanager:
-        enabled: false
-      kubeApiServer:
-        enabled: false
-      kubelet:
-        enabled: false
-      kubeControllerManager:
-        enabled: false
-      kubeEtcd:
-        enabled: false
-      kubeScheduler:
-        enabled: false
-      kubeProxy:
-        enabled: false
-      prometheus:
-        enabled: false
+    alertmanager:
+      enabled: false
+    kubeApiServer:
+      enabled: false
+    kubelet:
+      enabled: false
+    kubeControllerManager:
+      enabled: false
+    kubeEtcd:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    prometheus:
+      enabled: false
