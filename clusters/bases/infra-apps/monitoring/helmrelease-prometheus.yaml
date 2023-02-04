@@ -34,3 +34,9 @@ spec:
       enabled: false
     prometheus:
       enabled: false
+    grafana:
+      admin:
+        existingSecret: grafana-creds
+      ingress:
+        enabled: true
+        hosts: [] # Declare in env specific file
