@@ -4,6 +4,7 @@ resources:
   - ./helm-repo-ingress-nginx.yaml
   - ./helm-repo-jetstack.yaml
   - ./helm-repo-mojo2600.yaml
+  - ./helm-repo-prometheus.yaml
   - ./helm-repo-sealed-secrets.yaml
   - ./helm-repo-syncthing.yaml
   - ./helm-repo-vmware-tanzu.yaml
