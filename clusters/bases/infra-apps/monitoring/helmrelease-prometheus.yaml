@@ -18,8 +18,6 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    alertmanager:
-      enabled: false
     kubeApiServer:
       enabled: false
     kubelet:
@@ -32,11 +30,68 @@ spec:
       enabled: false
     kubeProxy:
       enabled: false
-    prometheus:
-      enabled: false
     grafana:
       admin:
         existingSecret: grafana-creds
       ingress:
         enabled: true
         hosts: [] # Declare in env specific file
+    defaultRules:
+      create: true
+      rules:
+        alertmanager: true
+        etcd: false
+        configReloaders: true
+        general: true
+        k8s: true
+        kubeApiserverAvailability: true
+        kubeApiserverBurnrate: true
+        kubeApiserverHistogram: true
+        kubeApiserverSlos: true
+        kubeControllerManager: false
+        kubelet: false
+        kubeProxy: false
+        kubePrometheusGeneral: true
+        kubePrometheusNodeRecording: true
+        kubernetesApps: true
+        kubernetesResources: true
+        kubernetesStorage: true
+        kubernetesSystem: true
+        kubeSchedulerAlerting: false
+        kubeSchedulerRecording: false
+        kubeStateMetrics: true
+        network: true
+        node: true
+        nodeExporterAlerting: true
+        nodeExporterRecording: true
+        prometheus: true
+        prometheusOperator: true
+    prometheus:
+      enabled: true
+      ingress:
+        enabled: true
+      prometheusSpec:
+        resources:
+          limits:
+            memory: 400Mi
+            cpu: 1
+          requests:
+            memory: 400Mi
+            cpu: 1m
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 5Gi
+    alertmanager:
+      enabled: true
+      ingress:
+        enabled: true
+      alertmanagerSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 5Gi
