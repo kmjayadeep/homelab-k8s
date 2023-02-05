@@ -10,13 +10,28 @@ spec:
         hosts:
         - grafana.andromeda.local
         - grafana.andromeda.jayadeep.me 
+        tls:
+        - secretName: grafana-cert
+          hosts:
+          - grafana.andromeda.local
+          - grafana.andromeda.jayadeep.me 
     prometheus:
       ingress:
         hosts:
         - prometheus.andromeda.local
         - prometheus.andromeda.jayadeep.me 
+        tls:
+        - secretName: prometheus-cert
+          hosts:
+          - prometheus.andromeda.local
+          - prometheus.andromeda.jayadeep.me 
     alertmanager:
       ingress:
         hosts:
         - alertmanager.andromeda.local
         - alertmanager.andromeda.jayadeep.me 
+        tls:
+        - secretName: alertmanager-cert
+          hosts:
+          - alertmanager.andromeda.local
+          - alertmanager.andromeda.jayadeep.me 
