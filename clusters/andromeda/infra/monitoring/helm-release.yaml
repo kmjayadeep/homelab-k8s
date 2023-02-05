@@ -25,6 +25,13 @@ spec:
           hosts:
           - prometheus.andromeda.local
           - prometheus.andromeda.jayadeep.me 
+      prometheusSpec:
+        additionalScrapeConfigs:
+        - job_name: nuc
+          static_configs:
+          - targets:
+            - 192.168.0.50:9100 ## Node exporter from nuc
+            - 192.168.0.50:18080 ## taskwarrior metrics from nuc
     alertmanager:
       ingress:
         hosts:
