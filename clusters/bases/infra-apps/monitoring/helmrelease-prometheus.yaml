@@ -121,4 +121,5 @@ spec:
                     help: "Count of unavailable replicas"
                     each:
                       type: Gauge
-                      path: [status, unavailableReplicas]
+                      gauge:
+                        path: [status, unavailableReplicas]
