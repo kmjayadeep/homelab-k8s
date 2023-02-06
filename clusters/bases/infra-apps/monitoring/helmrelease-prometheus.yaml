@@ -107,3 +107,18 @@ spec:
         - apiGroups: ["monitoring.coreos.com"]
           resources: ["prometheuses"]
           verbs: ["list", "watch"]
+      extraArgs:
+      - --custom-resource-state-config
+      -  |
+          spec:
+            resources:
+              - groupVersionKind:
+                  group: monitoring.coreos.com
+                  version: "v1"
+                  kind: Prometheus
+                metrics:
+                  - name: unavailable_replicas
+                    help: "Count of unavailable replicas"
+                    each:
+                      type: Gauge
+                      path: [status, unavailableReplicas]
