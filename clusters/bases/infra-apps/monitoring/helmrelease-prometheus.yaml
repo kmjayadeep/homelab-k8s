@@ -101,3 +101,9 @@ spec:
               resources:
                 requests:
                   storage: 5Gi
+    kube-state-metrics:
+      rbac:
+        extraRules:
+        - apiGroups: ["monitoring.coreos.com"]
+          resources: ["prometheuses"]
+          verbs: ["list", "watch"]
