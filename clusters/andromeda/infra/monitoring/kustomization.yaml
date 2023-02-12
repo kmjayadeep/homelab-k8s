@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - ../../../bases/infra-apps/monitoring
   - ./grafana-creds-sealed.yaml
+  - ./alermanager-config-sealed.yaml
 patchesStrategicMerge:
   - helm-release.yaml
