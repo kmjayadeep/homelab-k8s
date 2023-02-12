@@ -42,3 +42,7 @@ spec:
           hosts:
           - alertmanager.andromeda.local
           - alertmanager.andromeda.jayadeep.me 
+      alertmanagerSpec:
+        useExistingSecret: true
+        secrets:
+        - alertmanager-config
