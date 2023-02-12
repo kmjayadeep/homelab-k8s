@@ -44,5 +44,4 @@ spec:
           - alertmanager.andromeda.jayadeep.me 
       alertmanagerSpec:
         useExistingSecret: true
-        secrets:
-        - alertmanager-config
+        configSecret: alertmanager-config
