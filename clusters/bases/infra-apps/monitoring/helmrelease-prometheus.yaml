@@ -58,7 +58,7 @@ spec:
         kubernetesApps: true
         kubernetesResources: true
         kubernetesStorage: true
-        kubernetesSystem: true
+        kubernetesSystem: false
         kubeSchedulerAlerting: false
         kubeSchedulerRecording: false
         kubeStateMetrics: true
