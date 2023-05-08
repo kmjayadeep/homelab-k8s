@@ -15,7 +15,7 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: calico-operator
+      name: cilium-operator
       namespace: kube-system
     - apiVersion: apps/v1
       kind: DaemonSet
