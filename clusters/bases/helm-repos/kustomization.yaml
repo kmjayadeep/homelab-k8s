@@ -8,3 +8,4 @@ resources:
   - ./helm-repo-sealed-secrets.yaml
   - ./helm-repo-syncthing.yaml
   - ./helm-repo-vmware-tanzu.yaml
+  - ./helm-repo-cilium.yaml

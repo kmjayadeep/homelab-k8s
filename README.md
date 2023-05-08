@@ -9,3 +9,7 @@ A mini pc sitting at my home
 
 ### Milkyway
 K3s running in hetzner cloud
+
+### Cosmos
+Same as Andromeda, but later upgraded to use cilium as CNI.
+
