@@ -1,0 +1,33 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  values:
+    ipv6:
+      enabled: true
+    cluster:
+      namee: cosmos
+    operator:
+      replicas: 1
+
+    ipam:
+      mode: kubernetes
+      operator:
+        clusterPoolIPv6PodCIDRList:
+        - 2a02:8109:8400:60f4:900::/112
+        clusterPoolIPv4PodCIDRList:
+        - 10.63.0.0/16
+        clusterPoolIPv6MaskSize=: 112
+
+    bpf:
+      masquerade: true
+
+    enableIPv6Masquerade: false
+    extraArgs:
+    - --enable-ipv6-ndp
+    - --ipv6-mcast-device=enp0s25
+
+    k8sServiceHost: 192.168.0.15
+    k8sServicePort: 6443
