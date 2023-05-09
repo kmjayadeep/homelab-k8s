@@ -8,7 +8,7 @@ spec:
     ipv6:
       enabled: true
     cluster:
-      namee: cosmos
+      name: cosmos
     operator:
       replicas: 1
 
