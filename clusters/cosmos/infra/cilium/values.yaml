@@ -19,7 +19,7 @@ spec:
         - 2a02:8109:8400:60f4:900::/112
         clusterPoolIPv4PodCIDRList:
         - 10.63.0.0/16
-        clusterPoolIPv6MaskSize=: 112
+        clusterPoolIPv6MaskSize: 112
 
     bpf:
       masquerade: true
