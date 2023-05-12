@@ -12,6 +12,8 @@ spec:
     operator:
       replicas: 1
 
+    kubeProxyReplacement: strict
+
     ipam:
       mode: kubernetes
       operator:
