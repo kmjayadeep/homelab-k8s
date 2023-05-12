@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
 - ../../../../infra/metallb
 patchesStrategicMerge:
-- addresspool.yaml
+- public-pool.yaml
+- pihole-pool.yaml

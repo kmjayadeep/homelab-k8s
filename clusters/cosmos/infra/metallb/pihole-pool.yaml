@@ -1,9 +1,10 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: main-pool
+  name: pihole-pool
   namespace: metallb-system
 spec:
   addresses:
-  - 192.168.0.100-192.168.0.120
-  - 2a02:8109:8400:60f4:cccc::/80
+  - 192.168.0.101/32
+  - 2a02:8109:8400:60f4::101/128
+  autoAssign: false
