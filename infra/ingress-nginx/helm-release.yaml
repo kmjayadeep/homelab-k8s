@@ -15,6 +15,8 @@ spec:
         namespace: ingress-nginx
       interval: 1m
   install:
+    # Avoid waiting for resources to be ready on first install
+    # Otherwise this might fail when LB IP is not ready
     disableWait: true
   values:
     controller:
