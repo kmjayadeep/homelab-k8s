@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  values:
+    serviceWeb:
+      type: LoadBalancer
+      loadBalancerIP: 192.168.0.101
+      loadBalancerIPv6: 2a02:8109:8400:60f4::101
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole
+
+    serviceDns:
+      type: LoadBalancer
+      loadBalancerIP: 192.168.0.101
+      loadBalancerIPv6: 2a02:8109:8400:60f4::101
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole
+
+    dnsmasq:
+      customDnsEntries:
+      - address=/pihole.local/192.168.0.101
+
+    podAnnotations:
+      # Enable velero backup
+      backup.velero.io/backup-volumes: config
