@@ -36,12 +36,11 @@ spec:
 
     hubble:
       ui:
-        frontend:
-          ingress:
-            enabled: true
+        ingress:
+          enabled: true
+          hosts:
+          - hubble.cosmos.local
+          tls:
+          - secretName: hubble-tls
             hosts:
             - hubble.cosmos.local
-            tls:
-            - secretName: hubble-tls
-              hosts:
-              - hubble.cosmos.local
