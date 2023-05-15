@@ -8,7 +8,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - host: weave.cosmos.local
+      - host: weave.cosmos.cboxlab.com
         paths:
         - path: /
           pathType: ImplementationSpecific
@@ -16,4 +16,4 @@ spec:
       tls:
       - secretName: weave-tls
         hosts:
-        - weave.cosmos.local
+        - weave.cosmos.cboxlab.com

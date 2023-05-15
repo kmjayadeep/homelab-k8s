@@ -39,8 +39,8 @@ spec:
         ingress:
           enabled: true
           hosts:
-          - hubble.cosmos.local
+          - hubble.cosmos.cboxlab.com
           tls:
           - secretName: hubble-tls
             hosts:
-            - hubble.cosmos.local
+            - hubble.cosmos.cboxlab.com
