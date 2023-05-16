@@ -40,7 +40,7 @@ spec:
           cp /vpn/auth.conf /vpn-rw/;
       containers:
       - name: deluge-openvpn
-        image: binhex/arch-delugevpn:2.1.1-1-02
+        image: binhex/arch-delugevpn:2.1.1-4-01
         env:
         - name: VPN_CLIENT
           value: openvpn
