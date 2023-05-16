@@ -4,6 +4,8 @@ kind: Deployment
 metadata:
   name: jellyfin
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: jellyfin
