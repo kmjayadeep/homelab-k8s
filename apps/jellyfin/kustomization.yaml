@@ -9,4 +9,5 @@ resources:
   - ingress.yaml
   - config-storage.yaml
   - media-storage.yaml
+  - downloads-storage.yaml
   - service.yaml

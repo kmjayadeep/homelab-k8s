@@ -36,6 +36,9 @@ spec:
         - containerPort: 8096
           protocol: TCP
         volumeMounts:
+        - mountPath: /data/downloads
+          name: media
+          readOnly: True
         - mountPath: /data/media
           name: media
           readOnly: True
@@ -46,6 +49,9 @@ spec:
       - name: media
         persistentVolumeClaim:
           claimName: media-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: downloads-pvc-jf
       - name: jellyfin-config
         persistentVolumeClaim:
           claimName: jellyfin-config
