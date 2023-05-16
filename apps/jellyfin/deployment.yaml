@@ -29,7 +29,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-          image: docker.io/jellyfin/jellyfin:10.8.10
+        image: docker.io/jellyfin/jellyfin:10.8.10
         imagePullPolicy: IfNotPresent
         name: jellyfin
         ports:
