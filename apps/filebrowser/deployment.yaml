@@ -13,7 +13,7 @@ spec:
         app: filebrowser
     spec:
       containers:
-        image: docker.io/filebrowser/filebrowser:v2.23.0
+      - image: docker.io/filebrowser/filebrowser:v2.23.0
         imagePullPolicy: IfNotPresent
         name: filebrowser
         ports:
