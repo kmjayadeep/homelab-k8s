@@ -22,7 +22,6 @@ spec:
         volumeMounts:
         - mountPath: /srv
           name: media
-          readOnly: True
         - mountPath: /config
           name: filebrowser-config
       restartPolicy: Always
