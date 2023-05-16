@@ -1,0 +1,33 @@
+# Create a persistent volume to mount local downloads folder into container
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: downloads-pv-deluge
+  labels:
+    volume-type: downloads-volume
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: downloads-pvc-deluge
+    namespace: deluge
+  storageClassName: downloads-storage-deluge
+  hostPath:
+    path: /mnt/downloads
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: downloads-pvc-deluge
+spec:
+  storageClassName: downloads-storage-deluge
+  volumeName: downloads-pv-deluge
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
