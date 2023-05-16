@@ -14,7 +14,7 @@ spec:
      paths:
      - backend:
          service:
-           name: deluige-openvpn
+           name: deluge-openvpn
            port:
              number: 8112
        path: /
