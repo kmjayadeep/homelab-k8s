@@ -4,6 +4,8 @@ kind: Deployment
 metadata:
   name: filebrowser
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: filebrowser
