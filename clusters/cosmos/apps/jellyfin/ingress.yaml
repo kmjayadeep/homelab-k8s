@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: jellyfin-ingress
+spec:
+ tls:
+ - hosts:
+   - jellyfin.cosmos.cboxlab.com
+   secretName: jellyfin-tls-secret
+ rules:
+ - host: jellyfin.cosmos.cboxlab.com
+   http:
+     paths:
+     - backend:
+         service:
+           name: jellyfin
+           port:
+             number: 8096
+       path: /
+       pathType: Prefix

@@ -1,0 +1,42 @@
+# Create a storage class from microk8s default host storage class
+# that allows data retention and volume expansion.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: media-storage
+reclaimPolicy: Retain
+allowVolumeExpansion: True
+---
+# Create a persistent volume to mount local media folder into container
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-pv
+  labels:
+    volume-type: media-volume
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadOnlyMany
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: media-pvc
+    namespace: jellyfin
+  storageClassName: media-storage
+  hostPath:
+    path: /mnt/media
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-pvc
+spec:
+  storageClassName: media-storage
+  volumeName: media-pv
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 20Gi
