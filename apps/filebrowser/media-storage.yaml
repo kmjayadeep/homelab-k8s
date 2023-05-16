@@ -9,7 +9,7 @@ spec:
   capacity:
     storage: 20Gi
   accessModes:
-    - ReadOnlyMany
+    - ReadWriteMany
   claimRef:
     kind: PersistentVolumeClaim
     name: media-pvc
@@ -27,7 +27,7 @@ spec:
   storageClassName: media-storage-filebrowser
   volumeName: media-pv-filemanager
   accessModes:
-    - ReadOnlyMany
+    - ReadWriteMany
   resources:
     requests:
       storage: 20Gi
