@@ -5,10 +5,10 @@ metadata:
 spec:
  tls:
  - hosts:
-   - homer.cosmos.cboxlab.com
+   - home.cosmos.cboxlab.com
    secretName: homer-tls-secret
  rules:
- - host: homer.cosmos.cboxlab.com
+ - host: home.cosmos.cboxlab.com
    http:
      paths:
      - backend:
