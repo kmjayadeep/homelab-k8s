@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: djjudas21
+  namespace: homer
+spec:
+  interval: 1h
+  url: https://djjudas21.github.io/charts
