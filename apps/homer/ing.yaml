@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: homer
+    app.kubernetes.io/name: homer
+  name: homer-ingress
+spec:
+  tls:
+  - hosts:
+    - homer.local
+    secretName: homer-cert
+  rules:
+  - host: homer.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homer
+            port:
+              number: http

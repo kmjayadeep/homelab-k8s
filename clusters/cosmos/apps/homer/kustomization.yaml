@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
 - ../../../../apps/homer
 patches:
-- path: helm-release.yaml
+- path: ingress.yaml
