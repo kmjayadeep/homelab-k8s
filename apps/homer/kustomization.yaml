@@ -8,7 +8,6 @@ configMapGenerator:
   files:
     - assets/config.yml
 
-
 resources:
   - ./namespace.yaml
   - ./deploy.yaml
