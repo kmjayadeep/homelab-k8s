@@ -20,4 +20,4 @@ spec:
           service:
             name: homer
             port:
-              number: http
+              name: http
