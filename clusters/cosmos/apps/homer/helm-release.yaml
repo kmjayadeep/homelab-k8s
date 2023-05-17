@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: homer
+  namespace: homer
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: homer
+      version: '8.1.7'
+      sourceRef:
+        kind: HelmRepository
+        name: djjudas21
+        namespace: homer
+      interval: 1m
+  values:
+    ingress:
+      main:
+        hosts:
+        - host: home.cosmos.cboxlab.com
+          paths:
+            - path: /
+              pathType: Prefix
+              service:
+                port: http
+        tls:
+         - secretName: homer-tls-secret
+           hosts:
+             - home.cosmos.cboxlab.com
