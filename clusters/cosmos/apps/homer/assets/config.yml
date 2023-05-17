@@ -1,11 +1,11 @@
 ---
-itle: "Cosmos Dashboard"
+title: "Cosmos Dashboard"
 subtitle: "Homer"
 logo: "logo.png"
 # icon: "fas fa-skull-crossbones" # Optional icon
 
 header: true
-footer: '<p>Created with <span class="has-text-danger">❤️</span> with <a href="https://bulma.io/">bulma</a>, <a href="https://vuejs.org/">vuejs</a> & <a href="https://fontawesome.com/">font awesome</a> // Fork me on <a href="https://github.com/bastienwirtz/homer"><i class="fab fa-github-alt"></i></a></p>' # set false if you want to hide it.
+footer: '<p>Dashboard created with <span class="has-text-danger">❤️</span> with <a href="https://github.com/bastienwirtz/homer">Homer</a> // Find my fluxcd gitops config on <a href="https://github.com/kmjayadeep/homelab-k8s"><i class="fab fa-github-alt"></i></a></p>'
 
 # Optional theme customization
 theme: default
@@ -48,18 +48,10 @@ message:
 # Optional navbar
 # links: [] # Allows for navbar (dark mode, layout, and search) without any links
 links:
-  - name: "Contribute"
+  - name: "Flux configs"
     icon: "fab fa-github"
-    url: "https://github.com/bastienwirtz/homer"
+    url: "https://github.com/kmjayadeep/homelab-k8s"
     target: "_blank" # optional html a tag target attribute
-  - name: "Wiki"
-    icon: "fas fa-book"
-    url: "https://www.wikipedia.org/"
-  # this will link to a second homer page that will load config from additional-page.yml and keep default config values as in config.yml file
-  # see url field and assets/additional-page.yml.dist used in this example:
-  #- name: "another page!"
-  #  icon: "fas fa-file-alt"
-  #  url: "#additional-page" 
 
 # Services
 # First level array represent a group.
@@ -68,15 +60,15 @@ services:
   - name: "Applications"
     icon: "fas fa-cloud"
     items:
-      - name: "Awesome app"
+      - name: "Pihole"
         logo: "assets/tools/sample.png"
-        subtitle: "Bookmark example"
+        subtitle: "DNS"
         tag: "app"
-        keywords: "self hosted reddit"
-        url: "https://www.reddit.com/r/selfhosted/"
+        keywords: "pihole dns"
+        url: "http://pihole.cboxlab.com/admin/"
         target: "_blank" # optional html a tag target attribute
-      - name: "Another one"
+      - name: "Jellyfin"
         logo: "assets/tools/sample2.png"
-        subtitle: "Another application"
+        subtitle: "Media"
         tag: "app"
-        url: "#"
+        url: "https://jellyfin.cosmos.cboxlab.com"
