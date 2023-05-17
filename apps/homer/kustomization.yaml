@@ -3,6 +3,12 @@ kind: Kustomization
 
 namespace: homer
 
+configMapGenerator:
+- name: homer-config
+  files:
+    - assets/config.yml
+
+
 resources:
   - ./namespace.yaml
   - ./deploy.yaml

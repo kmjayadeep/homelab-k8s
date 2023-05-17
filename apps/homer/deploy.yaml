@@ -20,12 +20,8 @@ spec:
         app.kubernetes.io/instance: homer
         app.kubernetes.io/name: homer
     spec:
-      automountServiceAccountToken: true
       containers:
-      - env:
-        - name: TZ
-          value: UTC
-        image: b4bz/homer:v23.02.2
+      - image: b4bz/homer:v23.02.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
@@ -35,6 +31,10 @@ spec:
             port: 8080
           timeoutSeconds: 1
         name: homer
+        volumeMounts:
+        - name: homer-config
+          mountPath: /www/assets/config.yml
+          subPath: config.yml
         ports:
         - containerPort: 8080
           name: http
@@ -57,7 +57,7 @@ spec:
           tcpSocket:
             port: 8080
           timeoutSeconds: 1
-      dnsPolicy: ClusterFirst
-      enableServiceLinks: true
-      serviceAccountName: default
----
+      volumes:
+      - name: homer-config
+        configMap:
+          name: homer-config
