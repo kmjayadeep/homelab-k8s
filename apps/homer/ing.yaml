@@ -4,6 +4,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: homer
     app.kubernetes.io/name: homer
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
   name: homer-ingress
 spec:
   tls:
