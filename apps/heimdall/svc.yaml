@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall
+spec:
+  selector:
+    app: heimdall           # < reference to the deployment (connects with this deployment)
+  ports:
+    - name: http-80
+      protocol: TCP
+      port: 80

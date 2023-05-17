@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: heimdall-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: default-clusterissuer
+spec:
+  tls:
+  - hosts:
+    - heimdall.local
+    secretName: heimdall-cert
+  rules:
+  - host: heimdall.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: heimdall
+            port:
+              number: 80
