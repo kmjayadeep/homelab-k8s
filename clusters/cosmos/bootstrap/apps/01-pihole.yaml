@@ -12,6 +12,7 @@ spec:
   path: clusters/cosmos/apps/pihole
   dependsOn:
   - name: infra
+    namespace: flux-system
   interval: 15m
   prune: true
   wait: true
