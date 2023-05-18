@@ -1,9 +1,0 @@
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: main-pool
-  namespace: metallb-system
-spec:
-  addresses:
-  - 192.168.0.200-192.168.0.250
-  - 2a02:8109:8400:60f4:cccc::/80
