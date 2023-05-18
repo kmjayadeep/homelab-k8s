@@ -23,7 +23,6 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
-  validation: server
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
