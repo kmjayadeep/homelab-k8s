@@ -23,3 +23,9 @@ spec:
       kind: Deployment
       name: pihole
       namespace: pihole
+  dependsOn:
+  - name: infra
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
