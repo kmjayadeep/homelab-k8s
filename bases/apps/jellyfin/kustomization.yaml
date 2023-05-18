@@ -4,7 +4,6 @@ kind: Kustomization
 namespace: jellyfin
 
 resources:
-  - namespace.yaml
   - deployment.yaml
   - ingress.yaml
   - config-storage.yaml

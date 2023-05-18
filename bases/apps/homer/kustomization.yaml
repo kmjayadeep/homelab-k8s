@@ -9,7 +9,6 @@ configMapGenerator:
     - assets/config.yml
 
 resources:
-  - ./namespace.yaml
   - ./deploy.yaml
   - ./svc.yaml
   - ./ing.yaml

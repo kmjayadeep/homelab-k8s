@@ -4,7 +4,6 @@ kind: Kustomization
 namespace: deluge
 
 resources:
-  - namespace.yaml
   - deluge-ing.yaml
   - deluge-ovpn-deploy.yaml
   - deluge-pvc.yaml
