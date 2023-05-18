@@ -1,0 +1,65 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: pihole
+      version: '2.11.0'
+      sourceRef:
+        kind: HelmRepository
+        name: mojo2600
+        namespace: pihole
+      interval: 1m
+  values:
+    hostname: pihole
+
+    dualStack:
+      enabled: true
+
+    persistentVolumeClaim:
+      enabled: true
+      storageClass: local-path
+      size: 500Mi # Doesn't matter for local-path
+
+    serviceWeb:
+      type: LoadBalancer
+      loadBalancerIP:   # Override in env specific configs
+      loadBalancerIPv6: # Override in env specific configs
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole
+
+    serviceDns:
+      type: LoadBalancer
+      loadBalancerIP:   # Override in env specific configs
+      loadBalancerIPv6: # Override in env specific configs
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole
+
+    virtualHost: pihole.local
+
+    admin:
+      existingSecret: "pihole-admin"
+      passwordKey: "password"
+
+    DNS1: "1.1.1.1"
+    DNS2: "1.0.0.1"
+
+    adlists:
+    - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+    - http://sysctl.org/cameleon/hosts
+    - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+    - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+
+    whitelist:
+    - cdn.segment.com # localyzeapp was not working
+
+    dnsmasq:
+      customDnsEntries: []
+
+    podAnnotations:
+      # Enable velero backup
+      backup.velero.io/backup-volumes: config

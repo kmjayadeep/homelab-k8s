@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: homer
+    app.kubernetes.io/name: homer
+  name: homer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: homer
+      app.kubernetes.io/name: homer
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: homer
+        app.kubernetes.io/name: homer
+    spec:
+      containers:
+      - image: b4bz/homer:v23.02.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 1
+        name: homer
+        volumeMounts:
+        - name: homer-config
+          mountPath: /www/assets/config.yml
+          subPath: config.yml
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 1
+        securityContext:
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        startupProbe:
+          failureThreshold: 30
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 1
+      volumes:
+      - name: homer-config
+        configMap:
+          name: homer-config
