@@ -10,9 +10,6 @@ metadata:
   namespace: jellyfin
 spec:
   path: clusters/cosmos/apps/jellyfin
-  dependsOn:
-  - name: infra
-    namespace: flux-system
   interval: 15m
   prune: true
   wait: true

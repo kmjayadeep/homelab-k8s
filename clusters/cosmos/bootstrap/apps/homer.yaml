@@ -10,9 +10,6 @@ metadata:
   namespace: homer
 spec:
   path: clusters/cosmos/apps/homer
-  dependsOn:
-  - name: infra
-    namespace: flux-system
   interval: 15m
   prune: true
   wait: true

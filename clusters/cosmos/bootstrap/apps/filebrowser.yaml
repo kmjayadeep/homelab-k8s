@@ -10,9 +10,6 @@ metadata:
   namespace: filebrowser
 spec:
   path: clusters/cosmos/apps/filebrowser
-  dependsOn:
-  - name: infra
-    namespace: flux-system
   interval: 15m
   prune: true
   wait: true
