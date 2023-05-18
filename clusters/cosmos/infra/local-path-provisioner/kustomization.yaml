@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: kube-system
 
 resources:
-- ../../../../infra/local-path-provisioner
+- ../../../../bases/infra/local-path-provisioner
 
 patchesStrategicMerge:
   # Add annotations to set this as default storage class
