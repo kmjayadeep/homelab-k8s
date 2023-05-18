@@ -5,9 +5,6 @@ metadata:
   namespace: kube-system
 spec:
   path: clusters/cosmos/infra/metrics-server
-  dependsOn:
-  - name: cilium
-    namespace: kube-system
   interval: 15m
   prune: true
   wait: true

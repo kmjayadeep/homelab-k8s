@@ -13,6 +13,8 @@ spec:
   dependsOn:
   - name: pihole
     namespace: pihole
+  - name: sealed-secrets
+    namespace: flux-system
   interval: 15m
   prune: true
   wait: true

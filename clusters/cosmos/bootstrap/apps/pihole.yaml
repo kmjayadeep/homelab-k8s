@@ -11,7 +11,7 @@ metadata:
 spec:
   path: clusters/cosmos/apps/pihole
   dependsOn:
-  - name: infra
+  - name: sealed-secrets
     namespace: flux-system
   interval: 15m
   prune: true

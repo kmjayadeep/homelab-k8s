@@ -10,9 +10,6 @@ metadata:
   namespace: ingress-nginx
 spec:
   path: clusters/cosmos/infra/ingress-nginx
-  dependsOn:
-  - name: cilium
-    namespace: kube-system
   interval: 15m
   prune: true
   wait: true

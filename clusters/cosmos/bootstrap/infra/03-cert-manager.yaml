@@ -10,9 +10,6 @@ metadata:
   namespace: cert-manager
 spec:
   path: clusters/cosmos/infra/cert-manager
-  dependsOn:
-  - name: cilium
-    namespace: kube-system
   interval: 15m
   prune: true
   wait: true
