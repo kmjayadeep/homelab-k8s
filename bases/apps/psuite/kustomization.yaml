@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: psuite
+
+bases:
+- git::https://github.com/kmjayadeep/productivity-suite.git//server/kustomize/base?ref=dddf069238e6564bb51edd35718d5b953bdef1b4
