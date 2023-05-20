@@ -29,7 +29,6 @@ spec:
     enableIPv6Masquerade: false
     extraArgs:
     - --enable-ipv6-ndp
-    - --ipv6-mcast-device=enp0s25
 
     k8sServiceHost: 192.168.0.15
     k8sServicePort: 6443
