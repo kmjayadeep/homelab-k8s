@@ -12,8 +12,6 @@ spec:
     matchLabels:
       app.kubernetes.io/instance: homer
       app.kubernetes.io/name: homer
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -21,7 +19,7 @@ spec:
         app.kubernetes.io/name: homer
     spec:
       containers:
-      - image: b4bz/homer:v23.02.2
+      - image: kmjayadeep/homer:v23.02.2-corsfix
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
