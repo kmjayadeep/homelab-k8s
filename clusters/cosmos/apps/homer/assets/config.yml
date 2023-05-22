@@ -117,7 +117,7 @@ services:
         subtitle: "DNS Server"
         tag: "app"
         keywords: "pihole dns"
-        url: "http://pihole.cosmos.cboxlab.com/admin/"
+        url: "https://pihole.cosmos.cboxlab.com/admin/"
         type: Ping
         method: "GET"
         mode: "no-cors"
