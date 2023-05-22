@@ -26,3 +26,15 @@ spec:
     podAnnotations:
       # Enable velero backup
       backup.velero.io/backup-volumes: config
+
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: default-clusterissuer
+      path: /
+      hosts:
+        - pihole.cosmos.cboxlab.com
+      tls:
+        - secretName: pihole-admin-tls
+          hosts:
+            - pihole.cosmos.cboxlab.com
