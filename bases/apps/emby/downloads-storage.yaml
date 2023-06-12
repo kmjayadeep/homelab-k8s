@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: downloads-pv-jf
+  name: downloads-pv-emby
   labels:
     volume-type: downloads-volume
 spec:
@@ -12,7 +12,7 @@ spec:
     - ReadWriteMany
   claimRef:
     kind: PersistentVolumeClaim
-    name: downloads-pvc-jf
+    name: downloads-pvc-emby
     namespace: emby
   storageClassName: downloads-storage-jf
   hostPath:
@@ -22,10 +22,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: downloads-pvc-jf
+  name: downloads-pvc-emby
 spec:
   storageClassName: downloads-storage-jf
-  volumeName: downloads-pv-jf
+  volumeName: downloads-pv-emby
   accessModes:
     - ReadWriteMany
   resources:
