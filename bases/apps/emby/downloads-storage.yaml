@@ -1,0 +1,33 @@
+# Create a persistent volume to mount local downloads folder into container
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: downloads-pv-jf
+  labels:
+    volume-type: downloads-volume
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: downloads-pvc-jf
+    namespace: emby
+  storageClassName: downloads-storage-jf
+  hostPath:
+    path: /mnt/downloads
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: downloads-pvc-jf
+spec:
+  storageClassName: downloads-storage-jf
+  volumeName: downloads-pv-jf
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: emby-ingress
+ annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+spec:
+ tls:
+ - hosts:
+   - emby.local
+   secretName: emby-tls-secret
+ rules:
+ - host: emby.local
+   http:
+     paths:
+     - backend:
+         service:
+           name: emby
+           port:
+             number: 8096
+       path: /
+       pathType: Prefix

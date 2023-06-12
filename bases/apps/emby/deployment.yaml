@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emby
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: emby
+  template:
+    metadata:
+      labels:
+        app: emby
+    spec:
+      containers:
+      - image: docker.io/emby/embyserver:4.8.0.39
+        imagePullPolicy: IfNotPresent
+        name: emby
+        ports:
+        - containerPort: 8096
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /data/downloads
+          name: downloads
+          readOnly: True
+        - mountPath: /data/media
+          name: media
+          readOnly: True
+        - mountPath: /config
+          name: emby-config
+      restartPolicy: Always
+      volumes:
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-pvc
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: downloads-pvc-jf
+      - name: emby-config
+        persistentVolumeClaim:
+          claimName: emby-config
