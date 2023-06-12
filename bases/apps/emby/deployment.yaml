@@ -37,7 +37,7 @@ spec:
           claimName: media-pvc
       - name: downloads
         persistentVolumeClaim:
-          claimName: downloads-pvc-jf
+          claimName: downloads-pvc-emby
       - name: emby-config
         persistentVolumeClaim:
           claimName: emby-config
