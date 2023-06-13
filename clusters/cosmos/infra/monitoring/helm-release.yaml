@@ -1,0 +1,41 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  values:
+    grafana:
+      ingress:
+        hosts:
+        - grafana.cosmos.cboxlab.com
+        tls:
+        - secretName: grafana-cert
+          hosts:
+          - grafana.cosmos.cboxlab.com
+    prometheus:
+      ingress:
+        hosts:
+        - prometheus.cosmos.cboxlab.com
+        tls:
+        - secretName: prometheus-cert
+          hosts:
+          - prometheus.cosmos.cboxlab.com
+      prometheusSpec:
+        additionalScrapeConfigs:
+        - job_name: nuc
+          static_configs:
+          - targets:
+            - 192.168.0.50:9100 ## Node exporter from nuc
+            - 192.168.0.50:18080 ## taskwarrior metrics from nuc
+    alertmanager:
+      ingress:
+        hosts:
+        - alertmanager.cosmos.cboxlab.com
+        tls:
+        - secretName: alertmanager-cert
+          hosts:
+          - alertmanager.cosmos.cboxlab.com
+      alertmanagerSpec:
+        useExistingSecret: true
+        configSecret: alertmanager-config
