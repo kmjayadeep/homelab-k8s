@@ -35,7 +35,7 @@ spec:
         existingSecret: grafana-creds
       ingress:
         annotations:
-          cert-manager.io/cluster-issuer: ca-issuer
+          cert-manager.io/cluster-issuer: default-clusterissuer
         enabled: true
         hosts: [] # Declare in env specific file
     defaultRules:
@@ -73,7 +73,7 @@ spec:
       ingress:
         enabled: true
         annotations:
-          cert-manager.io/cluster-issuer: ca-issuer
+          cert-manager.io/cluster-issuer: default-clusterissuer
       prometheusSpec:
         resources:
           limits:
@@ -93,7 +93,7 @@ spec:
       ingress:
         enabled: true
         annotations:
-          cert-manager.io/cluster-issuer: ca-issuer
+          cert-manager.io/cluster-issuer: default-clusterissuer
       alertmanagerSpec:
         storageSpec:
           volumeClaimTemplate:
