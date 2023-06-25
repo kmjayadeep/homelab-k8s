@@ -1,0 +1,10 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: keycloak
+  namespace: idp
+spec:
+  values:
+    ingress:
+      hostname: idp.cosmos.cboxlab.com
+      tls: true
