@@ -20,5 +20,5 @@ spec:
     namespace: flux-system
   healthChecks:
     - apiVersion: apps/v1
-      kind: Deployment
+      kind: StatefulSet
       name: keycloak
