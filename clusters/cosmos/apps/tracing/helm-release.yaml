@@ -11,6 +11,6 @@ spec:
         - jaeger.cosmos.cboxlab.com
 
         tls:
-        - secretName: weave-tls
+        - secretName: jaeger-tls
           hosts:
           - jaeger.cosmos.cboxlab.com
