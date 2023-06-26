@@ -31,5 +31,10 @@ spec:
       enabled: false
     collector:
       enabled: false
+      # Enable ingress for collector, it will point to collector service, which points to allInOne pods
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: default-clusterissuer
     query:
       enabled: false

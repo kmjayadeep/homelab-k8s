@@ -14,3 +14,13 @@ spec:
         - secretName: jaeger-tls
           hosts:
           - jaeger.cosmos.cboxlab.com
+
+    collector:
+      ingress:
+        hosts:
+        - jaeger-collector.cosmos.cboxlab.com
+
+        tls:
+        - secretName: jaeger-collector-tls
+          hosts:
+          - jaeger-collector.cosmos.cboxlab.com
