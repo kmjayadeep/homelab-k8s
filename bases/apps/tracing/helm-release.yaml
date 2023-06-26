@@ -15,51 +15,19 @@ spec:
         namespace: tracing
       interval: 1m
   values:
-    hostname: pihole
-
-    dualStack:
+    provisionDataStore:
+      cassandra: false
+      elasticsearch: false
+      kafka: false
+    allInOne:
       enabled: true
-
-    persistentVolumeClaim:
-      enabled: true
-      storageClass: local-path
-      size: 500Mi # Doesn't matter for local-path
-
-    serviceWeb:
-      type: LoadBalancer
-      loadBalancerIP:   # Override in env specific configs
-      loadBalancerIPv6: # Override in env specific configs
-      annotations:
-        metallb.universe.tf/allow-shared-ip: pihole
-
-    serviceDns:
-      type: LoadBalancer
-      loadBalancerIP:   # Override in env specific configs
-      loadBalancerIPv6: # Override in env specific configs
-      annotations:
-        metallb.universe.tf/allow-shared-ip: pihole
-
-    virtualHost: pihole.local
-
-    admin:
-      existingSecret: "pihole-admin"
-      passwordKey: "password"
-
-    DNS1: "1.1.1.1"
-    DNS2: "1.0.0.1"
-
-    adlists:
-    - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-    - http://sysctl.org/cameleon/hosts
-    - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
-    - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
-
-    whitelist:
-    - cdn.segment.com # localyzeapp was not working
-
-    dnsmasq:
-      customDnsEntries: []
-
-    podAnnotations:
-      # Enable velero backup
-      backup.velero.io/backup-volumes: config
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: default-clusterissuer
+    agent:
+      enabled: false
+    collector:
+      enabled: false
+    query:
+      enabled: false

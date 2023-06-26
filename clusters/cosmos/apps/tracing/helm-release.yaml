@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jaeger
+  namespace: tracing
+spec:
+  values:
+    allInOne:
+      ingress:
+        hosts:
+        - jaeger.cosmos.cboxlab.com
+
+        tls:
+        - secretName: weave-tls
+          hosts:
+          - jaeger.cosmos.cboxlab.com
