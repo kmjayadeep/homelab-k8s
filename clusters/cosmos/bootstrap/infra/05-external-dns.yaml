@@ -11,8 +11,6 @@ metadata:
 spec:
   path: clusters/cosmos/infra/external-dns
   dependsOn:
-  - name: pihole
-    namespace: pihole
   - name: sealed-secrets
     namespace: flux-system
   interval: 15m
