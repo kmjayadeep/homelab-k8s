@@ -57,16 +57,11 @@ spec:
         # If authentication is disabled and/or you didn't create
         # a secret, you can remove this block.
         env:
-        - name: CF_API_KEY
+        - name: CF_API_TOKEN
           valueFrom:
             secretKeyRef:
-              name: coudflare-creds
-              key: api_key
-        - name: CF_API_EMAIL
-          valueFrom:
-            secretKeyRef:
-              name: coudflare-creds
-              key: email
+              name: cloudflare-creds
+              key: api_token
         args:
         - --source=service
         - --source=ingress
