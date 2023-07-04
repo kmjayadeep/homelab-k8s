@@ -24,6 +24,9 @@ spec:
         - name: deluge-data
           persistentVolumeClaim:
             claimName: downloads-pvc-deluge
+        - name: deluge-config
+          persistentVolumeClaim:
+            claimName: deluge-config
       initContainers:
       - name: copy-vpn-config
         image: busybox
@@ -58,3 +61,5 @@ spec:
           mountPath: /config/openvpn
         - name: deluge-data
           mountPath: /data
+        - name: deluge-config
+          mountPath: /config
