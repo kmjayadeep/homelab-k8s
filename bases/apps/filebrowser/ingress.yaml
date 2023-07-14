@@ -4,6 +4,7 @@ metadata:
  name: filebrowser-ingress
  annotations:
    cert-manager.io/cluster-issuer: default-clusterissuer
+   nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
  tls:
  - hosts:
