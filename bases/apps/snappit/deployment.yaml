@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snappit
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: snappit
+  template:
+    metadata:
+      labels:
+        app: snappit
+    spec:
+      containers:
+      - image: docker.io/kmjayadeep/snappit:0.1
+        imagePullPolicy: IfNotPresent
+        name: snappit
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: PORT
+          value: "3000"
+        - name: MONGO_URL
+          valueFrom:
+            secretKeyRef:
+              name: mongo-creds 
+              key: MONGO_URL
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+      restartPolicy: Always
