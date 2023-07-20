@@ -1,0 +1,14 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: nextcloud
+spec:
+  values:
+    nextcloud:
+      host: nextcloud.cosmos.cboxlab.com
+    ingress:
+      tls:
+      - secretName: nextcloud-tls
+        hosts:
+          - nextcloud.cosmos.cboxlab.com
