@@ -19,15 +19,15 @@ spec:
         app.kubernetes.io/name: totp
     spec:
       containers:
-      - image: 2fauth/2fauth
+      - image: 2fauth/2fauth:4.1.0
         imagePullPolicy: IfNotPresent
         name: 2fauth
         # env: https://docs.2fauth.app/getting-started/installation/docker/docker-compose/
         envFrom: 
         - configMapRef: 
-          name: totp-cm
+            name: totp-cm
         - secretRef: 
-          name: totp-secret
+            name: totp-secret
         ports:
         - containerPort: 8000
           name: http
