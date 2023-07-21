@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: totp
     spec:
       containers:
-      - image: 2fauth/2fauth:4.1.0
+      - image: kmjayadeep/2fauth:4.1.0-psql
         imagePullPolicy: IfNotPresent
         name: 2fauth
         # env: https://docs.2fauth.app/getting-started/installation/docker/docker-compose/
