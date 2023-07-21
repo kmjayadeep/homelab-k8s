@@ -15,6 +15,7 @@ spec:
         namespace: productivity
       interval: 1m
   values:
+    secretKey: e3ac9011c639dbb21510aa2f9a6c56123dd72ef953450d1113718dae3de43c3be7ecfea8951756fd67d2d86b4a2bc6b2254c2c89a108c83c849db41463745eb9
     ingress:
       enabled: true
       annotations:
