@@ -32,3 +32,5 @@ spec:
         - secretName: planka-tls
           hosts:
           - planka.local
+    persistence:
+      enabled: true
