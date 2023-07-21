@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: totp
+    app.kubernetes.io/name: totp
+  name: totp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: totp
+      app.kubernetes.io/name: totp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: totp
+        app.kubernetes.io/name: totp
+    spec:
+      containers:
+      - image: 2fauth/2fauth
+        imagePullPolicy: IfNotPresent
+        name: 2fauth
+        # env: https://docs.2fauth.app/getting-started/installation/docker/docker-compose/
+        envFrom: 
+        - configMapRef: 
+          name: totp-cm
+        - secretRef: 
+          name: totp-secret
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP

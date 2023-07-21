@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: totp
+    app.kubernetes.io/name: totp
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: totp-ingress
+spec:
+  tls:
+  - hosts:
+    - totp.local
+    secretName: totp-cert
+  rules:
+  - host: totp.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: totp
+            port:
+              name: http

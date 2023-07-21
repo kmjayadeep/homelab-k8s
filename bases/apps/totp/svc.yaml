@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: null
+  labels:
+    app.kubernetes.io/instance: totp
+    app.kubernetes.io/name: totp
+    app.kubernetes.io/service: totp
+  name: totp
+spec:
+  ports:
+  - name: http
+    port: 8000
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/instance: totp
+    app.kubernetes.io/name: totp
+  type: ClusterIP
