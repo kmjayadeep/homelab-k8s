@@ -1,10 +1,10 @@
 apiVersion: v1
 data:
-  APP_NAME=totp
-  APP_ENV=production
-  SITE_OWNER=mail@cosmos.cboxlab.com
-  APP_URL=totp.local
-  WEBAUTHN_NAME=totp
+  APP_NAME: totp
+  APP_ENV: production
+  SITE_OWNER: mail@cosmos.cboxlab.com
+  APP_URL: totp.local
+  WEBAUTHN_NAME: totp
 kind: ConfigMap
 metadata:
   creationTimestamp: null
