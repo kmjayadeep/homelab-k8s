@@ -6,7 +6,7 @@ metadata:
 spec:
   chart:
     spec:
-      chart: postgres
+      chart: postgresql
       version: "12.6.8"
       sourceRef:
         kind: HelmRepository
