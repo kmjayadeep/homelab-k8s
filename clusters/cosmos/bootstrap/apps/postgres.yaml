@@ -21,5 +21,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: StatefulSet
-      name: postgres
+      name: postgres-postgresql
       namespace: postgres
