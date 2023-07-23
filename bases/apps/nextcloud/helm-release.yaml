@@ -24,6 +24,16 @@ spec:
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
     nextcloud:
       host: nextcloud.local
+      configs:
+        proxy.config.php: |-
+          <?php
+          $CONFIG = array (
+            'trusted_proxies' => array(
+              0 => '127.0.0.1',
+              1 => '10.0.0.0/8',
+            ),
+            'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
+          );
 
     rbac:
       enabled: true
@@ -47,13 +57,3 @@ spec:
       nextcloudData:
         enabled: true
 
-    configs:
-      proxy.config.php: |-
-        <?php
-        $CONFIG = array (
-          'trusted_proxies' => array(
-            0 => '127.0.0.1',
-            1 => '10.0.0.0/8',
-          ),
-          'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
-        );
