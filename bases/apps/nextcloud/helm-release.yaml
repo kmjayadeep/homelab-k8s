@@ -28,6 +28,9 @@ spec:
     rbac:
       enabled: true
 
+    internalDatabase:
+      enabled: false
+
     externalDatabase:
       enabled: true
       type: postgresql
