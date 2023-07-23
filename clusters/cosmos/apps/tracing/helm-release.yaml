@@ -17,6 +17,11 @@ spec:
 
     collector:
       ingress:
+        cert-manager.io/cluster-issuer: default-clusterissuer
+        nginx.ingress.kubernetes.io/auth-type: basic
+        nginx.ingress.kubernetes.io/auth-secret: tracing-auth
+        # message to display with an appropriate context why the authentication is required
+        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Tracing'
         hosts:
         - jaeger-collector.cosmos.cboxlab.com
 

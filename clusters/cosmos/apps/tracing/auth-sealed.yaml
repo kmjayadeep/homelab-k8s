@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: tracing-auth
+  namespace: tracing
+spec:
+  encryptedData:
+    auth: AgCOmd2vS6Byv67IgZ5MUit9oMvX1U8ZzNVC6pBntPLfePL7h8OzEUhyKnTk5GfuzaldIDatcxjsbOiq6AlO9ms7ymHWzi1pLeYaPSmcUrQUg8/BL2KNEvizEJsRxjB1NUNgwqF3Ri/zK1QpXgNzRrh+q4f71kCHRGeOTkQTZZxgKI3igALF8W4qsHNjWq7d8sKDPJpnC3K9v3+MrbUPlyFT6xUqdounb7NTjfqB8xOeAN6fvmfvZmHHAM6l0rJoA9SQ79Fc/4x+KBLVu8MLDGQqigzaX34mFBVkPfme0SXbPnz0TL0j/Uuj8W9NYuU1WiP8YDsh/37TP4ioMm/JqO3cHUg1pUyz9SK5s01w+oudfYoql7Kv8dk+RIWh2gc0Ke7j6+YRfpGPMYO2BbTVIaa/bDqAzm8Z/UvFgzk7q8A6+j4LQnEBM1L4y0oqEn+P9p/CCi4QqTsOCBq/7UZzwl3pQuo39iR4/bHjiuXnoOi53FoyAoVB6HIAPyI9zNY8XnrisyIMMTaMvLyG9I38pk0dgUogzwu9XKaqowXSJxOpULulM+B+0x+kzRO6n9pMrPsc4NYv9c6UU0bqXjiMougy7K/xO5htDAD25y2IGPbGAy7nLgO+lLbmj36jETHlOvRz8shlseZUsBolsAHIVEZaGXhbw7rPlOA6Rj7pvzkSUkXhVrj8+XGib+dWnaJ6UZMxaZus/uUQBZkZwlFFIxw5v8NOXm/Kx08JUMSZRTJgHQLumg7yhzF4XFKnew==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: tracing-auth
+      namespace: tracing
+
