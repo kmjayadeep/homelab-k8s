@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: pgweb
+    app.kubernetes.io/name: pgweb
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: pgweb-ingress
+spec:
+  tls:
+  - hosts:
+    - pgweb.local
+    secretName: pgweb-cert
+  rules:
+  - host: pgweb.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pgweb
+            port:
+              name: http
