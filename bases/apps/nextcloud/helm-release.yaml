@@ -47,6 +47,9 @@ spec:
             deny all;
           }
 
+    phpClientHttpsFix:
+      enabled: true
+
     nextcloud:
       host: nextcloud.local
       configs:
