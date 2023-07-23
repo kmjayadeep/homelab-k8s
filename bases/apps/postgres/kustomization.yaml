@@ -8,3 +8,4 @@ resources:
   - ./helm-release.yaml
   - ./pgweb-deploy.yaml
   - ./pgweb-svc.yaml
+  - ./pgweb-ing.yaml
