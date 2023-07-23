@@ -27,3 +27,19 @@ spec:
 
     rbac:
       enabled: true
+
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      existingSecret:
+        enabled: true
+        secretName: postgres-secret
+        usernameKey: username
+        passwordKey: password
+        hostKey: host
+        databaseKey: database
+
+    persistence:
+      enabled: true
+      nextcloudData:
+        enabled: true
