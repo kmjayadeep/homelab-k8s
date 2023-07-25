@@ -1,0 +1,20 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager-clusterissuer
+  namespace: cert-manager
+spec:
+  path: clusters/milkyway/infra/cert-manager-clusterissuer
+  dependsOn:
+  - name: cert-manager
+    namespace: cert-manager
+  - name: sealed-secrets
+    namespace: flux-system
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
