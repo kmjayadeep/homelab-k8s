@@ -7,6 +7,7 @@ spec:
   values:
     grafana:
       ingress:
+        ingressClassName: public
         hosts:
         - grafana.milkyway.cboxlab.com
         tls:
