@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-dns
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  path: clusters/milkyway/infra/external-dns
+  dependsOn:
+  - name: sealed-secrets
+    namespace: flux-system
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: external-dns
