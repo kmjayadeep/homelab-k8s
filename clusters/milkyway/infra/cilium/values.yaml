@@ -8,7 +8,7 @@ spec:
     ipv6:
       enabled: true
     cluster:
-      name: cosmos
+      name: milkyway
     operator:
       replicas: 1
 
