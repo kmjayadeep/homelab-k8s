@@ -20,6 +20,6 @@ spec:
     disableWait: true
   values:
     controller:
-      watchIngressWithoutClass: true
+      watchIngressWithoutClass: false
       service:
         loadBalancerIP:  # Set in env specific patches
