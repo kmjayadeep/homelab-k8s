@@ -7,9 +7,5 @@ spec:
   values:
     controller:
       service:
-        annotations:
-          metallb.universe.tf/loadBalancerIPs: "116.203.51.197,2a01:4f8:1c0c:a01d::"
-        ipFamilyPolicy: PreferDualStack
-        ipFamilies:
-        - IPv4
-        - IPv6
+        # Don't expose directly, expose through vpn
+        type: ClusterIP
