@@ -5,7 +5,7 @@ metadata:
   namespace: cert-manager
 spec:
   acme:
-    email: kmjayadeep+cosmos@gmail.com
+    email: kmjayadeep+milkyway@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: cboxlab-issuer-private-key
