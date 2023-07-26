@@ -1,7 +1,22 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: postgres
+  name: postgres-operator-ui
   namespace: postgres
 spec:
-  values: {}
+  values:
+    ingress:
+      hosts:
+      - host: postgres-operator.cosmos.cboxlab.com
+        paths:
+         - backend:
+             service:
+               name: pgweb
+               port:
+                 name: http
+           path: /
+           pathType: Prefix
+      tls:
+      - hosts:
+        - postgres-operator.cosmos.cboxlab.com
+        secretName: postgres-operator-tls-secret

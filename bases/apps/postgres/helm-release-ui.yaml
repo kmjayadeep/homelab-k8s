@@ -17,4 +17,16 @@ spec:
     crds: Create
   upgrade:
     crds: CreateReplace
-  values: {}
+  values:
+    ingress:
+      hosts:
+      - host: postgres-operator.local
+        paths:
+         - backend:
+             service:
+               name: postgres-operator-ui
+               port:
+                 name: http
+           path: /
+           pathType: Prefix
+      tls: []
