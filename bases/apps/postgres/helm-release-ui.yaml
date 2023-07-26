@@ -18,6 +18,8 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    envs:
+      appUrl: "http://postgres-operator.local"
     ingress:
       enabled: true
       annotations:

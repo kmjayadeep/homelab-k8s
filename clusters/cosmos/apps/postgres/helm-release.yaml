@@ -5,6 +5,8 @@ metadata:
   namespace: postgres
 spec:
   values:
+    envs:
+      appUrl: "https://postgres-operator.cosmos.cboxlab.com"
     ingress:
       hosts:
       - host: postgres-operator.cosmos.cboxlab.com
