@@ -24,12 +24,9 @@ spec:
         cert-manager.io/cluster-issuer: default-clusterissuer
       hosts:
       - host: postgres-operator.local
-        paths:
-         - backend:
-             service:
-               name: postgres-operator-ui
-               port:
-                 number: 8081
-           path: /
-           pathType: Prefix
-      tls: []
+        paths: ["/"]
+      tls:
+      - secretName: postgres-operator-tls
+        hosts:
+        - postgres-operator.local
+

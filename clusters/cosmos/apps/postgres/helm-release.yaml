@@ -8,14 +8,7 @@ spec:
     ingress:
       hosts:
       - host: postgres-operator.cosmos.cboxlab.com
-        paths:
-         - backend:
-             service:
-               name: postgres-operator-ui
-               port:
-                 number: 8081
-           path: /
-           pathType: Prefix
+        paths: ["/"]
       tls:
       - hosts:
         - postgres-operator.cosmos.cboxlab.com
