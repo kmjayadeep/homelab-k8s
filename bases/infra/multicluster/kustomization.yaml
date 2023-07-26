@@ -4,6 +4,5 @@ kind: Kustomization
 namespace: multicluster
 
 resources:
-- ./deploy.yaml.
-- ./svc.yaml
 - ./deploy.yaml
+- ./svc.yaml
