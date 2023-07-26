@@ -19,6 +19,9 @@ spec:
     crds: CreateReplace
   values:
     ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: default-clusterissuer
       hosts:
       - host: postgres-operator.local
         paths:
