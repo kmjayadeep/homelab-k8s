@@ -11,9 +11,9 @@ spec:
         paths:
          - backend:
              service:
-               name: pgweb
+               name: postgres-operator-ui
                port:
-                 name: http
+                 number: 8081
            path: /
            pathType: Prefix
       tls:
