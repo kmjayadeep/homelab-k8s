@@ -45,10 +45,6 @@ spec:
         ports:
         - containerPort: 51820
           protocol: UDP
-        command:
-        - sh
-        - -c
-        - echo "Public key '$(wg pubkey < /etc/wireguard/wg0.key)'" && /entrypoint.sh
         env:
         - name: LOG_LEVEL
           value: info
