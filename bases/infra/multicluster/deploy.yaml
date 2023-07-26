@@ -1,0 +1,74 @@
+---
+#! Deployment definition for WireGuard for a single instance container.
+#! Configuration data from a secret gets mounted as files into the container.
+#! The init container ensures forwarding is enabled.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard
+  namespace: multicluster
+  labels:
+    app: wireguard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: init
+        image: busybox:1.32.0
+        command:
+        - sh
+        - -c
+        - sysctl -w net.ipv4.ip_forward=1 && sysctl -w net.ipv4.conf.all.forwarding=1
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+      containers:
+      - name: wireguard
+        image: masipcat/wireguard-go:0.0.20220316
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+        ports:
+        - containerPort: 51820
+          protocol: UDP
+        command:
+        - sh
+        - -c
+        - echo "Public key '$(wg pubkey < /etc/wireguard/wg0.key)'" && /entrypoint.sh
+        env:
+        - name: LOG_LEVEL
+          value: info
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "150m"
+          limits:
+            memory: "128Mi"
+        volumeMounts:
+        - name: wireguard-config
+          mountPath: /etc/wireguard/wg0.key
+          subPath: wg0.key
+          readOnly: true
+        - name: wireguard-config
+          mountPath: /etc/wireguard/wg0.conf
+          subPath: wg0.conf
+          readOnly: true
+      volumes:
+      - name: wireguard-config
+        secret:
+          secretName: wireguard
+
