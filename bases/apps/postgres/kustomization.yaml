@@ -7,7 +7,6 @@ resources:
   - ./helm-repo.yaml
   - ./helm-release.yaml
   - ./helm-release-ui.yaml
-  - ./postgresql.yaml
   - ./pgweb-deploy.yaml
   - ./pgweb-svc.yaml
   - ./pgweb-ing.yaml
