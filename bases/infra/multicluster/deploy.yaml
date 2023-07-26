@@ -36,7 +36,7 @@ spec:
             - NET_ADMIN
       containers:
       - name: wireguard
-        image: masipcat/wireguard-go:0.0.20220316
+        image: dpok/wg-quick:latest # no other tags available
         securityContext:
           privileged: true
           capabilities:
