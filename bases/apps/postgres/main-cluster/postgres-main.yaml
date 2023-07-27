@@ -14,7 +14,8 @@ spec:
     planka: planka-user
   postgresql:
     version: "15"
-    password_encryption: scram-sha-256
+    parameters:
+      password_encryption: scram-sha-256
 
   volume:
     size: 1Gi
