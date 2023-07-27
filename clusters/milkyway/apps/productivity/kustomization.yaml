@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - ../../../../bases/apps/productivity
   - ./secret-sealed.yaml
+
 patches:
-- path: helm-release.yaml
+- path: planka-ing.yaml

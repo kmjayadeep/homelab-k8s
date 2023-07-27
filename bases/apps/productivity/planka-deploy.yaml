@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: planka
+    app.kubernetes.io/name: planka
+  name: planka
+  namespace: productivity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: planka
+      app.kubernetes.io/name: planka
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: planka
+        app.kubernetes.io/name: planka
+    spec:
+      containers:
+      - env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: productivity.planka-user.main.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: productivity.planka-user.main.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: DATABASE_URL
+          value: "postgresql://$(DB_USER):$(DB_PASS)@main.postgres.svc.cluster.local:5432/planka"
+        - name: BASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: BASE_URL
+              name: planka-secret
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_KEY
+              name: planka-secret
+        - name: TRUST_PROXY
+          value: "0"
+        image: ghcr.io/plankanban/planka:1.12.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: planka
+        ports:
+        - containerPort: 1337
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/public/user-avatars
+          name: planka
+          subPath: user-avatars
+        - mountPath: /app/public/project-background-images
+          name: planka
+          subPath: project-background-images
+        - mountPath: /app/private/attachments
+          name: planka
+          subPath: attachments
+      serviceAccountName: planka
+      volumes:
+      - name: planka
+        persistentVolumeClaim:
+          claimName: planka
