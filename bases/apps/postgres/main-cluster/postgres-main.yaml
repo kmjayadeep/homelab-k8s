@@ -1,0 +1,28 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: main
+spec:
+  teamId: "kmjayadeep"
+  numberOfInstances: 1
+  users:
+    admin:
+    - superuser
+    - createdb
+    planka-user: []
+  databases:
+    planka: planka-user
+  postgresql:
+    version: "15"
+    password_encryption: scram-sha-256
+
+  volume:
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      cpu: 500m
+      memory: 500Mi

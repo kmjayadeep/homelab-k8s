@@ -9,7 +9,7 @@ metadata:
   name: postgres
   namespace: postgres
 spec:
-  path: clusters/cosmos/apps/postgres
+  path: clusters/cosmos/apps/postgres/operator
   interval: 15m
   prune: true
   wait: true
