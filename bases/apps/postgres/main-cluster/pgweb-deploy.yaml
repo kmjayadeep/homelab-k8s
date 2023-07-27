@@ -22,9 +22,19 @@ spec:
       - image: sosedoff/pgweb:0.14.1
         imagePullPolicy: IfNotPresent
         name: pgweb
-        envFrom: 
-        - secretRef: 
-            name: pgweb-secret
+        env:
+        - name: PGWEB_AUTH_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres.main.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: PGWEB_AUTH_PASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres.main.credentials.postgresql.acid.zalan.do
+              key: password
+        args:
+        - --host=main.postgres.svc.cluster.local
         ports:
         - containerPort: 8081
           name: http

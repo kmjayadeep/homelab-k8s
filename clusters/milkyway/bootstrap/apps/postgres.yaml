@@ -42,7 +42,7 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: StatefulSet
-      name: main-cluster
+      name: main
       namespace: postgres
   dependsOn:
   - name: sealed-secrets
