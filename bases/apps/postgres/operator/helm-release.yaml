@@ -17,4 +17,6 @@ spec:
     crds: Create
   upgrade:
     crds: CreateReplace
-  values: {}
+  values:
+    configKubernetes:
+      enable_cross_namespace_secret: true
