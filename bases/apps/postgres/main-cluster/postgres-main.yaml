@@ -18,6 +18,9 @@ spec:
     parameters:
       password_encryption: scram-sha-256
 
+  allowedSourceRanges:
+  - 0.0.0.0/0
+
   volume:
     size: 1Gi
 
