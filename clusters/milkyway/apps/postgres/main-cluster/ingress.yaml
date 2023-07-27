@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
  name: pgweb-ingress
 spec:
+ ingressClassName: public
  tls:
  - hosts:
    - pgweb.cosmos.cboxlab.com

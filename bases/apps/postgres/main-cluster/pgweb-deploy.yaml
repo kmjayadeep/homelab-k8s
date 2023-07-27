@@ -23,6 +23,7 @@ spec:
         imagePullPolicy: IfNotPresent
         name: pgweb
         env:
+        # Use the same db creds for web login
         - name: PGWEB_AUTH_USER
           valueFrom:
             secretKeyRef:
@@ -35,6 +36,8 @@ spec:
               key: password
         args:
         - --host=main.postgres.svc.cluster.local
+        - "--user=$(PGWEB_AUTH_USER)"
+        - "--pass=$(PGWEB_AUTH_PASS)"
         ports:
         - containerPort: 8081
           name: http
