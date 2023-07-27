@@ -6,12 +6,12 @@ metadata:
 spec:
   values:
     envs:
-      appUrl: "https://postgres-operator.cosmos.cboxlab.com"
+      appUrl: "https://postgres-operator.milkyway.cboxlab.com"
     ingress:
       hosts:
-      - host: postgres-operator.cosmos.cboxlab.com
+      - host: postgres-operator.milkyway.cboxlab.com
         paths: ["/"]
       tls:
       - hosts:
-        - postgres-operator.cosmos.cboxlab.com
+        - postgres-operator.milkyway.cboxlab.com
         secretName: postgres-operator-tls-secret
