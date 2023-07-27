@@ -10,9 +10,9 @@ spec:
     - superuser
     - createdb
     # User in productivity ns
-    planka.planka-user: []
+    productivity.planka-user: []
   databases:
-    planka: planka.planka-user
+    planka: productivity.planka-user
   postgresql:
     version: "15"
     parameters:
