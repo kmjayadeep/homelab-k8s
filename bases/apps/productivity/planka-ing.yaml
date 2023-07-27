@@ -6,6 +6,8 @@ metadata:
     app.kubernetes.io/name: planka
   name: planka
   namespace: productivity
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   rules:
   - host: planka.local
