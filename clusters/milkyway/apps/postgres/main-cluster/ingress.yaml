@@ -6,10 +6,10 @@ spec:
  ingressClassName: public
  tls:
  - hosts:
-   - pgweb.cosmos.cboxlab.com
+   - pgweb.milkyway.cboxlab.com
    secretName: pgweb-tls-secret
  rules:
- - host: pgweb.cosmos.cboxlab.com
+ - host: pgweb.milkyway.cboxlab.com
    http:
      paths:
      - backend:
