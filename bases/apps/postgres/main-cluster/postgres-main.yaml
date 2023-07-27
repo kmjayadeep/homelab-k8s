@@ -6,9 +6,6 @@ spec:
   teamId: "kmjayadeep"
   numberOfInstances: 1
   users:
-    admin:
-    - superuser
-    - createdb
     # User in productivity ns
     productivity.planka-user: []
   databases:
