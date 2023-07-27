@@ -31,7 +31,7 @@ spec:
               name: productivity.planka-user.main.credentials.postgresql.acid.zalan.do
               key: password
         - name: DATABASE_URL
-          value: "postgresql://$(DB_USER):$(DB_PASS)@main.postgres.svc.cluster.local:5432/planka"
+          value: "postgresql://$(DB_USER):$(DB_PASS)@main.postgres.svc.cluster.local:5432/planka?ssl=true"
         - name: NODE_TLS_REJECT_UNAUTHORIZED
           value: "0"
         - name: PGSSLMODE
