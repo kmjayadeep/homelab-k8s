@@ -5,7 +5,4 @@ metadata:
   namespace: ingress-nginx
 spec:
   values:
-    controller:
-      service:
-        # Don't expose directly, expose through vpn
-        type: ClusterIP
+    controller: {}
