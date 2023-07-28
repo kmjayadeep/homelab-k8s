@@ -5,4 +5,7 @@ metadata:
   namespace: ingress-nginx
 spec:
   values:
-    controller: {}
+    controller:
+      service:
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: "192.168.10.100"

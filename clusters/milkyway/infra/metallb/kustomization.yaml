@@ -4,3 +4,4 @@ resources:
   - ../../../../bases/infra/metallb
   - ./addresspool.yaml
   - ./db-pool.yaml
+  - ./private-pool.yaml
