@@ -6,3 +6,4 @@ namespace: multicluster
 resources:
 - ./deploy.yaml
 - ./svc.yaml
+- ./proxy-config.yaml

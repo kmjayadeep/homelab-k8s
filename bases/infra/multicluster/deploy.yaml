@@ -35,6 +35,11 @@ spec:
             add:
             - NET_ADMIN
       containers:
+      - image: tecnativa/tcp-proxy:v1.0.1
+        name: tcp-proxy
+        envFrom:
+        - configMapRef:
+            name: proxy-config
       - name: wireguard
         image: dpok/wg-quick:latest # no other tags available
         securityContext:
@@ -67,4 +72,3 @@ spec:
       - name: wireguard-config
         secret:
           secretName: wireguard
-

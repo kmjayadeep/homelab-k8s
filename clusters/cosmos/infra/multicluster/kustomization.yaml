@@ -3,3 +3,6 @@ kind: Kustomization
 resources:
   - ../../../../bases/infra/multicluster
   - ./secret-sealed.yaml
+
+patches:
+- path: ./proxy-config.yaml

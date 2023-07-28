@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  LISTEN: ":443 :80"
+  TALK: "192.168.0.100:443 192.168.0.100:80"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: proxy-config
