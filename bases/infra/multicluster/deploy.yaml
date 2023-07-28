@@ -35,11 +35,6 @@ spec:
             add:
             - NET_ADMIN
       containers:
-      - image: tecnativa/tcp-proxy:v1.0.1
-        name: tcp-proxy
-        envFrom:
-        - configMapRef:
-            name: proxy-config
       - name: wireguard
         image: dpok/wg-quick:latest # no other tags available
         securityContext:
@@ -68,6 +63,11 @@ spec:
           mountPath: /etc/wireguard/wg0.conf
           subPath: wg0.conf
           readOnly: true
+      - image: tecnativa/tcp-proxy:v1.0.1
+        name: tcp-proxy
+        envFrom:
+        - configMapRef:
+            name: proxy-config
       volumes:
       - name: wireguard-config
         secret:

@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
-  LISTEN: ":443 :80 :5432"
-  TALK: "192.168.10.100:443 192.168.10.100:80 192.168.10.0:5432"
+  LISTEN: ":443 :5432"
+  TALK: "192.168.10.100:443 192.168.10.0:5432"
 kind: ConfigMap
 metadata:
   creationTimestamp: null
