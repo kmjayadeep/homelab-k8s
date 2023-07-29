@@ -226,14 +226,14 @@ services:
         method: "GET"
         mode: "no-cors"
 
-  - name: "Office"
-    icon: "fas fa-suitcase"
-    items:
-      - name: "NextCloud"
-        logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABcVBMVEUWebL4+/xNmcT7/f0AAAAXerMWd65HcEz+/v4og7j1+PoziboUb6MefrX3+vsWdq7c6/MYerMrhbkAAAAUbJ8TaJnU4+vR5O8gb5x3pb9+tdQkgbb4+vtjmbjx9fhimbdqnLhtq8/w9fgwfKja5+0igLYqhbgigLYqhbkUb6MAAgMAAwQHKTwHKT0WdawbcKAWdavV4+skgbd7qMHW5/Edd6t+tdV6stN3p8Ikc58cd6p8rsojfK9Lj7Yng7h9tNTQ4eq+1uNrnbnx9/purM+/2urQ5O/1+fsxfajb5+4XerP///8Wdq37/P0WebLW5/FLj7Yng7jx9/r1+fvP3+h6stMWdawxibv4+/wVdKpmp8wkcp+FrsVlp8yIutjA2uq/1uMVc6iSwNuPtcp6p8Aue6d5stMbcKAkgbf4+vvV4+sjfK93p8IufKgefrV9rsoWdq7Q4eokc5/R5PBrnbm+1uO/2upurM/c6/Pb5+4xfagsYdqKAAAASnRSTlP+/v7+Jv7+AP7+/v7o/v7+/v5GIP7+/v7+/v7+/v7+/v7+/v7+4+Pi4+cGBmBg/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/s3jHQkAAAFtSURBVEjH7ZbnTwJBFMQXsDylg0i1995778rQQUXsvffuX++1ED6s4dTEKHHyLnn3SyY7u3u7OVb4SbEfMdjqi1Sp0aYY6vzML5bwyE1mZb40KAYrUymrYvCrHSH/qwamWv+RflWk78/B6HFqNM5+Y7Y5RKu2ZqNCs9oLkFDhVRk+j/MjbcYIFEuxqzDJBoSNEsRMihdJqyNROq2HyOR2udwmook05ETaBmr3l4C5e9DFCvOvDALzEnwlPHEixYGa3UVgIQk6F8kooJHgGyHOiVRMpGd6omIfkVcEXiFaGnIi7QCWPQswdQs6EskAMCnBF8IjJ1IkKKwLITh2DUoud58sa4ARCYKCEU6kgopqYT3Kywr6ukhR6XAa8jYusF65MX0XYKHDUnkfzi5l+DAU+OBbMq+ZxSbUcZDwnSZ6jkMyvMl+HtpLHI6Szpw+ojl5CfzBu9WgdoQmxdBqUGcwtCmGZnueKtlbfuTn5B3mawbfr5yGtwAAAABJRU5ErkJggg=="
-        subtitle: "Self hosted cloud"
-        tag: "cloud"
-        url: "https://nextcloud.cosmos.cboxlab.com"
-        type: Ping
-        method: "GET"
-        mode: "no-cors"
+  # - name: "Office"
+  #   icon: "fas fa-suitcase"
+  #   items:
+  #     - name: "NextCloud"
+  #       logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABcVBMVEUWebL4+/xNmcT7/f0AAAAXerMWd65HcEz+/v4og7j1+PoziboUb6MefrX3+vsWdq7c6/MYerMrhbkAAAAUbJ8TaJnU4+vR5O8gb5x3pb9+tdQkgbb4+vtjmbjx9fhimbdqnLhtq8/w9fgwfKja5+0igLYqhbgigLYqhbkUb6MAAgMAAwQHKTwHKT0WdawbcKAWdavV4+skgbd7qMHW5/Edd6t+tdV6stN3p8Ikc58cd6p8rsojfK9Lj7Yng7h9tNTQ4eq+1uNrnbnx9/purM+/2urQ5O/1+fsxfajb5+4XerP///8Wdq37/P0WebLW5/FLj7Yng7jx9/r1+fvP3+h6stMWdawxibv4+/wVdKpmp8wkcp+FrsVlp8yIutjA2uq/1uMVc6iSwNuPtcp6p8Aue6d5stMbcKAkgbf4+vvV4+sjfK93p8IufKgefrV9rsoWdq7Q4eokc5/R5PBrnbm+1uO/2upurM/c6/Pb5+4xfagsYdqKAAAASnRSTlP+/v7+Jv7+AP7+/v7o/v7+/v5GIP7+/v7+/v7+/v7+/v7+/v7+4+Pi4+cGBmBg/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/s3jHQkAAAFtSURBVEjH7ZbnTwJBFMQXsDylg0i1995778rQQUXsvffuX++1ED6s4dTEKHHyLnn3SyY7u3u7OVb4SbEfMdjqi1Sp0aYY6vzML5bwyE1mZb40KAYrUymrYvCrHSH/qwamWv+RflWk78/B6HFqNM5+Y7Y5RKu2ZqNCs9oLkFDhVRk+j/MjbcYIFEuxqzDJBoSNEsRMihdJqyNROq2HyOR2udwmook05ETaBmr3l4C5e9DFCvOvDALzEnwlPHEixYGa3UVgIQk6F8kooJHgGyHOiVRMpGd6omIfkVcEXiFaGnIi7QCWPQswdQs6EskAMCnBF8IjJ1IkKKwLITh2DUoud58sa4ARCYKCEU6kgopqYT3Kywr6ukhR6XAa8jYusF65MX0XYKHDUnkfzi5l+DAU+OBbMq+ZxSbUcZDwnSZ6jkMyvMl+HtpLHI6Szpw+ojl5CfzBu9WgdoQmxdBqUGcwtCmGZnueKtlbfuTn5B3mawbfr5yGtwAAAABJRU5ErkJggg=="
+  #       subtitle: "Self hosted cloud"
+  #       tag: "cloud"
+  #       url: "https://nextcloud.cosmos.cboxlab.com"
+  #       type: Ping
+  #       method: "GET"
+  #       mode: "no-cors"
