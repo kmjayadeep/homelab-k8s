@@ -63,3 +63,10 @@ spec:
           mountPath: /data
         - name: deluge-config
           mountPath: /config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "25m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"
