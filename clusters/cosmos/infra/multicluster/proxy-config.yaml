@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
-  LISTEN: ":443"
-  TALK: "192.168.0.200:443"
+  LISTEN: ":5432"
+  TALK: "192.168.10.0:5432"
 kind: ConfigMap
 metadata:
   creationTimestamp: null
