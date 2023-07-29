@@ -12,8 +12,6 @@ spec:
     operator:
       replicas: 1
 
-    kubeProxyReplacement: strict
-
     ipam:
       mode: kubernetes
       operator:
@@ -27,8 +25,6 @@ spec:
       masquerade: true
 
     enableIPv6Masquerade: false
-    extraArgs:
-    - --enable-ipv6-ndp
 
     k8sServiceHost: 192.168.0.20
     k8sServicePort: 6443
