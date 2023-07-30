@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../../../bases/infra/multicluster
   - ./secret-sealed.yaml
+  - ./postgres-svc.yaml
 
 patches:
 - path: ./proxy-config.yaml

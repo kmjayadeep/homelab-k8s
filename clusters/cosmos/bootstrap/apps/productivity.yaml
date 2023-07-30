@@ -14,6 +14,11 @@ spec:
   prune: true
   wait: true
   timeout: 2m
+  dependsOn:
+  - name: sealed-secrets
+    namespace: flux-system
+  - name: multicluster
+    namespace: flux-system
   sourceRef:
     kind: GitRepository
     name: flux-system
