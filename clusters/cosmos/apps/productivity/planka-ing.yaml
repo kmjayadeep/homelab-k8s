@@ -7,7 +7,6 @@ metadata:
   name: planka
   namespace: productivity
 spec:
-  ingressClassName: public
   rules:
   - host: planka.cosmos.cboxlab.com
     http:
