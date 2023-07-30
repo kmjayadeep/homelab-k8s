@@ -4,5 +4,7 @@ resources:
   - ../../../../bases/infra/multicluster
   - ./secret-sealed.yaml
 
+namespace: multicluster
+
 patches:
 - path: ./proxy-config.yaml

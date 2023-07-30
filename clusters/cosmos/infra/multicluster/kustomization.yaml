@@ -5,5 +5,7 @@ resources:
   - ./secret-sealed.yaml
   - ./postgres-svc.yaml
 
+namespace: multicluster
+
 patches:
 - path: ./proxy-config.yaml
