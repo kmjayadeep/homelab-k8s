@@ -1,0 +1,21 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: standby
+spec:
+  teamId: "kmjayadeep"
+  volume:
+    size: 1Gi
+  numberOfInstances: 1
+  postgresql:
+    version: "15"
+  standby:
+    standby_host: "postgresql-primary.multicluster.svc.cluster.local"
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
+    limits:
+      cpu: 500m
+      memory: 500Mi

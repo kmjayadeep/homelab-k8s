@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: pgweb
+    app.kubernetes.io/name: pgweb
+  name: pgweb
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: pgweb
+      app.kubernetes.io/name: pgweb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: pgweb
+        app.kubernetes.io/name: pgweb
+    spec:
+      containers:
+      - image: sosedoff/pgweb:0.14.1
+        imagePullPolicy: IfNotPresent
+        name: pgweb
+        env:
+        # Use the same db creds for web login
+        - name: PGWEB_AUTH_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres.standby.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: PGWEB_AUTH_PASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres.standby.credentials.postgresql.acid.zalan.do
+              key: password
+        args:
+        - --host=standby.postgres.svc.cluster.local
+        - "--user=$(PGWEB_AUTH_USER)"
+        - "--pass=$(PGWEB_AUTH_PASS)"
+        ports:
+        - containerPort: 8081
+          name: http
+          protocol: TCP
