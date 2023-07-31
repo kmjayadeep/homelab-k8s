@@ -23,3 +23,29 @@ spec:
       kind: StatefulSet
       name: postgres-postgresql
       namespace: postgres
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: postgres-standby
+  namespace: postgres
+spec:
+  path: clusters/cosmos/apps/postgres/standby-cluster
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: StatefulSet
+      name: standby
+      namespace: postgres
+  dependsOn:
+  - name: sealed-secrets
+    namespace: flux-system
+  - name: postgres-operator
+    namespace: postgres
