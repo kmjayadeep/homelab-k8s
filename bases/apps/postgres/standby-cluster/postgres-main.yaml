@@ -11,6 +11,7 @@ spec:
     version: "15"
   standby:
     standby_host: "postgresql-primary.multicluster.svc.cluster.local"
+    standby_port: "5432"
 
   resources:
     requests:
