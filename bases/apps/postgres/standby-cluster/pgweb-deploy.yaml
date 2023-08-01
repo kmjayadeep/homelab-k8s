@@ -27,15 +27,15 @@ spec:
         - name: PGWEB_AUTH_USER
           valueFrom:
             secretKeyRef:
-              name: postgres.standby.credentials.postgresql.acid.zalan.do
+              name: postgres.main.credentials.postgresql.acid.zalan.do
               key: username
         - name: PGWEB_AUTH_PASS
           valueFrom:
             secretKeyRef:
-              name: postgres.standby.credentials.postgresql.acid.zalan.do
+              name: postgres.main.credentials.postgresql.acid.zalan.do
               key: password
         args:
-        - --host=standby.postgres.svc.cluster.local
+        - --host=main.postgres.svc.cluster.local
         - "--user=$(PGWEB_AUTH_USER)"
         - "--pass=$(PGWEB_AUTH_PASS)"
         ports:
