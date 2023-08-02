@@ -9,7 +9,10 @@ kind: CronJob
 metadata:
   name: postgres-backup
 spec:
-  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  schedule: "0 0 * * *"
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
@@ -35,7 +38,7 @@ spec:
             - name: PGHOST
               value: "main"
             - name: PGPORT
-              value: "5423"
+              value: "5432"
             volumeMounts:
             - name: backup-volume
               mountPath: /backup
