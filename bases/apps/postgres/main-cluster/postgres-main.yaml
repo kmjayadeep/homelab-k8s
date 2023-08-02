@@ -9,8 +9,11 @@ spec:
   users:
     # User in productivity ns
     productivity.planka-user: []
+    # User in totp ns
+    totp.totp-user: []
   databases:
     planka: productivity.planka-user
+    totp: totp.totp-user
   postgresql:
     version: "15"
     parameters:

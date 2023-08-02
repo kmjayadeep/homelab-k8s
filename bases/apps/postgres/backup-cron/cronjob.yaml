@@ -34,7 +34,7 @@ spec:
                   name: postgres.main.credentials.postgresql.acid.zalan.do
                   key: password
             - name: DATABASES
-              value: "planka"
+              value: "planka,totp"
             - name: PGHOST
               value: "main"
             - name: PGPORT
