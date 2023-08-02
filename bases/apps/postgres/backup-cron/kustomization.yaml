@@ -10,3 +10,4 @@ configMapGenerator:
   - name: backup-script
     files:
       - files/backup.sh
+      - files/pg_dump.sh

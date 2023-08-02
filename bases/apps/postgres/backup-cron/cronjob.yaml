@@ -14,6 +14,34 @@ spec:
     spec:
       template:
         spec:
+          initContainers:
+          - name: pg-dump-init
+            image: postgres:16beta2-alpine3.18
+            command: ["/bin/sh"]
+            args: ["-c", "sh /scripts/pg_dump.sh"]
+            env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres.main.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres.main.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: DATABASES
+              value: "planka"
+            - name: PGHOST
+              value: "main"
+            - name: PGPORT
+              value: "5423"
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+            - name: script-volume
+              mountPath: "/scripts"
+              readOnly: true
           containers:
           - name: backup
             image: restic/restic:0.16.0
@@ -44,8 +72,12 @@ spec:
             - name: script-volume
               mountPath: "/scripts"
               readOnly: true
+            - name: backup-volume
+              mountPath: /backup
           restartPolicy: OnFailure
           volumes:
+          - name: backup-volume
+            emptydir: {}
           - name: script-volume
             configMap:
               name: backup-script
