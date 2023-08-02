@@ -10,7 +10,7 @@ metadata:
   name: postgres-backup
 spec:
   concurrencyPolicy: Forbid
-  schedule: "0 0 * * *"
+  schedule: "0 * * * *"
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
   jobTemplate:
