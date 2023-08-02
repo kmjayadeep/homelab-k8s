@@ -77,7 +77,7 @@ spec:
           restartPolicy: OnFailure
           volumes:
           - name: backup-volume
-            emptydir: {}
+            emptyDir: {}
           - name: script-volume
             configMap:
               name: backup-script
