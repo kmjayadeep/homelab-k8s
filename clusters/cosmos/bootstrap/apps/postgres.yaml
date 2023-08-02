@@ -49,3 +49,31 @@ spec:
     namespace: flux-system
   - name: postgres-operator
     namespace: postgres
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: backup-cron
+  namespace: postgres
+spec:
+  path: clusters/cosmos/apps/postgres/backup-cron
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  healthChecks:
+    - apiVersion: batch/v1
+      kind: CronJob
+      name: postgres-backup
+      namespace: postgres
+  dependsOn:
+  - name: sealed-secrets
+    namespace: flux-system
+  - name: postgres-operator
+    namespace: postgres
+  - name: standby-cluster
+    namespace: postgres

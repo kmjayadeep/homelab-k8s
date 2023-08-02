@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backup-sa
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: restic/restic:0.16.0
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: restic-creds
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: restic-creds
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: RESTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: restic-creds
+                  key: RESTIC_PASSWORD
+            - name: RESTIC_REPOSITORY
+              valueFrom:
+                secretKeyRef:
+                  name: restic-creds
+                  key: RESTIC_REPOSITORY
+            command: ["/bin/sh"]
+            args: ["-c", "sh /scripts/backup.sh"]
+            volumeMounts:
+            - name: script-volume
+              mountPath: "/scripts"
+              readOnly: true
+          restartPolicy: OnFailure
+          volumes:
+          - name: script-volume
+            configMap:
+              name: backup-script
