@@ -9,7 +9,7 @@ kind: CronJob
 metadata:
   name: postgres-backup
 spec:
-  schedule: "0 0 * * *"
+  schedule: "* * * * *"
   jobTemplate:
     spec:
       template:
