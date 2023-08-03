@@ -78,7 +78,11 @@ spec:
           protocol: TCP
         volumeMounts:
         - name: passport-creds
-          mountPath: /passport
+          mountPath: /srv/storage/oauth-private.key
+          subPath: oauth-private.key
+        - name: passport-creds
+          mountPath: /srv/storage/oauth-public.key
+          subPath: oauth-public.key
         # For debugging
         command: ['/bin/sh']
         args: ['-c', 'sleep 10d']
