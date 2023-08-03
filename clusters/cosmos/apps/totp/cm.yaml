@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
   SITE_OWNER: mail@cosmos.cboxlab.com
-  APP_URL: totp.cosmos.cboxlab.com
+  APP_URL: https://totp.cosmos.cboxlab.com
 kind: ConfigMap
 metadata:
   creationTimestamp: null
