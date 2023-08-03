@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: totp
     spec:
       containers:
-      - image: kmjayadeep/2fauth:4.1.0-psql
+      - image: kmjayadeep/2fauth:4.1.0-psql-0.1
         imagePullPolicy: IfNotPresent
         name: 2fauth
         # env: https://docs.2fauth.app/getting-started/installation/docker/docker-compose/
@@ -64,10 +64,6 @@ spec:
             secretKeyRef:
               name: totp-secret
               key: APP_KEY
-        - name: PASSPORT_PRIVATE_KEY
-          value: /passport/oauth-private.key
-        - name: PASSPORT_PUBLIC_KEY
-          value: /passport/oauth-public.key
         - name: DATABASE_URL
           value: "postgresql://$(DB_USER):$(DB_PASS)@$(DB_HOST):5432/totp"
         - name: APP_DEBUG
@@ -84,8 +80,8 @@ spec:
           mountPath: /srv/storage/oauth-public.key
           subPath: oauth-public.key
         # For debugging
-        command: ['/bin/sh']
-        args: ['-c', 'sleep 10d']
+        # command: ['/bin/sh']
+        # args: ['-c', 'sleep 10d']
       volumes:
       - name: passport-creds
         secret:
@@ -95,4 +91,3 @@ spec:
             path: oauth-private.key
           - key: PASSPORT_PUBLIC_KEY
             path: oauth-public.key
-

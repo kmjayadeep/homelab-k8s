@@ -1,7 +1,7 @@
 version: "3"
 services:
   2fauth:
-    image: kmjayadeep/2fauth:4.1.0-psql
+    image: kmjayadeep/2fauth:4.1.0-psql-0.1
     build: .
     container_name: 2fauth
     ports:
