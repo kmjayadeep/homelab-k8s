@@ -23,9 +23,6 @@ spec:
         imagePullPolicy: IfNotPresent
         name: 2fauth
         # env: https://docs.2fauth.app/getting-started/installation/docker/docker-compose/
-        envFrom: 
-        - configMapRef: 
-            name: totp-cm
         env:
         - name: APP_NAME
           valueFrom:
@@ -69,6 +66,8 @@ spec:
               key: APP_KEY
         - name: DATABASE_URL
           value: "postgresql://$(DB_USER):$(DB_PASS)@$(DB_HOST):5432/totp"
+        command: ["/bin/sh"]
+        args: ["-c", "echo ${COMMIT} > /2fauth/installed; /usr/local/bin/entrypoint.sh"]
         ports:
         - containerPort: 8000
           name: http
