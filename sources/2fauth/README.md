@@ -10,3 +10,11 @@ Run the following query in postgresql first
 ```
 CREATE COLLATION nocase (LOCALE = 'en_US.utf8');
 ```
+
+First time setup:
+
+```
+php artisan passport:install
+```
+
+run this inside the totp container when initializing the db for the first time
