@@ -65,15 +65,9 @@ spec:
               name: totp-secret
               key: APP_KEY
         - name: PASSPORT_PRIVATE_KEY
-          valueFrom:
-            secretKeyRef:
-              name: totp-secret
-              key: PASSPORT_PRIVATE_KEY
+          value: /passport/oauth-private.key
         - name: PASSPORT_PUBLIC_KEY
-          valueFrom:
-            secretKeyRef:
-              name: totp-secret
-              key: PASSPORT_PUBLIC_KEY
+          value: /passport/oauth-public.key
         - name: DATABASE_URL
           value: "postgresql://$(DB_USER):$(DB_PASS)@$(DB_HOST):5432/totp"
         - name: APP_DEBUG
@@ -82,3 +76,19 @@ spec:
         - containerPort: 8000
           name: http
           protocol: TCP
+        volumeMounts:
+        - name: passport-creds
+          mountPath: /passport
+        # For debugging
+        command: ['/bin/sh']
+        args: ['-c', 'sleep 10d']
+      volumes:
+      - name: passport-creds
+        secret:
+          secretName: totp-secret
+          items:
+          - key: PASSPORT_PRIVATE_KEY
+            path: oauth-private.key
+          - key: PASSPORT_PUBLIC_KEY
+            path: oauth-public.key
+
