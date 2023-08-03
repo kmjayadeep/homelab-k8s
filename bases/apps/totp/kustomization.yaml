@@ -8,3 +8,4 @@ resources:
   - ./svc.yaml
   - ./ing.yaml
   - ./cm.yaml
+  - ./storage-pvc.yaml
