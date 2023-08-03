@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
   APP_NAME: totp
-  SITE_OWNER: mail@cosmos.cboxlab.com
+  SITE_OWNER: mail@local
   APP_URL: totp.local
   WEBAUTHN_NAME: totp
 kind: ConfigMap
