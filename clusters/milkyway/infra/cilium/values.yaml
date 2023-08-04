@@ -23,9 +23,6 @@ spec:
         - 10.63.0.0/16
         clusterPoolIPv6MaskSize: 48
 
-    bpf:
-      masquerade: true
-
     enableIPv6Masquerade: true
 
     hubble:
