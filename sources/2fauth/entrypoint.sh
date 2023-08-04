@@ -16,6 +16,10 @@ nginx -v
 #   rm -r /srv/storage
 # fi
 # ln -s /2fauth/storage /srv/storage
+#
+
+mkdir -p /srv/storage/app/imagesLink /srv/storage/app/public/icons /srv/storage/app/qrcodes /srv/storage/framework/cache/data /srv/storage/framework/sessions /srv/storage/framework/testing /srv/storage/framework/views /srv/storage/logs
+ln -s /srv/storage /2fauth/storage
 
 php artisan migrate
 php artisan storage:link --quiet
