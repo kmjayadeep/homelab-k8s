@@ -26,9 +26,7 @@ spec:
     bpf:
       masquerade: true
 
-    enableIPv6Masquerade: false
-    extraArgs:
-    - --enable-ipv6-ndp
+    enableIPv6Masquerade: true
 
     hubble:
       ui:
