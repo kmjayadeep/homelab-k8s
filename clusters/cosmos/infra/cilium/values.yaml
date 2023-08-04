@@ -24,7 +24,7 @@ spec:
     bpf:
       masquerade: true
 
-    enableIPv6Masquerade: false
+    enableIPv6Masquerade: true
 
     k8sServiceHost: 192.168.0.20
     k8sServicePort: 6443
