@@ -21,9 +21,6 @@ spec:
         - 10.63.0.0/16
         clusterPoolIPv6MaskSize: 112
 
-    bpf:
-      masquerade: true
-
     enableIPv6Masquerade: true
 
     k8sServiceHost: 192.168.0.20
