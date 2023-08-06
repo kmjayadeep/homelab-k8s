@@ -225,6 +225,14 @@ services:
         type: Ping
         method: "GET"
         mode: "no-cors"
+      - name: "Vaultwarden"
+        logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAe1BMVEUAAAAWXdwWXdwXX+EXXuAXXdwXX+IXXuAXX+EXXuEYX+EXXuAXX+IXX+EWXdz7+/4NVtv///9Ee+MGUdru8/wTWtzG1fUmaN/09v2Tsu690fXU4Pji6vo6deEhY920yvSEqO15oOuZt+9znOpqluhikecwbuBZiubL2vdi+UhUAAAADnRSTlMA9Qy7wu6bkHheTzchtAX3TeEAAAMeSURBVHja7NXLroIwEIDh1oKA6LT1UDkSo3Hh+7+imLjqLYh0anQ+DbDrHwYKI4QQ8slWi5mx+LapRMkXUoqq2bJXbASHhXGxYVO1BSRRtGySGpKp2QRrSGg9Y33kghocqFNoIbn4k1hAckX0/QcEsf1gBwh2kf2Xg0Mpo0bGqCf7OnYeD+Dg4V258ax/Gw5vGG6egiYYULnrX7WUejYp9dUtqIIBAiym7+Tof+b/oesNWETw+1+CRe3l2/YKLOUqFMBxAviXBXiG//jhBWipXVKjBRwGr8tJ4wR0Z+Vj/o5YAT14IQaYnw+gEVCAgl+/A9kDaAQUkP0ZoG8BjYBGkP0OUAAFUED2fSB7wL19O9pxEwaiACq1XVWt1LszDCQOxoZAAvv/X1itGtZkuynGNqWVuI8g5CMM83S9+RbsgHUBJhjQjgATBehVIIDqG0D1MQDYisMA0L8e5MoWMQA6BAHc3vGBEAOQNgwgZ74BWokDXMMAeBkB1zgAHfMQgAzsRnUgwH3NAQB6ewE1IRIwBACkG/9BHmIBgOalAOrHfWMNxAKkWwxw/y53Eg0ANC8DuF+XNRAPkIsvwI2AEXCRBAAUB/YFOK+bgvEAMsofINdnlywNANKwL0Au7hafBbEAN43mAY7qZlAqQGE1ewCI2sn6GkUyAKiveBZAx3KyftUT0gFAJucZgGQTJOeGkBIAyvI/Aoiau8uZIBXACfgxQPpycpfzjJAaADIVPwAQdVMdV4aQHgA6av4AAIgppzdYHwlrAEC25t8BYhs1uay4toR1ACio5fcAe73fGT5RgfQAN2rVPUG93C+vLgKsCIAYzY+rDKyNYF0ACKfnhzmBsDYAkOzjl8DaTZ9VASC47959/KoBYV2Ai5j6XY+FayNALOAJviEaXvdBvb39gQi+efo0X+Waj6CrbgSuOgj883mmzOZNsM0rgavGCpbk60ydzzuF2HNZnq0UWJRv3oXGeQIReS/vCo3/bqVz+1Lr5rXe7YvNm1e7ty+3b1/v3/6Aw/ZHPFY65PLj+9JjPl/SHvP53w467dmzZ8+ev5af7k9cJvQSMhwAAAAASUVORK5CYII="
+        subtitle: "Password Manager"
+        tag: "sync"
+        url: "https://vaultwarden.cosmos.cboxlab.com"
+        type: Ping
+        method: "GET"
+        mode: "no-cors"
 
   # - name: "Office"
   #   icon: "fas fa-suitcase"
