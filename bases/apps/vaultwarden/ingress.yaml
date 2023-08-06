@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: vaultwarden-ingress
+ annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+spec:
+ tls:
+ - hosts:
+   - vaultwarden.local
+   secretName: waultwarden-tls-secret
+ rules:
+ - host: vaultwarden.local
+   http:
+     paths:
+     - backend:
+         service:
+           name: vaultwarden
+           port:
+             number: 80
+       path: /
+       pathType: Prefix

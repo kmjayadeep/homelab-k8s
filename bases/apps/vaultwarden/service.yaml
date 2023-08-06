@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: vaultwarden
+  name: vaultwarden
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: vaultwarden
+  type: ClusterIP

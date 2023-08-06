@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vaultwarden
+  labels:
+    app.kubernetes.io/name: vaultwarden
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vaultwarden
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vaultwarden
+      annotations:
+    spec:
+      containers:
+        - name: vaultwarden
+          image: "vaultwarden/server:1.29.1"
+          resources:
+            requests:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                cpu: 200m
+                memory: 500Mi
+          env:
+            - name: SIGNUPS_ALLOWED
+              value: "true"
+            - name: DOMAIN
+              value: "https://vaultwarden.cosmos.cboxlab.com"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+          - name: data
+            mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: vaultwarden-pvc
