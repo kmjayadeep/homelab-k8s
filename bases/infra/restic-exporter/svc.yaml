@@ -4,7 +4,7 @@ metadata:
   annotations: null
   labels:
     app.kubernetes.io/name: restic-exporter
-  name: totp
+  name: restic-exporter
 spec:
   ports:
   - name: http-metrics
