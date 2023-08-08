@@ -5,3 +5,4 @@ namespace: monitoring
 
 resources:
   - deploy.yaml
+  - svc.yaml
