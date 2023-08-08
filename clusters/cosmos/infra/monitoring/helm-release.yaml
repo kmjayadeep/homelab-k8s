@@ -28,17 +28,18 @@ spec:
           - targets:
             - 192.168.0.50:9100 ## Node exporter from nuc
             - 192.168.0.50:18080 ## taskwarrior metrics from nuc
-        additionalServiceMonitors:
-        - name: restic-exporter
-          selector:
-            matchLabels:
-              app.kubernetes.io/name: restic-exporter
-          namespaceSelector:
-            matchNames:
-            - monitoring
-          endpoints:
-          - port: http-metrics
-            interval: 30s
+
+      additionalServiceMonitors:
+      - name: restic-exporter
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: restic-exporter
+        namespaceSelector:
+          matchNames:
+          - monitoring
+        endpoints:
+        - port: http-metrics
+          interval: 30s
     alertmanager:
       ingress:
         hosts:
