@@ -2,6 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: restic-rules
+  namespace: monitoring
 spec:
   groups:
   - name: restic-rules
@@ -14,10 +15,10 @@ spec:
       labels:
         severity: critical
     - alert: ResticBackupS3Filling
-      expr: max by(repo) (restic_s3_size_total) > 50*1024*1024*1024
+      expr: max by(repo) (restic_s3_size_total) > 100*1024*1024*1024
       annotations:
-        description: Restic backup for repo {{$labels.repo}} is taking more than 50GB of space in the bucket
-        summary: Restic backup is storing more than 50GB in the bucket
+        description: Restic backup for repo {{$labels.repo}} is taking more than 100GB of space in the bucket
+        summary: Restic backup is storing more than 100GB in the bucket
       labels:
         severity: warning
     - alert: ResticBackupS3TooManyObjects
@@ -36,9 +37,9 @@ spec:
       labels:
         severity: critical
     - alert: ResticRefreshSlow
-      expr: restic_repo_stats_fetch_duration_count - ignoring(le) restic_repo_stats_fetch_duration_bucket{le="20"} > 0
+      expr: restic_repo_stats_fetch_duration_count - ignoring(le) restic_repo_stats_fetch_duration_bucket{le="60"} > 0
       annotations:
-        description: Restic stats for repo {{$labels.repo}} is taking more than 20seconds to complete. Probably there are too many snapshots.
+        description: Restic stats for repo {{$labels.repo}} is taking more than 60seconds to complete. Probably there are too many snapshots.
         summary: Restic stats slow to refresh
       for: 30m
       labels:
