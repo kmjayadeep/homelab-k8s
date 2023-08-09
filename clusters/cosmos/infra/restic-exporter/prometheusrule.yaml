@@ -15,10 +15,10 @@ spec:
       labels:
         severity: critical
     - alert: ResticBackupS3Filling
-      expr: max by(repo) (restic_s3_size_total) > 100*1024*1024*1024
+      expr: max by(repo) (restic_s3_size_total/restic_s3_size_limit) > 0.8
       annotations:
-        description: Restic backup for repo {{$labels.repo}} is taking more than 100GB of space in the bucket
-        summary: Restic backup is storing more than 100GB in the bucket
+        description: Restic backup for repo {{$labels.repo}} is taking more than 80% of space limit in the bucket
+        summary: Restic backup crossed 80% of the size limit
       labels:
         severity: warning
     - alert: ResticBackupS3TooManyObjects
@@ -41,6 +41,14 @@ spec:
       annotations:
         description: Restic stats for repo {{$labels.repo}} is taking more than 60seconds to complete. Probably there are too many snapshots.
         summary: Restic stats slow to refresh
+      for: 30m
+      labels:
+        severity: warning
+    - alert: ResticTooManySnapshots
+      expr: max by(repo) restic_repo_stats_snapshots_active > 50
+      annotations:
+        description: Restic repo {{$labels.repo}} has more than 50 active snapshots
+        summary: Restic repo has too many snapshots
       for: 30m
       labels:
         severity: warning
