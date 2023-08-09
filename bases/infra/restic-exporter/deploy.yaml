@@ -18,14 +18,7 @@ spec:
     spec:
       containers:
       - name: restic-exporter
-        image: "kmjayadeep/restic-exporter:0.2"
-        resources:
-          requests:
-            cpu: 10m
-            memory: 10Mi
-          limits:
-            cpu: 100m
-            memory: 100Mi
+        image: "kmjayadeep/restic-exporter:0.3"
         ports:
           - name: http-metrics
             containerPort: 18090
