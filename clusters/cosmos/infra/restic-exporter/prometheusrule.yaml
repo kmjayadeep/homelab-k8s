@@ -45,7 +45,7 @@ spec:
       labels:
         severity: warning
     - alert: ResticTooManySnapshots
-      expr: max by(repo) restic_repo_stats_snapshots_active > 50
+      expr: max by(repo) (restic_repo_stats_snapshots_active) > 50
       annotations:
         description: Restic repo {{$labels.repo}} has more than 50 active snapshots
         summary: Restic repo has too many snapshots
