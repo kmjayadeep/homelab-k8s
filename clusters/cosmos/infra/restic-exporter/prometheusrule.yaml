@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: restic-rules
+spec:
+  groups:
+  - name: restic-rules
+    rules:
+    - alert: ResticBackupFailing
+      expr: time() -  max by(repo) (restic_repo_last_snapshot) > 60*60*48
+      annotations:
+        description: Restic backup for repo {{$labels.repo}} has no snapshots taken in the past 48h
+        summary: No restic snapshots taken in the past 48 hours
+      labels:
+        severity: critical
+    - alert: ResticBackupS3Filling
+      expr: max by(repo) (restic_s3_size_total) > 50*1024*1024*1024
+      annotations:
+        description: Restic backup for repo {{$labels.repo}} is taking more than 50GB of space in the bucket
+        summary: Restic backup is storing more than 50GB in the bucket
+      labels:
+        severity: warning
+    - alert: ResticBackupS3TooManyObjects
+      expr: max by(repo) (restic_s3_object_count) > 10000
+      annotations:
+        description: Restic backup for repo {{$labels.repo}} has more than 10k objects in the bucket
+        summary: Restic backup is storing more than 10k objects in the bucket
+      labels:
+        severity: warning
+    - alert: ResticRefreshFailing
+      expr: sum by(repo) (rate(restic_repo_stats_refresh_fail_total[5m])) > 0
+      annotations:
+        description: Restic stats for repo {{$labels.repo}} is failing to refresh for 30 mins. Probably there are too many snapshots.
+        summary: Restic stats failing to refresh
+      for: 30m
+      labels:
+        severity: critical
+    - alert: ResticRefreshSlow
+      expr: restic_repo_stats_fetch_duration_count - ignoring(le) restic_repo_stats_fetch_duration_bucket{le="20"} > 0
+      annotations:
+        description: Restic stats for repo {{$labels.repo}} is taking more than 20seconds to complete. Probably there are too many snapshots.
+        summary: Restic stats slow to refresh
+      for: 30m
+      labels:
+        severity: warning

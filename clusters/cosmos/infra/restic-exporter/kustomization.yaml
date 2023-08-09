@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - ../../../../bases/infra/restic-exporter
   - ./secret-sealed.yaml
+  - ./prometheusrule.yaml

@@ -75,6 +75,9 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: default-clusterissuer
       prometheusSpec:
+        # Allow monitoring from all namespaces
+        ruleSelector: {}
+        serviceMonitorSelector: {}
         resources:
           limits:
             memory: 400Mi
