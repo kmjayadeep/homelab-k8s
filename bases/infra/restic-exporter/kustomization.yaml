@@ -4,5 +4,6 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
-  - deploy.yaml
-  - svc.yaml
+  - ./deploy.yaml
+  - ./svc.yaml
+  - ./grafana-dashboard.yaml
