@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: otpcloud-ingress
+spec:
+ tls:
+ - hosts:
+   - totp.milkyway.cboxlab.com
+   secretName: otpcloud-tls-secret
+ rules:
+ - host: totp.milkyway.cboxlab.com
+   http:
+     paths:
+     - backend:
+         service:
+           name: otpcloud
+           port:
+             name: http
+       path: /
+       pathType: Prefix
