@@ -6,6 +6,8 @@ metadata:
 spec:
   values:
     grafana:
+      # Disable temporarily to save memory usage
+      enabled: false
       ingress:
         ingressClassName: public
         hosts:
