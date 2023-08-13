@@ -6,4 +6,3 @@ namespace: postgres
 resources:
   - ./helm-repo.yaml
   - ./helm-release.yaml
-  - ./helm-release-ui.yaml
