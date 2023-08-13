@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: null
+  labels:
+    app.kubernetes.io/instance: otpcloud
+    app.kubernetes.io/name: otpcloud
+    app.kubernetes.io/service: otpcloud
+  name: otpcloud
+spec:
+  ports:
+  - name: http
+    port: 3000
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/instance: otpcloud
+    app.kubernetes.io/name: otpcloud
+  type: ClusterIP

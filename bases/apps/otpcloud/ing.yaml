@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: otpcloud
+    app.kubernetes.io/name: otpcloud
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: otpcloud-ingress
+spec:
+  tls:
+  - hosts:
+    - otpcloud.local
+    secretName: otpcloud-cert
+  rules:
+  - host: otpcloud.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: otpcloud
+            port:
+              name: http

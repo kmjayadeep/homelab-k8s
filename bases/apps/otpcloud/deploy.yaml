@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: otpcloud
+    app.kubernetes.io/name: otpcloud
+  name: otpcloud
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: otpcloud
+      app.kubernetes.io/name: otpcloud
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: otpcloud
+        app.kubernetes.io/name: otpcloud
+    spec:
+      containers:
+      - image: kmjayadeep/otpcloud:0.2
+        imagePullPolicy: IfNotPresent
+        name: otpcloud
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: totp.totp-user.main.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: totp.totp-user.main.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: otpcloud-secret
+              key: DB_HOST
+        - name: APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: otpcloud-secret
+              key: APP_KEY
+        - name: DB_CONNECTION_STRING
+          value: "user=$(DB_USER) password=$(DB_PASS) host=$(DB_HOST) port=5432 dbname=totp"
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
