@@ -3,10 +3,10 @@ kind: Service
 metadata:
   annotations: null
   labels:
-    app.kubernetes.io/instance: totp
-    app.kubernetes.io/name: totp
-    app.kubernetes.io/service: totp
-  name: totp
+    app.kubernetes.io/instance: speedtest
+    app.kubernetes.io/name: speedtest
+    app.kubernetes.io/service: speedtest
+  name: sp
 spec:
   ports:
   - name: http
@@ -14,6 +14,6 @@ spec:
     protocol: TCP
     targetPort: http
   selector:
-    app.kubernetes.io/instance: totp
-    app.kubernetes.io/name: totp
+    app.kubernetes.io/instance: speedtest
+    app.kubernetes.io/name: speedtest
   type: ClusterIP
