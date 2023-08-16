@@ -5,10 +5,10 @@ metadata:
 spec:
  tls:
  - hosts:
-   - speedtest.cosmos.cboxlab.com
+   - speedtest.milkyway.cboxlab.com
    secretName: speedtest-tls-secret
  rules:
- - host: speedtest.cosmos.cboxlab.com
+ - host: speedtest.milkyway.cboxlab.com
    http:
      paths:
      - backend:
