@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/instance: speedtest
     app.kubernetes.io/name: speedtest
     app.kubernetes.io/service: speedtest
-  name: sp
+  name: speedtest
 spec:
   ports:
   - name: http
