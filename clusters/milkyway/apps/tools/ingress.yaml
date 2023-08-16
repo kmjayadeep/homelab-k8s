@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
  name: speedtest-ingress
 spec:
+ ingressClassName: public
  tls:
  - hosts:
    - speedtest.milkyway.cboxlab.com

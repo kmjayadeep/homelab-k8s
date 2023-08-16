@@ -63,7 +63,7 @@ links:
 # First level array represent a group.
 # Leave only a "items" key if not using group (group name, icon & tagstyle are optional, section separation will not be displayed).
 services:
-  - name: "Games"
+  - name: "Games & Tools"
     icon: "fas fa-gamepad"
     items:
       - name: "Wordle"
@@ -71,6 +71,14 @@ services:
         subtitle: "Wordle game"
         tag: "games"
         url: "https://wordle.milkyway.cboxlab.com"
+        type: Ping
+        method: "HEAD"
+        mode: "no-cors"
+      - name: "Speedtest"
+        logo: "data:image/png;base64,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"
+        subtitle: "Test connection speed"
+        tag: "games"
+        url: "https://speedtest.milkyway.cboxlab.com"
         type: Ping
         method: "HEAD"
         mode: "no-cors"
