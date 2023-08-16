@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: speedtest
+    app.kubernetes.io/name: speedtest
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: speedtest-ingress
+spec:
+  tls:
+  - hosts:
+    - speedtest.local
+    secretName: speedtest-cert
+  rules:
+  - host: speedtest.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: speedtest
+            port:
+              name: http

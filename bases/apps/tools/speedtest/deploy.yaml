@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: speedtest
+    app.kubernetes.io/name: speedtest
+  name: speedtest
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: speedtest
+      app.kubernetes.io/name: speedtest
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: speedtest
+        app.kubernetes.io/name: speedtest
+    spec:
+      containers:
+        # No other tags
+      - image: adolfintel/speedtest:latest
+        imagePullPolicy: IfNotPresent
+        name: speedtest
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
