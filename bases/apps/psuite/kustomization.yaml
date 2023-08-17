@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: psuite
 
 bases:
-- git::https://github.com/kmjayadeep/productivity-suite.git//server/kustomize/base?ref=2b7f2732f6a785d6d03e6ae5e8f276a8bfe430d5
+- git::https://github.com/kmjayadeep/productivity-suite.git//server/kustomize/base?ref=9433f5a830f3f77cdd12d0de5bc696d1ff6bd236
