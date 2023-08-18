@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../../../bases/infra/multicluster
   - ./secret-sealed.yaml
+  - ./tailscale-secret-sealed.yaml
 
 namespace: multicluster
 

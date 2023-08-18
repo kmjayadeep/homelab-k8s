@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: multicluster
 
 resources:
+- ./tailscale/deploy.yaml
 - ./deploy.yaml
 - ./svc.yaml
 - ./proxy-config.yaml

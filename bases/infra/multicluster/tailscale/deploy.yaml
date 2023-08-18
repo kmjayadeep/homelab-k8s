@@ -1,0 +1,36 @@
+---
+#! Deployment definition for tailscale for a single instance container.
+#! Configuration data from a secret gets mounted as files into the container.
+#! The init container ensures forwarding is enabled.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailscale
+  namespace: multicluster
+  labels:
+    app: tailscale
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: tailscale
+  template:
+    metadata:
+      labels:
+        app: tailscale
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: tailscale
+        image: tailscale/tailscale:v1.46.1
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        envFrom:
+        - secretRef:
+            name: tailscale-creds
