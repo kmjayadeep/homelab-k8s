@@ -38,6 +38,16 @@ spec:
             add:
             - NET_ADMIN
             - NET_RAW
+        env:
+        - name: TS_STATE_DIR
+          value: /data
         envFrom:
         - secretRef:
             name: tailscale-creds
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: tailscale-pvc
