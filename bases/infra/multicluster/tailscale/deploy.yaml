@@ -5,6 +5,7 @@ metadata:
   namespace: multicluster
   labels:
     app: tailscale
+    type: infra
 spec:
   replicas: 1
   strategy:
