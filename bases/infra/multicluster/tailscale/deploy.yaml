@@ -5,7 +5,6 @@ metadata:
   namespace: multicluster
   labels:
     app: tailscale
-    type: infra
 spec:
   replicas: 1
   strategy:
@@ -17,6 +16,7 @@ spec:
     metadata:
       labels:
         app: tailscale
+        type: infra
     spec:
       restartPolicy: Always
       containers:
