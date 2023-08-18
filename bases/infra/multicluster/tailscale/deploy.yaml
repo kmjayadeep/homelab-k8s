@@ -16,7 +16,6 @@ spec:
     metadata:
       labels:
         app: tailscale
-        type: infra
     spec:
       restartPolicy: Always
       initContainers:
