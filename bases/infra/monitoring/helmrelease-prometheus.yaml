@@ -92,7 +92,7 @@ spec:
                 requests:
                   storage: 5Gi
       additionalPodMonitors:
-        name: flux-system
+      - name: flux-system
         namespaceSelector:
           matchNames:
             - flux-system
