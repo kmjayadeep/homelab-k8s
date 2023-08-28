@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: gollum
+    app.kubernetes.io/name: gollum
+  name: gollum
+  namespace: productivity
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+spec:
+  rules:
+  - host: gollum.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: gollum
+            port:
+              number: 4567
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - gollum.local
+    secretName: gollum-tls

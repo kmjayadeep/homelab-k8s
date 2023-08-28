@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: gollum
+    app.kubernetes.io/name: gollum
+  name: gollum
+  namespace: psuite
+spec:
+  rules:
+  - host: gollum.cosmos.cboxlab.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: gollum
+            port:
+              number: 4567
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - gollum.cosmos.cboxlab.com
+    secretName: gollum-tls

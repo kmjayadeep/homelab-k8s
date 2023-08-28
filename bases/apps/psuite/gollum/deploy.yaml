@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: gollum
+    app.kubernetes.io/name: gollum
+  name: gollum
+  namespace: psuite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: gollum
+      app.kubernetes.io/name: gollum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: gollum
+        app.kubernetes.io/name: gollum
+    spec:
+      containers:
+      - image: gollumwiki/gollum:v5.3.2
+        imagePullPolicy: IfNotPresent
+        args:
+        - --mathjax
+        - --h1-title
+        name: gollum
+        ports:
+        - containerPort: 4567
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /wiki
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: gollum-data
