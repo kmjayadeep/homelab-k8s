@@ -32,7 +32,29 @@ spec:
         volumeMounts:
         - mountPath: /wiki
           name: data
+      - name: psuite-sync
+        image: linuxserver/syncthing:1.22.2
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config
+        livenessProbe:
+          httpGet:
+            path: /rest/noauth/health
+            port: 8384
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /rest/noauth/health
+            port: 8384
+          initialDelaySeconds: 5
+          periodSeconds: 10
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: gollum-data
+      - name: config
+        persistentVolumeClaim:
+          claimName: gollum-config
