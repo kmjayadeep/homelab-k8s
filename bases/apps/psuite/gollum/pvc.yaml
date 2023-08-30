@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/instance: gollum
     app.kubernetes.io/name: gollum
   name: gollum-data
-  namespace: productivity
+  namespace: psuite
 spec:
   accessModes:
   - ReadWriteOnce
