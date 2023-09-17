@@ -12,7 +12,7 @@ spec:
   - name: http
     port: 8080
     protocol: TCP
-    targetPort: http
+    targetPort: 8080
   selector:
     app.kubernetes.io/instance: headscale
     app.kubernetes.io/name: headscale
