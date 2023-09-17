@@ -24,9 +24,10 @@ spec:
       containers:
       - name: headscale
         image: headscale/headscale:sha-b01f1f1
+        command: ["headscale", "serve"]
         volumeMounts:
         - name: data
-          mountPath: /data
+          mountPath: /var/lib/headscale
         - name: headscale-config
           mountPath: /etc/headscale/config.yaml
           subPath: config.yaml
