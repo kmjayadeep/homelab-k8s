@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: multicluster
+
+resources:
+- ./deploy.yaml
+- ./svc.yaml
+- ./pvc.yaml
+- ./ing.yaml
+
+configMapGenerator:
+- name: headscale-config
+  files:
+    - assets/config.yaml

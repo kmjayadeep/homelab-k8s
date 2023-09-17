@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: headscale
+    app.kubernetes.io/name: headscale
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: headscale-ingress
+spec:
+  tls:
+  - hosts:
+    - headscale.local
+    secretName: headscale-cert
+  rules:
+  - host: headscale.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: headscale
+            port:
+              name: http

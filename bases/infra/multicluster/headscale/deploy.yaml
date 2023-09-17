@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: headscale
+  namespace: multicluster
+  labels:
+    app.kubernetes.io/instance: headscale
+    app.kubernetes.io/name: headscale
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: headscale
+      app.kubernetes.io/name: headscale
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: headscale
+        app.kubernetes.io/name: headscale
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: headscale
+        image: headscale/headscale:sha-b01f1f1
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: headscale-config
+          mountPath: /etc/headscale/config.yaml
+          subPath: config.yaml
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: headscale-pvc
+      - name: headscale-config
+        configMap:
+          name: headscale-config
