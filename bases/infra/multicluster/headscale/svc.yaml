@@ -3,10 +3,10 @@ kind: Service
 metadata:
   annotations: null
   labels:
-    app.kubernetes.io/instance: homer
-    app.kubernetes.io/name: homer
-    app.kubernetes.io/service: homer
-  name: homer
+    app.kubernetes.io/instance: headscale
+    app.kubernetes.io/name: headscale
+    app.kubernetes.io/service: headscale
+  name: headscale
 spec:
   ports:
   - name: http
@@ -14,6 +14,6 @@ spec:
     protocol: TCP
     targetPort: http
   selector:
-    app.kubernetes.io/instance: homer
-    app.kubernetes.io/name: homer
+    app.kubernetes.io/instance: headscale
+    app.kubernetes.io/name: headscale
   type: ClusterIP
