@@ -10,7 +10,7 @@
 #
 # https://myheadscale.example.com:443
 #
-server_url: https://headscale.cosmos.cboxlab.com:443
+server_url: https://headscale.milkyway.cboxlab.com:443
 
 # Address to listen to / bind to on the server
 #

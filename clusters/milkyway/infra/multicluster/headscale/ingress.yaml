@@ -3,12 +3,13 @@ kind: Ingress
 metadata:
  name: headscale-ingress
 spec:
+ ingressClassName: public
  tls:
  - hosts:
-   - headscale.cosmos.cboxlab.com
+   - headscale.milkyway.cboxlab.com
    secretName: headscale-tls-secret
  rules:
- - host: headscale.cosmos.cboxlab.com
+ - host: headscale.milkyway.cboxlab.com
    http:
      paths:
      - backend:
