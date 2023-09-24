@@ -23,7 +23,7 @@ spec:
       labels:
         severity: critical
     - alert: ResticRefreshSlow
-      expr: restic_repo_stats_fetch_duration_count - ignoring(le) restic_repo_stats_fetch_duration_bucket{le="60"} > 0
+      expr: sum by (repo) (rate(restic_repo_stats_fetch_duration_count[5m])) - sum by (repo) (rate(restic_repo_stats_fetch_duration_bucket{le="60"}[5m])) > 0
       annotations:
         description: Restic stats for repo {{$labels.repo}} is taking more than 60seconds to complete. Probably there are too many snapshots.
         summary: Restic stats slow to refresh
