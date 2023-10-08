@@ -6,3 +6,4 @@ namespace: external-dns
 resources:
   - namespace.yaml
   - deployment.yaml
+  - ./crd-dnsendpoint.yaml

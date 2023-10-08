@@ -63,8 +63,8 @@ spec:
               name: cloudflare-creds
               key: api_token
         args:
-        - --source=service
         - --source=ingress
+        - --source=crd
         - --domain-filter=cboxlab.com
         - --policy=upsert-only
         - --provider=cloudflare
