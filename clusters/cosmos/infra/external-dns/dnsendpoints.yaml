@@ -19,3 +19,13 @@ spec:
     recordType: A
     targets:
     - 192.168.0.20
+  - dnsName: titanic.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.0.30
+  - dnsName: zeus.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.0.31
