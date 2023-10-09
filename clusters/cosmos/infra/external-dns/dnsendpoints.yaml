@@ -29,3 +29,8 @@ spec:
     recordType: A
     targets:
     - 192.168.0.31
+  - dnsName: portainer.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.0.31
