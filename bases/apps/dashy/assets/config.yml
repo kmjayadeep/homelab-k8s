@@ -50,9 +50,10 @@ sections:
     icon: hl-dopplertask
     url: https://psuite.cosmos.cboxlab.com
     statusCheck: true
+    statusCheckAcceptCodes: 401,200
   - title: OtpCloud
     icon: hl-passwordpusher
-    url: https://psuite.cosmos.cboxlab.com
+    url: https://otpcloud.cosmos.cboxlab.com
     statusCheck: true
   - title: Vaultwarden
     icon: hl-bitwarden
@@ -67,7 +68,7 @@ sections:
     statusCheck: true
   - title: Speedtest
     description: Check connection speed to the server
-    icon: hl-speedtest
+    icon: hl-librespeed
     url: https://speedtest.milkyway.cboxlab.com
     statusCheck: true
   - title: Planka
@@ -76,7 +77,7 @@ sections:
     statusCheck: true
   - title: OtpCloud
     icon: hl-passwordpusher
-    url: https://psuite.milkyway.cboxlab.com
+    url: https://otpcloud.milkyway.cboxlab.com
     statusCheck: true
 - name: Infra
   items:
