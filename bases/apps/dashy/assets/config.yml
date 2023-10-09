@@ -1,26 +1,146 @@
 ---
+appConfig:
+  layout: auto
+  iconSize: medium
+  theme: nord-frost
 pageInfo:
-  title: Home Lab
-sections: # An array of sections
-- name: Section 1 - Getting Started
-  items: # An array of items
-  - title: GitHub
-    description: Source code and documentation on GitHub
-    icon: fab fa-github
-    url: https://github.com/Lissy93/dashy
-  - title: Issues
-    description: View currently open issues, or raise a new one
-    icon: fas fa-bug
-    url: https://github.com/Lissy93/dashy/issues
-  - title: Demo
-    description: A live demo
-    icon: far fa-rocket
-    url: https://dashy-demo-1.netlify.app
-- name: Section 2 - Local Services
+  title: Cosmos HomeLab
+  description: K8s all the things!
+  navLinks: []
+  footerText: github.com/kmjayadeep
+sections:
+- name: Media
   items:
-  - title: Firewall
-    icon: favicon
-    url: http://192.168.1.1/
-  - title: Game Server
-    icon: https://i.ibb.co/710B3Yc/space-invader-x256.png
-    url: http://192.168.130.1/
+  - title: Emby
+    description: Media player
+    icon: hl-emby
+    url: https://emby.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Filebrowser
+    description: View and upload media files
+    icon: hl-filebrowser
+    url: https://filebrowser.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Deluge
+    description: Torrent downloader
+    icon: hl-deluge
+    url: https://deluge.cosmos.cboxlab.com
+    statusCheck: true
+- name: Apps
+  items:
+  - title: Wordle
+    description: Worldle game
+    icon: hl-google-play-games
+    url: https://wordle.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Speedtest
+    description: Check connection speed to the server
+    icon: hl-librespeed
+    url: https://speedtest.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Planka
+    icon: hl-planka
+    url: https://planka.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Snappit
+    icon: hl-pastebin
+    url: https://snappit.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Psuite
+    icon: hl-dopplertask
+    url: https://psuite.cosmos.cboxlab.com
+    statusCheck: true
+  - title: OtpCloud
+    icon: hl-passwordpusher
+    url: https://psuite.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Vaultwarden
+    icon: hl-bitwarden
+    url: https://vaultwarden.cosmos.cboxlab.com
+    statusCheck: true
+- name: Apps - Milkyway
+  items:
+  - title: Wordle Public
+    description: Worldle game
+    icon: hl-google-play-games
+    url: https://wordle.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Speedtest
+    description: Check connection speed to the server
+    icon: hl-speedtest
+    url: https://speedtest.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Planka
+    icon: hl-planka
+    url: https://planka.milkyway.cboxlab.com
+    statusCheck: true
+  - title: OtpCloud
+    icon: hl-passwordpusher
+    url: https://psuite.milkyway.cboxlab.com
+    statusCheck: true
+- name: Infra
+  items:
+  - title: Grafana
+    icon: hl-grafana
+    url: https://grafana.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Prometheus
+    icon: hl-prometheus
+    url: https://prometheus.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Alertmanager
+    icon: hl-alertmanager
+    url: https://alertmanager.cosmos.cboxlab.com
+    statusCheck: true
+  - title: Postgres
+    icon: hl-postgres
+    url: https://pgweb.cosmos.cboxlab.com
+    statusCheck: true
+- name: Infra - Milkyway
+  items:
+  - title: Grafana
+    icon: hl-grafana
+    url: https://grafana.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Prometheus
+    icon: hl-prometheus
+    url: https://prometheus.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Alertmanager
+    icon: hl-alertmanager
+    url: https://alertmanager.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Weave
+    icon: hl-weave
+    url: https://weave.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Hubble
+    icon: hl-hubble
+    url: https://hubble.milkyway.cboxlab.com
+    statusCheck: true
+  - title: Postgres
+    icon: hl-postgres
+    url: https://pgweb.milkyway.cboxlab.com
+    statusCheck: true
+- name: Server & Network
+  items:
+  - title: Router
+    icon: hl-asus-router
+    url: http://192.168.0.1
+    statusCheck: true
+    statusCheckAllowInsecure: true
+  - title: Proxmox - Pluto
+    icon: hl-proxmox
+    url: http://pluto.cosmos.cboxlab.com:8006
+    statusCheck: true
+    statusCheckAllowInsecure: true
+  - title: Proxmox - Thinkpad
+    icon: hl-proxmox
+    url: http://thinkpad.cosmos.cboxlab.com:8006
+    statusCheck: true
+    statusCheckAllowInsecure: true
+  - title: Portainer - Zeus
+    icon: hl-portainer
+    url: http://Portainer.cosmos.cboxlab.com:9443
+    statusCheck: true
+    statusCheckAllowInsecure: true
