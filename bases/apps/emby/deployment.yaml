@@ -28,6 +28,9 @@ spec:
         - mountPath: /data/media
           name: media
           readOnly: True
+        - mountPath: /data/nfs-media
+          name: nfs-media
+          readOnly: True
         - mountPath: /config
           name: emby-config
       restartPolicy: Always
@@ -41,3 +44,8 @@ spec:
       - name: emby-config
         persistentVolumeClaim:
           claimName: emby-config
+      - name: nfs-media
+        nfs:
+          server: 192.168.0.31
+          path: /srv/media
+          readOnly: true
