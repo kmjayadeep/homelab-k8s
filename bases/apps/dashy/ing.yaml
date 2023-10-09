@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: dashy
+    app.kubernetes.io/name: dashy
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: dashy-ingress
+spec:
+  tls:
+  - hosts:
+    - dashy.local
+    secretName: dashy-cert
+  rules:
+  - host: dashy.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dashy
+            port:
+              name: http

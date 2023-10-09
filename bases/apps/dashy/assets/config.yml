@@ -1,0 +1,26 @@
+---
+pageInfo:
+  title: Home Lab
+sections: # An array of sections
+- name: Section 1 - Getting Started
+  items: # An array of items
+  - title: GitHub
+    description: Source code and documentation on GitHub
+    icon: fab fa-github
+    url: https://github.com/Lissy93/dashy
+  - title: Issues
+    description: View currently open issues, or raise a new one
+    icon: fas fa-bug
+    url: https://github.com/Lissy93/dashy/issues
+  - title: Demo
+    description: A live demo
+    icon: far fa-rocket
+    url: https://dashy-demo-1.netlify.app
+- name: Section 2 - Local Services
+  items:
+  - title: Firewall
+    icon: favicon
+    url: http://192.168.1.1/
+  - title: Game Server
+    icon: https://i.ibb.co/710B3Yc/space-invader-x256.png
+    url: http://192.168.130.1/
