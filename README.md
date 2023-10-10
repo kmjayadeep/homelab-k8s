@@ -1,6 +1,9 @@
 # Homelab K8s
 
-This is where I keep all my kubernetes manifests for my homelab
+This is where I keep all my kubernetes manifests for my homelab. Here is a screenshot of my homer dashboard.
+
+![Homer](assets/homer.png)
+
 
 ## Clusters
 
