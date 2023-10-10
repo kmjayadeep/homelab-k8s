@@ -4,11 +4,5 @@ namespace: homer
 resources:
 - ../../../../bases/apps/homer
 
-configMapGenerator:
-- name: homer-config
-  behavior: replace
-  files:
-    - assets/config.yml
-
 patches:
 - path: ingress.yaml
