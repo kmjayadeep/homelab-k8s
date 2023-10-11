@@ -4,9 +4,11 @@ kind: Kustomization
 namespace: homer
 
 configMapGenerator:
-- name: homer-config
+- name: homer-assets
   files:
-    - assets/config.yml
+    - ./assets/config.yml
+    - ./assets/dracula.css
+    - ./assets/dracula-background.png
 
 resources:
   - ./deploy.yaml

@@ -30,9 +30,8 @@ spec:
           timeoutSeconds: 1
         name: homer
         volumeMounts:
-        - name: homer-config
-          mountPath: /www/assets/config.yml
-          subPath: config.yml
+        - name: homer-assets
+          mountPath: /www/assets
         ports:
         - containerPort: 8080
           name: http
@@ -56,6 +55,6 @@ spec:
             port: 8080
           timeoutSeconds: 1
       volumes:
-      - name: homer-config
+      - name: homer-assets
         configMap:
-          name: homer-config
+          name: homer-assets
