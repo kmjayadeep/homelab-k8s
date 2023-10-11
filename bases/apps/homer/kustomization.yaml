@@ -8,7 +8,7 @@ configMapGenerator:
   files:
     - ./assets/config.yml
     - ./assets/dracula.css
-    - ./assets/dracula-background.png
+    # - ./assets/dracula-background.png
 
 resources:
   - ./deploy.yaml
