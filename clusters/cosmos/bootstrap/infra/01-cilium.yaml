@@ -6,7 +6,7 @@ metadata:
 spec:
   path: clusters/cosmos/infra/cilium
   interval: 15m
-  prune: true
+  prune: false
   wait: true
   timeout: 2m
   sourceRef:
