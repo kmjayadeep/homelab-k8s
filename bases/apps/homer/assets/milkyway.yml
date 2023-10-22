@@ -10,10 +10,17 @@ footer: '<p>Dashboard created with <span class="has-text-danger">❤️</span> w
 stylesheet:
 - "assets/dracula.css"
 
+defaults:
+  layout: list
+  colorTheme: dark
+
 links:
   - name: "Gitops"
     icon: "fab fa-github"
     url: "https://github.com/kmjayadeep/homelab-k8s"
+  - name: "Cosmos"
+    icon: "fa-solid fa-cloud"
+    url: "/"
 
 # Services
 # First level array represent a group.
