@@ -9,7 +9,8 @@ configMapGenerator:
     - ./assets/config.yml
     - ./assets/milkyway.yml
     - ./assets/dracula.css
-    - ./assets/dracula-background.png
+    # not working
+    # - ./assets/dracula-background.png
 
 resources:
   - ./deploy.yaml
