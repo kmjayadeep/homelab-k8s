@@ -10,6 +10,10 @@ footer: '<p>Dashboard created with <span class="has-text-danger">❤️</span> w
 stylesheet:
 - "assets/dracula.css"
 
+defaults:
+  layout: list
+  colorTheme: dark
+
 links:
   - name: "Gmail"
     icon: "fas fa-inbox"
