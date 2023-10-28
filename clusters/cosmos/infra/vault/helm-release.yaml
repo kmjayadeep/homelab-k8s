@@ -12,7 +12,7 @@ spec:
         - host: vault.cosmos.cboxlab.com
           paths:
           - path: /
-            pathType: ImplementationSpecific
+            pathType: Prefix
 
         tls:
         - secretName: vault-tls
