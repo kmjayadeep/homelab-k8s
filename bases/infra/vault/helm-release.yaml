@@ -22,12 +22,8 @@ spec:
       ingress:
         enabled: true
         hosts:
-        - host: vault.local
-          paths:
-          - path: /
-            pathType: Prefix
-
+        - host: vault.cosmos.cboxlab.com
         tls:
         - secretName: vault-tls
           hosts:
-          - vault.local
+          - vault.cosmos.cboxlab.com

@@ -10,10 +10,6 @@ spec:
         enabled: true
         hosts:
         - host: vault.cosmos.cboxlab.com
-          paths:
-          - path: /
-            pathType: Prefix
-
         tls:
         - secretName: vault-tls
           hosts:
