@@ -21,6 +21,8 @@ spec:
     server:
       ingress:
         enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: default-clusterissuer
         hosts:
         - host: vault.cosmos.cboxlab.com
         tls:
