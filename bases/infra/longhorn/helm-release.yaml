@@ -18,6 +18,8 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    longhornUI:
+      replicas: 1
     ingress:
       enabled: true
       annotations:
@@ -25,3 +27,8 @@ spec:
       host: longhorn.local
       tls: true
       tlsSecret: longhorn-tls
+    csi:
+      attacherReplicaCount: 1
+      provisionerReplicaCount: 1
+      resizerReplicaCount: 1
+      snapshotterReplicaCount: 1
