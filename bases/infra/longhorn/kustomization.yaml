@@ -1,4 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+namespace: vault
+
 resources:
-  - ./helm-release.yaml
+  - helm-repo.yaml
+  - helm-release.yaml
