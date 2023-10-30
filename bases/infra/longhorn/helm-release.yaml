@@ -32,3 +32,8 @@ spec:
       provisionerReplicaCount: 1
       resizerReplicaCount: 1
       snapshotterReplicaCount: 1
+    defaultSettings:
+      defaultReplicaCount: 1
+    persistence:
+      defaultClass: false
+      defaultClassReplicaCount: 1
