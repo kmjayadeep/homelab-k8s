@@ -1,33 +1,32 @@
-# Create a persistent volume to mount local downloads folder into container
+## PV for nfs mount
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: downloads-pv-emby
-  labels:
-    volume-type: downloads-volume
+  name: emby-downloads-nfs
 spec:
   capacity:
-    storage: 20Gi
+    storage: 10Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
-  claimRef:
-    kind: PersistentVolumeClaim
-    name: downloads-pvc-emby
-    namespace: emby
-  storageClassName: downloads-storage-jf
-  hostPath:
-    path: /mnt/downloads
-    type: Directory
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /srv/downloads
+    server: 192.168.0.31
 ---
+# PVC for nfs media mount
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: downloads-pvc-emby
+  name: emby-downloads-nfs
 spec:
-  storageClassName: downloads-storage-jf
-  volumeName: downloads-pv-emby
+  storageClassName: nfs
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 20Gi
+      storage: 10Gi

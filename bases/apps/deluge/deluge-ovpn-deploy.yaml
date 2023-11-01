@@ -24,9 +24,9 @@ spec:
         - name: deluge-config
           persistentVolumeClaim:
             claimName: deluge-config
-        - name: nfs-media
+        - name: nfs-downloads
           persistentVolumeClaim:
-            claimName: deluge-media-nfs
+            claimName: deluge-downloads-nfs
       initContainers:
       - name: copy-vpn-config
         image: busybox
@@ -62,7 +62,7 @@ spec:
         - name: deluge-config
           mountPath: /config
         - mountPath: /downloads
-          name: nfs-media
+          name: nfs-downloads
         resources:
           requests:
             memory: "128Mi"

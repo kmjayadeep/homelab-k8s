@@ -1,33 +1,32 @@
-# Create a persistent volume to mount local media folder into container
+## PV for nfs mount
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: media-pv-emby
-  labels:
-    volume-type: media-volume
+  name: emby-media-nfs
 spec:
   capacity:
-    storage: 20Gi
+    storage: 10Gi
+  volumeMode: Filesystem
   accessModes:
-    - ReadOnlyMany
-  claimRef:
-    kind: PersistentVolumeClaim
-    name: media-pvc
-    namespace: emby
-  storageClassName: media-storage
-  hostPath:
-    path: /mnt/media
-    type: Directory
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /srv/media
+    server: 192.168.0.31
 ---
+# PVC for nfs media mount
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: media-pvc
+  name: emby-media-nfs
 spec:
-  storageClassName: media-storage
-  volumeName: media-pv-emby
+  storageClassName: nfs
   accessModes:
-    - ReadOnlyMany
+    - ReadWriteMany
   resources:
     requests:
-      storage: 20Gi
+      storage: 10Gi
