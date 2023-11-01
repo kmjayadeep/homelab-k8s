@@ -15,7 +15,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /srv/media
+    path: /srv/downloads
     server: 192.168.0.31
 ---
 # PVC for nfs media mount
