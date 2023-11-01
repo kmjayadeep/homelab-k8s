@@ -37,7 +37,7 @@ spec:
           claimName: emby-config
       - name: downloads
         persistentVolumeClaim:
-          claimName: emby-downloads-pvc
+          claimName: emby-downloads-nfs
       - name: media
         persistentVolumeClaim:
-          claimName: emby-media-pvc
+          claimName: emby-media-nfs
