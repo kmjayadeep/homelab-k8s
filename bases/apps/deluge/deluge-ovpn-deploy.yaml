@@ -21,9 +21,6 @@ spec:
             optional: false
         - name: openvpn-rw
           emptyDir: {}
-        - name: deluge-data
-          persistentVolumeClaim:
-            claimName: downloads-pvc-deluge
         - name: deluge-config
           persistentVolumeClaim:
             claimName: deluge-config
@@ -62,8 +59,6 @@ spec:
         volumeMounts:
         - name: openvpn-rw
           mountPath: /config/openvpn
-        - name: deluge-data
-          mountPath: /data
         - name: deluge-config
           mountPath: /config
         - mountPath: /downloads
