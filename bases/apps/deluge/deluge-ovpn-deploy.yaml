@@ -28,9 +28,8 @@ spec:
           persistentVolumeClaim:
             claimName: deluge-config
         - name: nfs-media
-          nfs:
-            server: 192.168.0.31
-            path: /srv/media
+          persistentVolumeClaim:
+            claimName: deluge-media-nfs
       initContainers:
       - name: copy-vpn-config
         image: busybox
@@ -67,7 +66,7 @@ spec:
           mountPath: /data
         - name: deluge-config
           mountPath: /config
-        - mountPath: /nfs
+        - mountPath: /downloads
           name: nfs-media
         resources:
           requests:
