@@ -30,7 +30,7 @@ spec:
       volumes:
       - name: media
         persistentVolumeClaim:
-          claimName: media-pvc
+          claimName: filebrowser-media-nfs
       - name: filebrowser-config
         persistentVolumeClaim:
           claimName: filebrowser-config
