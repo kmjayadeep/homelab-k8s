@@ -29,3 +29,5 @@ spec:
         - secretName: vault-tls
           hosts:
           - vault.cosmos.cboxlab.com
+      dataStorage:
+        storageClass: longhorn

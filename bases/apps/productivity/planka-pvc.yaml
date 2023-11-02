@@ -7,8 +7,9 @@ metadata:
   name: planka
   namespace: productivity
 spec:
+  storageClassName: longhorn
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 2Gi
