@@ -22,6 +22,9 @@ rules:
 - apiGroups: ["externaldns.k8s.io"]
   resources: ["dnsendpoints"]
   verbs: ["get","watch","list"]
+- apiGroups: ["externaldns.k8s.io"]
+  resources: ["dnsendpoints/status"]
+  verbs: ["update"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
