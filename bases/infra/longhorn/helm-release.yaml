@@ -34,7 +34,6 @@ spec:
       snapshotterReplicaCount: 1
     defaultSettings:
       defaultReplicaCount: 1
-      backupTarget: nfs://nfs.cosmos.cboxlab.com:/srv/longhorn
     persistence:
       defaultClass: false
       defaultClassReplicaCount: 1

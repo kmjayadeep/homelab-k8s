@@ -7,3 +7,5 @@ spec:
   values:
     ingress:
       host: longhorn.cosmos.cboxlab.com
+    defaultSettings:
+      backupTarget: nfs://nfs.cosmos.cboxlab.com:/srv/longhorn

@@ -16,7 +16,7 @@ spec:
     - nfsvers=4.1
   nfs:
     path: /srv/downloads
-    server: 192.168.0.31
+    server: nfs.cosmos.cboxlab.com
 ---
 # PVC for nfs media mount
 apiVersion: v1
