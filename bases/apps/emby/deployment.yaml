@@ -15,7 +15,7 @@ spec:
         app: emby
     spec:
       containers:
-      - image: docker.io/emby/embyserver:4.8.0.39
+      - image: docker.io/emby/embyserver:4.8.0.57
         imagePullPolicy: IfNotPresent
         name: emby
         ports:
