@@ -90,11 +90,13 @@ spec:
           cert-manager.io/cluster-issuer: default-clusterissuer
       prometheusSpec:
         # Allow monitoring from all namespaces
+        ruleSelectorNilUsesHelmValues: false
         ruleSelector: {}
+        serviceMonitorSelectorNilUsesHelmValues: false
         serviceMonitorSelector: {}
         resources:
           limits:
-            memory: 400Mi
+            memory: 700Mi
             cpu: 1
           requests:
             memory: 400Mi
