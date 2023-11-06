@@ -4,7 +4,6 @@ resources:
   - ../../../../bases/infra/multicluster
   - ./secret-sealed.yaml
   - ./postgres-svc.yaml
-  - ./tailscale-secret-sealed.yaml
 
 namespace: multicluster
 
