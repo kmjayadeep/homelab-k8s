@@ -26,8 +26,8 @@ spec:
         - job_name: nuc
           static_configs:
           - targets:
-            - 192.168.0.50:9100 ## Node exporter from nuc
-            - 192.168.0.50:18080 ## taskwarrior metrics from nuc
+            - 100.94.246.133:9100 ## Node exporter from nuc
+            - 100.94.246.133:18080 ## taskwarrior metrics from nuc
 
       additionalServiceMonitors:
       - name: restic-exporter
