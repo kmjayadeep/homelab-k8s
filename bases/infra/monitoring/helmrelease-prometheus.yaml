@@ -94,6 +94,7 @@ spec:
         ruleSelector: {}
         serviceMonitorSelectorNilUsesHelmValues: false
         serviceMonitorSelector: {}
+        retention: 3h
         resources:
           limits:
             memory: 700Mi
