@@ -29,6 +29,11 @@ spec:
             - 100.94.246.133:9100 ## Node exporter from nuc
             - 100.94.246.133:18080 ## taskwarrior metrics from nuc
 
+        thanos:
+          objectStorageConfig:
+            name: thanos-s3
+            key: config
+
       additionalServiceMonitors:
       - name: restic-exporter
         selector:

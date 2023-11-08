@@ -4,6 +4,7 @@ resources:
   - ../../../../bases/infra/monitoring
   - ./grafana-creds-sealed.yaml
   - ./alermanager-config-sealed.yaml
+  - ./thanos-s3-sealed.yaml
 
 patches:
 - path: helm-release.yaml
