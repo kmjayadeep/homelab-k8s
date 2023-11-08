@@ -33,6 +33,7 @@ spec:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: default-clusterissuer
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
       hosts:
       - minio.local
       tls:
