@@ -1,0 +1,14 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  values:
+    consoleIngress:
+      hosts:
+      - minio.cosmos.cboxlab.com
+      tls:
+      - secretName: minio-tls
+        hosts:
+        - minio.cosmos.cboxlab.com
