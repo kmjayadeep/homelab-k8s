@@ -22,6 +22,8 @@ spec:
     # To be provided in env specific folder
     existingSecret: minio-creds
 
+    replicas: 1
+
     persistence:
       storageClass: longhorn
       size: 10Gi
