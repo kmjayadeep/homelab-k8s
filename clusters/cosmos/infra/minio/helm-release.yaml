@@ -5,6 +5,14 @@ metadata:
   namespace: minio
 spec:
   values:
+    ingress:
+      hosts:
+      - minio-server.cosmos.cboxlab.com
+      tls:
+      - secretName: minio-server-tls
+        hosts:
+        - minio-server.cosmos.cboxlab.com
+
     consoleIngress:
       hosts:
       - minio.cosmos.cboxlab.com
