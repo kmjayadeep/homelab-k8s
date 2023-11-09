@@ -21,6 +21,9 @@ spec:
     existingObjstoreSecret: thanos-s3
     query:
       enabled: true
+    queryFrontend:
+      # Enabled by default
+      enabled: false
     bucketweb:
       enabled: true
     compactor:
