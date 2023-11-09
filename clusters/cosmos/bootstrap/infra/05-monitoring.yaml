@@ -29,6 +29,25 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: thanos
+  namespace: monitoring
+spec:
+  path: clusters/cosmos/infra/monitoring/thanos
+  dependsOn:
+  - name: monitoring
+    namespace: monitoring
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: longhorn-monitoring
   namespace: monitoring
 spec:
