@@ -23,6 +23,12 @@ spec:
       enabled: true
       stores:
       - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
+      ingress:
+        enabled: true
+        hostname: thanos.local
+        annotations:
+          cert-manager.io/cluster-issuer: default-clusterissuer
+        tls: true
     queryFrontend:
       # Enabled by default
       enabled: false
