@@ -13,6 +13,12 @@ spec:
         - secretName: grafana-cert
           hosts:
           - grafana.cosmos.cboxlab.com
+
+      sidecar:
+        datasources:
+          uid: thanos-query
+          url: http://thanos-query:9090/
+
     prometheus:
       ingress:
         hosts:

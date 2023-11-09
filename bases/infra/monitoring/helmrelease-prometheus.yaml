@@ -38,6 +38,8 @@ spec:
           cert-manager.io/cluster-issuer: default-clusterissuer
         enabled: true
         hosts: [] # Declare in env specific file
+      alertmanager:
+        enabled: false
     defaultRules:
       create: true
       rules:
