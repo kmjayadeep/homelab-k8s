@@ -16,7 +16,6 @@ spec:
 
       sidecar:
         datasources:
-          uid: thanos-query
           url: http://thanos-query:9090/
 
     prometheus:
