@@ -21,6 +21,8 @@ spec:
     existingObjstoreSecret: thanos-s3
     query:
       enabled: true
+      stores:
+      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
     queryFrontend:
       # Enabled by default
       enabled: false
