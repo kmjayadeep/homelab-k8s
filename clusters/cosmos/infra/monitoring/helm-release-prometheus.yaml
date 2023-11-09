@@ -34,8 +34,8 @@ spec:
             name: thanos-s3
             key: objstore.yml
 
-        thanosService:
-          enabled: true
+      thanosService:
+        enabled: true
 
       additionalServiceMonitors:
       - name: restic-exporter
