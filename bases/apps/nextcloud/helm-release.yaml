@@ -67,10 +67,10 @@ spec:
       enabled: true
 
     internalDatabase:
-      enabled: false
+      enabled: true
 
     externalDatabase:
-      enabled: true
+      enabled: false
       type: postgresql
       existingSecret:
         enabled: true
