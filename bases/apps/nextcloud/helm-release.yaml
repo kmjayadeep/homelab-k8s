@@ -15,6 +15,10 @@ spec:
         namespace: nextcloud
       interval: 1m
   values:
+    image:
+      flavor: fpm
+    nginx:
+      enabled: true
     ingress:
       enabled: true
       annotations:
