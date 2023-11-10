@@ -7,10 +7,10 @@ spec:
   values:
     ingress:
       hosts:
-      - cockroachdb.cosmos.cboxlab.com
+      - cockroachdb-console.cosmos.cboxlab.com
       tls:
       - hosts:
-        - cockroachdb.cosmos.cboxlab.com
+        - cockroachdb-console.cosmos.cboxlab.com
         secretName: cockroachdb-tls
 
     service:
