@@ -21,7 +21,7 @@ links:
     # target: "_blank"
   - name: "Tutanota"
     icon: "fas fa-envelope"
-    url: "https://mail.tutanota.com"
+    url: "https://app.tuta.com"
   - name: "Youtube"
     icon: "fa-brands fa-youtube"
     url: "https://youtube.com"
