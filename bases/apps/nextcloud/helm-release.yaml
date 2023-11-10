@@ -15,10 +15,6 @@ spec:
         namespace: nextcloud
       interval: 1m
   values:
-    image:
-      flavor: fpm
-    nginx:
-      enabled: true
     ingress:
       enabled: true
       annotations:
@@ -26,66 +22,6 @@ spec:
         nginx.ingress.kubernetes.io/proxy-body-size: 4G
         nginx.ingress.kubernetes.io/enable-cors: "true"
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
-        nginx.ingress.kubernetes.io/server-snippet: |-
-          server_tokens off;
-          proxy_hide_header X-Powered-By;
-          rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
-          rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
-          rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
-          rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
-          location = /.well-known/carddav {
-            return 301 $scheme://$host/remote.php/dav;
-          }
-          location = /.well-known/caldav {
-            return 301 $scheme://$host/remote.php/dav;
-          }
-          location = /robots.txt {
-            allow all;
-            log_not_found off;
-            access_log off;
-          }
-          location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
-            deny all;
-          }
-          location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
-            deny all;
-          }
-
-    phpClientHttpsFix:
-      enabled: true
 
     nextcloud:
       host: nextcloud.local
-      configs:
-        proxy.config.php: |-
-          <?php
-          $CONFIG = array (
-            'trusted_proxies' => array(
-              0 => '127.0.0.1',
-              1 => '10.0.0.0/8',
-            ),
-            'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
-          );
-
-    rbac:
-      enabled: true
-
-    internalDatabase:
-      enabled: true
-
-    externalDatabase:
-      enabled: false
-      type: postgresql
-      existingSecret:
-        enabled: true
-        secretName: postgres-secret
-        usernameKey: username
-        passwordKey: password
-        hostKey: host
-        databaseKey: database
-
-    persistence:
-      enabled: true
-      nextcloudData:
-        enabled: true
-
