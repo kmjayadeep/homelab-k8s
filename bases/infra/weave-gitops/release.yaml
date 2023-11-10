@@ -37,7 +37,7 @@ spec:
       # https://docs.gitops.weave.works/docs/configuration/securing-access-to-the-dashboard/#login-via-a-cluster-user-account
       # pacman -S weave-gitops-bin
       # echo -n $PASSWORD | gitops get bcrypt-hash
-      passwordHash: "$2a$10$vQauQZr/H5FV8sSU0yO1ReD9kcxvaKhpmW9X3PM5eONMivlJbSCOa"
+      passwordHash: "$2a$10$j18Hk.kc6D9y2uuop.kdSeS.1lvAI5/vnGz7b1ysopUZNXxRLgFHO"
 
     ingress:
       enabled: true
