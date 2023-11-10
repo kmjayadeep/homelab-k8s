@@ -38,3 +38,35 @@ spec:
       persistentVolume:
         enabled: true
         size: 10Gi
+
+    provisioning:
+      enabled: true
+      # https://www.cockroachlabs.com/docs/stable/cluster-settings.html
+      clusterSettings:
+        # cluster.organization: "'FooCorp - Local Testing'"
+        # enterprise.license: "'xxxxx'"
+      users:
+      - name: test
+        password: test
+        # https://www.cockroachlabs.com/docs/stable/create-user.html#parameters
+        options: [LOGIN]
+      databases:
+      - name: nextcloud
+      #   # https://www.cockroachlabs.com/docs/stable/create-database.html#parameters
+      #   options: [encoding='utf-8']
+      #   owners: []
+      #   # https://www.cockroachlabs.com/docs/stable/grant.html#parameters
+      #   owners_with_grant_option: []
+      #   # Backup schedules are not idemponent for now and will fail on next run
+      #   # https://github.com/cockroachdb/cockroach/issues/57892
+      #   backup:
+      #     into: s3://
+      #     # Enterprise-only option (revision_history)
+      #     # https://www.cockroachlabs.com/docs/stable/create-schedule-for-backup.html#backup-options
+      #     options: [revision_history]
+      #     recurring: '@always'
+      #     # Enterprise-only feature. Remove this value to use `FULL BACKUP ALWAYS`
+      #     fullBackup: '@daily'
+      #     schedule:
+      #       # https://www.cockroachlabs.com/docs/stable/create-schedule-for-backup.html#schedule-options
+      #       options: [first_run = 'now']
