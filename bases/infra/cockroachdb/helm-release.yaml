@@ -19,7 +19,7 @@ spec:
     crds: CreateReplace
   values:
     conf:
-      single-mode: true
+      single-node: true
     statefulset:
       replicas: 1
 
