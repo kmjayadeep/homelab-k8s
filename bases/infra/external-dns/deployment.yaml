@@ -70,6 +70,7 @@ spec:
         args:
         - --source=ingress
         - --source=crd
+        - --source=service
         - --domain-filter=cboxlab.com
         - --policy=upsert-only
         - --provider=cloudflare

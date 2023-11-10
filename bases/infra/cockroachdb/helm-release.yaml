@@ -22,16 +22,30 @@ spec:
       single-node: false
     statefulset:
       replicas: 2
+      resources:
+        limits:
+          cpu: 300m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 200Mi
 
+    service:
+      public:
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: cockroachdb.local
+
+    # Cockroachdb UI
     ingress:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: default-clusterissuer
       hosts:
-      - cockroachdb.local
+      - cockroachdb-console.local
       tls:
       - hosts:
-        - cockroachdb.local
+        - cockroachdb-console.local
         secretName: cockroachdb-tls
     
     storage:
@@ -74,4 +88,3 @@ spec:
       #
     tls:
       enabled: false
-

@@ -12,3 +12,9 @@ spec:
       - hosts:
         - cockroachdb.cosmos.cboxlab.com
         secretName: cockroachdb-tls
+
+    service:
+      public:
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: cockroachdb.cosmos.cboxlab.com
