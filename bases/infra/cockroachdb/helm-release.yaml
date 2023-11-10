@@ -52,6 +52,7 @@ spec:
       persistentVolume:
         enabled: true
         size: 10Gi
+        storageClass: longhorn
 
     provisioning:
       enabled: true
