@@ -7,4 +7,7 @@ spec:
   values:
     query:
       ingress:
-        hostname: thanos.cosmos.cboxlab.com
+        hostname: thanos-query.cosmos.cboxlab.com
+    compactor:
+      ingress:
+        hostname: thanos-compact.cosmos.cboxlab.com
