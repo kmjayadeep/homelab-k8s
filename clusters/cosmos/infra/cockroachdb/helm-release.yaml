@@ -1,0 +1,14 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cockroachdb
+  namespace: cockroachdb
+spec:
+  values:
+    ingress:
+      hosts:
+      - cockroachdb.cosmos.cboxlab.com
+      tls:
+      - hosts:
+        - cockroachdb.cosmos.cboxlab.com
+        secretName: cockroachdb-tls

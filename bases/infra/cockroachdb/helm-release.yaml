@@ -1,0 +1,40 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cockroachdb
+  namespace: cockroachdb
+spec:
+  chart:
+    spec:
+      chart: cockroachdb
+      version: "11.2.1"
+      sourceRef:
+        kind: HelmRepository
+        name: cockroachdb
+        namespace: cockroachdb
+  interval: 1h0m0s
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    conf:
+      single-mode: true
+    statefulset:
+      replicas: 1
+
+    ingress:
+      enabled: false
+      annotations:
+        cert-manager.io/cluster-issuer: default-clusterissuer
+      hosts:
+      - cockroachdb.local
+      tls:
+      - hosts:
+        - cockroachdb.local
+        secretName: cockroachdb-tls
+    
+    storage:
+      persistentVolume:
+        enabled: true
+        size: 10Gi
