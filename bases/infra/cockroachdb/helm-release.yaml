@@ -70,3 +70,8 @@ spec:
       #     schedule:
       #       # https://www.cockroachlabs.com/docs/stable/create-schedule-for-backup.html#schedule-options
       #       options: [first_run = 'now']
+      #
+      #
+    tls:
+      enabled: false
+
