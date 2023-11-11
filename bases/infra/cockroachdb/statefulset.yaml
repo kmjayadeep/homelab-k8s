@@ -53,6 +53,18 @@ spec:
       # No pre-stop hook is required, a SIGTERM plus some time is all that's
       # needed for graceful shutdown of a node.
       terminationGracePeriodSeconds: 60
+      initContainers:
+      - name: init
+        image: busybox:1.32.0
+        command:
+        - sh
+        - -c
+        - sysctl -w net.ipv4.ip_forward=1 && sysctl -w net.ipv4.conf.all.forwarding=1
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
       containers:
         - name: db
           image: "cockroachdb/cockroach:v23.1.11"
@@ -124,10 +136,30 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
+        - name: tailscale
+          image: tailscale/tailscale:v1.46.1
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+              - NET_RAW
+          env:
+          - name: TS_AUTHKEY
+            value: "AUTHKEY"
+          - name: TS_STATE_DIR
+            value: /data
+          - name: TS_EXTRA_ARGS
+            value: --login-server https://headscale.milkyway.cboxlab.com
+          volumeMounts:
+            - name: tailscale
+              mountPath: /data
       volumes:
         - name: datadir
           persistentVolumeClaim:
             claimName: datadir
+        - name: tailscale
+          persistentVolumeClaim:
+            claimName: tailscale
       securityContext:
         seccompProfile:
           type: "RuntimeDefault"
@@ -147,3 +179,14 @@ spec:
         resources:
           requests:
             storage: "10Gi"
+    - metadata:
+        name: tailscale
+        labels:
+          app.kubernetes.io/name: cockroachdb
+          app.kubernetes.io/instance: "cockroachdb"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: "1Gi"
