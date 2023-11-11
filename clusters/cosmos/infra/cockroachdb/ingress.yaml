@@ -1,20 +1,23 @@
 ---
 # Source: cockroachdb/templates/ingress.yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: cockroachdb-ingress
   namespace: cockroachdb
 spec:
   rules:
-    - host: cockroachdb-console.cosmos.cboxlab.com
-      http:
-        paths:
-          - path: "/"
-            backend:
-              serviceName: cockroachdb-public
-              servicePort: "http"
+  - host: cockroachdb-console.cosmos.cboxlab.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: cockroachdb-public
+            port:
+              name: http
+        path: /
+        pathType: Prefix
   tls:
-    - hosts:
-      - cockroachdb-console.cosmos.cboxlab.com
-      secretName: cockroachdb-tls
+  - hosts:
+    - cockroachdb-console.cosmos.cboxlab.com
+    secretName: cockroachdb-tls
