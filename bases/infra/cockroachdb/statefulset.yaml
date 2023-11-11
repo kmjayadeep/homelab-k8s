@@ -141,6 +141,8 @@ spec:
             value: tailscale-state-$(POD_NAME)
           - name: TS_AUTH_ONCE
             value: "true"
+          - name: TS_ACCEPT_DNS
+            value: "true"
           - name: TS_USERSPACE
             value: "false"
           - name: TS_AUTHKEY
