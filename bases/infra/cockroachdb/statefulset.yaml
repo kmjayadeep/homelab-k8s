@@ -132,6 +132,10 @@ spec:
               - NET_ADMIN
               - NET_RAW
           env:
+          - name: POD_NAME
+            valueFrom:
+               fieldRef:
+                 fieldPath: metadata.name
           # For storing the state
           - name: TS_KUBE_SECRET
             value: tailscale-state-$(POD_NAME)
@@ -144,10 +148,6 @@ spec:
               secretKeyRef:
                 name: tailscale-auth
                 key: TS_AUTHKEY
-          - name: POD_NAME
-            valueFrom:
-               fieldRef:
-                 fieldPath: metadata.name
           - name: TS_EXTRA_ARGS
             value: "--login-server https://headscale.milkyway.cboxlab.com --hostname=$(CLUSTER_NAME)-$(POD_NAME)"
       volumes:
