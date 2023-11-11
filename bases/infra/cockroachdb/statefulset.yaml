@@ -79,7 +79,7 @@ spec:
             - >-
               exec /cockroach/cockroach
               start --join=${CLUSTER_NAME}-${STATEFULSET_NAME}-0:26257,${CLUSTER_NAME}-${STATEFULSET_NAME}-1:26257
-              --advertise-host=$(CLUSTER_NAME)-$(POD_NAME)"
+              --advertise-host="$(CLUSTER_NAME)-$(POD_NAME)"
               --insecure
               --http-port=8080
               --port=26257
