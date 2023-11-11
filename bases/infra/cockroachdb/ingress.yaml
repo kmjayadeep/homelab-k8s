@@ -1,0 +1,27 @@
+---
+# Source: cockroachdb/templates/ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: "default-clusterissuer"
+  name: cockroachdb-ingress
+  namespace: cockroachdb
+  labels:
+    helm.sh/chart: cockroachdb-11.2.1
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb"
+    app.kubernetes.io/managed-by: "Helm"
+spec:
+  rules:
+    - host: cockroachdb.local
+      http:
+        paths:
+          - path: "/"
+            backend:
+              serviceName: cockroachdb-public
+              servicePort: "http"
+  tls:
+    - hosts:
+      - cockroachdb.local
+      secretName: cockroachdb-tls

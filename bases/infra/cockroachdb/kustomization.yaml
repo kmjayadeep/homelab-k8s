@@ -3,6 +3,11 @@ kind: Kustomization
 
 namespace: cockroachdb
 
-resources:
-  - helm-repo.yaml
-  - helm-release.yaml
+resources: 
+- ./ingress.yaml
+- ./job.init.yaml
+- ./poddisruptionbudget.yaml
+- ./service.discovery.yaml
+- ./service.public.yaml
+- ./serviceaccount.yaml
+- ./statefulset.yaml

@@ -1,0 +1,78 @@
+---
+# Source: cockroachdb/templates/job.init.yaml
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: cockroachdb-init
+  namespace: "cockroachdb"
+  labels:
+    helm.sh/chart: cockroachdb-11.2.1
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/component: init
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cockroachdb
+        app.kubernetes.io/instance: "cockroachdb"
+        app.kubernetes.io/component: init
+    spec:
+      securityContext:
+        seccompProfile:
+          type: "RuntimeDefault"
+        runAsGroup: 1000
+        runAsUser: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+      restartPolicy: OnFailure
+      terminationGracePeriodSeconds: 0
+      serviceAccountName: cockroachdb
+      containers:
+        - name: cluster-init
+          image: "cockroachdb/cockroach:v23.1.11"
+          imagePullPolicy: "IfNotPresent"
+          # Run the command in an `while true` loop because this Job is bound
+          # to come up before the CockroachDB Pods (due to the time needed to
+          # get PersistentVolumes attached to Nodes), and sleeping 5 seconds
+          # between attempts is much better than letting the Pod fail when
+          # the init command does and waiting out Kubernetes' non-configurable
+          # exponential back-off for Pod restarts.
+          # Command completes either when cluster initialization succeeds,
+          # or when cluster has been initialized already.
+          command:
+          - /bin/bash
+          - -c
+          - >-
+              initCluster() {
+                while true; do
+                  local output=$(
+                    set -x;
+
+                    /cockroach/cockroach init \
+                      --insecure \
+                      --host=cockroachdb-0.cockroachdb:26257 \
+                  2>&1);
+
+                  local exitCode="$?";
+                  echo $output;
+
+                  if [[ "$output" =~ .*"Cluster successfully initialized".* || "$output" =~ .*"cluster has already been initialized".* ]]; then
+                    break;
+                  fi
+
+                  echo "Cluster is not ready to be initialized, retrying in 5 seconds"
+                  sleep 5;
+                done
+              }
+
+              initCluster;
+          env:
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:  
+              drop: ["ALL"]

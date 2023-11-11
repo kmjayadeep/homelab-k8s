@@ -1,0 +1,148 @@
+---
+# Source: cockroachdb/templates/statefulset.yaml
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: cockroachdb
+  namespace: "cockroachdb"
+  labels:
+    helm.sh/chart: cockroachdb-11.2.1
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/component: cockroachdb
+spec:
+  serviceName: cockroachdb
+  replicas: 2
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cockroachdb
+      app.kubernetes.io/instance: "cockroachdb"
+      app.kubernetes.io/component: cockroachdb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cockroachdb
+        app.kubernetes.io/instance: "cockroachdb"
+        app.kubernetes.io/component: cockroachdb
+    spec:
+      serviceAccountName: cockroachdb
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: cockroachdb
+                    app.kubernetes.io/instance: "cockroachdb"
+                    app.kubernetes.io/component: cockroachdb
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: cockroachdb
+            app.kubernetes.io/instance: "cockroachdb"
+            app.kubernetes.io/component: cockroachdb
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
+      # No pre-stop hook is required, a SIGTERM plus some time is all that's
+      # needed for graceful shutdown of a node.
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: db
+          image: "cockroachdb/cockroach:v23.1.11"
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - shell
+            - -ecx
+            # The use of qualified `hostname -f` is crucial:
+            # Other nodes aren't able to look up the unqualified hostname.
+            #
+            # `--join` CLI flag is hardcoded to exactly 3 Pods, because:
+            # 1. Having `--join` value depending on `statefulset.replicas`
+            #    will trigger undesired restart of existing Pods when
+            #    StatefulSet is scaled up/down. We want to scale without
+            #    restarting existing Pods.
+            # 2. At least one Pod in `--join` is enough to successfully
+            #    join CockroachDB cluster and gossip with all other existing
+            #    Pods, even if there are 3 or more Pods.
+            # 3. It's harmless for `--join` to have 3 Pods even for 1-Pod
+            #    clusters, while it gives us opportunity to scale up even if
+            #    some Pods of existing cluster are down (for whatever reason).
+            # See details explained here:
+            # https://github.com/helm/charts/pull/18993#issuecomment-558795102
+            - >-
+              exec /cockroach/cockroach
+              start --join=${STATEFULSET_NAME}-0.${STATEFULSET_FQDN}:26257,${STATEFULSET_NAME}-1.${STATEFULSET_FQDN}:26257
+              --advertise-host=$(hostname).${STATEFULSET_FQDN}
+              --insecure
+              --http-port=8080
+              --port=26257
+              --cache=50Mi
+              --max-sql-memory=100Mi
+              --logtostderr=INFO
+          env:
+            - name: STATEFULSET_NAME
+              value: cockroachdb
+            - name: STATEFULSET_FQDN
+              value: cockroachdb.cockroachdb.svc.cluster.local
+            - name: COCKROACH_CHANNEL
+              value: kubernetes-helm
+          ports:
+            - name: grpc
+              containerPort: 26257
+              protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: datadir
+              mountPath: /cockroach/cockroach-data/
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health?ready=1
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 2
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: datadir
+          persistentVolumeClaim:
+            claimName: datadir
+      securityContext:
+        seccompProfile:
+          type: "RuntimeDefault"
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+  volumeClaimTemplates:
+    - metadata:
+        name: datadir
+        labels:
+          app.kubernetes.io/name: cockroachdb
+          app.kubernetes.io/instance: "cockroachdb"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: "10Gi"
