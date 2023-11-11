@@ -11,3 +11,4 @@ resources:
 - ./service.public.yaml
 - ./serviceaccount.yaml
 - ./statefulset.yaml
+- ./rbac.yaml
