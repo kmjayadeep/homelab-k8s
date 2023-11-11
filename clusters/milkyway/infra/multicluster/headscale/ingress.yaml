@@ -16,6 +16,13 @@ spec:
          service:
            name: headscale
            port:
+             name: ui
+       path: /web
+       pathType: Prefix
+     - backend:
+         service:
+           name: headscale
+           port:
              name: http
        path: /
        pathType: Prefix
