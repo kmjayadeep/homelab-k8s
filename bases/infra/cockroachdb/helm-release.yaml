@@ -20,6 +20,8 @@ spec:
   values:
     conf:
       single-node: true
+      cache: 40Mi
+      max-sql-memory: 100Mi
     statefulset:
       replicas: 1
       resources:
