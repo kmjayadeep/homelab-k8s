@@ -78,8 +78,8 @@ spec:
             # https://github.com/helm/charts/pull/18993#issuecomment-558795102
             - >-
               exec /cockroach/cockroach
-              start --join=${STATEFULSET_NAME}-0.${STATEFULSET_FQDN}:26257,${STATEFULSET_NAME}-1.${STATEFULSET_FQDN}:26257
-              --advertise-host=$(hostname).${STATEFULSET_FQDN}
+              start --join=${CLUSTER_NAME}-${STATEFULSET_NAME}-0:26257,${CLUSTER_NAME}-${STATEFULSET_NAME}-1:26257
+              --advertise-host=$(CLUSTER_NAME)-$(POD_NAME)"
               --insecure
               --http-port=8080
               --port=26257
@@ -94,6 +94,10 @@ spec:
               value: cockroachdb.cockroachdb.svc.cluster.local
             - name: COCKROACH_CHANNEL
               value: kubernetes-helm
+            - name: POD_NAME
+              valueFrom:
+                 fieldRef:
+                   fieldPath: metadata.name
           ports:
             - name: grpc
               containerPort: 26257
