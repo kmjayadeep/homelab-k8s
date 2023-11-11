@@ -5,3 +5,13 @@ resources:
 patches:
 - path: ./ingress.yaml
 - path: ./service.public.yaml
+- patch: |-
+    - op: add
+      path: "/spec/template/spec/containers/0/env/-"
+      value:
+        name: LOCALITY
+        value: region=berlin,zone=pluto
+  target:
+    kind: StatefulSet
+    namespace: cockroachdb
+    name: cockroachdb

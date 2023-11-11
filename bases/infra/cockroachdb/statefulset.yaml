@@ -86,6 +86,7 @@ spec:
               --cache=50Mi
               --max-sql-memory=100Mi
               --logtostderr=INFO
+              --locality=${LOCALITY}
           env:
             - name: STATEFULSET_NAME
               value: cockroachdb
