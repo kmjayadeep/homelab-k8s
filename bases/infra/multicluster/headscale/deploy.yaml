@@ -31,6 +31,8 @@ spec:
         - name: headscale-config
           mountPath: /etc/headscale/config.yaml
           subPath: config.yaml
+      - name: headscale-ui
+        image: ghcr.io/gurucomputing/headscale-ui:latest
       volumes:
       - name: data
         persistentVolumeClaim:
