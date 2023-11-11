@@ -136,7 +136,7 @@ spec:
           - name: TS_KUBE_SECRET
             value: tailscale-state
           - name: TS_EXTRA_ARGS
-            value: --login-server https://headscale.milkyway.cboxlab.com
+            value: --login-server https://headscale.milkyway.cboxlab.com --hostname=${CLUSTER_NAME}-${HOSTNAME}
           - name: TS_AUTH_ONCE
             value: "true"
           - name: TS_AUTHKEY
