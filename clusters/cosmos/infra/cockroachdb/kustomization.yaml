@@ -13,7 +13,7 @@ patches:
         name: LOCALITY
         value: region=berlin,zone=pluto
     - op: add
-      path: "/spec/template/spec/containers/1/env/-"
+      path: "/spec/template/spec/containers/1/env/0"
       value:
         name: CLUSTER_NAME
         value: cosmos
