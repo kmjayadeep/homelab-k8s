@@ -134,9 +134,11 @@ spec:
           env:
           # For storing the state
           - name: TS_KUBE_SECRET
-            value: tailscale-state
+            value: tailscale-state-$(POD_NAME)
           - name: TS_AUTH_ONCE
             value: "true"
+          - name: TS_USERSPACE
+            value: "false"
           - name: TS_AUTHKEY
             valueFrom:
               secretKeyRef:

@@ -10,7 +10,7 @@ rules:
   # Create can not be restricted to a resource name.
   verbs: ["create"]
 - apiGroups: [""] # "" indicates the core API group
-  resourceNames: ["tailscale-state"]
+  resourceNames: ["tailscale-state-cockroachdb-0", "tailscale-state-cockroachdb-1"]
   resources: ["secrets"]
   verbs: ["get", "update", "patch"]
 
