@@ -19,6 +19,11 @@ patches:
         name: CLUSTER_NAME
         value: milkyway
     - op: add
+      path: "/spec/template/spec/containers/0/env/0"
+      value:
+        name: OTHER_CLUSTER
+        value: cosmos
+    - op: add
       path: "/spec/template/spec/containers/1/env/0"
       value:
         name: CLUSTER_NAME
