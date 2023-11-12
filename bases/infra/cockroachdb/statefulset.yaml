@@ -13,7 +13,7 @@ metadata:
     app.kubernetes.io/component: cockroachdb
 spec:
   serviceName: cockroachdb
-  replicas: 2
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   podManagementPolicy: "Parallel"
@@ -78,7 +78,7 @@ spec:
             # https://github.com/helm/charts/pull/18993#issuecomment-558795102
             - >-
               exec /cockroach/cockroach
-              start --join=cosmos-${STATEFULSET_NAME}-0:26257,cosmos-${STATEFULSET_NAME}-1:26257
+              start --join=cosmos-${STATEFULSET_NAME}-0:26257,milkyway-${STATEFULSET_NAME}-0:26257
               --advertise-host="$(CLUSTER_NAME)-$(POD_NAME)"
               --insecure
               --http-port=8080

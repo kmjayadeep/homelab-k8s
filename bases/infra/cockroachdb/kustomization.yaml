@@ -5,7 +5,6 @@ namespace: cockroachdb
 
 resources: 
 - ./ingress.yaml
-- ./job.init.yaml
 - ./poddisruptionbudget.yaml
 - ./service.discovery.yaml
 - ./service.public.yaml

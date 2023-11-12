@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - ../../../../bases/infra/cockroachdb
 - ./secret-sealed.yaml
+- ./job.init.yaml
 patches:
 - path: ./ingress.yaml
 - path: ./service.public.yaml
