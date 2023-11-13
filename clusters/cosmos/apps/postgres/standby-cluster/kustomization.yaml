@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ./secret-sealed.yaml
   - ./superuser-secret-sealed.yaml
+  - ./tailscale-sealed.yaml
   - ../../../../../bases/apps/postgres/standby-cluster
 
 patches:

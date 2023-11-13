@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: tailscale-auth
+  namespace: postgres
+spec:
+  encryptedData:
+    TS_AUTHKEY: AgB7zVu7UC34k+qM48ETG02lx2EdP2XGzpE3zJSCxBKEKjrsyycSUTSweg7UJGkQKNc7u1kF281zsvZOWRYc3usCADJ8g9wUBqElyjP0lIje6mSAPrSBzUb1xCcqM8JBXpzDYRijVnQPkB7AH+dtiFFDP5DXI0XP0PijeRAU2sgP+CoR/qXP5epk+Byht74avSskw1DGUz13nnRnJweDBBMF9FOJcfNcpxB0XaVSROT3grEZ60o3fR4N5RJzjiHx3A4w9DkWnUyMqATtDDzYGPpNCz5QlCKFRS4jhL72RF5USMo7kTW3LpV5DdGwytFi5aE0tT4m3Nai94FE7cDhKYql+ESUh5Mte98aRYH0HQaoqyZkZZlvtixKLPCjLXh3famjYVV4O7veQCVg4FR/8MXYnYd1ZUqPATb3/hlOwSJ9VFdoliQsbAYl9Ad45XNdB/bAj8LW0P8giF/WQXN8Wm2cEXM60KPOOkL5fX7YlKAwIgvzbOXpALvIUnPmjOZCZOwiBr8SFKBLxnbs8wy3qxott+vsAspUC2hWAB4Z1rxZaBz89U8mJRRm/I0TIKmIVJYMCFjbPAucm1EAQRFk2+F5Rq6i51XPrtR3jGprdv/h/WSAUHBz/QE5muVWnZ6Hky/lWAIfdqC74Ail9uP2hUrmuo6dUTDSJ58Z0WOC/Wk8H4/JJXGh14YmV6JJwWHXkyBnIaYeA+UYkE7f154Omg7bDEFndkFNZM6AH9htdi4+BoAH7cvy4uAnXUqocPgGh5I=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: tailscale-auth
+      namespace: postgres
+
