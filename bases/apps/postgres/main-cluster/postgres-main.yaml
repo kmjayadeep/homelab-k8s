@@ -22,6 +22,11 @@ spec:
   allowedSourceRanges:
   - 0.0.0.0/0
 
+  patroni:
+    pg_hba:
+    - "local  all all md5"
+    - "host all all 0.0.0.0/0 md5"
+
   volume:
     size: 1Gi
 
