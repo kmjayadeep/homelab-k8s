@@ -113,7 +113,13 @@ spec:
         - name: TS_EXTRA_ARGS
           value: "--login-server https://headscale.milkyway.cboxlab.com --hostname=postgresql-primary-client"
       - image: tecnativa/tcp-proxy:v1.0.1
-        name: tcp-proxy-client
+        name: tcp-proxy
+        dnsPolicy: "None"
+        dnsConfig:
+          nameservers:
+          - nameserver 100.100.100.100
+          searches:
+          - cosmos.headscale.cosmos.cboxlab.com
         envFrom:
         - configMapRef:
             name: proxy-client-config
