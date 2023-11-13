@@ -8,3 +8,4 @@ resources:
   - ./pgweb-deploy.yaml
   - ./pgweb-svc.yaml
   - ./pgweb-ing.yaml
+  - ./postgres-primary-proxy.yaml
