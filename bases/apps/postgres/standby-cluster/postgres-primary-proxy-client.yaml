@@ -112,7 +112,7 @@ spec:
               key: TS_AUTHKEY
         - name: TS_EXTRA_ARGS
           value: "--login-server https://headscale.milkyway.cboxlab.com --hostname=postgresql-primary-client"
-      - image: tecnativa/tcp-proxy-client:v1.0.1
+      - image: tecnativa/tcp-proxy:v1.0.1
         name: tcp-proxy-client
         envFrom:
         - configMapRef:
