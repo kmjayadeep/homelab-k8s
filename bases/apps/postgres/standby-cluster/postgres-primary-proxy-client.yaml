@@ -5,7 +5,7 @@
 apiVersion: v1
 data:
   LISTEN: ":5432"
-  TALK: "postgresql-primary:5432"
+  TALK: "100.64.0.1:5432"
 kind: ConfigMap
 metadata:
   creationTimestamp: null
@@ -99,10 +99,8 @@ spec:
           value: tailscale-state
         - name: TS_AUTH_ONCE
           value: "true"
-        # No need of dns here
-        # As the entire traffic is forwarded to main:5432 through CNI
         - name: TS_ACCEPT_DNS
-          value: "true"
+          value: "false"
         - name: TS_USERSPACE
           value: "false"
         - name: TS_AUTHKEY
@@ -114,12 +112,6 @@ spec:
           value: "--login-server https://headscale.milkyway.cboxlab.com --hostname=postgresql-primary-client"
       - image: tecnativa/tcp-proxy:v1.0.1
         name: tcp-proxy
-        dnsPolicy: "None"
-        dnsConfig:
-          nameservers:
-          - nameserver 100.100.100.100
-          searches:
-          - cosmos.headscale.cosmos.cboxlab.com
         envFrom:
         - configMapRef:
             name: proxy-client-config
