@@ -102,7 +102,7 @@ spec:
         # No need of dns here
         # As the entire traffic is forwarded to main:5432 through CNI
         - name: TS_ACCEPT_DNS
-          value: "false"
+          value: "true"
         - name: TS_USERSPACE
           value: "false"
         - name: TS_AUTHKEY
