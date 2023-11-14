@@ -23,7 +23,11 @@ spec:
         nginx.ingress.kubernetes.io/enable-cors: "true"
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
 
+    internalDatabase:
+      enabled: false
+
     externalDatabase:
+      enabled: true
       type: postgresql
       host: postgresql-primary.postgres
       database: nextcloud
