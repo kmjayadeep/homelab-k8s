@@ -40,5 +40,9 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: default-clusterissuer
         tls: true
+      persistence:
+        enabled: false
     storegateway:
       enabled: true
+      persistence:
+        enabled: false
