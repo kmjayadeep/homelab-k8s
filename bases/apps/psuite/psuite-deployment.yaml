@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psuite
+  labels:
+    app: psuite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psuite
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: psuite
+    spec:
+      hostname: psuite
+      serviceAccountName: psuite
+      initContainers:
+      - name: init-syncthing
+        image: restic/restic:0.14.0
+        envFrom:
+        - secretRef:
+            name: psuite-restic-creds
+        command: ['sh', '/scripts/init-syncthing.sh']
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts/
+        - name: data
+          mountPath: /syncthing/data
+        - name: config
+          mountPath: /syncthing/config
+      containers:
+      - name: psuite
+        image: linuxserver/syncthing:1.22.2
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config
+        livenessProbe:
+          httpGet:
+            path: /rest/noauth/health
+            port: 8384
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /rest/noauth/health
+            port: 8384
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      - name: backup
+        image: restic/restic:0.14.0
+        command: ['sh', '/scripts/backup.sh']
+        envFrom:
+        - secretRef:
+            name: psuite-restic-creds
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config
+        - name: scripts
+          mountPath: /scripts/
+      volumes:
+      - name: scripts
+        configMap:
+          name: psuite-scripts
+      - name: data
+        persistentVolumeClaim:
+          claimName: psuite-data
+      - name: config
+        persistentVolumeClaim:
+          claimName: psuite-config

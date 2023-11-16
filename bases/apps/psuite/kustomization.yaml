@@ -3,5 +3,15 @@ kind: Kustomization
 
 namespace: psuite
 
-bases:
-- git::https://github.com/kmjayadeep/productivity-suite.git//server/kustomize/base?ref=9433f5a830f3f77cdd12d0de5bc696d1ff6bd236
+resources:
+  - ./psuite-deployment.yaml
+  - ./psuite-ingress.yaml
+  - ./psuite-pvc.yaml
+  - ./psuite-service.yaml
+  - ./psuite-serviceaccount.yaml
+
+configMapGenerator:
+- name: psuite-scripts
+  files:
+  - init-syncthing.sh
+  - backup.sh

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: psuite
+  labels:
+    app: psuite
+spec:
+ tls:
+ - hosts:
+   - home.cosmos.cboxlab.com
+   secretName: psuite-cert
+ rules:
+  - host: psuite.local
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: psuite
+              port:
+                number: 8384
