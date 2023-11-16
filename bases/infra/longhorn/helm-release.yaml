@@ -35,6 +35,7 @@ spec:
     defaultSettings:
       defaultReplicaCount: 1
     persistence:
+      defaultFsType: "xfs"
       defaultClass: false
       defaultClassReplicaCount: 1
       recurringJobSelector:
