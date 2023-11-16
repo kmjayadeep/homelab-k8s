@@ -4,4 +4,14 @@ resources:
   - ../../../../bases/apps/vaultwarden
 
 patches:
-- path: ./ingress.yaml
+- path: ingress-patch.yaml
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: vaultwarden-ingress
+- path: longhorn-patch.yaml
+  target:
+    version: v1
+    kind: PersistentVolumeClaim
+    name: vaultwarden-pvc
