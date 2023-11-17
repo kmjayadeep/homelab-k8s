@@ -15,10 +15,6 @@ spec:
       labels:
         app: psuite
     spec:
-      securityContext:
-        runAsUser: 65534
-        runAsGroup: 65534
-        fsGroup: 65534
       hostname: psuite
       serviceAccountName: psuite
       initContainers:
@@ -43,6 +39,11 @@ spec:
           mountPath: /data
         - name: config
           mountPath: /config
+        env:
+        - name: PUID
+          value: "65534"
+        - name: PGID
+          value: "65534"
         livenessProbe:
           httpGet:
             path: /rest/noauth/health
