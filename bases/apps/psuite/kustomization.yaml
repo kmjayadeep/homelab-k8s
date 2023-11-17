@@ -4,12 +4,12 @@ kind: Kustomization
 namespace: psuite
 
 resources:
-  - ./psuite-deployment.yaml
+  - ./psuite-sts.yaml
   - ./psuite-ingress.yaml
   - ./psuite-pvc.yaml
   - ./psuite-service.yaml
   - ./psuite-serviceaccount.yaml
-  - ./psuite-backup.yaml
+  - ./psuite-cron.yaml
 
 configMapGenerator:
 - name: psuite-scripts

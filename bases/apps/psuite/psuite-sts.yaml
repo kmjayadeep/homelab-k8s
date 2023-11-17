@@ -1,16 +1,15 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: psuite
   labels:
     app: psuite
 spec:
   replicas: 1
+  serviceName: "psuite-headless"
   selector:
     matchLabels:
       app: psuite
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
