@@ -11,11 +11,9 @@ spec:
     productivity.planka-user: []
     # User in totp ns
     totp.totp-user: []
-    nextcloud-user: []
   databases:
     planka: productivity.planka-user
     totp: totp.totp-user
-    nextcloud: nextcloud-user
   postgresql:
     version: "15"
     parameters:
@@ -23,11 +21,6 @@ spec:
 
   allowedSourceRanges:
   - 0.0.0.0/0
-
-  patroni:
-    pg_hba:
-    - "local  all all md5"
-    - "host all all 0.0.0.0/0 md5"
 
   volume:
     size: 1Gi
