@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: obsidian
+    app.kubernetes.io/name: obsidian
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: obsidian-ingress
+spec:
+  tls:
+  - hosts:
+    - obsidian.local
+    secretName: obsidian-cert
+  rules:
+  - host: obsidian.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: obsidian
+            port:
+              name: http
