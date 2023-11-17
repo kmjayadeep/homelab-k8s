@@ -37,5 +37,9 @@ spec:
         hostKey: host
         databaseKey: database
 
+    persistence:
+      enabled: true
+      storageClass: longhorn
+
     nextcloud:
       host: nextcloud.local
