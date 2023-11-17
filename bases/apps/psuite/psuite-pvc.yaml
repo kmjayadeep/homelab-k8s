@@ -1,10 +1,32 @@
+## PV for nfs mount
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: psuite-data-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /srv/k8s/psuite
+    server: nfs.cosmos.cboxlab.com
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: psuite-data
 spec:
+  storageClassName: nfs
+  volumeName: psuite-data-nfs
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
