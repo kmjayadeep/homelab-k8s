@@ -29,10 +29,13 @@ spec:
     externalDatabase:
       enabled: true
       type: postgresql
-      host: postgresql-primary.postgres
-      database: nextcloud
-      user: nextcloud
-      password: tbd
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-secret
+        usernameKey: username
+        passwordKey: password
+        hostKey: host
+        databaseKey: database
 
     nextcloud:
       host: nextcloud.local
