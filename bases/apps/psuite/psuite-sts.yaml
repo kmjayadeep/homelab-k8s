@@ -15,6 +15,10 @@ spec:
       labels:
         app: psuite
     spec:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       hostname: psuite
       serviceAccountName: psuite
       initContainers:
