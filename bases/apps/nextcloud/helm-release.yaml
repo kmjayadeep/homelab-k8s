@@ -43,3 +43,11 @@ spec:
 
     nextcloud:
       host: nextcloud.local
+
+      extraVolumes:
+      - name: psuite-data
+        persistentVolumeClaim:
+          claimName: nextcloud-psuite
+      extraVolumeMounts:
+      - name: psuite-data
+        mountPath: /var/www/html/data/admin/files/psuite

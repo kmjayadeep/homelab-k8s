@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - ./helm-repo.yaml
   - ./helm-release.yaml
+  - ./psuite-pvc.yaml
