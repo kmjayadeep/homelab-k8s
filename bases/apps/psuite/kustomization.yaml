@@ -9,6 +9,7 @@ resources:
   - ./psuite-pvc.yaml
   - ./psuite-service.yaml
   - ./psuite-serviceaccount.yaml
+  - ./psuite-backup.yaml
 
 configMapGenerator:
 - name: psuite-scripts
