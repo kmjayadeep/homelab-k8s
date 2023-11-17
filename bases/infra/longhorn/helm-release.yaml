@@ -34,6 +34,7 @@ spec:
       snapshotterReplicaCount: 1
     defaultSettings:
       defaultReplicaCount: 1
+      replicaAutoBalance: true
     persistence:
       defaultFsType: "xfs"
       defaultClass: false
