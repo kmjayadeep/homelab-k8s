@@ -6,6 +6,9 @@ metadata:
     app.kubernetes.io/name: obsidian
   annotations:
    cert-manager.io/cluster-issuer: default-clusterissuer
+   nginx.ingress.kubernetes.io/auth-type: basic
+   nginx.ingress.kubernetes.io/auth-secret: obsidian-auth
+   nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Obsidian'
   name: obsidian-ingress
 spec:
   tls:
