@@ -37,7 +37,7 @@ metadata:
   name: psuite-config
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
