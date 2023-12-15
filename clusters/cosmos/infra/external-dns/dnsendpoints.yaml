@@ -28,9 +28,9 @@ spec:
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.0.31
+    - 192.168.0.21
   - dnsName: nfs.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.0.31
+    - 192.168.0.21
