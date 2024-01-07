@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
 - ../../../../bases/infra/metallb
 - public-pool.yaml
-- pihole-pool.yaml
