@@ -4,33 +4,23 @@ metadata:
   name: cosmos
 spec:
   endpoints:
-  - dnsName: thinkpad.cosmos.cboxlab.com
-    recordTTL: 60
-    recordType: A
-    targets:
-    - 192.168.0.16
   - dnsName: pluto.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.0.15
+    - 192.168.1.15
   - dnsName: k8s.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.0.20
-  - dnsName: titanic.cosmos.cboxlab.com
-    recordTTL: 60
-    recordType: A
-    targets:
-    - 192.168.0.30
+    - 192.168.1.20
   - dnsName: zeus.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.0.21
+    - 192.168.1.21
   - dnsName: nfs.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.0.21
+    - 192.168.1.21

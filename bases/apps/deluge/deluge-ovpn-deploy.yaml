@@ -52,7 +52,7 @@ spec:
         - name: VPN_PROV
           value: custom
         - name: LAN_NETWORK
-          value: 192.168.0.0/24
+          value: 192.168.1.0/24
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
