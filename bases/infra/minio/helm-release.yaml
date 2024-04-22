@@ -27,7 +27,7 @@ spec:
 
     persistence:
       storageClass: longhorn
-      size: 20Gi
+      size: 30Gi
 
     ingress:
       enabled: true
