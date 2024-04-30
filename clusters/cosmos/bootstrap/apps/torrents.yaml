@@ -30,3 +30,7 @@ spec:
       kind: Deployment
       name: radarr
       namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: prowlarr
+      namespace: torrents

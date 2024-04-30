@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prowlarr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: prowlarr
+  template:
+    metadata:
+      labels:
+        app: prowlarr
+    spec:
+      volumes:
+        - name: prowlarr-config
+          persistentVolumeClaim:
+            claimName: prowlarr-config
+      containers:
+      - name: prowlarr
+        image: linuxserver/prowlarr:1.17.1-nightly
+        volumeMounts:
+        - name: prowlarr-config
+          mountPath: /config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "25m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"

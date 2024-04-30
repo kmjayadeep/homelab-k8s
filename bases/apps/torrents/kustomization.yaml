@@ -12,3 +12,7 @@ resources:
   - ./radarr/radarr-pvc.yaml
   - ./radarr/radarr-svc.yaml
   - ./radarr/radarr-deploy.yaml
+  - ./prowlarr/prowlarr-ing.yaml
+  - ./prowlarr/prowlarr-pvc.yaml
+  - ./prowlarr/prowlarr-svc.yaml
+  - ./prowlarr/prowlarr-deploy.yaml
