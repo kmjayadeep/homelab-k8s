@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: radarr-openvpn
+spec:
+  selector: 
+    app: radarr-openvpn
+  type: ClusterIP
+  ports:
+  - port: 7878
+    targetPort: 7878

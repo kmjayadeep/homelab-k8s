@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: torrents
+
+resources:
+  - ./deluge/deluge-ing.yaml
+  - ./deluge/deluge-ovpn-deploy.yaml
+  - ./deluge/deluge-pvc.yaml
+  - ./deluge/deluge-svc.yaml
+  - ./radarr/radarr-ing.yaml
+  - ./radarr/radarr-pvc.yaml
+  - ./radarr/radarr-svc.yaml
+  - ./radarr/radarr-deploy.yaml

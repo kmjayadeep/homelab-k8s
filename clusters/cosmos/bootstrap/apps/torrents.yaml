@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: deluge
+  name: torrents
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: deluge
-  namespace: deluge
+  name: torrents
+  namespace: torrents
 spec:
-  path: clusters/cosmos/apps/deluge
+  path: clusters/cosmos/apps/torrents
   dependsOn:
   - name: sealed-secrets
     namespace: flux-system
@@ -25,4 +25,8 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: deluge
-      namespace: deluge
+      namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: radarr
+      namespace: torrents

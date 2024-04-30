@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+    spec:
+      volumes:
+        - name: radarr-config
+          persistentVolumeClaim:
+            claimName: radarr-config
+        - name: nfs-downloads
+          persistentVolumeClaim:
+            claimName: radarr-downloads-nfs
+      containers:
+      - name: radarr
+        image: linuxserver/radarr:5.5.2-nightly
+        volumeMounts:
+        - name: radarr-config
+          mountPath: /config
+        - mountPath: /movies
+          name: nfs-downloads
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "25m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"
