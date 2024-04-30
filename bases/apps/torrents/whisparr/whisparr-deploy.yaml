@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whisparr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: whisparr
+  template:
+    metadata:
+      labels:
+        app: whisparr
+    spec:
+      volumes:
+        - name: whisparr-config
+          persistentVolumeClaim:
+            claimName: whisparr-config
+        - name: nfs-downloads
+          persistentVolumeClaim:
+            claimName: whisparr-downloads-nfs
+      containers:
+      - name: whisparr
+        image: hotio/whisparr:v3-5d4c05e
+        volumeMounts:
+        - name: whisparr-config
+          mountPath: /config
+        - mountPath: /data
+          name: nfs-downloads
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "25m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"

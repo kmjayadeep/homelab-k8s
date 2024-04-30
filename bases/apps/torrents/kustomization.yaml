@@ -16,3 +16,7 @@ resources:
   - ./prowlarr/prowlarr-pvc.yaml
   - ./prowlarr/prowlarr-svc.yaml
   - ./prowlarr/prowlarr-deploy.yaml
+  - ./whisparr/whisparr-ing.yaml
+  - ./whisparr/whisparr-pvc.yaml
+  - ./whisparr/whisparr-svc.yaml
+  - ./whisparr/whisparr-deploy.yaml

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whisparr-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: default-clusterissuer
+spec:
+  tls:
+  - hosts:
+    - whisparr.local
+    secretName: whisparr-cert
+  rules:
+  - host: whisparr.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: whisparr
+            port:
+              number: 6969
