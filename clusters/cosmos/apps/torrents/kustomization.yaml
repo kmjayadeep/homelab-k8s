@@ -7,3 +7,4 @@ resources:
 patches:
 - path: deluge-ingress.yaml
 - path: radarr-ingress.yaml
+- path: prowlarr-ingress.yaml
