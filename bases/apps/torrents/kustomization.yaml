@@ -20,3 +20,7 @@ resources:
   - ./whisparr/whisparr-pvc.yaml
   - ./whisparr/whisparr-svc.yaml
   - ./whisparr/whisparr-deploy.yaml
+  - ./sonarr/sonarr-ing.yaml
+  - ./sonarr/sonarr-pvc.yaml
+  - ./sonarr/sonarr-svc.yaml
+  - ./sonarr/sonarr-deploy.yaml

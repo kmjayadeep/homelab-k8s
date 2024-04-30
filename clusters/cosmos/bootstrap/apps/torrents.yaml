@@ -38,3 +38,7 @@ spec:
       kind: Deployment
       name: whisparr
       namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: sonarr
+      namespace: torrents

@@ -9,3 +9,4 @@ patches:
 - path: radarr-ingress.yaml
 - path: prowlarr-ingress.yaml
 - path: whisparr-ingress.yaml
+- path: sonarr-ingress.yaml

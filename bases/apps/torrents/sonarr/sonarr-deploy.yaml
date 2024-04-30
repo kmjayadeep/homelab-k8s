@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      volumes:
+        - name: sonarr-config
+          persistentVolumeClaim:
+            claimName: sonarr-config
+        - name: nfs-downloads
+          persistentVolumeClaim:
+            claimName: sonarr-downloads-nfs
+      containers:
+      - name: sonarr
+        image: hotio/sonarr:nightly-f250e30
+        volumeMounts:
+        - name: sonarr-config
+          mountPath: /config
+        - mountPath: /data
+          name: nfs-downloads
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "25m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"
