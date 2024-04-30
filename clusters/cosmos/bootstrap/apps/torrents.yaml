@@ -34,3 +34,7 @@ spec:
       kind: Deployment
       name: prowlarr
       namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: whisparr
+      namespace: torrents
