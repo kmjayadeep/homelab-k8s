@@ -57,8 +57,6 @@ spec:
         - name: PGID
           value: "3000"
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 3000
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:
