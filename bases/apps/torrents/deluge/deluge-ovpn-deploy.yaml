@@ -52,6 +52,10 @@ spec:
           value: custom
         - name: LAN_NETWORK
           value: 192.168.1.0/24
+        - name: PUID
+          value: 1000
+        - name: PGID
+          value: 3000
         securityContext:
           runAsUser: 1000
           runAsGroup: 3000
