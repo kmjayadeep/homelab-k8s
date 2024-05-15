@@ -53,6 +53,8 @@ spec:
         - name: LAN_NETWORK
           value: 192.168.1.0/24
         securityContext:
+          runAsUser: 1000
+          runAsGroup: 3000
           capabilities:
             add: ["NET_ADMIN"]
         volumeMounts:

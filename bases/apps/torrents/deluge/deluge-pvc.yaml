@@ -15,8 +15,8 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /srv/downloads
-    server: nfs.cosmos.cboxlab.com
+    path: /mnt/ssd/media/tv/downloads
+    server: truenas.cosmos.cboxlab.com
 ---
 # PVC for nfs downloads mount
 apiVersion: v1
