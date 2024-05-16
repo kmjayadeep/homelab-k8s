@@ -17,8 +17,6 @@ spec:
   dependsOn:
   - name: sealed-secrets
     namespace: flux-system
-  - name: multicluster
-    namespace: multicluster
   sourceRef:
     kind: GitRepository
     name: flux-system
