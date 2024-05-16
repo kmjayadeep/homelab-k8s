@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - ../../../../bases/apps/productivity
   - ./secret-sealed.yaml
-  - ./db-secret-sealed.yaml
 
 patches:
 - path: planka-ing.yaml
