@@ -75,5 +75,5 @@ spec:
     namespace: flux-system
   - name: postgres-operator
     namespace: postgres
-  - name: postgres-standby
+  - name: postgres-main
     namespace: postgres
