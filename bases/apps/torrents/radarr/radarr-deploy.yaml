@@ -28,6 +28,11 @@ spec:
           mountPath: /config
         - mountPath: /movies
           name: nfs-downloads
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "3000"
         resources:
           requests:
             memory: "128Mi"

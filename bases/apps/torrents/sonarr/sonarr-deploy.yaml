@@ -23,6 +23,11 @@ spec:
       containers:
       - name: sonarr
         image: hotio/sonarr:nightly-f250e30
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "3000"
         volumeMounts:
         - name: sonarr-config
           mountPath: /config

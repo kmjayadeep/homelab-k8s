@@ -23,6 +23,11 @@ spec:
       containers:
       - name: whisparr
         image: hotio/whisparr:v3-5d4c05e
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "3000"
         volumeMounts:
         - name: whisparr-config
           mountPath: /config
