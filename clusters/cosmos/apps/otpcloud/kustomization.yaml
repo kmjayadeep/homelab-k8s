@@ -4,7 +4,6 @@ namespace: totp
 resources:
 - ../../../../bases/apps/otpcloud
 - ./secret-sealed.yaml
-- ./db-secret-sealed.yaml
 
 patches:
 - path: ingress.yaml
