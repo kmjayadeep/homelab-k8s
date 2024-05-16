@@ -64,7 +64,7 @@ spec:
           mountPath: /config/openvpn
         - name: deluge-config
           mountPath: /config
-        - mountPath: /downloads
+        - mountPath: /data/downloads
           name: nfs-downloads
         resources:
           requests:
