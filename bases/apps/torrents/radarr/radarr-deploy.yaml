@@ -22,11 +22,11 @@ spec:
             claimName: radarr-downloads-nfs
       containers:
       - name: radarr
-        image: linuxserver/radarr:5.5.2-nightly
+        image: hotio/radarr:nightly-116e977
         volumeMounts:
         - name: radarr-config
           mountPath: /config
-        - mountPath: /movies
+        - mountPath: /data
           name: nfs-downloads
         env:
         - name: PUID
