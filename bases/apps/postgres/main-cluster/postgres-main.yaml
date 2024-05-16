@@ -3,7 +3,6 @@ kind: postgresql
 metadata:
   name: main
 spec:
-  enableMasterLoadBalancer: true
   teamId: "kmjayadeep"
   numberOfInstances: 1
   users:
