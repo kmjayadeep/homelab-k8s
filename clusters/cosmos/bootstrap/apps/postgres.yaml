@@ -30,7 +30,7 @@ metadata:
   name: postgres-main
   namespace: postgres
 spec:
-  path: clusters/milkyway/apps/postgres/main-cluster
+  path: clusters/cosmos/apps/postgres/main-cluster
   interval: 15m
   prune: true
   wait: true
