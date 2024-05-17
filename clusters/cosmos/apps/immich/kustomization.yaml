@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: immich
 resources:
 - ../../../../bases/apps/immich
+- ./secret-sealed.yaml
 
 patches:
 - path: ingress.yaml
