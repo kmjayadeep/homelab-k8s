@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich
+  labels:
+    app: immich
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3001
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    labels:
+      app: immich

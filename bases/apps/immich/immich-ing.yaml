@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/name: immich
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: immich-ingress
+spec:
+  tls:
+  - hosts:
+    - immich.local
+    secretName: immich-cert
+  rules:
+  - host: immich.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: immich
+            port:
+              name: http

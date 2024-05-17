@@ -10,9 +10,12 @@ spec:
     productivity.planka-user: []
     # User in totp ns
     totp.totp-user: []
+    # User in immich ns
+    immich.immich-user: []
   databases:
     planka: productivity.planka-user
     totp: totp.totp-user
+    immich: immich.immich-user
   postgresql:
     version: "15"
     parameters:

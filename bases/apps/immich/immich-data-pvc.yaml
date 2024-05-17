@@ -1,0 +1,32 @@
+## PV for nfs mount
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-data-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/ssd/media/immich
+    server: truenas.cosmos.cboxlab.com
+---
+# PVC for nfs downloads mount
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-data-nfs
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
