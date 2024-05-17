@@ -44,8 +44,6 @@ spec:
                 key: password
           - name: DB_URL
             value: postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOSTNAME):5432/immich?ssl=true
-          - name: NODE_TLS_REJECT_UNAUTHORIZED
-            value: "0"
           ports:
             - name: http
               containerPort: 3001
