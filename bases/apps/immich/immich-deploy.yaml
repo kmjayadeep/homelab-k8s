@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: radarr
+        app: immich
     spec:
       # Prevent config interference
       enableServiceLinks: false
