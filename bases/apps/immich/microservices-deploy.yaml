@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservices
+  labels:
+    app: microservices
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: microservices
+  template:
+    metadata:
+      labels:
+        app: microservices
+    spec:
+      # Prevent config interference
+      enableServiceLinks: false
+      containers:
+        - name: microservices
+          image: ghcr.io/immich-app/immich-server:v1.105.1
+          command:
+            - "/bin/sh"
+          args:
+            - ./start-microservices.sh
+          envFrom:
+            - configMapRef:
+                name: immich-env
+            - secretRef:
+                name: immich-secret
+          env:
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: immich.immich-user.main.credentials.postgresql.acid.zalan.do
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: immich.immich-user.main.credentials.postgresql.acid.zalan.do
+                key: password
+          - name: DB_URL
+            value: postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOSTNAME):5432/immich?ssl=true
+          volumeMounts:
+            - name: library
+              mountPath: /usr/src/app/upload
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+      volumes:
+        - name: library
+          persistentVolumeClaim:
+            claimName: immich-data-nfs
