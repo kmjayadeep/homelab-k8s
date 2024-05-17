@@ -4,6 +4,7 @@ data:
   DB_HOSTNAME: main.postgres.svc.cluster.local
   DB_DATABASE_NAME: immich
   REDIS_HOSTNAME: redis-headless.redis.svc.cluster.local
+  DB_VECTOR_EXTENSION: pgvector
   NODE_TLS_REJECT_UNAUTHORIZED: "0"
 kind: ConfigMap
 metadata:
