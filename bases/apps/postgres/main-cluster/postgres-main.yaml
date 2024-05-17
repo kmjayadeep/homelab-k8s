@@ -3,6 +3,7 @@ kind: postgresql
 metadata:
   name: main
 spec:
+  dockerImage: ghcr.io/zalando/spilo-15:3.2-p1
   teamId: "kmjayadeep"
   numberOfInstances: 1
   users:
