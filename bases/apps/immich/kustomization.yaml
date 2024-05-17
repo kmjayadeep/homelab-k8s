@@ -10,3 +10,5 @@ resources:
   - ./immich-ing.yaml
   - ./immich-cm.yaml
   - ./microservices-deploy.yaml
+  - ./ml-deploy.yaml
+  - ./ml-service.yaml
