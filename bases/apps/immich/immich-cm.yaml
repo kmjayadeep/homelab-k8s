@@ -2,6 +2,7 @@ apiVersion: v1
 data:
   TZ: Europe/Berlin
   DB_HOSTNAME: main.postgres.svc.cluster.local
+  DB_DATABASE_NAME: immich
 kind: ConfigMap
 metadata:
   name: immich-env
