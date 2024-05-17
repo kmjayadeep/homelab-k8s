@@ -25,12 +25,10 @@ spec:
         - name: machine-learning
           image: ghcr.io/immich-app/immich-machine-learning:v1.105.1
           envFrom:
-            - configMapRef:
-                name: immich-env
-            - secretRef:
-                name: immich-secret
-            - name: TRANSFORMERS_CACHE
-              value: /cache
+          - configMapRef:
+              name: immich-env
+          - secretRef:
+              name: immich-secret
           env:
           - name: TRANSFORMERS_CACHE
             value: /cache
