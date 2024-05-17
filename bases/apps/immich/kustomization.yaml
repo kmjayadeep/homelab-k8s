@@ -8,3 +8,4 @@ resources:
   - ./immich-svc.yaml
   - ./immich-data-pvc.yaml
   - ./immich-ing.yaml
+  - ./immich-cm.yaml
