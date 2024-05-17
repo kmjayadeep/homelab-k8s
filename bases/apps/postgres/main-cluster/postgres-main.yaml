@@ -16,6 +16,14 @@ spec:
     planka: productivity.planka-user
     totp: totp.totp-user
     immich: immich.immich-user
+  preparedDatabases:
+    immich:
+      schemas:
+        public: {}
+      extensions:
+        cube: public
+        earthdistance: public
+        vector: public
   postgresql:
     version: "15"
     parameters:
