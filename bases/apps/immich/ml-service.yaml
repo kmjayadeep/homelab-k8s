@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: machine-learning
+  name: immich-machine-learning
   labels:
     app: machine-learning
 spec:
