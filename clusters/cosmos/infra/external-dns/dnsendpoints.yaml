@@ -34,3 +34,8 @@ spec:
     recordType: A
     targets:
     - 192.168.1.80
+  - dnsName: jellyfin.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.80
