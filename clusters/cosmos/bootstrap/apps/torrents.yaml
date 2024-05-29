@@ -42,3 +42,7 @@ spec:
       kind: Deployment
       name: sonarr
       namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: nzbget
+      namespace: torrents

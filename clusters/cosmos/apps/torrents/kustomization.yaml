@@ -10,3 +10,4 @@ patches:
 - path: prowlarr-ingress.yaml
 - path: whisparr-ingress.yaml
 - path: sonarr-ingress.yaml
+- path: nzbget-ingress.yaml

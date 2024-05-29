@@ -24,3 +24,7 @@ resources:
   - ./sonarr/sonarr-pvc.yaml
   - ./sonarr/sonarr-svc.yaml
   - ./sonarr/sonarr-deploy.yaml
+  - ./nzbget/nzbget-ing.yaml
+  - ./nzbget/nzbget-pvc.yaml
+  - ./nzbget/nzbget-svc.yaml
+  - ./nzbget/nzbget-deploy.yaml
