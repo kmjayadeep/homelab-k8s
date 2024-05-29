@@ -1,0 +1,44 @@
+## PV for nfs mount
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nzbget-downloads-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/ssd/media/tv/downloads
+    server: truenas.cosmos.cboxlab.com
+---
+# PVC for nfs downloads mount
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nzbget-downloads-nfs
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nzbget-config
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
