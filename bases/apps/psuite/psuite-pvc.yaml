@@ -15,8 +15,8 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /srv/k8s/psuite
-    server: nfs.cosmos.cboxlab.com
+    path: /mnt/ssd/k8s/psuite
+    server: truenas.cosmos.cboxlab.com
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
