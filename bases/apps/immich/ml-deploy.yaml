@@ -23,7 +23,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: machine-learning
-          image: ghcr.io/immich-app/immich-machine-learning:v1.105.1
+          image: ghcr.io/immich-app/immich-machine-learning:v1.106.4
           envFrom:
           - configMapRef:
               name: immich-env

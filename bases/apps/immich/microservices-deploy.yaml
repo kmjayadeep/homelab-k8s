@@ -20,7 +20,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: microservices
-          image: ghcr.io/immich-app/immich-server:v1.105.1
+          image: ghcr.io/immich-app/immich-server:v1.106.4
           command:
             - "/bin/sh"
           args:

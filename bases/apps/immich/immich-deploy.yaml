@@ -20,7 +20,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: server
-          image: ghcr.io/immich-app/immich-server:v1.105.1
+          image: ghcr.io/immich-app/immich-server:v1.106.4
           imagePullPolicy: IfNotPresent
           command:
             - "/bin/sh"
