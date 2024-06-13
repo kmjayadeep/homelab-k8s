@@ -15,7 +15,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/ssd/k8s/psuite
+    path: /mnt/main/k8s/psuite
     server: truenas.cosmos.cboxlab.com
 ---
 apiVersion: v1
