@@ -24,4 +24,4 @@ spec:
       name: immich
     - apiVersion: apps/v1
       kind: Deployment
-      name: microservices
+      name: machine-learning
