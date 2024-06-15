@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: nfs
+  storageClassName: nfs-whisparr
   mountOptions:
     - hard
     - nfsvers=4.1
@@ -24,7 +24,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: whisparr-downloads-nfs
 spec:
-  storageClassName: nfs
+  storageClassName: nfs-whisparr
   accessModes:
     - ReadWriteMany
   resources:
