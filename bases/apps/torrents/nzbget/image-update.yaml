@@ -14,7 +14,7 @@ spec:
   imageRepositoryRef:
     name: nzbget
   filterTags:
-    pattern: '^release-[0-9]*\.(?P<semver>[0-9]*)'
+    pattern: '^release-24\.(?P<semver>[0-9]*)'
     extract: '$semver'
   policy:
     numerical:
