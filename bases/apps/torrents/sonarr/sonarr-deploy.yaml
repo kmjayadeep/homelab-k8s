@@ -21,22 +21,22 @@ spec:
           persistentVolumeClaim:
             claimName: sonarr-downloads-nfs
       containers:
-      - name: sonarr
-        image: ghcr.io/hotio/sonarr:nightly-f250e30 # {"$imagepolicy": "torrents:sonarr"}
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "3000"
-        volumeMounts:
-        - name: sonarr-config
-          mountPath: /config
-        - mountPath: /data
-          name: nfs-downloads
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "25m"
-          limits:
-            memory: "500Mi"
-            cpu: "250m"
+        - name: sonarr
+          image: ghcr.io/hotio/sonarr:nightly-4.0.5.1740 # {"$imagepolicy": "torrents:sonarr"}
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "3000"
+          volumeMounts:
+            - name: sonarr-config
+              mountPath: /config
+            - mountPath: /data
+              name: nfs-downloads
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"
