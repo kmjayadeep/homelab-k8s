@@ -29,3 +29,4 @@ resources:
   - ./nzbget/nzbget-pvc.yaml
   - ./nzbget/nzbget-svc.yaml
   - ./nzbget/nzbget-deploy.yaml
+  - ./image-update-automation.yaml
