@@ -21,22 +21,22 @@ spec:
           persistentVolumeClaim:
             claimName: nzbget-downloads-nfs
       containers:
-      - name: nzbget
-        image: hotio/nzbget:release-24.0 # {"$imagepolicy": "torrents:nzbget"}
-        volumeMounts:
-        - name: nzbget-config
-          mountPath: /config
-        - mountPath: /data
-          name: nfs-downloads
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "3000"
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "25m"
-          limits:
-            memory: "500Mi"
-            cpu: "250m"
+        - name: nzbget
+          image: ghcr.io/hotio/nzbget:release-24.1 # {"$imagepolicy": "torrents:nzbget"}
+          volumeMounts:
+            - name: nzbget-config
+              mountPath: /config
+            - mountPath: /data
+              name: nfs-downloads
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "3000"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"
