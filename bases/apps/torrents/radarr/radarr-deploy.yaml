@@ -21,22 +21,22 @@ spec:
           persistentVolumeClaim:
             claimName: radarr-downloads-nfs
       containers:
-      - name: radarr
-        image: ghcr.io/hotio/radarr:release-5.6.0.8846 # {"$imagepolicy": "torrents:radarr"}
-        volumeMounts:
-        - name: radarr-config
-          mountPath: /config
-        - mountPath: /data
-          name: nfs-downloads
-        env:
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "3000"
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "25m"
-          limits:
-            memory: "500Mi"
-            cpu: "250m"
+        - name: radarr
+          image: ghcr.io/hotio/radarr:nightly-5.7.0.8877 # {"$imagepolicy": "torrents:radarr"}
+          volumeMounts:
+            - name: radarr-config
+              mountPath: /config
+            - mountPath: /data
+              name: nfs-downloads
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "3000"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"
