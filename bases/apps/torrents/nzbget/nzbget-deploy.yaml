@@ -26,7 +26,7 @@ spec:
           volumeMounts:
             - name: nzbget-config
               mountPath: /config
-            - mountPath: /data
+            - mountPath: /data/downloads
               name: nfs-downloads
           env:
             - name: PUID
