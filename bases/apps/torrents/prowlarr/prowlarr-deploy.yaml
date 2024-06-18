@@ -18,15 +18,15 @@ spec:
           persistentVolumeClaim:
             claimName: prowlarr-config
       containers:
-      - name: prowlarr
-        image: linuxserver/prowlarr:1.17.1-nightly # {"$imagepolicy": "torrents:prowlarr"}
-        volumeMounts:
-        - name: prowlarr-config
-          mountPath: /config
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "25m"
-          limits:
-            memory: "500Mi"
-            cpu: "250m"
+        - name: prowlarr
+          image: ghcr.io/hotio/prowlarr:nightly-1.19.0.4562 # {"$imagepolicy": "torrents:prowlarr"}
+          volumeMounts:
+            - name: prowlarr-config
+              mountPath: /config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"
