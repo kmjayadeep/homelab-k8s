@@ -13,10 +13,13 @@ spec:
     totp.totp-user: []
     # User in immich ns
     immich.immich-user: []
+    # External user for immich
+    immich-nas: []
   databases:
     planka: productivity.planka-user
     totp: totp.totp-user
     immich: immich.immich-user
+  enableMasterLoadBalancer: true
   preparedDatabases:
     immich:
       schemas:
