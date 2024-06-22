@@ -5,3 +5,4 @@ resources:
 
 patches:
 - path: ingress.yaml
+- path: ingress-postgres.yaml
