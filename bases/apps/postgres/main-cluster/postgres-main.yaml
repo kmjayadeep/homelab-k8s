@@ -18,7 +18,7 @@ spec:
   databases:
     planka: productivity.planka-user
     totp: totp.totp-user
-    immich: immich.immich-user
+    immich: immich-nas
   enableMasterLoadBalancer: true
   preparedDatabases:
     immich:
