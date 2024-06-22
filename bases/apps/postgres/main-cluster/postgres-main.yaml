@@ -11,8 +11,6 @@ spec:
     productivity.planka-user: []
     # User in totp ns
     totp.totp-user: []
-    # User in immich ns
-    immich.immich-user: []
     # External user for immich
     immich-nas: []
   databases:
