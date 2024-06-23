@@ -1,0 +1,32 @@
+## PV for nfs mount
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: fava-data-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-fava
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/main/k8s/psuite/psuite-beancount
+    server: truenas.cosmos.cboxlab.com
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fava-data
+spec:
+  storageClassName: nfs-fava
+  volumeName: fava-data-nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

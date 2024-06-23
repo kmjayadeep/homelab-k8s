@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fava
+spec:
+  selector:
+    matchLabels:
+      app: fava
+  template:
+    metadata:
+      labels:
+        app: fava
+    spec:
+      containers:
+      - image: yegle/fava:v1.27
+        imagePullPolicy: IfNotPresent
+        name: fava
+        env:
+        - name: BEANCOUNT_FILE
+          value: "/bean/journal.beancount"
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+          name: http
+        volumeMounts:
+        - name: data
+          mountPath: /bean
+      restartPolicy: Always
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: fava-data

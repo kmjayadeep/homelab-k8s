@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: fava
+    app.kubernetes.io/name: fava
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: fava-ingress
+spec:
+  tls:
+  - hosts:
+    - fava.local
+    secretName: fava-cert
+  rules:
+  - host: fava.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fava
+            port:
+              name: http

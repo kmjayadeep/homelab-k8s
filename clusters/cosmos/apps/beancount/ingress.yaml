@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: fava-ingress
+spec:
+ tls:
+ - hosts:
+   - fava.cosmos.cboxlab.com
+   secretName: fava-tls-secret
+ rules:
+ - host: fava.cosmos.cboxlab.com
+   http:
+     paths:
+     - backend:
+         service:
+           name: fava
+           port:
+             name: http
+       path: /
+       pathType: Prefix
