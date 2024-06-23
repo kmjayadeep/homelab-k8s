@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: netalertx
+    app.kubernetes.io/name: netalertx
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: netalertx-ingress
+spec:
+  tls:
+  - hosts:
+    - netalertx.local
+    secretName: netalertx-cert
+  rules:
+  - host: netalertx.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: netalertx
+            port:
+              name: http
