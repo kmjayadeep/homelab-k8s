@@ -6,6 +6,10 @@ metadata:
     app.kubernetes.io/name: fava
   annotations:
    cert-manager.io/cluster-issuer: default-clusterissuer
+   nginx.ingress.kubernetes.io/auth-type: basic
+   # Use this link to generate your credentials: https://hostingcanada.org/htpasswd-generator/
+   nginx.ingress.kubernetes.io/auth-secret: fava-auth
+   nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Fava'
   name: fava-ingress
 spec:
   tls:

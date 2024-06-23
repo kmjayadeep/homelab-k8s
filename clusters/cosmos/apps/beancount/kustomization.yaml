@@ -5,4 +5,9 @@ resources:
 - ../../../../bases/apps/beancount
 
 patches:
-- path: ingress.yaml
+- path: ingress-patch.yaml
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: fava-ingress
