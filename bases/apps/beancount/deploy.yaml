@@ -16,9 +16,8 @@ spec:
       - image: yegle/fava:v1.27
         imagePullPolicy: IfNotPresent
         name: fava
-        env:
-        - name: BEANCOUNT_FILE
-          value: "/bean/journal.beancount"
+        command: ["fava"]
+        args: ["/bean/journal.beancount", "-p", "5000"]
         ports:
         - containerPort: 5000
           protocol: TCP
