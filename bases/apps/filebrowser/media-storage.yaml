@@ -10,12 +10,12 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: nfs
+  storageClassName: nfs-fb
   mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/ssd/media/tv
+    path: /mnt/main/media/tv
     server: truenas.cosmos.cboxlab.com
 ---
 # PVC for nfs media mount
@@ -24,7 +24,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: filebrowser-media-nfs
 spec:
-  storageClassName: nfs
+  storageClassName: nfs-fb
   accessModes:
     - ReadWriteMany
   resources:
