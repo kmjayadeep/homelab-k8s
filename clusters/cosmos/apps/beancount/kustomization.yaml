@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: beancount
 resources:
 - ../../../../bases/apps/beancount
+- ./secret-sealed.yaml
 
 patches:
 - path: ingress-patch.yaml
