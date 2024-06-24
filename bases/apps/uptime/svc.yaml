@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: uptime
+    app.kubernetes.io/name: uptime
+    app.kubernetes.io/service: uptime
+  name: uptime
+spec:
+  ports:
+  - name: http
+    port: 3001
+    protocol: TCP
+    targetPort: 3001
+  selector:
+    app: uptime
+  type: ClusterIP

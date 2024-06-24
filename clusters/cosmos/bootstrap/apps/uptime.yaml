@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: netalertx
+  name: uptime
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: netalertx
-  namespace: netalertx
+  name: uptime
+  namespace: uptime
 spec:
-  path: clusters/cosmos/apps/netalertx
+  path: clusters/cosmos/apps/uptime
   interval: 15m
   prune: true
   wait: true
@@ -21,4 +21,4 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: netalertx
+      name: uptime
