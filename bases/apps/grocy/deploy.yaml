@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grocy
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: grocy
+  template:
+    metadata:
+      labels:
+        app: grocy
+    spec:
+      containers:
+      - image: linuxserver/grocy:4.2.0
+        imagePullPolicy: IfNotPresent
+        name: grocy
+        ports:
+        - containerPort: 80
+          protocol: TCP
+          name: http
+        volumeMounts:
+        - mountPath: /config
+          name: grocy-config
+      restartPolicy: Always
+      volumes:
+      - name: grocy-config
+        persistentVolumeClaim:
+          claimName: grocy-config

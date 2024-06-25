@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: grocy
+    app.kubernetes.io/name: grocy
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: grocy-ingress
+spec:
+  tls:
+  - hosts:
+    - grocy.local
+    secretName: grocy-cert
+  rules:
+  - host: grocy.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grocy
+            port:
+              name: http
