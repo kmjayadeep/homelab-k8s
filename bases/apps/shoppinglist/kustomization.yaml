@@ -8,3 +8,4 @@ resources:
   - ./svc.yaml
   - ./ing.yaml
   - ./image-update.yaml
+  - ./image-update-automation.yaml
