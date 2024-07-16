@@ -1,0 +1,21 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: shoppinglist
+spec:
+  image: ghcr.io/kmjayadeep/shoppinglist-server
+  interval: 2m
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: shoppinglist
+spec:
+  imageRepositoryRef:
+    name: shoppinglist
+  filterTags:
+    pattern: '^(?P<timestamp>[0-9]*)$'
+    extract: '$timestamp'
+  policy:
+    alphabetical:
+      order: asc

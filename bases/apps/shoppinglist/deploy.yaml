@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shoppinglist
+spec:
+  selector:
+    matchLabels:
+      app: shoppinglist
+  template:
+    metadata:
+      labels:
+        app: shoppinglist
+    spec:
+      containers:
+        - name: shoppinglist
+          image: ghcr.io/kmjayadeep/shoppinglist-server:1721081383
+          env:
+            - name: GIN_MODE
+              value: "release"
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "25m"
+            limits:
+              memory: "100Mi"
+              cpu: "250m"

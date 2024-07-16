@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shoppinglist
+spec:
+  selector: 
+    app: shoppinglist
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+
