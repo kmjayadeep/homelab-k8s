@@ -4,7 +4,7 @@ metadata:
   name: shoppinglist
 spec:
   image: ghcr.io/kmjayadeep/shoppinglist-server
-  interval: 2m
+  interval: 5m
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
