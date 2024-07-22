@@ -9,3 +9,6 @@ resources:
   - ./ing.yaml
   - ./image-update.yaml
   - ./image-update-automation.yaml
+  - ./ui-deploy.yaml
+  - ./ui-image-update.yaml
+  - ./ui-svc.yaml

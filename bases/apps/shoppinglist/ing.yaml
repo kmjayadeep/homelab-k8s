@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   name: shoppinglist-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: default-clusterissuer
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
@@ -15,10 +14,24 @@ spec:
   - host: shoppinglist.local
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: /api
+        pathType: ImplementationSpecific
         backend:
           service:
             name: shoppinglist
+            port:
+              number: 8080
+      - path: /swagger
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: shoppinglist
+            port:
+              number: 8080
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: shoppinglist-ui
             port:
               number: 8080

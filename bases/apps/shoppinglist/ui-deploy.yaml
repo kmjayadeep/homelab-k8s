@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shoppinglist-ui
+spec:
+  selector:
+    matchLabels:
+      app: shoppinglist-ui
+  template:
+    metadata:
+      labels:
+        app: shoppinglist-ui
+    spec:
+      containers:
+        - name: ui
+          image: ghcr.io/greeshmabk/shoppinglist-ui:1721679143 # {"$imagepolicy": "shoppinglist:shoppinglist-ui"}
