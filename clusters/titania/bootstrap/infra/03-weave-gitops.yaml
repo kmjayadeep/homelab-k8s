@@ -4,7 +4,7 @@ metadata:
   name: weave-gitops
   namespace: flux-system
 spec:
-  path: clusters/cosmos/infra/weave-gitops
+  path: clusters/titania/infra/weave-gitops
   interval: 15m
   prune: true
   wait: true
