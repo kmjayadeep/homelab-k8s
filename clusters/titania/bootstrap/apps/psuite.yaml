@@ -9,7 +9,7 @@ metadata:
   name: psuite
   namespace: psuite
 spec:
-  path: clusters/cosmos/apps/psuite
+  path: clusters/titania/apps/psuite
   dependsOn:
   - name: sealed-secrets
     namespace: flux-system
