@@ -1,4 +1,4 @@
-apiVersion: v1
+piVersion: v1
 kind: Namespace
 metadata:
   name: vaultwarden
@@ -9,7 +9,7 @@ metadata:
   name: vaultwarden
   namespace: vaultwarden
 spec:
-  path: clusters/cosmos/apps/vaultwarden
+  path: clusters/titania/apps/vaultwarden
   interval: 15m
   prune: true
   wait: true
