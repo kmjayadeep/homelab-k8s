@@ -9,7 +9,7 @@ metadata:
   name: homer
   namespace: homer
 spec:
-  path: clusters/cosmos/apps/homer
+  path: clusters/titania/apps/homer
   interval: 15m
   prune: true
   wait: true
