@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: thanos
+  namespace: monitoring
+spec:
+  values:
+    query:
+      ingress:
+        hostname: thanos-query.cosmos.cboxlab.com
+    compactor:
+      ingress:
+        hostname: thanos-compact.cosmos.cboxlab.com

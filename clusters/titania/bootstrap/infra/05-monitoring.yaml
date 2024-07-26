@@ -9,7 +9,7 @@ metadata:
   name: monitoring
   namespace: monitoring
 spec:
-  path: clusters/cosmos/infra/monitoring
+  path: clusters/titania/infra/monitoring
   dependsOn:
   - name: sealed-secrets
     namespace: flux-system
@@ -32,7 +32,7 @@ metadata:
   name: thanos
   namespace: monitoring
 spec:
-  path: clusters/cosmos/infra/monitoring/thanos
+  path: clusters/titania/infra/monitoring/thanos
   dependsOn:
   - name: monitoring
     namespace: monitoring
@@ -51,7 +51,7 @@ metadata:
   name: longhorn-monitoring
   namespace: monitoring
 spec:
-  path: clusters/cosmos/infra/monitoring/longhorn
+  path: clusters/titania/infra/monitoring/longhorn
   dependsOn:
   - name: monitoring
     namespace: monitoring

@@ -1,0 +1,63 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: restic-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: restic-rules
+    rules:
+    - alert: ResticBackupFailing
+      expr: time() -  max by(repo) (restic_repo_last_snapshot) > 60*60*48
+      annotations:
+        description: Restic backup for repo {{$labels.repo}} has no snapshots taken in the past 48h
+        summary: No restic snapshots taken in the past 48 hours
+      labels:
+        severity: critical
+    - alert: ResticRefreshFailing
+      expr: sum by(repo) (rate(restic_repo_stats_refresh_fail_total[5m])) > 0
+      annotations:
+        description: Restic stats for repo {{$labels.repo}} is failing to refresh for 30 mins. Probably there are too many snapshots.
+        summary: Restic stats failing to refresh
+      for: 30m
+      labels:
+        severity: critical
+    - alert: ResticRefreshSlow
+      expr: sum by (repo) (rate(restic_repo_stats_fetch_duration_count[5m])) - sum by (repo) (rate(restic_repo_stats_fetch_duration_bucket{le="60"}[5m])) > 0
+      annotations:
+        description: Restic stats for repo {{$labels.repo}} is taking more than 60seconds to complete. Probably there are too many snapshots.
+        summary: Restic stats slow to refresh
+      for: 30m
+      labels:
+        severity: warning
+    - alert: ResticTooManySnapshots
+      expr: max by(repo) (restic_repo_stats_snapshots_active) > 50
+      annotations:
+        description: Restic repo {{$labels.repo}} has more than 50 active snapshots
+        summary: Restic repo has too many snapshots
+      labels:
+        severity: warning
+    - alert: ResticMetricsMissing
+      expr: absent(restic_repo_last_snapshot)
+      annotations:
+        description: Restic exporter is not exporting metrics
+        summary: Restic exporter metrics missing
+      for: 30m
+      labels:
+        severity: critical
+  - name: restic-s3-rules
+    rules:
+    - alert: ResticBackupS3Filling
+      expr: max by(repo) (restic_s3_size_total/restic_s3_size_limit) > 0.8
+      annotations:
+        description: Restic backup for repo {{$labels.repo}} is taking more than 80% of space limit in the bucket
+        summary: Restic backup crossed 80% of the size limit
+      labels:
+        severity: warning
+    - alert: ResticBackupS3TooManyObjects
+      expr: max by(repo) (restic_s3_object_count) > 10000
+      annotations:
+        description: Restic backup for repo {{$labels.repo}} has more than 10k objects in the bucket
+        summary: Restic backup is storing more than 10k objects in the bucket
+      labels:
+        severity: warning

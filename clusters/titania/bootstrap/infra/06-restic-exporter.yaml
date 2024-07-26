@@ -4,7 +4,7 @@ metadata:
   name: restic-exporter
   namespace: monitoring
 spec:
-  path: clusters/cosmos/infra/restic-exporter
+  path: clusters/titania/infra/restic-exporter
   dependsOn:
   - name: sealed-secrets
     namespace: flux-system
