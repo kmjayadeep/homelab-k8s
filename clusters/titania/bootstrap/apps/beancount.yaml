@@ -9,7 +9,7 @@ metadata:
   name: beancount
   namespace: beancount
 spec:
-  path: clusters/cosmos/apps/beancount
+  path: clusters/titania/apps/beancount
   interval: 15m
   prune: true
   wait: true

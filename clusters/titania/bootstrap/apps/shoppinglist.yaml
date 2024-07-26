@@ -9,7 +9,7 @@ metadata:
   name: shoppinglist
   namespace: shoppinglist
 spec:
-  path: clusters/cosmos/apps/shoppinglist
+  path: clusters/titania/apps/shoppinglist
   interval: 15m
   prune: true
   wait: true
