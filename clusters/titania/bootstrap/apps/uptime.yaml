@@ -9,7 +9,7 @@ metadata:
   name: uptime
   namespace: uptime
 spec:
-  path: clusters/cosmos/apps/uptime
+  path: clusters/titania/apps/uptime
   interval: 15m
   prune: true
   wait: true
