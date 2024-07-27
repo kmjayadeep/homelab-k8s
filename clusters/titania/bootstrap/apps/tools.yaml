@@ -9,7 +9,7 @@ metadata:
   name: tools
   namespace: tools
 spec:
-  path: clusters/cosmos/apps/tools
+  path: clusters/titania/apps/tools
   interval: 15m
   prune: true
   wait: true
