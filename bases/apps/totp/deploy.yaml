@@ -44,28 +44,16 @@ spec:
             configMapKeyRef:
               name: totp-cm
               key: WEBAUTHN_NAME
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: totp.totp-user.main.credentials.postgresql.acid.zalan.do
-              key: username
-        - name: DB_PASS
-          valueFrom:
-            secretKeyRef:
-              name: totp.totp-user.main.credentials.postgresql.acid.zalan.do
-              key: password
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: totp-secret
-              key: DB_HOST
         - name: APP_KEY
           valueFrom:
             secretKeyRef:
               name: totp-secret
               key: APP_KEY
         - name: DATABASE_URL
-          value: "postgresql://$(DB_USER):$(DB_PASS)@$(DB_HOST):5432/totp"
+          valueFrom:
+            secretKeyRef:
+              name: totp-secret
+              key: DATABASE_URL
         - name: APP_DEBUG
           value: "true"
         ports:

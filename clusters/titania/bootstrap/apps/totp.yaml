@@ -9,7 +9,7 @@ metadata:
   name: otpcloud
   namespace: totp
 spec:
-  path: clusters/cosmos/apps/otpcloud
+  path: clusters/titania/apps/otpcloud
   interval: 15m
   prune: true
   wait: true
