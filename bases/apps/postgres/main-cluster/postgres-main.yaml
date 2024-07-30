@@ -7,15 +7,9 @@ spec:
   teamId: "kmjayadeep"
   numberOfInstances: 1
   users:
-    # User in productivity ns
-    productivity.planka-user: []
-    # User in totp ns
-    totp.totp-user: []
     # External user for immich
     immich-nas: []
   databases:
-    planka: productivity.planka-user
-    totp: totp.totp-user
     immich: immich-nas
   enableMasterLoadBalancer: true
   preparedDatabases:
