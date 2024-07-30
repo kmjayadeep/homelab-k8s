@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: planka
+    app.kubernetes.io/name: planka
+  name: planka
+  namespace: productivity
+spec:
+  rules:
+  - host: planka.cosmos.cboxlab.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: planka
+            port:
+              number: 1337
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - planka.cosmos.cboxlab.com
+    secretName: planka-tls

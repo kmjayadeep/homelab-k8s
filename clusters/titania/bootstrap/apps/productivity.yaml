@@ -9,7 +9,7 @@ metadata:
   name: productivity
   namespace: productivity
 spec:
-  path: clusters/cosmos/apps/productivity
+  path: clusters/titania/apps/productivity
   interval: 15m
   prune: true
   wait: true
