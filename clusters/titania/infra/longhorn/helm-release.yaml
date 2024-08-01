@@ -6,6 +6,6 @@ metadata:
 spec: 
   values:
     ingress:
-      host: longhorn-titania.cosmos.cboxlab.com
+      host: longhorn.cosmos.cboxlab.com
     defaultSettings:
       backupTarget: nfs://nfs.cosmos.cboxlab.com:/srv/longhorn
