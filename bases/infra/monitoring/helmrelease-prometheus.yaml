@@ -31,7 +31,7 @@ spec:
     kubeProxy:
       enabled: false
     grafana:
-      enabled: false
+      enabled: true
       admin:
         existingSecret: grafana-creds
       ingress:
