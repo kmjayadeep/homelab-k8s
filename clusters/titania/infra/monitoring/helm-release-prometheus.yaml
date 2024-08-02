@@ -33,6 +33,11 @@ spec:
           - targets:
             - 100.66.72.120:9100 ## Node exporter from nuc
             - 100.66.72.120:18080 ## taskwarrior metrics from nuc
+        - job_name: polaris
+          static_configs:
+          - targets:
+            - 192.168.1.41:9100 ## Node exporter
+            - 192.168.1.41:9187 ## Postgres exporter
 
         thanos:
           objectStorageConfig:
