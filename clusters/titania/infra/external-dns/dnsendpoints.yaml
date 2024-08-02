@@ -13,7 +13,7 @@ spec:
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.1.20
+    - 192.168.1.40
   - dnsName: titania.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
@@ -64,3 +64,8 @@ spec:
     recordType: A
     targets:
     - 192.168.1.80
+  - dnsName: postgres.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.41
