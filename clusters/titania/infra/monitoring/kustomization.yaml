@@ -5,6 +5,7 @@ resources:
   - ./grafana-creds-sealed.yaml
   - ./alermanager-config-sealed.yaml
   - ./thanos-s3-sealed.yaml
+  - ./postgres-prometheusrule.yaml
 
 patches:
 - path: ./helm-release-prometheus.yaml
