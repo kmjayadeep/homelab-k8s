@@ -4,3 +4,6 @@
 - op: replace
   path: /spec/tls/0/hosts/0
   value: psuite.cosmos.cboxlab.com
+- op: add
+  path: /metadata/annotations
+  value: { "cert-manager.io/cluster-issuer": "default-clusterissuer" }
