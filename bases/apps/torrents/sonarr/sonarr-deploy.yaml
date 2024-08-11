@@ -22,7 +22,7 @@ spec:
             claimName: sonarr-downloads-nfs
       containers:
         - name: sonarr
-          image: ghcr.io/hotio/sonarr:nightly-4.0.8.2008 # {"$imagepolicy": "torrents:sonarr"}
+          image: ghcr.io/hotio/sonarr:nightly-4.0.8.2093 # {"$imagepolicy": "torrents:sonarr"}
           env:
             - name: PUID
               value: "1000"
