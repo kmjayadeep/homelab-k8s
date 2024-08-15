@@ -22,7 +22,7 @@ spec:
             claimName: radarr-downloads-nfs
       containers:
         - name: radarr
-          image: ghcr.io/hotio/radarr:nightly-5.9.0.9050 # {"$imagepolicy": "torrents:radarr"}
+          image: ghcr.io/hotio/radarr:nightly-5.9.0.9051 # {"$imagepolicy": "torrents:radarr"}
           volumeMounts:
             - name: radarr-config
               mountPath: /config
