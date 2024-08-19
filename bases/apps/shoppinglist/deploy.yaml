@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: shoppinglist
-          image: ghcr.io/kmjayadeep/shoppinglist-server:1723994796 # {"$imagepolicy": "shoppinglist:shoppinglist"}
+          image: ghcr.io/kmjayadeep/shoppinglist-server:1724064428 # {"$imagepolicy": "shoppinglist:shoppinglist"}
           env:
             - name: GIN_MODE
               value: "release"
