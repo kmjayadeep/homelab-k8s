@@ -79,3 +79,8 @@ spec:
     recordType: A
     targets:
     - 192.168.80.20
+  - dnsName: valheim.sreepadam.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 100.79.237.47
