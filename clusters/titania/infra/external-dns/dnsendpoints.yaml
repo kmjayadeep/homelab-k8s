@@ -84,3 +84,8 @@ spec:
     recordType: A
     targets:
     - 100.79.237.47
+  - dnsName: disneyland.sreepadam.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 100.91.232.115
