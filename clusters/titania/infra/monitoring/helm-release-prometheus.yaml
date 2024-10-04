@@ -28,11 +28,11 @@ spec:
           - prometheus.cosmos.cboxlab.com
       prometheusSpec:
         additionalScrapeConfigs:
-        - job_name: nuc
+        - job_name: jd-pc
           static_configs:
           - targets:
-            - 100.66.72.120:9100 ## Node exporter from nuc
-            - 100.66.72.120:18080 ## taskwarrior metrics from nuc
+            - 100.108.88.96:9100 ## Node exporter from jd-pc
+            - 100.108.88.96:18080 ## taskwarrior metrics from jd-pc
         - job_name: polaris
           static_configs:
           - targets:
