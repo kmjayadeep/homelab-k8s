@@ -1,17 +1,17 @@
 ## pv for downloads nfs mount
-apiversion: v1
+apiVersion: v1
 kind: persistentvolume
 metadata:
   name: deluge-downloads-nfs
 spec:
   capacity:
     storage: 10gi
-  volumemode: filesystem
-  accessmodes:
-    - readwritemany
-  persistentvolumereclaimpolicy: retain
-  storageclassname: nfs-downloads-deluge
-  mountoptions:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-download-deluge
+  mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
@@ -19,19 +19,19 @@ spec:
     server: truenas.cosmos.cboxlab.com
 ---
 ## pv for arr-downloads nfs mount
-apiversion: v1
+apiVersion: v1
 kind: persistentvolume
 metadata:
   name: deluge-arr-nfs
 spec:
   capacity:
     storage: 10gi
-  volumemode: filesystem
-  accessmodes:
-    - readwritemany
-  persistentvolumereclaimpolicy: retain
-  storageclassname: nfs-arr-deluge
-  mountoptions:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-arr-deluge
+  mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
