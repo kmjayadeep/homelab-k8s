@@ -1,6 +1,6 @@
 ## pv for downloads nfs mount
 apiVersion: v1
-kind: persistentvolume
+kind: PersistentVolume
 metadata:
   name: deluge-downloads-nfs
 spec:
@@ -20,7 +20,7 @@ spec:
 ---
 ## pv for arr-downloads nfs mount
 apiVersion: v1
-kind: persistentvolume
+kind: PersistentVolume
 metadata:
   name: deluge-arr-nfs
 spec:
