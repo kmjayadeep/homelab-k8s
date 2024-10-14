@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: nfs-download-deluge
+  storageClassName: nfs-downloads-deluge
   mountOptions:
     - hard
     - nfsvers=4.1
