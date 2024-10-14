@@ -5,7 +5,7 @@ metadata:
   name: deluge-downloads-nfs
 spec:
   capacity:
-    storage: 10gi
+    storage: 10Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
@@ -25,7 +25,7 @@ metadata:
   name: deluge-arr-nfs
 spec:
   capacity:
-    storage: 10gi
+    storage: 10Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
