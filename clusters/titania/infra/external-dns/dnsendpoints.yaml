@@ -89,3 +89,8 @@ spec:
     recordType: A
     targets:
     - 100.93.143.79
+  - dnsName: odin.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 100.92.249.94
