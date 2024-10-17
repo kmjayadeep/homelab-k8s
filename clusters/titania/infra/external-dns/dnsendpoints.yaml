@@ -9,6 +9,11 @@ spec:
     recordType: A
     targets:
     - 192.168.1.15
+  - dnsName: jupiter.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.16
   - dnsName: k8s.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
