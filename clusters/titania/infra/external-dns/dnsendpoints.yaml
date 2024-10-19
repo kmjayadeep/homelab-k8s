@@ -28,7 +28,7 @@ spec:
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.1.65
+    - 192.168.1.73
   - dnsName: dockge.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
