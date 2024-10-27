@@ -19,7 +19,7 @@ spec:
             claimName: prowlarr-config
       containers:
         - name: prowlarr
-          image: linuxserver/prowlarr:nightly-1.26.0.4820-ls87 # {"$imagepolicy": "torrents:prowlarr"}
+          image: linuxserver/prowlarr:nightly-1.26.0.4822-ls88 # {"$imagepolicy": "torrents:prowlarr"}
           volumeMounts:
             - name: prowlarr-config
               mountPath: /config
