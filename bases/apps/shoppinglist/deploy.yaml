@@ -17,6 +17,13 @@ spec:
           env:
             - name: GIN_MODE
               value: "release"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shoppinglist-config
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://shoppinglist:$(POSTGRES_PASSWORD)@postgres.cosmos.cboxlab.com:5432/shoppinglist"
           resources:
             requests:
               memory: "50Mi"
