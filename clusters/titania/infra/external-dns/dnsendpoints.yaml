@@ -98,7 +98,7 @@ spec:
     recordTTL: 60
     recordType: A
     targets:
-    - 100.92.249.94
+    - 100.89.211.117
   - dnsName: coder.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
