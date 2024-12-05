@@ -22,7 +22,7 @@ spec:
             claimName: nzbget-downloads-nfs
       containers:
         - name: nzbget
-          image: ghcr.io/hotio/nzbget:release-24.4 # {"$imagepolicy": "torrents:nzbget"}
+          image: ghcr.io/hotio/nzbget:release-24.5 # {"$imagepolicy": "torrents:nzbget"}
           volumeMounts:
             - name: nzbget-config
               mountPath: /config
