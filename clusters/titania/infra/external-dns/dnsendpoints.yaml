@@ -109,3 +109,8 @@ spec:
     recordType: A
     targets:
     - 100.86.160.44
+  - dnsName: gatekeeper.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.250
