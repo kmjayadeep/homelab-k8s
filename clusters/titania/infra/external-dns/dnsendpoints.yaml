@@ -109,6 +109,11 @@ spec:
     recordType: A
     targets:
     - 100.86.160.44
+  - dnsName: chillyfries.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 100.122.49.75
   - dnsName: gatekeeper.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
