@@ -33,7 +33,8 @@ spec:
           - targets:
             - 100.108.88.96:9100 ## Node exporter from jd-pc
             - 100.108.88.96:18080 ## taskwarrior metrics from jd-pc
-        - job_name: polaris
+        # Postgres node
+        - job_name: helios
           static_configs:
           - targets:
             - 192.168.1.77:9100 ## Node exporter
