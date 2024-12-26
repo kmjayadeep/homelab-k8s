@@ -36,8 +36,8 @@ spec:
         - job_name: polaris
           static_configs:
           - targets:
-            - 192.168.1.41:9100 ## Node exporter
-            - 192.168.1.41:9187 ## Postgres exporter
+            - 192.168.1.77:9100 ## Node exporter
+            - 192.168.1.77:9187 ## Postgres exporter
 
         thanos:
           objectStorageConfig:
