@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  values:
+    server:
+      ingress:
+        hosts:
+        - host: vault.cosmos.cboxlab.com
+        tls:
+        - secretName: vault-server-tls
+          hosts:
+          - vault.cosmos.cboxlab.com
