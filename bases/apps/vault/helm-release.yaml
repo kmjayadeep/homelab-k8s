@@ -26,17 +26,6 @@ spec:
       prometheusRules:
         enabled: true
     server:
-      extraVolumes:
-      - name: vault-unseal-key
-        secret:
-          secretName: vault-unseal-key
-      extraVolumeMounts:
-      - name: vault-unseal-key
-        mountPath: /etc/vault/unseal
-        readOnly: true
-      extraArgs:
-        - "-auto-unseal=true"
-        - "-unseal-key-file=/etc/vault/unseal/unseal-key"
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
