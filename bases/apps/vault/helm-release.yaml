@@ -51,6 +51,9 @@ spec:
               tls_disable = 1
             }
 
+            # Update active vault pods with `vault-active=true` label
+            service_registration "kubernetes" {}
+
             storage "raft" {
               path = "/vault/data"
               retry_join {
