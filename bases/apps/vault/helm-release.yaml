@@ -25,6 +25,21 @@ spec:
         enabled: true
       prometheusRules:
         enabled: true
+        rules:
+          - alert: VaultDown
+            expr: up{job="vault-active"} == 0
+            for: 5m
+            annotations:
+              summary: "Vault server is down or unreachable"
+              description: "Vault server has been down for more than 5 minutes."
+            
+          - alert: VaultUnsealed
+            expr: vault_core_unsealed == 0
+            for: 5m
+            annotations:
+              summary: "Vault is sealed"
+              description: "Vault is sealed and unable to serve requests."
+
     server:
       affinity:
         podAntiAffinity:
