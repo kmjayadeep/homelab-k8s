@@ -49,6 +49,9 @@ spec:
               address = "0.0.0.0:8200"
               cluster_address = "0.0.0.0:8201"
               tls_disable = 1
+              telemetry {
+                unauthenticated_metrics_access = "true"
+              }
             }
 
             # Update active vault pods with `vault-active=true` label
@@ -65,6 +68,11 @@ spec:
               retry_join {
                 leader_api_addr = "http://vault-2.vault-internal:8200"
               }
+            }
+
+            telemetry {
+              disable_hostname = true
+              prometheus_retention_time = "12h"
             }
       ingress:
         enabled: true
