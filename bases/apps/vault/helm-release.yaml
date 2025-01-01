@@ -34,9 +34,7 @@ spec:
       - name: vault-unseal-key
         mountPath: /etc/vault/unseal
         readOnly: true
-      extraArgs:
-        - "-auto-unseal=true"
-        - "-unseal-key-file=/etc/vault/unseal/unseal-key"
+      extraArgs: "-auto-unseal=true -unseal-key-file=/etc/vault/unseal/unseal-key"
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
