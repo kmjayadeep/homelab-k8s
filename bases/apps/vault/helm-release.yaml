@@ -27,13 +27,9 @@ spec:
         enabled: true
     server:
       extraVolumes:
-      - name: vault-unseal-key
-        secret:
-          secretName: vault-unseal-key
-      extraVolumeMounts:
-      - name: vault-unseal-key
-        mountPath: /etc/vault/unseal
-        readOnly: true
+      - type: secret
+        name: vault-unseal-key
+        path: /etc/vault/unseal
       extraArgs: "-auto-unseal=true -unseal-key-file=/etc/vault/unseal/unseal-key"
       affinity:
         podAntiAffinity:
