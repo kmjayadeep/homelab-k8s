@@ -119,3 +119,8 @@ spec:
     recordType: A
     targets:
     - 192.168.1.250
+  - dnsName: valkyrie.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 100.85.149.58
