@@ -44,5 +44,5 @@ spec:
       namespace: torrents
     - apiVersion: apps/v1
       kind: Deployment
-      name: nzbget
+      name: readarr
       namespace: torrents
