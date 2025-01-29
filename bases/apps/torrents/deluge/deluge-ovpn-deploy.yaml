@@ -54,7 +54,7 @@ spec:
         - name: VPN_PROV
           value: custom
         - name: LAN_NETWORK
-          value: 192.168.1.0/24
+          value: 10.42.0.0/16
         - name: PUID
           value: "1000"
         - name: PGID
