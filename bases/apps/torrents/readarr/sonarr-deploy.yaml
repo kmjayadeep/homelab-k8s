@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readarr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: readarr
+  template:
+    metadata:
+      labels:
+        app: readarr
+    spec:
+      volumes:
+        - name: readarr-config
+          persistentVolumeClaim:
+            claimName: readarr-config
+        - name: nfs-downloads
+          persistentVolumeClaim:
+            claimName: readarr-downloads-nfs
+      containers:
+        - name: readarr
+          image: ghcr.io/hotio/readarr:nightly-0.4.11.2735 # {"$imagepolicy": "torrents:readarr"}
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "3000"
+          volumeMounts:
+            - name: readarr-config
+              mountPath: /config
+            - mountPath: /data
+              name: nfs-downloads
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"

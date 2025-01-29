@@ -32,4 +32,9 @@ resources:
   # - ./nzbget/nzbget-svc.yaml
   # - ./nzbget/nzbget-deploy.yaml
   # - ./nzbget/image-update.yaml
+  - ./readarr/readarr-ing.yaml
+  - ./readarr/readarr-pvc.yaml
+  - ./readarr/readarr-svc.yaml
+  - ./readarr/readarr-deploy.yaml
+  - ./readarr/image-update.yaml
   - ./image-update-automation.yaml

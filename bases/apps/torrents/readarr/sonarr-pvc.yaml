@@ -1,0 +1,44 @@
+## PV for nfs mount
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: readarr-downloads-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-readarr
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/main/media/tv
+    server: truenas.cosmos.cboxlab.com
+---
+# PVC for nfs downloads mount
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: readarr-downloads-nfs
+spec:
+  storageClassName: nfs-readarr
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: readarr-config
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

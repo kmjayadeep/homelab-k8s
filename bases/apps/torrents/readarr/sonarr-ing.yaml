@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: readarr-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: default-clusterissuer
+spec:
+  tls:
+  - hosts:
+    - readarr.local
+    secretName: readarr-cert
+  rules:
+  - host: readarr.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: readarr
+            port:
+              number: 8787
