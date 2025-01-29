@@ -9,7 +9,7 @@ metadata:
   name: torrents
   namespace: torrents
 spec:
-  path: clusters/cosmos/apps/torrents
+  path: clusters/titania/apps/torrents
   dependsOn:
   - name: sealed-secrets
     namespace: flux-system
