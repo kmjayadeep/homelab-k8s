@@ -1,0 +1,11 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: actions-runner-controller
+  namespace: actions-runner-system
+spec:
+  values:
+    authSecret:
+      enabled: true
+      create: false
+      name: actions-runner-secret
