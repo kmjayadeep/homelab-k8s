@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskplanner
+spec:
+  selector:
+    matchLabels:
+      app: taskplanner
+  template:
+    metadata:
+      labels:
+        app: taskplanner
+    spec:
+      containers:
+        - name: taskplanner
+          image: ghcr.io/kmjayadeep/taskplanner-server:20250221193336 # {"$imagepolicy": "taskplanner:taskplanner"}
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskplanner-config
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://taskplanner:$(POSTGRES_PASSWORD)@postgres.cosmos.cboxlab.com:5432/taskplanner"
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "25m"
+            limits:
+              memory: "100Mi"
+              cpu: "250m"

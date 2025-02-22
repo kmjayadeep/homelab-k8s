@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: taskplanner
+spec:
+  selector: 
+    app: taskplanner
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+

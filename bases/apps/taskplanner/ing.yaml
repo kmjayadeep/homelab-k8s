@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: taskplanner-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: default-clusterissuer
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  tls:
+  - hosts:
+    - taskplanner.local
+    secretName: taskplanner-cert
+  rules:
+  - host: taskplanner.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: taskplanner
+            port:
+              number: 8000
