@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: taskplanner
-          image: ghcr.io/kmjayadeep/taskplanner-server:20250222021102 # {"$imagepolicy": "taskplanner:taskplanner"}
+          image: ghcr.io/kmjayadeep/taskplanner-server:20250223131708 # {"$imagepolicy": "taskplanner:taskplanner"}
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
