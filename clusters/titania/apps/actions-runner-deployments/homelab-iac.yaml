@@ -10,3 +10,4 @@ spec:
       repository: kmjayadeep/homelab-iac
       labels:
       - cosmos
+      image: ghcr.io/kmjayadeep/actions-runner:latest
