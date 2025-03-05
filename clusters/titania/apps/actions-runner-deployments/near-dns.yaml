@@ -11,3 +11,4 @@ spec:
       labels:
       - cosmos
       image: ghcr.io/kmjayadeep/actions-runner:latest
+      dockerEnabled: false
