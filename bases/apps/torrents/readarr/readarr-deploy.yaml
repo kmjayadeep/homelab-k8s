@@ -22,7 +22,7 @@ spec:
             claimName: readarr-downloads-nfs
       containers:
         - name: readarr
-          image: ghcr.io/hotio/readarr:nightly-0.4.13.2757 # {"$imagepolicy": "torrents:readarr"}
+          image: ghcr.io/hotio/readarr:nightly-0.4.13.2760 # {"$imagepolicy": "torrents:readarr"}
           env:
             - name: PUID
               value: "1000"
