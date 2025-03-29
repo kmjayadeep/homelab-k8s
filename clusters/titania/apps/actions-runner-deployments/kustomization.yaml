@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - ./near-dns.yaml
 - ./homelab-iac.yaml
+- ./homelab-docker-stacks.yaml
