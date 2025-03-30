@@ -54,6 +54,11 @@ spec:
     recordType: A
     targets:
     - 192.168.1.80
+  - dnsName: speedtest-nas.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.80
   - dnsName: minio.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
