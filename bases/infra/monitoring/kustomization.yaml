@@ -7,6 +7,10 @@ resources:
 - ./repo.yaml
 - ./helmrelease-prometheus.yaml
 
+# loki
+- ./repo-grafana.yaml
+- ./helmrelease-loki.yaml
+
 configMapGenerator:
 - name: flux-grafana-dashboards
   files:
