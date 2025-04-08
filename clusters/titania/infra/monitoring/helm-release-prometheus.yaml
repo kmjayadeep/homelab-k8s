@@ -40,6 +40,14 @@ spec:
             - 192.168.1.77:9100 ## Node exporter
             - 192.168.1.77:9187 ## Postgres exporter
 
+        # Docker hosts in truenas
+        - job_name: truenas
+          static_configs:
+          - targets:
+            - immich.cosmos.cboxlab.com:8081 # immich api
+            - immich.cosmos.cboxlab.com:8082 # immich microservices
+            - traefik.cosmos.cboxlab.com:8899 # traefik
+
         thanos:
           objectStorageConfig:
             name: thanos-s3
