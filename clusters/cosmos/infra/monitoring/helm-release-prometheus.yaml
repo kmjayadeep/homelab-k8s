@@ -33,7 +33,12 @@ spec:
           - targets:
             - 100.66.72.120:9100 ## Node exporter from nuc
             - 100.66.72.120:18080 ## taskwarrior metrics from nuc
-
+        - job_name: truenas
+          static_configs:
+          - targets:
+            - immich.cosmos.cboxlab.com:8081 # immich api
+            - immich.cosmos.cboxlab.com:8082 # immich microservices
+            - traefik.cosmos.cboxlab.com:8899 # traefik
         thanos:
           objectStorageConfig:
             name: thanos-s3
