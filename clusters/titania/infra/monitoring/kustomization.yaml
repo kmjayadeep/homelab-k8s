@@ -6,6 +6,7 @@ resources:
   - ./alermanager-config-sealed.yaml
   - ./thanos-s3-sealed.yaml
   - ./postgres-prometheusrule.yaml
+  - ./loki-minio-sealed.yaml
 
 patches:
 - path: ./helm-release-prometheus.yaml

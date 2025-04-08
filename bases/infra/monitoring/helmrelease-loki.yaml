@@ -14,6 +14,10 @@ spec:
       version: "6.29.0"
   interval: 1h0m0s
   values:
+    global:
+      extraEnvFrom:
+        - secretRef:
+            name: loki-minio-creds
     loki:
       auth_enabled: false
       commonConfig:
@@ -43,7 +47,7 @@ spec:
           admin: loki-cosmos-admin
         s3:
           region: us-west-000
-          endpoint: https://minio.cosmos.cboxlab.com
+          endpoint: minio.cosmos.cboxlab.com
 
     minio:
       # for testing
