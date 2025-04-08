@@ -85,3 +85,9 @@ spec:
       replicas: 0
     bloomGateway:
       replicas: 0
+
+    # helm test using loki canary
+    lokiCanary:
+      enabled: false
+    test:
+      enabled: false
