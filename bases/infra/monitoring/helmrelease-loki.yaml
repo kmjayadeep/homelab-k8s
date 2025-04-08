@@ -35,10 +35,19 @@ spec:
         retention_period: 168h # 7 days
       ruler:
         enable_api: true
+      storage:
+        type: s3
+        bucketNames:
+          chunks: loki-cosmos-chunks
+          ruler: loki-cosmos-ruler
+          admin: loki-cosmos-admin
+        s3:
+          region: us-west-000
+          endpoint: https://minio.cosmos.cboxlab.com
 
     minio:
       # for testing
-      enabled: true
+      enabled: false
 
     deploymentMode: SingleBinary
     singleBinary:
