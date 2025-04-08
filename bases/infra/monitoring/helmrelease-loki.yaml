@@ -44,6 +44,7 @@ spec:
         s3:
           region: us-west-000
           endpoint: minio.cosmos.cboxlab.com
+          s3forcepathstyle: true
 
     minio:
       # for testing
