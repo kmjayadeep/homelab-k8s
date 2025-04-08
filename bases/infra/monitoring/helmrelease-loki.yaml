@@ -14,10 +14,6 @@ spec:
       version: "6.29.0"
   interval: 1h0m0s
   values:
-    global:
-      extraEnvFrom:
-        - secretRef:
-            name: loki-minio-creds
     loki:
       auth_enabled: false
       commonConfig:
@@ -54,19 +50,23 @@ spec:
       enabled: false
 
     deploymentMode: SingleBinary
+
     singleBinary:
       replicas: 1
       resources:
         limits:
-          cpu: 3
-          memory: 4Gi
-        requests:
-          cpu: 2
+          cpu: 1
           memory: 2Gi
+        requests:
+          cpu: 0.5
+          memory: 1Gi
       extraEnv:
         # Keep a little bit lower than memory limits
         - name: GOMEMLIMIT
-          value: 3750MiB
+          value: 1500MiB
+      extraEnvFrom:
+        - secretRef:
+            name: loki-minio-creds
 
     chunksCache:
       enabled: false
