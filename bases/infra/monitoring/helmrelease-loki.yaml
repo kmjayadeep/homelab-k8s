@@ -15,6 +15,7 @@ spec:
   interval: 1h0m0s
   values:
     loki:
+      auth_enabled: false
       commonConfig:
         replication_factor: 1
       schemaConfig:
