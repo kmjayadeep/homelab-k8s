@@ -20,6 +20,7 @@ configMapGenerator:
     - dashboards/logs.json
     - dashboards/postgres.json
     - dashboards/traefik.json
+    - dashboards/vault.json
   options:
     labels:
       grafana_dashboard: "1"
