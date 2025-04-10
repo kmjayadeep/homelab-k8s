@@ -15,7 +15,7 @@ spec:
         app: grocy
     spec:
       containers:
-      - image: linuxserver/grocy:4.2.0
+      - image: linuxserver/grocy:4.5.0
         imagePullPolicy: IfNotPresent
         name: grocy
         ports:
