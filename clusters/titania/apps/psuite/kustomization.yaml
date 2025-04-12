@@ -12,8 +12,3 @@ patches:
     kind: Ingress
     name: psuite
     version: v1
-- path: longhorn-patch.yaml
-  target:
-    version: v1
-    kind: PersistentVolumeClaim
-    name: psuite-config
