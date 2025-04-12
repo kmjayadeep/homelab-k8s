@@ -40,4 +40,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
+  storageClassName: longhorn-static
+  volumeMode: Filesystem
+  volumeName: psuite-restore
