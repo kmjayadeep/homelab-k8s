@@ -21,6 +21,8 @@ spec:
           value: /psuite-data/psuite-wiki/data
         - name: SB_SYNC_ONLY
           value: "true"
+        - name: SB_DB_BACKEND
+          value: memory
         - name: SB_USER
           valueFrom:
             secretKeyRef:
