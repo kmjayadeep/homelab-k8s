@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
 - ../../../../bases/apps/psuite
 - ./secret-sealed.yaml
+- ./wiki-creds-sealed.yaml
 
 patches:
 - path: ingress-patch.yaml

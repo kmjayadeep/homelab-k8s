@@ -13,12 +13,19 @@ spec:
         app: psuite-wiki
     spec:
       containers:
-      - image: zefhemel/silverbullet:0.10.4
+      - name: silverbullet
+        image: zefhemel/silverbullet:0.10.4
         imagePullPolicy: IfNotPresent
         env:
         - name: SB_FOLDER
           value: /psuite-data/psuite-wiki/data
-        name: silverbullet
+        - name: SB_SYNC_ONLY
+          value: true
+        - name: SB_USER
+          valueFrom:
+            secretKeyRef:
+              name: psuite-wiki-creds
+              key: creds
         ports:
         - containerPort: 3000
           protocol: TCP

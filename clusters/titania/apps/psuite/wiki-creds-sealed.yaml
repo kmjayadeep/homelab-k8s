@@ -1,0 +1,17 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: psuite-wiki-creds
+  namespace: psuite
+spec:
+  encryptedData:
+    creds: AgAABwTTZX4hEdky+8IX+M39UiPK+WJz52jmddAYMS39SCO95VvjD0nwLyS2L7mwDHs5R+yczmwnkzym1qMXEm7V9WK98GqQ0xWbwP6KcgDo/XYpZ6zxDaDeBjceEHh44juxUDXAdXYAKCxYSdTv5M8+NgaSwltKw6qlxbcwKv9hKbM3tm3gv+XtwCZNA4TQLYZnzyB93DoaMCsjVRZazXdSOf2a7Gcahar+5gV7J/uoptBA5NRoefsa7PhWvDxkZNU6WLeJytRh55HvjRS4SpJkdwBH2FdIVh7mhorIuuSt9WLG1907e5BCTb82rXdwHIY8RKwx2qsX0a9Kd2KXSjffSbrW+vE0vdo5FuqX+2m61S2CLvP4V21YRSrpV0Yxt2M8bwgCNepGerV2GnQjQqTBs9Uzu4eTb62Mx7trwx4HC7H1FwJlfV4a6e20/D/Q4px0Lekavby7dm//8JAyA0YVGvHJTFvXb2cX2+mX/sqFyRaFlgrQPfij/+o5pTulF/uZapm1Immb4EvvRLHVd3mNyPbvE6FpkwqwryJl7JPY3fup7GyNK8kFhl7EvMxr0ZhaQ4+Rx7fu0LL0n4lfqnMqnm7yfrc1uUR5Uhls2IqedSByguI4QXToiHVRqctckWm8AtFgehzt/ugP6VcSm5M978Fqx2QDqyVkctve2Y9ElxAkVuiqFiHHLvhClAXhZdvuxA7MOobwWCaD6G9iHwDjfyrswJHOog==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: psuite-wiki-creds
+      namespace: psuite
+    type: Opaque
+
