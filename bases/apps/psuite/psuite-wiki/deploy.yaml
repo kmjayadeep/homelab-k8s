@@ -17,7 +17,7 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: SB_FOLDER
-          value: /data/psuite-wiki
+          value: /psuite-data/psuite-wiki/data
         name: silverbullet
         ports:
         - containerPort: 3000
@@ -25,7 +25,7 @@ spec:
           name: http
         volumeMounts:
         - name: psuite-data
-          mountPath: /data
+          mountPath: /psuite-data
       restartPolicy: Always
       volumes:
       - name: psuite-data
