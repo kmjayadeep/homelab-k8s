@@ -10,6 +10,9 @@ resources:
   - ./psuite-service.yaml
   - ./psuite-serviceaccount.yaml
   - ./psuite-cron.yaml
+  - ./psuite-wiki/deploy.yaml
+  - ./psuite-wiki/svc.yaml
+  - ./psuite-wiki/ing.yaml
 
 configMapGenerator:
 - name: psuite-scripts

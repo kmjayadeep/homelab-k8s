@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psuite-wiki
+spec:
+  selector:
+    matchLabels:
+      app: psuite-wiki
+  template:
+    metadata:
+      labels:
+        app: psuite-wiki
+    spec:
+      containers:
+      - image: zefhemel/silverbullet:0.10.4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SB_FOLDER
+          value: /data/psuite-wiki
+        name: silverbullet
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+          name: http
+        volumeMounts:
+        - name: psuite-data
+          mountPath: /data
+      restartPolicy: Always
+      volumes:
+      - name: psuite-data
+        persistentVolumeClaim:
+          claimName: psuite-data

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: psuite-wiki
+    app.kubernetes.io/name: psuite-wiki
+  annotations:
+   cert-manager.io/cluster-issuer: default-clusterissuer
+  name: psuite-wiki
+spec:
+  tls:
+  - hosts:
+    - psuite-wiki.local
+    secretName: psuite-wiki-cert
+  rules:
+  - host: psuite-wiki.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: psuite-wiki
+            port:
+              name: http

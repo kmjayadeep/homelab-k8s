@@ -12,3 +12,9 @@ patches:
     kind: Ingress
     name: psuite
     version: v1
+- path: wiki-ingress-patch.yaml
+  target:
+    group: networking.k8s.io
+    kind: Ingress
+    name: psuite-wiki
+    version: v1
