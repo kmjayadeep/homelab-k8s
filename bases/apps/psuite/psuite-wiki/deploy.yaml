@@ -20,7 +20,7 @@ spec:
         - name: SB_FOLDER
           value: /psuite-data/psuite-wiki/data
         - name: SB_SYNC_ONLY
-          value: true
+          value: "true"
         - name: SB_USER
           valueFrom:
             secretKeyRef:
