@@ -44,8 +44,6 @@ spec:
         - job_name: truenas
           static_configs:
           - targets:
-            - immich.cosmos.cboxlab.com:8081 # immich api
-            - immich.cosmos.cboxlab.com:8082 # immich microservices
             - traefik.cosmos.cboxlab.com:8899 # traefik
 
         thanos:
