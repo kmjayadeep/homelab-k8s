@@ -1,8 +1,0 @@
-apiVersion: v1
-data:
-  SITE_OWNER: mail@milkyway.cboxlab.com
-  APP_URL: https://totp.milkyway.cboxlab.com
-kind: ConfigMap
-metadata:
-  creationTimestamp: null
-  name: totp-cm
