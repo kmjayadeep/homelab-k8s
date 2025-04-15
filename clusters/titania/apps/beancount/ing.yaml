@@ -14,10 +14,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - fava.local
+    - fava.cosmos.cboxlab.com
     secretName: fava-cert
   rules:
-  - host: fava.local
+  - host: fava.cosmos.cboxlab.com
     http:
       paths:
       - path: /
