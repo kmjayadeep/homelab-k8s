@@ -4,6 +4,16 @@ metadata:
   name: actions-runner-controller
   namespace: actions-runner-system
 spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: actions-runner-controller
+      version: '0.23.7'
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller
+        namespace: actions-runner-system
+      interval: 1m
   values:
     authSecret:
       enabled: true
