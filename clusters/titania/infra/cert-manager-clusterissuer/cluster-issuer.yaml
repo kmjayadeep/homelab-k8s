@@ -28,7 +28,6 @@ spec:
   commonName: "*.cosmos.cboxlab.com"
   dnsNames:
   - "*.cosmos.cboxlab.com"
-  - "cosmos.cboxlab.com"
   secretName: cosmos-cboxlab-cert
   issuerRef:
     name: default-clusterissuer
