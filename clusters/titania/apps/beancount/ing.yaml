@@ -11,6 +11,7 @@ metadata:
    nginx.ingress.kubernetes.io/auth-secret: fava-auth
    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Fava'
   name: fava-ingress
+  namespace: beancount
 spec:
   tls:
   - hosts:
