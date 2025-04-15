@@ -18,3 +18,18 @@ spec:
       selector:
         dnsZones:
         - 'cboxlab.com'
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cosmos-cboxlab-cert
+  namespace: cert-manager
+spec:
+  commonName: "*.cosmos.cboxlab.com"
+  dnsNames:
+  - "*.cosmos.cboxlab.com"
+  - "cosmos.cboxlab.com"
+  secretName: cosmos-cboxlab-cert
+  issuerRef:
+    name: default-clusterissuer
+    kind: ClusterIssuer
