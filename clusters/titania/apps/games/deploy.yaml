@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordle
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wordle
+  template:
+    metadata:
+      labels:
+        app: wordle
+    spec:
+      containers:
+      - image: modem7/wordle:latest
+        imagePullPolicy: IfNotPresent
+        name: wordle
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+          name: http
+      restartPolicy: Always
