@@ -22,5 +22,5 @@ spec:
     name: flux-system
     namespace: flux-system
   update:
-    path: ./bases/apps/shoppinglist
+    path: ./clusters/titania/apps/shoppinglist
     strategy: Setters
