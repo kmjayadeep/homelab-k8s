@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - uptime.local
+    - uptime.cosmos.cboxlab.com
     secretName: uptime-cert
   rules:
-  - host: uptime.local
+  - host: uptime.cosmos.cboxlab.com
     http:
       paths:
       - path: /
