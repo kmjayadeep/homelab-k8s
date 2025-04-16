@@ -3,9 +3,43 @@ kind: HelmRelease
 metadata:
   name: longhorn
   namespace: longhorn-system
-spec: 
+spec:
+  chart:
+    spec:
+      chart: longhorn
+      version: "1.8.1"
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+        namespace: longhorn-system
+  interval: 1h0m0s
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
   values:
+    longhornUI:
+      replicas: 1
     ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: default-clusterissuer
       host: longhorn.cosmos.cboxlab.com
+      tls: true
+      tlsSecret: longhorn-tls
+    csi:
+      attacherReplicaCount: 1
+      provisionerReplicaCount: 1
+      resizerReplicaCount: 1
+      snapshotterReplicaCount: 1
     defaultSettings:
       backupTarget: nfs://nfs.cosmos.cboxlab.com:/srv/longhorn
+      defaultReplicaCount: 1
+      replicaAutoBalance: true
+    persistence:
+      defaultFsType: "xfs"
+      defaultClass: false
+      defaultClassReplicaCount: 1
+      recurringJobSelector:
+        enable: true
+        jobList: '[{"name":"daily", "isGroup":true}]'
