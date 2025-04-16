@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - taskplanner.local
+    - taskplanner.cosmos.cboxlab.com
     secretName: taskplanner-cert
   rules:
-  - host: taskplanner.local
+  - host: taskplanner.cosmos.cboxlab.com
     http:
       paths:
       - path: /
