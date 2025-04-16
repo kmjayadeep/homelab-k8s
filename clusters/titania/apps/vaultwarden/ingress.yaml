@@ -7,10 +7,10 @@ metadata:
 spec:
  tls:
  - hosts:
-   - vaultwarden.local
+   - vaultwarden.cosmos.cboxlab.com
    secretName: waultwarden-tls-secret
  rules:
- - host: vaultwarden.local
+ - host: vaultwarden.cosmos.cboxlab.com
    http:
      paths:
      - backend:
