@@ -4,4 +4,15 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
-  - ../../../../../bases/infra/monitoring/longhorn
+  - ./servicemonitor.yaml
+  - ./prometheusrule.yaml
+
+configMapGenerator:
+- name: longhorn-dashboards
+  files:
+    - dashboard.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+      app.kubernetes.io/part-of: longhorn
+      app.kubernetes.io/component: monitoring

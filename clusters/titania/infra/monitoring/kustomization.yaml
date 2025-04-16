@@ -1,12 +1,34 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - ../../../../bases/infra/monitoring
-  - ./grafana-creds-sealed.yaml
-  - ./alermanager-config-sealed.yaml
-  - ./thanos-s3-sealed.yaml
-  - ./postgres-prometheusrule.yaml
-  - ./loki-minio-sealed.yaml
 
-patches:
-- path: ./helm-release-prometheus.yaml
+namespace: monitoring
+
+resources:
+- ./repo.yaml
+- ./helmrelease-prometheus.yaml
+
+# loki
+- ./repo-grafana.yaml
+- ./helmrelease-loki.yaml
+- ./helmrelease-promtail.yaml
+
+- ./grafana-creds-sealed.yaml
+- ./alermanager-config-sealed.yaml
+- ./thanos-s3-sealed.yaml
+- ./postgres-prometheusrule.yaml
+- ./loki-minio-sealed.yaml
+
+configMapGenerator:
+- name: flux-grafana-dashboards
+  files:
+    - dashboards/control-plane.json
+    - dashboards/cluster.json
+    - dashboards/logs.json
+    - dashboards/postgres.json
+    - dashboards/traefik.json
+    - dashboards/vault.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+      app.kubernetes.io/part-of: flux
+      app.kubernetes.io/component: monitoring

@@ -4,10 +4,45 @@ metadata:
   name: thanos
   namespace: monitoring
 spec:
+  chart:
+    spec:
+      chart: thanos
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: monitoring
+      version: "12.14.1"
+  interval: 1h0m0s
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
   values:
+    existingObjstoreSecret: thanos-s3
     query:
+      enabled: true
+      stores:
+      - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
       ingress:
+        enabled: true
         hostname: thanos-query.cosmos.cboxlab.com
+        annotations:
+          cert-manager.io/cluster-issuer: default-clusterissuer
+        tls: true
+    queryFrontend:
+      # Enabled by default
+      enabled: false
     compactor:
+      enabled: true
       ingress:
+        enabled: true
         hostname: thanos-compact.cosmos.cboxlab.com
+        annotations:
+          cert-manager.io/cluster-issuer: default-clusterissuer
+        tls: true
+      persistence:
+        enabled: false
+    storegateway:
+      enabled: true
+      persistence:
+        enabled: false

@@ -38,9 +38,17 @@ spec:
         annotations:
           cert-manager.io/cluster-issuer: default-clusterissuer
         enabled: true
-        hosts: [] # Declare in env specific file
+        hosts:
+        - grafana.cosmos.cboxlab.com
+        tls:
+        - secretName: grafana-cert
+          hosts:
+          - grafana.cosmos.cboxlab.com
       alertmanager:
         enabled: false
+      sidecar:
+        datasources:
+          url: http://thanos-query:9090/
     defaultRules:
       create: true
       rules:
@@ -87,10 +95,18 @@ spec:
 
     prometheus:
       enabled: true
+      thanosService:
+        enabled: true
       ingress:
         enabled: true
         annotations:
           cert-manager.io/cluster-issuer: default-clusterissuer
+        hosts:
+        - prometheus.cosmos.cboxlab.com
+        tls:
+        - secretName: prometheus-cert
+          hosts:
+          - prometheus.cosmos.cboxlab.com
       prometheusSpec:
         # Allow monitoring from all namespaces
         ruleSelectorNilUsesHelmValues: false
@@ -111,6 +127,30 @@ spec:
               resources:
                 requests:
                   storage: 5Gi
+        thanos:
+          objectStorageConfig:
+            name: thanos-s3
+            key: objstore.yml
+
+        additionalScrapeConfigs:
+        - job_name: jd-pc
+          static_configs:
+          - targets:
+            - 100.108.88.96:9100 ## Node exporter from jd-pc
+            - 100.108.88.96:18080 ## taskwarrior metrics from jd-pc
+        # Postgres node
+        - job_name: helios
+          static_configs:
+          - targets:
+            - 192.168.1.77:9100 ## Node exporter
+            - 192.168.1.77:9187 ## Postgres exporter
+
+        # Docker hosts in truenas
+        - job_name: truenas
+          static_configs:
+          - targets:
+            - traefik.cosmos.cboxlab.com:8899 # traefik
+
       additionalPodMonitors:
       - name: flux-system
         namespaceSelector:
@@ -134,13 +174,34 @@ spec:
               - sourceLabels: [__meta_kubernetes_pod_phase]
                 action: keep
                 regex: Running
+
+      additionalServiceMonitors:
+      - name: restic-exporter
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: restic-exporter
+        namespaceSelector:
+          matchNames:
+          - monitoring
+        endpoints:
+        - port: http-metrics
+          interval: 30s
+
     alertmanager:
       enabled: true
       ingress:
         enabled: true
         annotations:
           cert-manager.io/cluster-issuer: default-clusterissuer
+        hosts:
+        - alertmanager.cosmos.cboxlab.com
+        tls:
+        - secretName: alertmanager-cert
+          hosts:
+          - alertmanager.cosmos.cboxlab.com
       alertmanagerSpec:
+        useExistingSecret: true
+        configSecret: alertmanager-config
         storageSpec:
           volumeClaimTemplate:
             spec:
