@@ -1,8 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../../../bases/apps/productivity
+  - ./planka-sa.yaml
+  - ./planka-pvc.yaml
+  - ./planka-deploy.yaml
+  - ./planka-svc.yaml
+  - ./planka-ing.yaml
   - ./secret-sealed.yaml
-
-patches:
-- path: planka-ing.yaml
