@@ -22,5 +22,5 @@ spec:
     name: flux-system
     namespace: flux-system
   update:
-    path: ./bases/apps/torrents
+    path: ./clusters/titania/apps/torrents
     strategy: Setters

@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - radarr.local
+    - radarr.cosmos.cboxlab.com
     secretName: radarr-cert
   rules:
-  - host: radarr.local
+  - host: radarr.cosmos.cboxlab.com
     http:
       paths:
       - path: /

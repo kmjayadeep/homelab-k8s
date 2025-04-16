@@ -1,23 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: deluge-ingress
+  name: readarr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:
-    - deluge.local
-    secretName: deluge-cert
+    - readarr.cosmos.cboxlab.com
+    secretName: readarr-cert
   rules:
-  - host: deluge.local
+  - host: readarr.cosmos.cboxlab.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: deluge-openvpn
+            name: readarr
             port:
-              number: 8112
+              number: 8787

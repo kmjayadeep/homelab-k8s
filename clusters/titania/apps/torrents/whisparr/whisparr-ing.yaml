@@ -1,23 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sonarr-ingress
+  name: whisparr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:
-    - sonarr.local
-    secretName: sonarr-cert
+    - whisparr.cosmos.cboxlab.com
+    secretName: whisparr-cert
   rules:
-  - host: sonarr.local
+  - host: whisparr.cosmos.cboxlab.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: sonarr
+            name: whisparr
             port:
-              number: 8989
+              number: 6969
