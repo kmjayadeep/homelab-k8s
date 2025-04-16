@@ -1,7 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 namespace: external-dns
+
 resources:
-- secret-sealed.yaml
-- ../../../../bases/infra/external-dns
-- ./dnsendpoints.yaml
+  - deployment.yaml
+  - ./crd-dnsendpoint.yaml
+  - ./secret-sealed.yaml
+  - ./dnsendpoints.yaml
