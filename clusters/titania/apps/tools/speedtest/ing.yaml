@@ -11,10 +11,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - speedtest.local
+    - speedtest.cosmos.cboxlab.com
     secretName: speedtest-cert
   rules:
-  - host: speedtest.local
+  - host: speedtest.cosmos.cboxlab.com
     http:
       paths:
       - path: /
