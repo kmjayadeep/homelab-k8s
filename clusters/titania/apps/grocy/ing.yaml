@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - grocy.local
+    - grocy.cosmos.cboxlab.com
     secretName: grocy-cert
   rules:
-  - host: grocy.local
+  - host: grocy.cosmos.cboxlab.com
     http:
       paths:
       - path: /
