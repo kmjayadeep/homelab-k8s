@@ -43,3 +43,13 @@ spec:
       enabled: true
       annotations:
         cert-manager.io/cluster-issuer: default-clusterissuer
+      hosts:
+      - host: weave.cosmos.cboxlab.com
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+      tls:
+      - secretName: weave-tls
+        hosts:
+        - weave.cosmos.cboxlab.com
