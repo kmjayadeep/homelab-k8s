@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - homer.local
+    - home.cosmos.cboxlab.com
     secretName: homer-cert
   rules:
-  - host: homer.local
+  - host: home.cosmos.cboxlab.com
     http:
       paths:
       - path: /
