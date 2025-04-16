@@ -1,21 +1,23 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-resources:
-- ../../../../bases/apps/psuite
-- ./secret-sealed.yaml
-- ./wiki-creds-sealed.yaml
+namespace: psuite
 
-patches:
-- path: ingress-patch.yaml
-  target:
-    group: networking.k8s.io
-    kind: Ingress
-    name: psuite
-    version: v1
-- path: wiki-ingress-patch.yaml
-  target:
-    group: networking.k8s.io
-    kind: Ingress
-    name: psuite-wiki
-    version: v1
+resources:
+  - ./psuite-sts.yaml
+  - ./psuite-ingress.yaml
+  - ./psuite-pvc.yaml
+  - ./psuite-service.yaml
+  - ./psuite-serviceaccount.yaml
+  - ./psuite-cron.yaml
+  - ./psuite-wiki/deploy.yaml
+  - ./psuite-wiki/svc.yaml
+  - ./psuite-wiki/ing.yaml
+  - ./secret-sealed.yaml
+  - ./wiki-creds-sealed.yaml
+
+configMapGenerator:
+- name: psuite-scripts
+  files:
+  - init-syncthing.sh
+  - backup.sh

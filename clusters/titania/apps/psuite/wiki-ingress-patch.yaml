@@ -1,9 +1,0 @@
-- op: replace
-  path: /spec/rules/0/host
-  value: wiki.cosmos.cboxlab.com
-- op: replace
-  path: /spec/tls/0/hosts/0
-  value: wiki.cosmos.cboxlab.com
-- op: add
-  path: /metadata/annotations
-  value: { "cert-manager.io/cluster-issuer": "default-clusterissuer" }

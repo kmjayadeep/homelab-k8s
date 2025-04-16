@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - psuite-wiki.local
+    - wiki.cosmos.cboxlab.com
     secretName: psuite-wiki-cert
   rules:
-  - host: psuite-wiki.local
+  - host: wiki.cosmos.cboxlab.com
     http:
       paths:
       - path: /
