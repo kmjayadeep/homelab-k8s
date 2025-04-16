@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - otpcloud.local
+    - totp.cosmos.cboxlab.com
     secretName: otpcloud-cert
   rules:
-  - host: otpcloud.local
+  - host: totp.cosmos.cboxlab.com
     http:
       paths:
       - path: /
