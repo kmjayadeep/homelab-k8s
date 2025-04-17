@@ -1,0 +1,17 @@
+{
+  "name": "Homelab K8s Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/zsh"
+  },
+  "postCreateCommand": "terraform --version && kubectl version --client && helm version",
+  "extensions": [
+    "hashicorp.terraform",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-azuretools.vscode-docker"
+  ],
+  "forwardPorts": [],
+  "remoteUser": "vscode"
+}
