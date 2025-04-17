@@ -6,12 +6,13 @@
   "settings": {
     "terminal.integrated.shell.linux": "/bin/zsh"
   },
-  "postCreateCommand": "terraform --version && kubectl version --client && helm version",
-  "extensions": [
-    "hashicorp.terraform",
-    "ms-kubernetes-tools.vscode-kubernetes-tools",
-    "ms-azuretools.vscode-docker"
-  ],
-  "forwardPorts": [],
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/nix:1": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "minikube": "none"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {}
+  }
 }
