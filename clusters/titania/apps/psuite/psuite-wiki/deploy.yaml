@@ -25,6 +25,10 @@ spec:
           value: memory
         - name: SB_NAME
           value: Wiki
+        - name: GUID
+          value: "1000"
+        - name: PUID
+          value: "1000"
         - name: SB_DESCRIPTION
           value: "Jayadeep's personal Wiki"
         - name: SB_USER

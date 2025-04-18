@@ -9,9 +9,7 @@ resources:
   - ./psuite-pvc.yaml
   - ./psuite-service.yaml
   - ./psuite-serviceaccount.yaml
-  - ./psuite-cron.yaml
   - ./psuite-wiki/deploy.yaml
   - ./psuite-wiki/svc.yaml
   - ./psuite-wiki/ing.yaml
-  - ./secret-sealed.yaml
   - ./wiki-creds-sealed.yaml
