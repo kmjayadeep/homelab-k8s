@@ -41,9 +41,9 @@ spec:
           mountPath: /config
         env:
         - name: PUID
-          value: "65534"
+          value: "1000"
         - name: PGID
-          value: "65534"
+          value: "1000"
         livenessProbe:
           httpGet:
             path: /rest/noauth/health
