@@ -37,10 +37,10 @@ metadata:
   name: psuite-config
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 2Gi
   storageClassName: longhorn-static
   volumeMode: Filesystem
-  volumeName: lh-psuite-config
+  volumeName: longhorn-psuite-config
