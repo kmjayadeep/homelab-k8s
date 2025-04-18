@@ -30,6 +30,8 @@ spec:
           value: "1000"
         - name: PGID
           value: "1000"
+        - name: TZ
+          value: "Europe/Zurich"
         livenessProbe:
           httpGet:
             path: /rest/noauth/health
