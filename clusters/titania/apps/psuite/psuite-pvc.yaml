@@ -43,4 +43,4 @@ spec:
       storage: 2Gi
   storageClassName: longhorn-static
   volumeMode: Filesystem
-  volumeName: psuite-restore
+  volumeName: lh-psuite-config
