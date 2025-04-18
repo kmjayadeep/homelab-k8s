@@ -15,9 +15,3 @@ resources:
   - ./psuite-wiki/ing.yaml
   - ./secret-sealed.yaml
   - ./wiki-creds-sealed.yaml
-
-configMapGenerator:
-- name: psuite-scripts
-  files:
-  - init-syncthing.sh
-  - backup.sh

@@ -17,20 +17,6 @@ spec:
     spec:
       hostname: psuite
       serviceAccountName: psuite
-      initContainers:
-      - name: init-syncthing
-        image: restic/restic:0.14.0
-        envFrom:
-        - secretRef:
-            name: psuite-restic-creds
-        command: ['sh', '/scripts/init-syncthing.sh']
-        volumeMounts:
-        - name: scripts
-          mountPath: /scripts/
-        - name: data
-          mountPath: /syncthing/data
-        - name: config
-          mountPath: /syncthing/config
       containers:
       - name: psuite
         image: linuxserver/syncthing:1.22.2
@@ -57,9 +43,6 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
       volumes:
-      - name: scripts
-        configMap:
-          name: psuite-scripts
       - name: data
         persistentVolumeClaim:
           claimName: psuite-data
