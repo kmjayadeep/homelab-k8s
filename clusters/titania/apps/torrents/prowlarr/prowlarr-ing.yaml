@@ -4,12 +4,11 @@ metadata:
   name: prowlarr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:
-    - prowlarr.cosmos.cboxlab.com
-    secretName: prowlarr-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: prowlarr.cosmos.cboxlab.com
     http:

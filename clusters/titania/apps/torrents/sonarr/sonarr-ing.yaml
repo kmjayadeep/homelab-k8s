@@ -4,12 +4,11 @@ metadata:
   name: sonarr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:
-    - sonarr.cosmos.cboxlab.com
-    secretName: sonarr-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: sonarr.cosmos.cboxlab.com
     http:

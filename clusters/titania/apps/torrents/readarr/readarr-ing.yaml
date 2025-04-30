@@ -4,12 +4,11 @@ metadata:
   name: readarr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:
-    - readarr.cosmos.cboxlab.com
-    secretName: readarr-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: readarr.cosmos.cboxlab.com
     http:

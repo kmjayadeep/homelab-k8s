@@ -4,12 +4,11 @@ metadata:
   name: radarr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:
-    - radarr.cosmos.cboxlab.com
-    secretName: radarr-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: radarr.cosmos.cboxlab.com
     http:
