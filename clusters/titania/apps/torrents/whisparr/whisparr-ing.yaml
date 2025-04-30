@@ -7,8 +7,8 @@ metadata:
 spec:
   tls:
   - hosts:
-    - whisparr.cosmos.cboxlab.com
-    secretName: whisparr-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: whisparr.cosmos.cboxlab.com
     http:
