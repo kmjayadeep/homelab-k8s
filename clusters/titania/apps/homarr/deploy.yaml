@@ -32,10 +32,6 @@ spec:
         env:
         - name: SECRET_ENCRYPTION_KEY
           value: 608237189fa741b4da90590132436403932772ad2620fe565de5dcb2c2791d81
-        securityContext:
-          runAsGroup: 1000
-          runAsNonRoot: true
-          runAsUser: 1000
       volumes:
       - name: data
         persistentVolumeClaim:
