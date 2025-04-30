@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: homarr
+    app.kubernetes.io/name: homarr
+  annotations:
+  name: homarr-ingress
+spec:
+  tls:
+  - hosts:
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
+  rules:
+  - host: homarr.cosmos.cboxlab.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homarr
+            port:
+              name: http
