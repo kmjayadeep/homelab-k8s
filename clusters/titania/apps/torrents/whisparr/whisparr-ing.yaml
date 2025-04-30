@@ -4,7 +4,6 @@ metadata:
   name: whisparr-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
   tls:
   - hosts:

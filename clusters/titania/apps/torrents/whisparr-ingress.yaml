@@ -6,7 +6,7 @@ spec:
  tls:
  - hosts:
    - whisparr.cosmos.cboxlab.com
-   secretName: whisparr-tls-secret
+   secretName: cosmos-cboxlab-cert
  rules:
  - host: whisparr.cosmos.cboxlab.com
    http:
