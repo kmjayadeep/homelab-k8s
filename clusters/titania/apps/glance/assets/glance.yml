@@ -76,17 +76,20 @@ pages:
                 url: https://wordle.cosmos.cboxlab.com
                 icon: di:google-play-games
               - title: Planka
-                url: http://planka.cosmos.cboxlab.com
+                url: https://planka.cosmos.cboxlab.com
                 icon: di:planka
               - title: OTPCloud
-                url: http://totp.cosmos.cboxlab.com
+                url: https://totp.cosmos.cboxlab.com
                 icon: di:passwork
               - title: Vaultwarden
-                url: http://vaultwarden.cosmos.cboxlab.com
+                url: https://vaultwarden.cosmos.cboxlab.com
                 icon: di:bitwarden
               - title: Wiki
-                url: http://wiki.cosmos.cboxlab.com
+                url: https://wiki.cosmos.cboxlab.com
                 icon: di:wikijs
+              - title: Psuite
+                url: https://psuite.cosmos.cboxlab.com
+                icon: di:syncthing
 
           - type: monitor
             cache: 1h
@@ -223,6 +226,8 @@ pages:
                 links:
                   - title: Backrest
                     url: http://localhost:9898
+                  - title: Psuite
+                    url: http://localhost:8384
 
   - name: Social
     columns:
