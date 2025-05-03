@@ -8,43 +8,32 @@ theme:
 branding:
   custom-footer: |
     <p><a href="https://github.com/kmjayadeep">github.com/kmjayadeep<a></p>
-
 pages:
   - name: Home
     columns:
       - size: small
         widgets:
-
-          - type: calendar
-            first-day-of-week: sunday
+          - type: clock
+            hour-format: 12h
+            timezones:
+              - timezone: Europe/Zurich
+                label: Switzerland
+              - timezone: Asia/Kolkata
+                label: India
           - type: weather
             define: &shared-weather-properties
                 location: Geneva
                 units: metric
                 hour-format: 12h
             <<: *shared-weather-properties
-          - type: custom-api
-            title: Immich stats
-            cache: 1d
-            url: https://immich.cosmos.cboxlab.com/api/server/statistics
-            headers:
-              x-api-key: "${IMMICH_API_KEY}"
-              Accept: application/json
-            template: |
-              <div class="flex justify-between text-center">
-                <div>
-                    <div class="color-highlight size-h3">{{ .JSON.Int "photos" | formatNumber }}</div>
-                    <div class="size-h6">PHOTOS</div>
-                </div>
-                <div>
-                    <div class="color-highlight size-h3">{{ .JSON.Int "videos" | formatNumber }}</div>
-                    <div class="size-h6">VIDEOS</div>
-                </div>
-                <div>
-                    <div class="color-highlight size-h3">{{ div (.JSON.Int "usage" | toFloat) 1073741824 | toInt | formatNumber }}GB</div>
-                    <div class="size-h6">USAGE</div>
-                </div>
-              </div>
+          - type: markets
+            markets:
+              - symbol: SPY
+                name: S&P 500
+              - symbol: SOL-USD
+                name: Solana
+              - symbol: NEAR-USD
+                name: NEAR
 
 
       - size: full
@@ -184,35 +173,34 @@ pages:
                 url: http://myspeed.cosmos.cboxlab.com
                 icon: di:myspeed
 
-          - type: monitor
-            cache: 1m
-            title: Local
-            style: compact
-            sites:
-              - title: Backrest
-                url: http://localhost:9898
-
           - type: videos
             channels:
               - UCw_0wf4I8-_C07VsUHyjrRw
 
       - size: small
         widgets:
-          - type: clock
-            hour-format: 12h
-            timezones:
-              - timezone: Europe/Zurich
-                label: Switzerland
-              - timezone: Asia/Kolkata
-                label: India
-          - type: markets
-            markets:
-              - symbol: SPY
-                name: S&P 500
-              - symbol: SOL-USD
-                name: Solana
-              - symbol: NEAR-USD
-                name: NEAR
+          - type: custom-api
+            title: Immich stats
+            cache: 1d
+            url: https://immich.cosmos.cboxlab.com/api/server/statistics
+            headers:
+              x-api-key: "${IMMICH_API_KEY}"
+              Accept: application/json
+            template: |
+              <div class="flex justify-between text-center">
+                <div>
+                    <div class="color-highlight size-h3">{{ .JSON.Int "photos" | formatNumber }}</div>
+                    <div class="size-h6">PHOTOS</div>
+                </div>
+                <div>
+                    <div class="color-highlight size-h3">{{ .JSON.Int "videos" | formatNumber }}</div>
+                    <div class="size-h6">VIDEOS</div>
+                </div>
+                <div>
+                    <div class="color-highlight size-h3">{{ div (.JSON.Int "usage" | toFloat) 1073741824 | toInt | formatNumber }}GB</div>
+                    <div class="size-h6">USAGE</div>
+                </div>
+              </div>
 
           - type: dns-stats
             service: adguard
@@ -226,32 +214,15 @@ pages:
               - links:
                   - title: Gmail
                     url: https://mail.google.com/mail/u/0/
-                  - title: Amazon
-                    url: https://www.amazon.com/
-                  - title: Github
-                    url: https://github.com/
-                  - title: Wikipedia
-                    url: https://en.wikipedia.org/
-              - title: Entertainment
-                color: 10 70 50
-                links:
-                  - title: Netflix
-                    url: https://www.netflix.com/
-                  - title: Disney+
-                    url: https://www.disneyplus.com/
-                  - title: YouTube
-                    url: https://www.youtube.com/
-                  - title: Prime Video
-                    url: https://www.primevideo.com/
-              - title: Social
+                  - title: Proton
+                    url: https://mail.proton.me
+                  - title: Youtube
+                    url: https://youtube.com
+              - title: Local
                 color: 200 50 50
                 links:
-                  - title: Reddit
-                    url: https://www.reddit.com/
-                  - title: Twitter
-                    url: https://twitter.com/
-                  - title: Instagram
-                    url: https://www.instagram.com/Vk
+                  - title: Backrest
+                    url: http://localhost:9898
 
   - name: Social
     columns:
