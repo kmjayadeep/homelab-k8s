@@ -26,7 +26,7 @@ pages:
             cache: 1d
             url: https://immich.cosmos.cboxlab.com/api/server/statistics
             headers:
-              x-api-key: ""
+              x-api-key: "${IMMICH_API_KEY}"
               Accept: application/json
             template: |
               <div class="flex justify-between text-center">
@@ -125,7 +125,7 @@ pages:
             service: adguard
             url: http://gatekeeper.cosmos.cboxlab.com/
             username: admin
-            password: ""
+            password: "${ADGUARD_PASSWORD}"
 
 
           - type: bookmarks
