@@ -12,4 +12,4 @@ resources:
   - ./deploy.yaml
   - ./svc.yaml
   - ./ing.yaml
-  - ./sealed-secret.yaml
+  - ./secret-sealed.yaml
