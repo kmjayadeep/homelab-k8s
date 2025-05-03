@@ -39,7 +39,7 @@ pages:
       - size: full
         widgets:
           - type: monitor
-            cache: 1m
+            cache: 1h
             title: Entertainment
             sites:
               - title: Jellyfin
@@ -62,7 +62,7 @@ pages:
                 icon: di:readarr
 
           - type: monitor
-            cache: 1m
+            cache: 1h
             title: Apps
             sites:
               - title: Coder
@@ -89,7 +89,7 @@ pages:
                 icon: di:wikijs
 
           - type: monitor
-            cache: 1m
+            cache: 1h
             title: Homelab Admin
             sites:
               - title: Proxmox - Pluto
@@ -115,7 +115,7 @@ pages:
                 alt-status-codes: [401]
 
           - type: monitor
-            cache: 1m
+            cache: 1h
             title: Storage
             sites:
               - title: Truenas
@@ -136,7 +136,7 @@ pages:
                 icon: di:postgres
 
           - type: monitor
-            cache: 1m
+            cache: 1h
             title: Monitoring
             sites:
               - title: Weave
