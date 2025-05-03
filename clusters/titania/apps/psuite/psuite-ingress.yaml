@@ -8,9 +8,9 @@ metadata:
    cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
  tls:
- - hosts:
-   - psuite.cosmos.cboxlab.com
-   secretName: psuite-cert
+  - hosts:
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
  rules:
   - host: psuite.cosmos.cboxlab.com
     http:
