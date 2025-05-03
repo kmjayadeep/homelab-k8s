@@ -8,11 +8,13 @@ theme:
 branding:
   custom-footer: |
     <p><a href="https://github.com/kmjayadeep">github.com/kmjayadeep<a></p>
+
 pages:
   - name: Home
     columns:
       - size: small
         widgets:
+
           - type: calendar
             first-day-of-week: sunday
           - type: weather
@@ -69,17 +71,38 @@ pages:
               - title: Readarr
                 url: https://readarr.cosmos.cboxlab.com/
                 icon: di:readarr
-              - title: Prowlarr
-                url: https://prowlarr.cosmos.cboxlab.com/
-                icon: di:prowlarr
 
           - type: monitor
             cache: 1m
-            title: Admin
+            title: Apps
             sites:
-              - title: AdGuard Home
-                url: http://gatekeeper.cosmos.cboxlab.com/
-                icon: di:adguard-home
+              - title: Coder
+                url: https://coder.cosmos.cboxlab.com
+                icon: di:code
+              - title: Fava
+                url: https://fava.cosmos.cboxlab.com
+                icon: di:bitcoin
+                alt-status-codes: [401]
+              - title: Wordle
+                url: https://wordle.cosmos.cboxlab.com
+                icon: di:google-play-games
+              - title: Planka
+                url: http://planka.cosmos.cboxlab.com
+                icon: di:planka
+              - title: OTPCloud
+                url: http://totp.cosmos.cboxlab.com
+                icon: di:passwork
+              - title: Vaultwarden
+                url: http://vaultwarden.cosmos.cboxlab.com
+                icon: di:bitwarden
+              - title: Wiki
+                url: http://wiki.cosmos.cboxlab.com
+                icon: di:wikijs
+
+          - type: monitor
+            cache: 1m
+            title: Homelab Admin
+            sites:
               - title: Proxmox - Pluto
                 url: https://pluto.cosmos.cboxlab.com:8006
                 allow-insecure: true
@@ -88,16 +111,86 @@ pages:
                 url: https://jupiter.cosmos.cboxlab.com:8006
                 allow-insecure: true
                 icon: di:proxmox
+              - title: Salt Router
+                url: http://192.168.1.1
+                icon: di:router
+              - title: Dockge
+                url: https://dockge.cosmos.cboxlab.com
+                icon: di:dockge
+              - title: AdGuard
+                url: http://gatekeeper.cosmos.cboxlab.com
+                icon: di:adguard-home
+              - title: Traefik
+                url: http://traefik.cosmos.cboxlab.com
+                icon: di:traefik
+                alt-status-codes: [401]
+
+          - type: monitor
+            cache: 1m
+            title: Storage
+            sites:
+              - title: Truenas
+                url: https://truenas.cosmos.cboxlab.com
+                icon: di:truenas
+              - title: Minio
+                url: https://minio-admin.cosmos.cboxlab.com
+                icon: di:minio
+              - title: Rclone
+                url: https://rclone.cosmos.cboxlab.com
+                icon: di:rclone
+                alt-status-codes: [401]
+              - title: Backrest
+                url: https://backrest.cosmos.cboxlab.com
+                icon: di:backrest
+              - title: Postgres
+                url: https://pgweb.cosmos.cboxlab.com
+                icon: di:postgres
+
+          - type: monitor
+            cache: 1m
+            title: Monitoring
+            sites:
               - title: Weave
                 url: http://weave.cosmos.cboxlab.com/
                 icon: di:flux-cd
               - title: Hubble
                 url: http://hubble.cosmos.cboxlab.com/
                 icon: di:netalertx
-              - title: Traefik
-                url: http://traefik.cosmos.cboxlab.com/
-                icon: di:traefik
-                alt-status-codes: [401]
+              - title: Prometheus
+                url: https://prometheus.cosmos.cboxlab.com/
+                icon: di:prometheus
+              - title: Grafana
+                url: https://grafana.cosmos.cboxlab.com/
+                icon: di:grafana
+              - title: Alertmanager
+                url: https://alertmanager.cosmos.cboxlab.com/
+                icon: di:alertmanager
+              - title: Thanos Query
+                url: https://thanos-query.cosmos.cboxlab.com/
+                icon: di:thanos
+              - title: Thanos Compact
+                url: https://thanos-compact.cosmos.cboxlab.com/
+                icon: di:thanos
+              - title: Uptime Kuma
+                url: https://uptime.cosmos.cboxlab.com/
+                icon: di:uptime-kuma
+              - title: Speedtest - Titania
+                url: https://speedtest.cosmos.cboxlab.com
+                icon: di:librespeed
+              - title: Speedtest - Truenas
+                url: https://speedtest-nas.cosmos.cboxlab.com
+                icon: di:librespeed
+              - title: MySpeed
+                url: http://myspeed.cosmos.cboxlab.com
+                icon: di:myspeed
+
+          - type: monitor
+            cache: 1m
+            title: Local
+            style: compact
+            sites:
+              - title: Backrest
+                url: http://localhost:9898
 
           - type: videos
             channels:
@@ -184,5 +277,4 @@ pages:
                 <<: *shared-properties
               - subreddit: homelab
                 <<: *shared-properties
-
 

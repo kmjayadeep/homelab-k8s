@@ -11,7 +11,7 @@ spec:
     - "*.cosmos.cboxlab.com"
     secretName: cosmos-cboxlab-cert
   rules:
-  - host: glance.cosmos.cboxlab.com
+  - host: home.cosmos.cboxlab.com
     http:
       paths:
       - path: /
