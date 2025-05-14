@@ -51,7 +51,7 @@ spec:
           value: openvpn
         - name: VPN_ENABLED
           value: yes
-        - name: ENABLE_PRIVOXY
+        - name: ENABLE_SOCKS
           value: yes
         - name: VPN_PROV
           value: custom

@@ -13,11 +13,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: deluge-privoxy
+  name: deluge-proxy
 spec:
   selector:
     app: deluge-openvpn
   type: ClusterIP
   ports:
-  - port: 8118
-    targetPort: 8118
+  - port: 9118
+    targetPort: 9118
