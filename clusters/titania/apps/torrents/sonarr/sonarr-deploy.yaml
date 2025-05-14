@@ -50,7 +50,7 @@ spec:
           cp /vpn/wg0.conf /vpn-rw/;
       containers:
         - name: sonarr
-          image: ghcr.io/hotio/sonarr:nightly-4.0.14.2938 # {"$imagepolicy": "torrents:sonarr"}
+          image: ghcr.io/hotio/sonarr:release-4.0.14.2939 # {"$imagepolicy": "torrents:sonarr"}
           env:
             - name: PUID
               value: "1000"
@@ -75,7 +75,7 @@ spec:
             - name: VPN_FIREWALL_TYPE
               value: "auto"
             - name: VPN_HEALTHCHECK_ENABLED
-              value: "false"
+              value: "true"
             - name: VPN_NAMESERVERS
               value: "1.1.1.1"
             - name: PRIVOXY_ENABLED
