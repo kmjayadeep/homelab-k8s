@@ -67,7 +67,7 @@ spec:
             - name: VPN_LAN_LEAK_ENABLED
               value: "false"
             - name: VPN_EXPOSE_PORTS_ON_LAN
-              value: ""
+              value: "8989"
             - name: VPN_AUTO_PORT_FORWARD
               value: "false"
             - name: VPN_AUTO_PORT_FORWARD_TO_PORTS
