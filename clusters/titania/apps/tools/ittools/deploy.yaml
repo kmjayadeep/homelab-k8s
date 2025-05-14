@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: ittools
+    app.kubernetes.io/name: ittools
+  name: ittools
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ittools
+      app.kubernetes.io/name: ittools
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ittools
+        app.kubernetes.io/name: ittools
+    spec:
+      containers:
+      - image: ghcr.io/corentinth/it-tools:2024.10.22-7ca5933
+        imagePullPolicy: IfNotPresent
+        name: ittools
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
