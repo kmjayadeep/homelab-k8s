@@ -23,6 +23,6 @@ spec:
         imagePullPolicy: IfNotPresent
         name: ittools
         ports:
-        - containerPort: 8080
+        - containerPort: 80
           name: http
           protocol: TCP
