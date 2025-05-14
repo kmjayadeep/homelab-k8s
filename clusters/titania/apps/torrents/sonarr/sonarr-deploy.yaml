@@ -67,7 +67,7 @@ spec:
             - name: VPN_LAN_LEAK_ENABLED
               value: "false"
             - name: VPN_EXPOSE_PORTS_ON_LAN
-              value: "8989/tcp"
+              value: ""
             - name: VPN_AUTO_PORT_FORWARD
               value: "false"
             - name: VPN_AUTO_PORT_FORWARD_TO_PORTS
@@ -75,7 +75,7 @@ spec:
             - name: VPN_FIREWALL_TYPE
               value: "auto"
             - name: VPN_HEALTHCHECK_ENABLED
-              value: "true"
+              value: "false"
             - name: VPN_NAMESERVERS
               value: "1.1.1.1"
             - name: PRIVOXY_ENABLED
