@@ -13,6 +13,12 @@ spec:
       labels:
         app: sonarr
     spec:
+      securityContext:
+        sysctls:
+          - name: net.ipv4.conf.all.src_valid_mark
+            value: "1"
+          - name: net.ipv6.conf.all.disable_ipv6
+            value: "1"
       volumes:
         - name: sonarr-config
           persistentVolumeClaim:
@@ -20,6 +26,28 @@ spec:
         - name: nfs-downloads
           persistentVolumeClaim:
             claimName: sonarr-downloads-nfs
+        - name: wg-config
+          secret:
+            secretName: wg-config
+            optional: false
+        - name: wg-rw
+          emptyDir: {}
+        - name: tun-device
+          hostPath:
+            path: /dev/net/tun
+      initContainers:
+      - name: copy-vpn-config
+        image: busybox
+        volumeMounts:
+        - name: wg-config
+          mountPath: /vpn
+        - name: wg-rw
+          mountPath: /vpn-rw
+        command:
+        - /bin/sh
+        - -c
+        - >
+          cp /vpn/wg0.conf /vpn-rw/;
       containers:
         - name: sonarr
           image: ghcr.io/hotio/sonarr:nightly-4.0.14.2938 # {"$imagepolicy": "torrents:sonarr"}
@@ -28,11 +56,46 @@ spec:
               value: "1000"
             - name: PGID
               value: "3000"
+            - name: VPN_ENABLED
+              value: "true"
+            - name: VPN_CONF
+              value: "wg0"
+            - name: VPN_PROVIDER
+              value: "generic"
+            - name: VPN_LAN_NETWORK
+              value: "10.42.0.0/16"
+            - name: VPN_LAN_LEAK_ENABLED
+              value: "false"
+            - name: VPN_EXPOSE_PORTS_ON_LAN
+              value: ""
+            - name: VPN_AUTO_PORT_FORWARD
+              value: "false"
+            - name: VPN_AUTO_PORT_FORWARD_TO_PORTS
+              value: ""
+            - name: VPN_FIREWALL_TYPE
+              value: "auto"
+            - name: VPN_HEALTHCHECK_ENABLED
+              value: "false"
+            - name: VPN_NAMESERVERS
+              value: ""
+            - name: PRIVOXY_ENABLED
+              value: "false"
+            - name: UNBOUND_ENABLED
+              value: "false"
+            - name: UNBOUND_NAMESERVERS
+              value: ""
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
           volumeMounts:
             - name: sonarr-config
               mountPath: /config
-            - mountPath: /data
-              name: nfs-downloads
+            - name: nfs-downloads
+              mountPath: /data
+            - name: wg-rw
+              mountPath: /config/wireguard
+            - name: tun-device
+              mountPath: /dev/net/tun
           resources:
             requests:
               memory: "128Mi"
