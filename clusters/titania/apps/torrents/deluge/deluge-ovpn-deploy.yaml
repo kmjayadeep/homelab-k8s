@@ -55,6 +55,10 @@ spec:
           value: yes
         - name: VPN_PROV
           value: custom
+        - name: SOCKS_USER
+          value: admin
+        - name: SOCKS_PASS
+          value: socks
         - name: LAN_NETWORK
           value: 10.42.0.0/16
         - name: PUID
