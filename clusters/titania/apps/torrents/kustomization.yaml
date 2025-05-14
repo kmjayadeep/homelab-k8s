@@ -34,4 +34,3 @@ resources:
   - ./readarr/image-update.yaml
   - ./image-update-automation.yaml
   - ./secret-sealed.yaml
-  - ./secret-wg-sealed.yaml
