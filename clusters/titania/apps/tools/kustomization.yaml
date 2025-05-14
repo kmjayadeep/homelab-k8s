@@ -7,3 +7,6 @@ resources:
   - ./speedtest/deploy.yaml
   - ./speedtest/svc.yaml
   - ./speedtest/ing.yaml
+  - ./ittools/deploy.yaml
+  - ./ittools/svc.yaml
+  - ./ittools/ing.yaml
