@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: signaturepdf
+    app.kubernetes.io/name: signaturepdf
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: signaturepdf-ingress
+spec:
+  tls:
+  - hosts:
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
+  rules:
+  - host: pdf.cosmos.cboxlab.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: signaturepdf
+            port:
+              name: http

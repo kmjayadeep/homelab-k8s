@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: signaturepdf
+    app.kubernetes.io/name: signaturepdf
+  name: signaturepdf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: signaturepdf
+      app.kubernetes.io/name: signaturepdf
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: signaturepdf
+        app.kubernetes.io/name: signaturepdf
+    spec:
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: signaturepdf-data
+      containers:
+      - image: xgaia/signaturepdf:1.7.4
+        imagePullPolicy: IfNotPresent
+        name: signaturepdf
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        env:
+         - name: SERVERNAME
+           value: "pdf.cosmos.cboxlab.com"
+         - name: PDF_STORAGE_PATH
+           value: "/data"
+        volumeMounts:
+         - name: data-volume
+           mountPath: /data
