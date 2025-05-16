@@ -8,6 +8,11 @@ resources:
   - ./deluge/deluge-ovpn-deploy.yaml
   - ./deluge/deluge-pvc.yaml
   - ./deluge/deluge-svc.yaml
+  - ./lidarr/lidarr-ing.yaml
+  - ./lidarr/lidarr-pvc.yaml
+  - ./lidarr/lidarr-svc.yaml
+  - ./lidarr/lidarr-deploy.yaml
+  - ./lidarr/image-update.yaml
   - ./radarr/radarr-ing.yaml
   - ./radarr/radarr-pvc.yaml
   - ./radarr/radarr-svc.yaml

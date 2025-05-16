@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidarr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lidarr
+  template:
+    metadata:
+      labels:
+        app: lidarr
+    spec:
+      volumes:
+        - name: lidarr-config
+          persistentVolumeClaim:
+            claimName: lidarr-config
+        - name: nfs-downloads
+          persistentVolumeClaim:
+            claimName: lidarr-downloads-nfs
+      containers:
+        - name: lidarr
+          image: ghcr.io/hotio/lidarr:release-2.11.2.4629 # {"$imagepolicy": "torrents:lidarr"}
+          volumeMounts:
+            - name: lidarr-config
+              mountPath: /config
+            - mountPath: /data
+              name: nfs-downloads
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "3000"
+            - name: TZ
+              value: "Europe/Zurich"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"

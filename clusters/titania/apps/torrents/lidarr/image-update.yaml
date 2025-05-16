@@ -1,0 +1,21 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: lidarr
+spec:
+  image: ghcr.io/hotio/lidarr
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: lidarr
+spec:
+  imageRepositoryRef:
+    name: lidarr
+  filterTags:
+    pattern: '^release-(?P<semver>[0-9]*\.[0-9]*\.[0-9]*)\.[0-9]*'
+    extract: '$semver'
+  policy:
+    semver:
+      range: '>2.0.0'
