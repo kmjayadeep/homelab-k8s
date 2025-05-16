@@ -60,6 +60,9 @@ pages:
               - title: Readarr
                 url: https://readarr.cosmos.cboxlab.com/
                 icon: di:readarr
+              - title: Lidarr
+                url: https://lidarr.cosmos.cboxlab.com/
+                icon: di:lidarr
 
           - type: monitor
             cache: 1h
