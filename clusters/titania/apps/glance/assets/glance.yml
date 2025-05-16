@@ -93,9 +93,12 @@ pages:
               - title: Psuite
                 url: https://psuite.cosmos.cboxlab.com
                 icon: di:syncthing
-              - title: IT-tools
+              - title: IT Tools
                 url: https://ittools.cosmos.cboxlab.com
                 icon: di:it-tools
+              - title: Signature PDF
+                url: https://pdf.cosmos.cboxlab.com
+                icon: di:stirling-pdf
 
           - type: monitor
             cache: 1h
