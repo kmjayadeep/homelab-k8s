@@ -146,6 +146,7 @@ pages:
               - title: Postgres
                 url: https://pgweb.cosmos.cboxlab.com
                 icon: di:postgres
+                alt-status-codes: [401]
 
           - type: monitor
             cache: 1h
@@ -217,7 +218,7 @@ pages:
           - type: dns-stats
             service: adguard
             url: http://gatekeeper.cosmos.cboxlab.com/
-            username: admin
+            username: adguard
             password: "${ADGUARD_PASSWORD}"
 
 
