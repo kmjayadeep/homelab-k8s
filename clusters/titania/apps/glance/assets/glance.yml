@@ -119,7 +119,7 @@ pages:
                 url: https://dockge.cosmos.cboxlab.com
                 icon: di:dockge
               - title: AdGuard
-                url: http://gatekeeper.cosmos.cboxlab.com
+                url: https://gatekeeper.cosmos.cboxlab.com
                 icon: di:adguard-home
               - title: Traefik
                 url: http://traefik.cosmos.cboxlab.com
@@ -217,7 +217,7 @@ pages:
 
           - type: dns-stats
             service: adguard
-            url: http://gatekeeper.cosmos.cboxlab.com/
+            url: https://gatekeeper.cosmos.cboxlab.com/
             username: adguard
             password: "${ADGUARD_PASSWORD}"
 
