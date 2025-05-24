@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: homarr
     spec:
       containers:
-      - image: ghcr.io/homarr-labs/homarr:v1.18.1
+      - image: ghcr.io/homarr-labs/homarr:v1.21.0
         imagePullPolicy: IfNotPresent
         name: homarr
         volumeMounts:
