@@ -3,13 +3,7 @@
   "extends": [
     "config:recommended"
   ],
-  "regexManagers": [
-    {
-      "fileMatch": ["^.*\\.ya?ml$"],
-      "matchStrings": [
-        "image:\\s*(?<depName>[\\w./-]+):(?<currentValue>[\\w.-]+)"
-      ],
-      "datasourceTemplate": "docker"
-    }
-  ]
+  "kubernetes": {
+    "managerFilePatterns": ["/clusters/.+\\.yaml$/"]
+  }
 }
