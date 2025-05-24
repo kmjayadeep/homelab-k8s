@@ -14,7 +14,7 @@ spec:
         app: fava
     spec:
       containers:
-      - image: yegle/fava:v1.27
+      - image: yegle/fava:v1.30
         imagePullPolicy: IfNotPresent
         name: fava
         command: ["fava"]
