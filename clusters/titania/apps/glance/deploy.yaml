@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: glance
     spec:
       containers:
-      - image: glanceapp/glance:v0.8.3
+      - image: glanceapp/glance:v0.8.4
         imagePullPolicy: IfNotPresent
         name: glance
         envFrom:
