@@ -92,13 +92,12 @@ spec:
       ingress:
         enabled: true
         annotations:
-          cert-manager.io/cluster-issuer: default-clusterissuer
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
         hosts:
         - host: vault.cosmos.cboxlab.com
         tls:
-        - secretName: vault-server-tls
+        - secretName: cosmos-cboxlab-cert
           hosts:
-            - vault.cosmos.cboxlab.com
+            - "*.cosmos.cboxlab.com"
       dataStorage:
         storageClass: longhorn
