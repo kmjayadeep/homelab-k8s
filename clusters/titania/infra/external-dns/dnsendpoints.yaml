@@ -45,7 +45,7 @@ spec:
     targets:
     - 192.168.1.80
   # jellyfin proxied through gatekeeper
-  - dnsName: jellyfin.ext.cosmos.cboxlab.com
+  - dnsName: jellyfin-public.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
     targets:
