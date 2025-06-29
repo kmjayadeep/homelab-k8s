@@ -26,9 +26,11 @@ spec:
       ingress:
         enabled: true
         hostname: thanos-query.cosmos.cboxlab.com
-        annotations:
-          cert-manager.io/cluster-issuer: default-clusterissuer
         tls: true
+        extraTls:
+        - secretName: cosmos-cboxlab-cert
+          hosts:
+          - "*.cosmos.cboxlab.com"
     queryFrontend:
       # Enabled by default
       enabled: false
@@ -37,9 +39,11 @@ spec:
       ingress:
         enabled: true
         hostname: thanos-compact.cosmos.cboxlab.com
-        annotations:
-          cert-manager.io/cluster-issuer: default-clusterissuer
         tls: true
+        extraTls:
+        - secretName: cosmos-cboxlab-cert
+          hosts:
+          - "*.cosmos.cboxlab.com"
       persistence:
         enabled: false
     storegateway:

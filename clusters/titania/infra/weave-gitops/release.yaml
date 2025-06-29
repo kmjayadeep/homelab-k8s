@@ -41,8 +41,6 @@ spec:
 
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: default-clusterissuer
       hosts:
       - host: weave.cosmos.cboxlab.com
         paths:
@@ -50,6 +48,6 @@ spec:
           pathType: ImplementationSpecific
 
       tls:
-      - secretName: weave-tls
+      - secretName: cosmos-cboxlab-cert
         hosts:
-        - weave.cosmos.cboxlab.com
+        - "*.cosmos.cboxlab.com"

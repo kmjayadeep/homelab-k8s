@@ -36,4 +36,3 @@ spec:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "actions-runner,actions-runner-deployments,beancount,games,glance,grocy,homer,homarr,otpcloud,productivity,psuite,shoppinglist,signaturepdf,taskplanner,tools,torrents,uptime,vault,vaultwarden"

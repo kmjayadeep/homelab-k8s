@@ -22,11 +22,9 @@ spec:
       replicas: 1
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: default-clusterissuer
       host: longhorn.cosmos.cboxlab.com
       tls: true
-      tlsSecret: longhorn-tls
+      tlsSecret: cosmos-cboxlab-cert
     csi:
       attacherReplicaCount: 1
       provisionerReplicaCount: 1

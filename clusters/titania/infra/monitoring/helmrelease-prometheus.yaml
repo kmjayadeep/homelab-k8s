@@ -35,15 +35,13 @@ spec:
       admin:
         existingSecret: grafana-creds
       ingress:
-        annotations:
-          cert-manager.io/cluster-issuer: default-clusterissuer
         enabled: true
         hosts:
         - grafana.cosmos.cboxlab.com
         tls:
-        - secretName: grafana-cert
+        - secretName: cosmos-cboxlab-cert
           hosts:
-          - grafana.cosmos.cboxlab.com
+          - "*.cosmos.cboxlab.com"
       alertmanager:
         enabled: false
       sidecar:
@@ -99,14 +97,12 @@ spec:
         enabled: true
       ingress:
         enabled: true
-        annotations:
-          cert-manager.io/cluster-issuer: default-clusterissuer
         hosts:
         - prometheus.cosmos.cboxlab.com
         tls:
-        - secretName: prometheus-cert
+        - secretName: cosmos-cboxlab-cert
           hosts:
-          - prometheus.cosmos.cboxlab.com
+          - "*.cosmos.cboxlab.com"
       prometheusSpec:
         # Allow monitoring from all namespaces
         ruleSelectorNilUsesHelmValues: false
@@ -191,14 +187,12 @@ spec:
       enabled: true
       ingress:
         enabled: true
-        annotations:
-          cert-manager.io/cluster-issuer: default-clusterissuer
         hosts:
         - alertmanager.cosmos.cboxlab.com
         tls:
-        - secretName: alertmanager-cert
+        - secretName: cosmos-cboxlab-cert
           hosts:
-          - alertmanager.cosmos.cboxlab.com
+          - "*.cosmos.cboxlab.com"
       alertmanagerSpec:
         useExistingSecret: true
         configSecret: alertmanager-config
