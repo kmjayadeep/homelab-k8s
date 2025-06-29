@@ -2,13 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
  name: vaultwarden-ingress
- annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
  tls:
- - hosts:
-   - vaultwarden.cosmos.cboxlab.com
-   secretName: waultwarden-tls-secret
+  - hosts:
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
  rules:
  - host: vaultwarden.cosmos.cboxlab.com
    http:

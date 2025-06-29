@@ -4,14 +4,12 @@ metadata:
   labels:
     app.kubernetes.io/instance: wordle
     app.kubernetes.io/name: wordle
-  annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
   name: wordle-ingress
 spec:
   tls:
   - hosts:
-    - wordle.cosmos.cboxlab.com
-    secretName: wordle-tls-secret
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: wordle.cosmos.cboxlab.com
     http:
