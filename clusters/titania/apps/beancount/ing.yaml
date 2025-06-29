@@ -5,7 +5,6 @@ metadata:
     app.kubernetes.io/instance: fava
     app.kubernetes.io/name: fava
   annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
    nginx.ingress.kubernetes.io/auth-type: basic
    # Use this link to generate your credentials: https://hostingcanada.org/htpasswd-generator/
    nginx.ingress.kubernetes.io/auth-secret: fava-auth
@@ -15,8 +14,8 @@ metadata:
 spec:
   tls:
   - hosts:
-    - fava.cosmos.cboxlab.com
-    secretName: fava-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: fava.cosmos.cboxlab.com
     http:
