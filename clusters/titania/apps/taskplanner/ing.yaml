@@ -3,13 +3,12 @@ kind: Ingress
 metadata:
   name: taskplanner-ingress
   annotations:
-    cert-manager.io/cluster-issuer: default-clusterissuer
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   tls:
   - hosts:
-    - taskplanner.cosmos.cboxlab.com
-    secretName: taskplanner-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: taskplanner.cosmos.cboxlab.com
     http:

@@ -4,14 +4,12 @@ metadata:
   labels:
     app.kubernetes.io/instance: uptime
     app.kubernetes.io/name: uptime
-  annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
   name: uptime-ingress
 spec:
   tls:
   - hosts:
-    - uptime.cosmos.cboxlab.com
-    secretName: uptime-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: uptime.cosmos.cboxlab.com
     http:

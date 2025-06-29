@@ -3,13 +3,12 @@ kind: Ingress
 metadata:
   name: shoppinglist-ingress
   annotations:
-    cert-manager.io/cluster-issuer: default-clusterissuer
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   tls:
   - hosts:
-    - shoppinglist.cosmos.cboxlab.com
-    secretName: shoppinglist-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: shoppinglist.cosmos.cboxlab.com
     http:

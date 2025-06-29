@@ -4,8 +4,6 @@ metadata:
   name: psuite
   labels:
     app: psuite
-  annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
 spec:
  tls:
   - hosts:

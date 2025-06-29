@@ -4,14 +4,12 @@ metadata:
   labels:
     app.kubernetes.io/instance: psuite-wiki
     app.kubernetes.io/name: psuite-wiki
-  annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
   name: psuite-wiki
 spec:
   tls:
   - hosts:
-    - wiki.cosmos.cboxlab.com
-    secretName: psuite-wiki-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: wiki.cosmos.cboxlab.com
     http:

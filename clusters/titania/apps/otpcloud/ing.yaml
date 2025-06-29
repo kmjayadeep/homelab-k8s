@@ -4,14 +4,12 @@ metadata:
   labels:
     app.kubernetes.io/instance: otpcloud
     app.kubernetes.io/name: otpcloud
-  annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
   name: otpcloud-ingress
 spec:
   tls:
   - hosts:
-    - totp.cosmos.cboxlab.com
-    secretName: otpcloud-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: totp.cosmos.cboxlab.com
     http:

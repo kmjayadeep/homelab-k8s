@@ -5,8 +5,8 @@ metadata:
 spec:
  tls:
  - hosts:
-   - totp.cosmos.cboxlab.com
-   secretName: otpcloud-tls-secret
+   - "*.cosmos.cboxlab.com"
+   secretName: cosmos-cboxlab-cert
  rules:
  - host: totp.cosmos.cboxlab.com
    http:

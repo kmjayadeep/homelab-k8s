@@ -4,14 +4,12 @@ metadata:
   labels:
     app.kubernetes.io/instance: grocy
     app.kubernetes.io/name: grocy
-  annotations:
-   cert-manager.io/cluster-issuer: default-clusterissuer
   name: grocy-ingress
 spec:
   tls:
   - hosts:
-    - grocy.cosmos.cboxlab.com
-    secretName: grocy-cert
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
   rules:
   - host: grocy.cosmos.cboxlab.com
     http:
