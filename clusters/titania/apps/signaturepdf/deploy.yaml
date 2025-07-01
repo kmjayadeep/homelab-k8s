@@ -23,7 +23,7 @@ spec:
           persistentVolumeClaim:
             claimName: signaturepdf-data
       containers:
-      - image: xgaia/signaturepdf:1.7.4
+      - image: xgaia/signaturepdf:1.8.0
         imagePullPolicy: IfNotPresent
         name: signaturepdf
         ports:
