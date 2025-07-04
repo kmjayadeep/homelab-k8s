@@ -19,7 +19,7 @@ spec:
       serviceAccountName: psuite
       containers:
       - name: psuite
-        image: linuxserver/syncthing:1.29.7
+        image: linuxserver/syncthing:1.30.0
         volumeMounts:
         - name: data
           mountPath: /data
