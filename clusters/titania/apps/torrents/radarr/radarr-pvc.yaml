@@ -36,9 +36,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: radarr-config
 spec:
-  storageClassName: longhorn-static
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
+  storageClassName: longhorn-static
+  volumeMode: Filesystem
+  volumeName: longhorn-radarr-config

@@ -4,9 +4,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: prowlarr-config
 spec:
-  storageClassName: longhorn-static
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
+  storageClassName: longhorn-static
+  volumeMode: Filesystem
+  volumeName: longhorn-prowlarr-config
