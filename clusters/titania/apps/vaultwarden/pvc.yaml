@@ -5,9 +5,11 @@ metadata:
     app.kubernetes.io/name: vaultwarden
   name: vaultwarden-pvc
 spec:
-  storageClassName: longhorn
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
+  storageClassName: longhorn-static
+  volumeMode: Filesystem
+  volumeName: longhorn-vaultwarden-data
