@@ -4,9 +4,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: uptime-data
 spec:
-  storageClassName: longhorn
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
+  storageClassName: longhorn-static
+  volumeMode: Filesystem
+  volumeName: longhorn-uptimekuma-data
