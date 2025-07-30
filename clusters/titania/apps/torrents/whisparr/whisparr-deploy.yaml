@@ -22,7 +22,7 @@ spec:
             claimName: whisparr-downloads-nfs
       containers:
       - name: whisparr
-        image: hotio/whisparr:v3-5d4c05e
+        image: ghcr.io/hotio/whisparr:v3-a005da5
         env:
         - name: PUID
           value: "1000"
