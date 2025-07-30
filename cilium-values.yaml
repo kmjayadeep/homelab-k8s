@@ -1,0 +1,36 @@
+ipv6:
+  enabled: true
+
+cluster:
+  name: cosmos
+
+operator:
+  replicas: 1
+
+ipam:
+  mode: kubernetes
+  operator:
+    clusterPoolIPv6PodCIDRList:
+    - 2001:cafe:42::/96
+    clusterPoolIPv4PodCIDRList:
+    - 10.42.0.0/16
+    clusterPoolIPv6MaskSize: 112
+
+enableIPv6Masquerade: true
+
+k8sServiceHost: 192.168.1.40
+k8sServicePort: 6443
+
+hubble:
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+    ingress:
+      enabled: true
+      hosts:
+      - hubble.cosmos.cboxlab.com
+      tls:
+      - secretName: cosmos-cboxlab-cert
+        hosts:
+        - "*.cosmos.cboxlab.com" 
