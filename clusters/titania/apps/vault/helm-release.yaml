@@ -100,4 +100,4 @@ spec:
           hosts:
             - "*.cosmos.cboxlab.com"
       dataStorage:
-        storageClass: longhorn
+        storageClass: longhorn-static
