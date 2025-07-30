@@ -36,7 +36,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: readarr-config
 spec:
-  storageClassName: longhorn
+  storageClassName: longhorn-static
   accessModes:
     - ReadWriteOnce
   resources:
