@@ -15,7 +15,6 @@ resources:
 - ./grafana-creds-sealed.yaml
 - ./alermanager-config-sealed.yaml
 - ./thanos-s3-sealed.yaml
-- ./postgres-prometheusrule.yaml
 - ./loki-minio-sealed.yaml
 
 configMapGenerator:
