@@ -69,7 +69,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: deluge-config
 spec:
-  storageClassName: longhorn
+  storageClassName: longhorn-static
   accessModes:
     - ReadWriteOnce
   resources:
