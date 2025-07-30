@@ -31,7 +31,7 @@ spec:
       resizerReplicaCount: 1
       snapshotterReplicaCount: 1
     defaultSettings:
-      backupTarget: nfs://nfs.cosmos.cboxlab.com:/srv/longhorn
+      backupTarget: nfs://truenas.cosmos.cboxlab.com:/mnt/main/k8s/longhorn-backup
       defaultReplicaCount: 1
       replicaAutoBalance: true
     persistence:
