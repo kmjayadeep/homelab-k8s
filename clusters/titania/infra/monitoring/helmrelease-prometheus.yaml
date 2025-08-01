@@ -190,8 +190,8 @@ spec:
         - job_name: jd-pc
           static_configs:
           - targets:
-            - 192.168.1.83:9100 ## Node exporter from jd-pc
-            - 192.168.1.83:18080 ## taskwarrior metrics from jd-pc
+            - 100.108.88.96:9100 ## Node exporter from jd-pc
+            - 100.108.88.96:18080 ## taskwarrior metrics from jd-pc
         # Postgres node
         - job_name: helios
           static_configs:
