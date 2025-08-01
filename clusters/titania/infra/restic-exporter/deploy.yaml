@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: restic-exporter
-        image: "kmjayadeep/restic-exporter:0.6"
+        image: "kmjayadeep/restic-exporter:0.7.0"
         ports:
           - name: http-metrics
             containerPort: 18090
