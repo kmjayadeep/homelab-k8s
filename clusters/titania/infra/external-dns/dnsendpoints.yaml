@@ -155,3 +155,9 @@ spec:
     recordType: A
     targets:
     - 100.85.149.58
+    # Copyparty in Truenas jail
+  - dnsName: files.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.80
