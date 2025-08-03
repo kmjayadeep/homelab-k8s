@@ -63,6 +63,9 @@ pages:
               - title: Lidarr
                 url: https://lidarr.cosmos.cboxlab.com/
                 icon: di:lidarr
+              - title: Copyparty
+                url: https://files.cosmos.cboxlab.com/
+                icon: di:filegator
 
           - type: monitor
             cache: 1h
