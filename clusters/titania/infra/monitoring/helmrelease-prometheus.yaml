@@ -295,7 +295,6 @@ spec:
       - storageclasses
       - validatingwebhookconfigurations
       - volumeattachments
-      - prometheuses
       extraArgs:
       - --custom-resource-state-config
       -  |
