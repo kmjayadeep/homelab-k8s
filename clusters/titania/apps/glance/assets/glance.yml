@@ -115,6 +115,10 @@ pages:
                 url: https://jupiter.cosmos.cboxlab.com:8006
                 allow-insecure: true
                 icon: di:proxmox
+              - title: Proxmox Backup Server
+                icon: di:proxmox
+                url: https://pbs.cosmos.cboxlab.com:8007
+                allow-insecure: true
               - title: Salt Router
                 url: http://192.168.1.1
                 icon: di:router
