@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: silverbullet
-        image: zefhemel/silverbullet:0.10.4
+        image: zefhemel/silverbullet:2.0.0
         imagePullPolicy: IfNotPresent
         env:
         - name: SB_FOLDER
