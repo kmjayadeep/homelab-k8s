@@ -7,7 +7,9 @@ metadata:
   name: planka
   namespace: productivity
 spec:
-  storageClassName: longhorn
+  storageClassName: longhorn-static
+  volumeMode: Filesystem
+  volumeName: longhorn-planka-data
   accessModes:
   - ReadWriteOnce
   resources:
