@@ -99,8 +99,8 @@ pages:
               - title: IT Tools
                 url: https://ittools.cosmos.cboxlab.com
                 icon: di:it-tools
-              - title: Signature PDF
-                url: https://pdf.cosmos.cboxlab.com
+              - title: Stirling PDF
+                url: https://stirling.cosmos.cboxlab.com
                 icon: di:stirling-pdf
 
           - type: monitor
