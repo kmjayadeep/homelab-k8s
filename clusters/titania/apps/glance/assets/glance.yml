@@ -100,7 +100,7 @@ pages:
                 url: https://ittools.cosmos.cboxlab.com
                 icon: di:it-tools
               - title: Stirling PDF
-                url: https://stirling.cosmos.cboxlab.com
+                url: https://stirlingpdf.cosmos.cboxlab.com
                 icon: di:stirling-pdf
 
           - type: monitor
