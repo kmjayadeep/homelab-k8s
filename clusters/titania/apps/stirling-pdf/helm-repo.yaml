@@ -5,4 +5,4 @@ metadata:
   namespace: stirling-pdf
 spec:
   interval: 1h0m0s
-  url: https://stirling-pdf.github.io/stirling-pdf-chart
+  url: https://stirling-tools.github.io/Stirling-PDF-chart
