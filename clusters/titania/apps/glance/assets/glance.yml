@@ -111,8 +111,8 @@ pages:
                 url: https://pluto.cosmos.cboxlab.com:8006
                 allow-insecure: true
                 icon: di:proxmox
-              - title: Proxmox - Jupiter
-                url: https://jupiter.cosmos.cboxlab.com:8006
+              - title: Proxmox - Mars
+                url: https://mars.cosmos.cboxlab.com:8006
                 allow-insecure: true
                 icon: di:proxmox
               - title: Proxmox Backup Server
