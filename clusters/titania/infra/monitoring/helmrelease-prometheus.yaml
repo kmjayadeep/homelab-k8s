@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: prometheus-community
         namespace: monitoring
-      version: "76.4.0"
+      version: "77.1.1"
   interval: 1h0m0s
   install:
     crds: Create
@@ -153,6 +153,8 @@ spec:
       enabled: true
       thanosService:
         enabled: true
+      thanosServiceMonitor:
+        enabled: true
       ingress:
         enabled: true
         hosts:
@@ -183,8 +185,9 @@ spec:
                   storage: 5Gi
         thanos:
           objectStorageConfig:
-            name: thanos-s3
-            key: objstore.yml
+            existingSecret:
+              name: thanos-s3
+              key: objstore.yml
 
         additionalScrapeConfigs:
         - job_name: jd-pc
