@@ -14,23 +14,19 @@ spec:
     spec:
       containers:
       - name: silverbullet
-        image: zefhemel/silverbullet:0.10.4
+        image: ghcr.io/silverbulletmd/silverbullet:2.0.0
         imagePullPolicy: IfNotPresent
         env:
         - name: SB_FOLDER
           value: /psuite-data/psuite-wiki/data
-        - name: SB_SYNC_ONLY
-          value: "true"
-        - name: SB_DB_BACKEND
-          value: memory
         - name: SB_NAME
           value: Wiki
+        - name: SB_DESCRIPTION
+          value: "Jayadeep's personal Wiki"
         - name: GUID
           value: "1000"
         - name: PUID
           value: "1000"
-        - name: SB_DESCRIPTION
-          value: "Jayadeep's personal Wiki"
         - name: SB_USER
           valueFrom:
             secretKeyRef:
