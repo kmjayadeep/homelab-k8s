@@ -22,7 +22,7 @@ spec:
             claimName: lidarr-downloads-nfs
       containers:
         - name: lidarr
-          image: ghcr.io/hotio/lidarr:release-2.13.3.4711 # {"$imagepolicy": "torrents:lidarr"}
+          image: ghcr.io/hotio/lidarr:release-2.14.5.4836 # {"$imagepolicy": "torrents:lidarr"}
           volumeMounts:
             - name: lidarr-config
               mountPath: /config
