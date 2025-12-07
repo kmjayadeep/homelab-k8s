@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: baskit-metrics
+  labels:
+    app: baskit-metrics
+spec:
+  selector:
+    matchLabels:
+      app: baskit-metrics
+  endpoints:
+    - port: http
+      interval: 60s
+      path: /metrics
+

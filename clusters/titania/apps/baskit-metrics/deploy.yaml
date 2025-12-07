@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: baskit-metrics
+  labels:
+    app: baskit-metrics
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: baskit-metrics
+  template:
+    metadata:
+      labels:
+        app: baskit-metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: metrics-server
+          image: ghcr.io/kmjayadeep/baskit/metrics-server:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/firebase-credentials.json
+            - name: POLL_INTERVAL
+              value: "1h"
+            - name: COLLECT_ITEMS
+              value: "false"
+            - name: LOG_LEVEL
+              value: "info"
+          volumeMounts:
+            - name: firebase-credentials
+              mountPath: /secrets
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: firebase-credentials
+          secret:
+            secretName: baskit-metrics-firebase
+
