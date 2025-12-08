@@ -24,7 +24,7 @@ spec:
         - name: ghcr-secret
       containers:
         - name: metrics-server
-          image: ghcr.io/kmjayadeep/baskit/metrics-server:latest
+          image: ghcr.io/kmjayadeep/baskit-server/metrics-server:main-ffa61eb
           imagePullPolicy: Always
           ports:
             - name: http
