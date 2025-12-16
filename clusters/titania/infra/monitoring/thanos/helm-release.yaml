@@ -11,13 +11,15 @@ spec:
         kind: HelmRepository
         name: bitnami
         namespace: monitoring
-      version: "17.3.1"
+      version: "12.14.1"
   interval: 1h0m0s
   install:
     crds: Create
   upgrade:
     crds: CreateReplace
   values:
+    image:
+      repository: bitnamilegacy/thanos
     existingObjstoreSecret: thanos-s3
     query:
       enabled: true
