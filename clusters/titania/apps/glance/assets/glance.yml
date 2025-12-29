@@ -102,7 +102,7 @@ pages:
               - title: Stirling PDF
                 url: https://stirlingpdf.cosmos.cboxlab.com
                 icon: di:stirling-pdf
-                url: https://home-assistant.cosmos.cboxlab.com
+              - url: https://home-assistant.cosmos.cboxlab.com
                 icon: di:home-assistant
 
           - type: monitor
