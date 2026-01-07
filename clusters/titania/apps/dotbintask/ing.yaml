@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dotbintask-ingress
+spec:
+  tls:
+  - hosts:
+    - "*.cosmos.cboxlab.com"
+    secretName: cosmos-cboxlab-cert
+  rules:
+  - host: dotbintask.cosmos.cboxlab.com
+    http:
+      paths:
+      # API routes
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: dotbintask
+            port:
+              number: 8080
+      # Swagger routes
+      - path: /swagger
+        pathType: Prefix
+        backend:
+          service:
+            name: dotbintask
+            port:
+              number: 8080
+      # Health check
+      - path: /health
+        pathType: Exact
+        backend:
+          service:
+            name: dotbintask
+            port:
+              number: 8080
+      # Frontend routes
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dotbintask
+            port:
+              number: 80

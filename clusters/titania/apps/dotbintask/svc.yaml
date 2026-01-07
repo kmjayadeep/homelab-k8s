@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotbintask-api
+spec:
+  selector: 
+    app: dotbintask
+  type: ClusterIP
+  ports:
+  - name: api
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotbintask-frontend
+spec:
+  selector: 
+    app: dotbintask
+  type: ClusterIP
+  ports:
+  - name: frontend
+    port: 80
+    targetPort: 80
+
