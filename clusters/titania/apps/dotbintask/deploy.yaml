@@ -30,7 +30,9 @@ spec:
         - name: TW_API_PORT
           value: "8080"
         - name: TW_DATA_LOCATION
-          value: "/home/appuser/.task"
+          value: "/home/appuser/psuite-todo"
+        - name: TW_TASKRC_LOCATION
+          value: "/home/appuser/psuite-todo/taskrc"
         - name: TW_API_LOG_LEVEL
           value: "info"
         resources:
@@ -54,7 +56,7 @@ spec:
           periodSeconds: 5
         volumeMounts:
         - name: task-data
-          mountPath: /home/appuser/.task
+          mountPath: /home/appuser/psuite-todo
 
       # Frontend GUI container
       - name: frontend
