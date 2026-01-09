@@ -1,11 +1,34 @@
+## PV for nfs mount
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-data-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-task
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/main/k8s/psuite/psuite-todo
+    server: truenas.cosmos.cboxlab.com
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: task-data-pvc
+  namespace: dotbintask
 spec:
+  storageClassName: nfs-task
+  volumeName: task-data-nfs
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi
 
