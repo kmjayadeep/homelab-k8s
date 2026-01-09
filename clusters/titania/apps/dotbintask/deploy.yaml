@@ -30,7 +30,7 @@ spec:
         - name: TW_API_PORT
           value: "8080"
         - name: TW_DATA_LOCATION
-          value: "/root/.task"
+          value: "/home/appuser/.task"
         - name: TW_API_LOG_LEVEL
           value: "info"
         resources:
@@ -54,7 +54,7 @@ spec:
           periodSeconds: 5
         volumeMounts:
         - name: task-data
-          mountPath: /root/.task
+          mountPath: /home/appuser/.task
 
       # Frontend GUI container
       - name: frontend
