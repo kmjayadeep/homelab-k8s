@@ -16,7 +16,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: dotbintask-api
+            name: dotbintask
             port:
               number: 8080
       # Swagger routes
