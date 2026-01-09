@@ -24,7 +24,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: dotbintask-api
+            name: dotbintask
             port:
               number: 8080
       # Health check
@@ -32,7 +32,7 @@ spec:
         pathType: Exact
         backend:
           service:
-            name: dotbintask-api
+            name: dotbintask
             port:
               number: 8080
       # Frontend routes
@@ -40,6 +40,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: dotbintask-frontend
+            name: dotbintask
             port:
               number: 80
