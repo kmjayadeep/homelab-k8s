@@ -8,7 +8,7 @@ spec:
     recordTTL: 60
     recordType: A
     targets:
-    - 192.168.1.73
+    - 192.168.1.9
   - dnsName: jailmaker-docker.cosmos.cboxlab.com
     recordTTL: 60
     recordType: A
