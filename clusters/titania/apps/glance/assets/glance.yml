@@ -74,6 +74,9 @@ pages:
               - title: Coder
                 url: https://coder.cosmos.cboxlab.com
                 icon: di:code
+              - title: OpenClaw
+                url: https://openclaw.cosmos.cboxlab.com
+                icon: di:openclaw
               - title: Fava
                 url: https://fava.cosmos.cboxlab.com
                 icon: di:bitcoin
@@ -273,4 +276,3 @@ pages:
                 <<: *shared-properties
               - subreddit: homelab
                 <<: *shared-properties
-
