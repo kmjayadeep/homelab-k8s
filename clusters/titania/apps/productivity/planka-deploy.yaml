@@ -41,7 +41,7 @@ spec:
               name: planka-secret
         - name: TRUST_PROXY
           value: "0"
-        image: ghcr.io/plankanban/planka:1.26.3
+        image: ghcr.io/plankanban/planka:2.0.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
