@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: deluge-openvpn
 spec:
+  replicas: 0
   strategy:
     type: Recreate
   selector:
