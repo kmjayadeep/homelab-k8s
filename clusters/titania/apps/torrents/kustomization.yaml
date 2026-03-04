@@ -6,6 +6,7 @@ namespace: torrents
 resources:
   - ./deluge/deluge-ing.yaml
   - ./deluge/deluge-ovpn-deploy.yaml
+  - ./deluge/deluge-wireguard-deploy.yaml
   - ./deluge/deluge-pvc.yaml
   - ./deluge/deluge-svc.yaml
   - ./lidarr/lidarr-ing.yaml

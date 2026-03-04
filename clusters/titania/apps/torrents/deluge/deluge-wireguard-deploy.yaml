@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deluge-wireguard
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: deluge-wireguard
+  template:
+    metadata:
+      labels:
+        app: deluge-wireguard
+    spec:
+      securityContext:
+        sysctls:
+          - name: net.ipv4.conf.all.src_valid_mark
+            value: "1"
+      volumes:
+        - name: wireguard-config
+          secret:
+            secretName: wg-config
+            optional: false
+        - name: wireguard-rw
+          emptyDir: {}
+        - name: deluge-config
+          persistentVolumeClaim:
+            claimName: deluge-config
+        - name: nfs-downloads
+          persistentVolumeClaim:
+            claimName: deluge-downloads-nfs
+        - name: nfs-arr-downloads
+          persistentVolumeClaim:
+            claimName: deluge-arr-nfs
+      initContainers:
+      - name: copy-vpn-config
+        image: busybox
+        volumeMounts:
+        - name: wireguard-config
+          mountPath: /vpn
+        - name: wireguard-rw
+          mountPath: /vpn-rw
+        command:
+        - /bin/sh
+        - -c
+        - >
+          cp /vpn/wg0.conf /vpn-rw/;
+      containers:
+      - name: deluge-wireguard
+        image: ghcr.io/binhex/arch-delugevpn:2.2.0-1-02
+        env:
+        - name: VPN_CLIENT
+          value: wireguard
+        - name: VPN_ENABLED
+          value: yes
+        - name: ENABLE_SOCKS
+          value: yes
+        - name: VPN_PROV
+          value: custom
+        - name: SOCKS_USER
+          value: admin
+        - name: SOCKS_PASS
+          value: socks
+        - name: LAN_NETWORK
+          value: 10.42.0.0/16
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "3000"
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["NET_ADMIN"]
+        volumeMounts:
+        - name: wireguard-rw
+          mountPath: /config/wireguard
+        - name: deluge-config
+          mountPath: /config
+        - mountPath: /data/downloads
+          name: nfs-downloads
+        - mountPath: /data/arr-downloads
+          name: nfs-arr-downloads
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "25m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"

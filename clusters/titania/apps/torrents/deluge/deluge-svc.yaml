@@ -13,6 +13,18 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: deluge-wireguard
+spec:
+  selector:
+    app: deluge-wireguard
+  type: ClusterIP
+  ports:
+  - port: 8112
+    targetPort: 8112
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: deluge-proxy
 spec:
   selector:

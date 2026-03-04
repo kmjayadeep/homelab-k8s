@@ -17,6 +17,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: deluge-openvpn
+            name: deluge-wireguard
             port:
               number: 8112
