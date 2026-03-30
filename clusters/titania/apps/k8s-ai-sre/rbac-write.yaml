@@ -1,0 +1,645 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: baskit
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: baskit
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: beancount
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: beancount
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: dotbintask
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: dotbintask
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: games
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: games
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: glance
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: glance
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: grocy
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: grocy
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: homer
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: homer
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: productivity
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: productivity
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: psuite
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: psuite
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: shoppinglist
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: shoppinglist
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: stirling-pdf
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: stirling-pdf
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: taskplanner
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: taskplanner
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: tools
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: tools
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: torrents
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: torrents
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: totp
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: totp
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: uptime
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: uptime
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: k8s-ai-sre-write
+  namespace: vaultwarden
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: k8s-ai-sre-write
+  namespace: vaultwarden
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8s-ai-sre-write
+subjects:
+  - kind: ServiceAccount
+    name: k8s-ai-sre
+    namespace: ai-sre-system

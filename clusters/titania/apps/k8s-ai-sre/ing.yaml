@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8s-ai-sre-ingress
+  namespace: ai-sre-system
+  labels:
+    app.kubernetes.io/name: k8s-ai-sre
+    app.kubernetes.io/instance: k8s-ai-sre
+    app.kubernetes.io/component: ingress
+spec:
+  tls:
+    - hosts:
+        - "*.cosmos.cboxlab.com"
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: ai-sre.cosmos.cboxlab.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: k8s-ai-sre
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
