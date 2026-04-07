@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # mksecret-alertmanager.sh: Create alertmanager secret
 
