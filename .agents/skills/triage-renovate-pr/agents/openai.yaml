@@ -1,0 +1,4 @@
+interface:
+  display_name: "Renovate PR Triage"
+  short_description: "Review and merge Renovate PRs safely, one by one."
+  default_prompt: "Use $triage-renovate-pr to review Renovate PRs sequentially, merge safe updates, gate on default-branch CI, and return a final report."
