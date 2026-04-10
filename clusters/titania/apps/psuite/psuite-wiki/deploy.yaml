@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: silverbullet
-        image: ghcr.io/silverbulletmd/silverbullet:2.4.1
+        image: ghcr.io/silverbulletmd/silverbullet:2.5.2
         imagePullPolicy: IfNotPresent
         env:
         - name: SB_FOLDER
