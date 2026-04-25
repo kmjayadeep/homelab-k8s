@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: vaultwarden
-          image: "vaultwarden/server:1.35.4"
+          image: "vaultwarden/server:1.35.8"
           resources:
             requests:
               cpu: 100m
