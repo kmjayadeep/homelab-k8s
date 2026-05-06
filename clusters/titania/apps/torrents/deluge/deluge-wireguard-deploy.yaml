@@ -46,7 +46,6 @@ spec:
         - -c
         - >
           cp /vpn/wg0.conf /vpn-rw/
-          chmod 600 /vpn-rw/wg0.conf
       containers:
       - name: deluge-wireguard
         image: ghcr.io/binhex/arch-delugevpn:2.2.0-1-02
