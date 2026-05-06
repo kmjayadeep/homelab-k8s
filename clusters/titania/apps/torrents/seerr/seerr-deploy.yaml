@@ -13,6 +13,9 @@ spec:
       labels:
         app: seerr
     spec:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
       volumes:
         - name: seerr-config
           persistentVolumeClaim:
