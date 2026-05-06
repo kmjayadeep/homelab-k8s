@@ -38,6 +38,11 @@ resources:
   - ./readarr/readarr-svc.yaml
   - ./readarr/readarr-deploy.yaml
   - ./readarr/image-update.yaml
+  - ./seerr/seerr-ing.yaml
+  - ./seerr/seerr-pvc.yaml
+  - ./seerr/seerr-svc.yaml
+  - ./seerr/seerr-deploy.yaml
+  - ./seerr/image-update.yaml
   - ./image-update-automation.yaml
   - ./secret-sealed.yaml
   - ./secret-wg-sealed.yaml

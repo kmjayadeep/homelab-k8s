@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seerr
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: seerr
+  template:
+    metadata:
+      labels:
+        app: seerr
+    spec:
+      volumes:
+        - name: seerr-config
+          persistentVolumeClaim:
+            claimName: seerr-config
+      containers:
+        - name: seerr
+          image: ghcr.io/seerr-team/seerr:v3.0.1 # {"$imagepolicy": "torrents:seerr"}
+          env:
+            - name: LOG_LEVEL
+              value: "debug"
+            - name: TZ
+              value: "Europe/Zurich"
+          ports:
+            - containerPort: 5055
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /api/v1/settings/public
+              port: http
+            initialDelaySeconds: 20
+            timeoutSeconds: 3
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/settings/public
+              port: http
+            initialDelaySeconds: 20
+            timeoutSeconds: 3
+            periodSeconds: 15
+            failureThreshold: 3
+          volumeMounts:
+            - name: seerr-config
+              mountPath: /app/config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "25m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"

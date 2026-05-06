@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: seerr-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+        - "*.cosmos.cboxlab.com"
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: seerr.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: seerr
+                port:
+                  number: 5055
