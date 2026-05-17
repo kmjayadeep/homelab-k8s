@@ -6,6 +6,10 @@ metadata:
     app: psuite
 spec:
   type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
   ports:
   - port: 8384
     targetPort: 8384
@@ -22,6 +26,10 @@ metadata:
     app: psuite
 spec:
   type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
   ports:
   - port: 22000
     targetPort: 22000
@@ -38,6 +46,10 @@ metadata:
     app: psuite
 spec:
   type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
   ports:
   - port: 22000
     targetPort: 22000
@@ -54,6 +66,10 @@ metadata:
     app: psuite
 spec:
   type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
   ports:
   - port: 21027
     targetPort: 21027
