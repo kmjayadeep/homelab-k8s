@@ -6,10 +6,10 @@ metadata:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: baskit-metrics
+  name: baskit
   namespace: baskit
 spec:
-  path: clusters/titania/apps/baskit-metrics
+  path: clusters/titania/apps/baskit
   interval: 15m
   prune: true
   wait: true
@@ -22,3 +22,6 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: baskit-metrics
+    - apiVersion: batch/v1
+      kind: CronJob
+      name: baskit-backup

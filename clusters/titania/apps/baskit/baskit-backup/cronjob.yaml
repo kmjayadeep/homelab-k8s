@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: baskit-backup
+  labels:
+    app: baskit-backup
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: baskit-backup
+        spec:
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: ghcr-secret
+          containers:
+            - name: firestore-backup
+              image: ghcr.io/kmjayadeep/baskit-server/firestore-backup:main-0d2fba6
+              imagePullPolicy: Always
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /secrets/firebase-credentials.json
+              envFrom:
+                - secretRef:
+                    name: baskit-backup
+              volumeMounts:
+                - name: firebase-credentials
+                  mountPath: /secrets
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+          volumes:
+            - name: firebase-credentials
+              secret:
+                secretName: baskit-backup
+                items:
+                  - key: firebase-credentials.json
+                    path: firebase-credentials.json

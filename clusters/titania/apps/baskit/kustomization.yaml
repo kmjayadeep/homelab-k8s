@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: baskit
+
+resources:
+  - ./ghcr-secret-sealed.yaml
+
+  - ./baskit-backup/cronjob.yaml
+  - ./baskit-backup/secret-sealed.yaml
+
+  - ./baskit-metrics/deploy.yaml
+  - ./baskit-metrics/svc.yaml
+  - ./baskit-metrics/servicemonitor.yaml
+  - ./baskit-metrics/secret-sealed.yaml
