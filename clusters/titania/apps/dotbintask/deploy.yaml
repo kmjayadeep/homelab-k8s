@@ -12,6 +12,9 @@ spec:
       labels:
         app: dotbintask
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       # Backend API container
       - name: api
@@ -35,6 +38,11 @@ spec:
           value: "/home/appuser/psuite-todo/taskrc"
         - name: TW_API_LOG_LEVEL
           value: "info"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop: ["ALL"]
         resources:
           requests:
             memory: "128Mi"
@@ -64,6 +72,11 @@ spec:
         ports:
         - containerPort: 80
           name: http-frontend
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop: ["ALL"]
         resources:
           requests:
             memory: "64Mi"
@@ -88,4 +101,3 @@ spec:
       - name: task-data
         persistentVolumeClaim:
           claimName: task-data-pvc
-
