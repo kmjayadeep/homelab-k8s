@@ -71,9 +71,8 @@ spec:
         - name: NAME_SERVERS
           value: "1.1.1.1,1.0.0.1"
         securityContext:
-          allowPrivilegeEscalation: false
+          privileged: true
           capabilities:
-            drop: ["ALL"]
             add: ["NET_ADMIN"]
         volumeMounts:
         - name: wireguard-rw
