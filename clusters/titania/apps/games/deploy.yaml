@@ -14,21 +14,10 @@ spec:
       labels:
         app: wordle
     spec:
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
       containers:
       - image: modem7/wordle:latest
         imagePullPolicy: IfNotPresent
         name: wordle
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-          runAsGroup: 1000
-          capabilities:
-            drop: ["ALL"]
         ports:
         - containerPort: 8080
           protocol: TCP
