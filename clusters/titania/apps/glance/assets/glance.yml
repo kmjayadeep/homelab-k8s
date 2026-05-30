@@ -57,9 +57,12 @@ pages:
               - title: Sonarr
                 url: https://sonarr.cosmos.cboxlab.com/
                 icon: di:sonarr
-              - title: Readarr
-                url: https://readarr.cosmos.cboxlab.com/
-                icon: di:readarr
+              - title: Prowlarr
+                url: https://prowlarr.cosmos.cboxlab.com/
+                icon: di:prowlarr
+              - title: Seerr
+                url: https://seerr.cosmos.cboxlab.com/
+                icon: di:overseerr
               - title: Lidarr
                 url: https://lidarr.cosmos.cboxlab.com/
                 icon: di:lidarr
@@ -71,12 +74,16 @@ pages:
             cache: 1h
             title: Apps
             sites:
-              - title: Coder
-                url: https://coder.cosmos.cboxlab.com
-                icon: di:code
+              - title: Hermes
+                url: https://hermes.cosmos.cboxlab.com
+                icon: di:hermes
+                alt-status-codes: [401]
               - title: OpenClaw
                 url: https://openclaw.cosmos.cboxlab.com
                 icon: di:openclaw
+              - title: K8s AI SRE
+                url: https://ai-sre.cosmos.cboxlab.com
+                icon: di:kubernetes
               - title: Fava
                 url: https://fava.cosmos.cboxlab.com
                 icon: di:bitcoin
@@ -84,12 +91,12 @@ pages:
               - title: Wordle
                 url: https://wordle.cosmos.cboxlab.com
                 icon: di:google-play-games
-              - title: Planka
-                url: https://planka.cosmos.cboxlab.com
-                icon: di:planka
               - title: OTPCloud
                 url: https://totp.cosmos.cboxlab.com
                 icon: di:passwork
+              - title: Grocy
+                url: https://grocy.cosmos.cboxlab.com
+                icon: di:grocy
               - title: Vaultwarden
                 url: https://vaultwarden.cosmos.cboxlab.com
                 icon: di:bitwarden
@@ -102,9 +109,6 @@ pages:
               - title: IT Tools
                 url: https://ittools.cosmos.cboxlab.com
                 icon: di:it-tools
-              - title: Paperclip AI
-                url: https://paperclip.cosmos.cboxlab.com/
-                icon: di:claude-ai
               - title: Stirling PDF
                 url: https://stirlingpdf.cosmos.cboxlab.com
                 icon: di:stirling-pdf
@@ -149,6 +153,12 @@ pages:
               - title: Truenas
                 url: https://truenas.cosmos.cboxlab.com
                 icon: di:truenas
+              - title: Longhorn
+                url: https://longhorn.cosmos.cboxlab.com
+                icon: di:longhorn
+              - title: Vault
+                url: https://vault.cosmos.cboxlab.com
+                icon: di:vault
               - title: Minio
                 url: https://minio-admin.cosmos.cboxlab.com
                 icon: di:minio
