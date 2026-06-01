@@ -114,13 +114,31 @@ spec:
               description: "{{ $labels.instance }} is exceeding 80% of the currently configured maximum Postgres connection limit (current value: {{ $value }}s). Please check utilization graphs and confirm if this is normal service growth, abuse or an otherwise temporary condition or if new resources need to be provisioned (or the limits increased, which is mostly likely)."
 
           - alert: PostgreSQLDown
-            expr: pg_up != 1
+            expr: pg_up{job="helios"} != 1
             for: 1m
             labels:
               severity: critical
             annotations:
               summary: "PostgreSQL is not processing queries: {{ $labels.instance }}"
-              description: "{{ $labels.instance }} is rejecting query requests from the exporter, and thus probably not allowing DNS requests to work either. User services should not be effected provided at least 1 node is still alive."
+              description: "{{ $labels.instance }} is rejecting query requests from the exporter. Helios Postgres may be unavailable to LAN applications."
+
+          - alert: HeliosExporterDown
+            expr: up{job="helios"} == 0
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Helios exporter target is down: {{ $labels.instance }}"
+              description: "Prometheus cannot scrape {{ $labels.instance }} for job {{ $labels.job }}. Helios or one of its exporters may be unavailable."
+
+          - alert: PostgreSQLImportantDatabaseMissingMetrics
+            expr: absent(pg_stat_database_xact_commit{job="helios",datname=~"immich|uptimekuma"})
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "PostgreSQL important database metrics are missing"
+              description: "Prometheus is not seeing transaction metrics for one or more important Helios databases. Check postgres_exporter and the database catalog."
 
           - alert: PostgreSQLSlowQueries
             expr: avg(rate(pg_stat_activity_max_tx_duration{datname!~"template.*"}[2m])) by (datname) > 2 * 60
@@ -141,13 +159,23 @@ spec:
               description: "PostgreSQL high number of queries per second on {{ $labels.cluster }} for database {{ $labels.datname }} with a value of {{ $value }}"
 
           - alert: PostgreSQLCacheHitRatio
-            expr: avg(rate(pg_stat_database_blks_hit{datname!~"template.*"}[5m]) / (rate(pg_stat_database_blks_hit{datname!~"template.*"}[5m]) + rate(pg_stat_database_blks_read{datname!~"template.*"}[5m]))) by (datname) < 0.9
-            for: 5m
+            expr: avg(rate(pg_stat_database_blks_hit{job="helios",datname!~"template.*"}[15m]) / (rate(pg_stat_database_blks_hit{job="helios",datname!~"template.*"}[15m]) + rate(pg_stat_database_blks_read{job="helios",datname!~"template.*"}[15m]))) by (datname) < 0.9
+            for: 30m
+            labels:
+              severity: warning
+            annotations:
+              summary: "PostgreSQL low cache hit rate for database {{ $labels.datname }}"
+              description: "PostgreSQL cache hit rate for {{ $labels.datname }} is below 90% for 30 minutes. This is warning-level for Helios because workloads like Immich can legitimately do large scans; check disk latency and app symptoms before treating it as an incident."
+
+          - alert: PostgreSQLBackupStale
+            expr: max by(repo) (time() - restic_repo_last_snapshot{repo=~".*postgres.*"}) > 60*60*2
+            for: 15m
             labels:
               severity: critical
             annotations:
-              summary: "PostgreSQL low cache hit rate on {{ $labels.cluster }} for database {{ $labels.datname }}"
-              description: "PostgreSQL low on cache hit rate on {{ $labels.cluster }} for database {{ $labels.datname }} with a value of {{ $value }}"
+              summary: "Helios Postgres backup is stale for repo {{ $labels.repo }}"
+              description: "The latest Restic snapshot for {{ $labels.repo }} is older than 2 hours. RPO target is <= 1 hour, so the backup pipeline should be checked."
+
 
     prometheus:
       enabled: true
