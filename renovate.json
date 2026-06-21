@@ -5,5 +5,12 @@
   ],
   "kubernetes": {
     "managerFilePatterns": ["/clusters/.+\\.yaml$/"]
-  }
+  },
+  "packageRules": [
+    {
+      "matchPackageNames": ["ghcr.io/fluxcd/*"],
+      "groupName": "fluxcd controllers",
+      "groupSlug": "fluxcd-controllers"
+    }
+  ]
 }
