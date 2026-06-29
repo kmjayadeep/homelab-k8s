@@ -84,6 +84,9 @@ pages:
               - title: K8s AI SRE
                 url: https://ai-sre.cosmos.cboxlab.com
                 icon: di:kubernetes
+              - title: LiteLLM
+                url: https://litellm.cosmos.cboxlab.com
+                icon: di:litellm
               - title: Fava
                 url: https://fava.cosmos.cboxlab.com
                 icon: di:bitcoin
