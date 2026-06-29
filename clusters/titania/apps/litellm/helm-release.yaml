@@ -1,0 +1,97 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: litellm
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: litellm-helm
+      version: "1.90.0"
+      sourceRef:
+        kind: HelmRepository
+        name: litellm
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    image:
+      pullPolicy: IfNotPresent
+
+    masterkeySecretName: litellm-secrets
+    masterkeySecretKey: LITELLM_MASTER_KEY
+
+    environmentSecrets: []
+    extraEnvVars:
+      - name: DATABASE_URL
+        valueFrom:
+          secretKeyRef:
+            name: litellm-secrets
+            key: DATABASE_URL
+      - name: LITELLM_SALT_KEY
+        valueFrom:
+          secretKeyRef:
+            name: litellm-secrets
+            key: LITELLM_SALT_KEY
+      - name: STORE_MODEL_IN_DB
+        value: "True"
+
+    db:
+      useExisting: false
+      deployStandalone: false
+
+    proxy_config:
+      model_list: []
+      litellm_settings:
+        json_logs: true
+        request_timeout: 600
+      general_settings:
+        master_key: os.environ/PROXY_MASTER_KEY
+        disable_master_key_return: true
+
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+        - host: litellm.cosmos.cboxlab.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - "*.cosmos.cboxlab.com"
+          secretName: cosmos-cboxlab-cert
+
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+    migrationJob:
+      enabled: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+
+    autoscaling:
+      enabled: false
+
+    redis:
+      enabled: false
