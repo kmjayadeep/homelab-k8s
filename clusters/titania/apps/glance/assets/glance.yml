@@ -76,7 +76,7 @@ pages:
             sites:
               - title: Hermes
                 url: https://hermes.cosmos.cboxlab.com
-                icon: di:hermes-agent
+                icon: di:hermes-icon
                 alt-status-codes: [401]
               - title: OpenClaw
                 url: https://openclaw.cosmos.cboxlab.com
@@ -86,7 +86,8 @@ pages:
                 icon: di:kubernetes
               - title: LiteLLM
                 url: https://litellm.cosmos.cboxlab.com/ui
-                icon: di:LiteLLM
+                icon: di:litlellm
+                alt-status-codes: [401]
               - title: Fava
                 url: https://fava.cosmos.cboxlab.com
                 icon: di:bitcoin
