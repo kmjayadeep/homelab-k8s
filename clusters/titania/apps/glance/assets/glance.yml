@@ -81,9 +81,6 @@ pages:
               - title: OpenClaw
                 url: https://openclaw.cosmos.cboxlab.com
                 icon: di:openclaw
-              - title: K8s AI SRE
-                url: https://ai-sre.cosmos.cboxlab.com
-                icon: di:kubernetes
               - title: LiteLLM
                 url: https://litellm.cosmos.cboxlab.com/ui
                 icon: di:litlellm
