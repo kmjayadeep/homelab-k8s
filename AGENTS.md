@@ -1,255 +1,37 @@
 # AGENTS.md
 
-This file contains guidelines and commands for agentic coding agents working in this homelab Kubernetes repository.
+## Repository
 
-## Repository Overview
+Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests and Sealed Secrets manages sensitive values.
 
-This is a Kubernetes homelab repository using FluxCD for GitOps deployment. The repository contains manifests for multiple clusters (currently `titania`) with applications and infrastructure components.
+## Safety rules
 
-- **GitOps Tool**: FluxCD
-- **Manifest Management**: Kustomize
-- **Secrets Management**: Sealed Secrets
-- **Clusters**: titania (and potentially others)
+- **Never read plaintext secrets into agent context.** `*-decrypted.yaml` is a non-encrypted plaintext secret: do not use `read`, `cat`, `grep`, decode commands, logs, or `kubectl get` to display its values, and never commit it. For debugging, use tools to extract only the required YAML structure or non-secret metadata; never echo secret values.
+- `*-sealed.yaml` is a Sealed Secret and is the version to commit. Handle decrypted files only through file-to-file pipelines (for example, `kubectl create secret ... --from-file=... | kubeseal ...`).
+- Use `kubeseal` with `kubeseal/pub-sealed-secrets.pem` to generate sealed secrets. Create the Kubernetes Secret from the decrypted file and pipe it directly to `kubeseal`; never print or decode the plaintext:
+  ```bash
+  kubectl create secret generic <name> -n <namespace> --from-file=<key>=<decrypted-file> --dry-run=client -o yaml | kubeseal --format=yaml --cert kubeseal/pub-sealed-secrets.pem > <name>-sealed.yaml
+  ```
+- **Never perform destructive operations without explicit human approval.** This includes `rm`, `kubectl delete`, pruning/removing Flux resources, force operations, database/data deletion, and destructive rewrites. Explain the impact and wait for approval.
+- Do not apply or reconcile changes to the cluster unless explicitly requested.
 
-## Build/Lint/Test Commands
+## Conventions
 
-### Single Test Commands
+- Use 2-space YAML indentation. Put `apiVersion` and `kind` first.
+- Keep app-specific manifests in `clusters/titania/apps/<app>/` with a `kustomization.yaml`.
+- Define resource requests and limits, plus readiness and liveness probes, for workloads.
+- Use standard Kubernetes labels, including `app.kubernetes.io/name` and `app.kubernetes.io/instance`.
+- Use TLS for ingresses where certificates are available.
+
+## Validation
+
 ```bash
-# Validate a single manifest file
-kubectl --dry-run=client apply -f clusters/titania/apps/vaultwarden/deploy.yaml
+# Build and validate an app or infrastructure kustomization
+kustomize build clusters/titania/apps/<app> | kubectl apply --dry-run=client -f -
+kustomize build clusters/titania/infra/<component> | kubectl apply --dry-run=client -f -
 
-# Validate a single app's kustomization
-kustomize build clusters/titania/apps/<app-name> | kubectl --dry-run=client apply -f -
-
-# Test a single kustomization build
-kustomize build clusters/titania/apps/<app-name>
-
-# Validate secret encryption
-kubeseal --format=yaml --cert kubeseal/pub-sealed-secrets.pem < secret.yaml | kubectl --dry-run=client apply -f -
-```
-
-### Batch Validation
-```bash
-# Validate all manifests in the repository
-find . -name "*.yaml" -type f -exec kubectl --dry-run=client apply -f {} \;
-
-# Validate cluster-specific manifests
-find clusters/titania -name "*.yaml" -type f -exec kubectl --dry-run=client apply -f {} \;
-
-# Validate with kubeconform (if available)
-kubeconform -summary clusters/titania
-```
-
-### FluxCD Operations
-```bash
-# Check FluxCD status
+# Inspect Flux state when requested
 flux get all -n flux-system
-
-# Reconcile specific kustomization
-flux reconcile kustomization <kustomization-name> -n flux-system
-
-# Check Flux logs
-flux logs -f
 ```
 
-## Code Style Guidelines
-
-### YAML Formatting
-- Use 2 spaces for indentation (not tabs)
-- Ensure consistent spacing in lists and mappings
-- Use `apiVersion` and `kind` as the first two fields
-- Follow Kubernetes field ordering: metadata, spec, status (if present)
-
-### Resource Naming Conventions
-- **Deployments**: Use app name (e.g., `vaultwarden`)
-- **Services**: Use app name (e.g., `vaultwarden`)
-- **Ingress**: Use `<app-name>-ingress` pattern
-- **PVCs**: Use `<app-name>-pvc` pattern
-- **Secrets**: Use descriptive names with `-secret` suffix
-
-### Labels and Annotations
-```yaml
-# Standard labels for applications
-labels:
-  app.kubernetes.io/name: <app-name>
-  app.kubernetes.io/instance: <app-name>
-  app.kubernetes.io/component: <component>
-
-# Common annotations for deployments
-annotations:
-  kubernetes.io/managed-by: FluxCD
-  kustomize.toolkit.fluxcd.io/checksum: <checksum>
-
-# For deployments/pods
-selector:
-  matchLabels:
-    app.kubernetes.io/name: <app-name>
-```
-
-### Kustomize Structure
-- Each app directory should contain: `kustomization.yaml`, `deploy.yaml`, `service.yaml`, `ingress.yaml`
-- Use `kustomization.yaml` to define namespace and resources
-- Keep cluster-specific overrides in `clusters/<cluster-name>/apps/<app-name>/`
-- Use patches for cluster-specific modifications
-
-### Namespace Management
-- Define namespace in kustomization.yaml: `namespace: <namespace-name>`
-- Create namespace manifests in `clusters/<cluster-name>/bootstrap/infra/`
-- Use consistent naming across clusters
-
-### Resource Limits and Requests
-- Always define resource requests and limits for containers
-- Use reasonable defaults for homelab environments:
-  ```yaml
-  resources:
-    requests:
-      cpu: 100m
-      memory: 100Mi
-    limits:
-      cpu: 200m
-      memory: 500Mi
-  ```
-
-### Ingress Configuration
-- Use TLS with wildcard certificates where available
-- Follow standard ingress structure:
-  ```yaml
-  spec:
-    tls:
-      - hosts:
-          - "*.cosmos.cboxlab.com"
-        secretName: cosmos-cboxlab-cert
-    rules:
-      - host: <app-name>.cosmos.cboxlab.com
-        http:
-          paths:
-            - backend:
-                service:
-                  name: <app-name>
-                  port:
-                    number: 80
-              path: /
-              pathType: Prefix
-  ```
-
-### Health Checks
-- Always define both `livenessProbe` and `readinessProbe` for applications
-- Use appropriate paths and ports for each application
-- Consider adding `startupProbe` for applications with long startup times
-- Include proper timeout, periodSeconds, and failureThreshold values
-
-### Environment Variables
-- Use clear, descriptive environment variable names
-- Separate words with underscores (e.g., `SIGNUPS_ALLOWED`)
-- Use string values for consistency
-
-### Volume Management
-- Use descriptive PVC names: `<app-name>-pvc`
-- Define appropriate storage classes and sizes
-- Use consistent mount paths across similar applications
-
-### Secret Management
-- Never commit plaintext secrets to the repository
-- Use sealed-secrets for all sensitive data
-- Keep decrypted secrets in `secret-decrypted.yaml` (add to .gitignore)
-- Store sealed secrets as `secret-sealed.yaml`
-
-### File Organization
-- Keep application manifests together in app directories
-- Separate infrastructure components from applications
-- Use `bootstrap/` for FluxCD and cluster initialization manifests
-- Maintain the existing cluster structure: `clusters/<cluster-name>/`
-
-### Git Workflow
-- Commit manifests in logical groups (app by app)
-- Use descriptive commit messages following existing patterns
-- Validate manifests before committing
-- Test changes in a non-production cluster first
-
-## Testing Strategy
-
-### Manual Testing
-1. Use `kubectl --dry-run=client` to validate manifest syntax
-2. Use `kustomize build` to verify kustomization structure
-3. Test in a development cluster before production
-
-### Automated Validation (Recommended)
-- Set up pre-commit hooks for manifest validation
-- Use kubeconform for Kubernetes resource validation
-- Implement CI/CD pipeline checks for manifest syntax
-
-## Common Patterns
-
-### Application Deployment
-```yaml
-# Standard deployment pattern
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: <app-name>
-  labels:
-    app.kubernetes.io/name: <app-name>
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: <app-name>
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: <app-name>
-    spec:
-      containers:
-        - name: <app-name>
-          image: <image>:<tag>
-          ports:
-            - name: http
-              containerPort: 80
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            timeoutSeconds: 5
-            periodSeconds: 30
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-            timeoutSeconds: 5
-            periodSeconds: 10
-            failureThreshold: 3
-```
-
-### Service Configuration
-```yaml
-# Standard service pattern
-apiVersion: v1
-kind: Service
-metadata:
-  name: <app-name>
-  labels:
-    app.kubernetes.io/name: <app-name>
-spec:
-  ports:
-    - name: http
-      port: 80
-      targetPort: 80
-  selector:
-    app.kubernetes.io/name: <app-name>
-  type: ClusterIP
-```
-
-## Tools and Dependencies
-
-- **kubectl**: Required for manifest validation
-- **kustomize**: Required for building overlays
-- **kubeseal**: Required for secret management
-- **flux**: Required for GitOps operations
-- **kubeconform**: Recommended for additional validation
-
-## Error Handling
-
-- Always validate manifests before applying
-- Check FluxCD logs for deployment issues
-- Use `kubectl describe` for troubleshooting pod issues
-- Verify sealed secrets encryption before committing
+Run the relevant Kustomize build and client dry-run after manifest changes. Report validation results and any remaining risks.
