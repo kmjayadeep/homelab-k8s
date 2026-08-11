@@ -69,6 +69,9 @@ pages:
               - title: Copyparty
                 url: https://files.cosmos.cboxlab.com/
                 icon: di:filegator
+              - title: TubeArchivist
+                url: https://tubearchivist.cosmos.cboxlab.com/
+                icon: di:tube-archivist
 
           - type: monitor
             cache: 1h
@@ -82,7 +85,7 @@ pages:
                 url: https://openclaw.cosmos.cboxlab.com
                 icon: di:openclaw
               - title: LiteLLM
-                url: https://litellm.cosmos.cboxlab.com/ui
+                url: https://litellm.cosmos.cboxlab.com/ui/
                 icon: di:litlellm
                 alt-status-codes: [401]
               - title: Fava
