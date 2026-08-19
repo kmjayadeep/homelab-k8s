@@ -71,7 +71,7 @@ pages:
                 icon: di:filegator
               - title: TubeArchivist
                 url: https://tubearchivist.cosmos.cboxlab.com/
-                icon: di:tube-archivist
+                icon: si:youtube
 
           - type: monitor
             cache: 1h
