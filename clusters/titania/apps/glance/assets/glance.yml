@@ -77,10 +77,6 @@ pages:
             cache: 1h
             title: Apps
             sites:
-              - title: Hermes
-                url: https://hermes.cosmos.cboxlab.com
-                icon: di:hermes-icon
-                alt-status-codes: [401]
               - title: OpenClaw
                 url: https://openclaw.cosmos.cboxlab.com
                 icon: di:openclaw
@@ -101,6 +97,9 @@ pages:
               - title: Grocy
                 url: https://grocy.cosmos.cboxlab.com
                 icon: di:grocy
+              - title: Wallabag
+                url: https://wallabag.cosmos.cboxlab.com
+                icon: di:wallabag
               - title: Vaultwarden
                 url: https://vaultwarden.cosmos.cboxlab.com
                 icon: di:bitwarden
