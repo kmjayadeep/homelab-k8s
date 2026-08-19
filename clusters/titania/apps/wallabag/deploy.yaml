@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallabag
+  labels:
+    app.kubernetes.io/name: wallabag
+    app.kubernetes.io/instance: wallabag
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wallabag
+      app.kubernetes.io/instance: wallabag
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wallabag
+        app.kubernetes.io/instance: wallabag
+    spec:
+      containers:
+        - name: wallabag
+          image: wallabag/wallabag:2.6.14
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: SYMFONY__ENV__DATABASE_DRIVER
+              value: pdo_sqlite
+            - name: SYMFONY__ENV__DATABASE_PATH
+              value: /var/www/wallabag/data/db/wallabag.sqlite
+            - name: SYMFONY__ENV__DOMAIN_NAME
+              value: https://wallabag.cosmos.cboxlab.com
+            - name: SYMFONY__ENV__FOSUSER_REGISTRATION
+              value: "false"
+            - name: SYMFONY__ENV__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: wallabag-config
+                  key: SYMFONY__ENV__SECRET
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /var/www/wallabag/data
+            - name: images
+              mountPath: /var/www/wallabag/web/assets/images
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: wallabag-data
+        - name: images
+          persistentVolumeClaim:
+            claimName: wallabag-images

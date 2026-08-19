@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wallabag-ingress
+  labels:
+    app.kubernetes.io/name: wallabag
+    app.kubernetes.io/instance: wallabag
+spec:
+  tls:
+    - hosts:
+        - wallabag.cosmos.cboxlab.com
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: wallabag.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wallabag
+                port:
+                  name: http
