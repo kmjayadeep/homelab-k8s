@@ -100,6 +100,9 @@ pages:
               - title: Wallabag
                 url: https://wallabag.cosmos.cboxlab.com
                 icon: di:wallabag
+              - title: BookOrbit
+                url: https://bookorbit.cosmos.cboxlab.com
+                icon: mdi:book-open-variant
               - title: Vaultwarden
                 url: https://vaultwarden.cosmos.cboxlab.com
                 icon: di:bitwarden
