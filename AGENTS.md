@@ -2,7 +2,7 @@
 
 ## Repository
 
-Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests and Sealed Secrets manages sensitive values.
+Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests. Vault with External Secrets is the target architecture for application secrets, while Sealed Secrets remains available for bootstrap and unmigrated secrets.
 
 ## Safety rules
 
@@ -14,6 +14,14 @@ Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `
   ```
 - **Never perform destructive operations without explicit human approval.** This includes `rm`, `kubectl delete`, pruning/removing Flux resources, force operations, database/data deletion, and destructive rewrites. Explain the impact and wait for approval.
 - Do not apply or reconcile changes to the cluster unless explicitly requested.
+
+## Vault and External Secrets
+
+- Before changing Vault, the External Secrets Operator, `SecretStore`/`ClusterSecretStore` resources, `ExternalSecret` resources, or migrating a SealedSecret, read and follow `adrs/0001-vault-external-secrets.md`.
+- Store application secret values in Vault, never in Git. Git may contain only non-secret references, policies, roles, and External Secrets manifests.
+- Use Vault Kubernetes authentication and least-privilege namespaced stores by default; do not introduce static Vault tokens or a broad `ClusterSecretStore` without explicit approval.
+- Keep Vault recovery/unseal material and the initial root token outside both Git and the cluster.
+- Do not remove a working SealedSecret during migration until the replacement ExternalSecret is verified and removal is explicitly approved.
 
 ## Conventions
 
