@@ -21,13 +21,13 @@ Sealed Secrets will remain available only for bootstrap data that cannot be obta
 
 Secret material is stored in these locations:
 
-1. **Vault KV v2** stores application values under `secret/apps/<namespace>/<application>/...`.
+1. **Vault KV v2** stores application values in the existing `homelab/kv` mount under `apps/<application>/...`.
 2. **Kubernetes etcd** holds the Kubernetes Secrets materialized by ESO. Encryption at rest must be enabled and maintained for the cluster datastore.
 3. **An offline password manager** stores Vault recovery/unseal material and the initial root token. These values must never be stored in this repository or in a Kubernetes Secret managed by ESO.
 
 Git stores only non-secret declarations:
 
-- `SecretStore` resources describing how a namespace authenticates to Vault.
+- `SecretStore` resources describing how a Kubernetes namespace authenticates to Vault.
 - `ExternalSecret` resources containing Vault paths and key mappings.
 - ServiceAccounts and non-secret Vault role names.
 - Vault policy/configuration automation that contains no credentials.
@@ -38,11 +38,15 @@ Vault paths and property names can disclose system structure. Treat this metadat
 
 ESO must use Vault's Kubernetes authentication method. Long-lived Vault tokens must not be placed in Git or used as the normal controller credential.
 
-Use a namespaced `SecretStore` and a dedicated ServiceAccount for each application or trust boundary. Bind that ServiceAccount to a narrowly scoped Vault role and policy. A policy should permit reading only the application's path, for example `secret/data/apps/<namespace>/<application>/*` and the corresponding KV metadata path when required.
+Use a Kubernetes-namespaced `SecretStore` and a dedicated ServiceAccount for each application or trust boundary. Bind that ServiceAccount to a narrowly scoped Vault role and policy. A policy should permit reading only the application's path, for example `homelab/kv/data/apps/<application>` and its descendants, plus the corresponding KV metadata paths when required.
+
+This deployment uses Vault OSS and does not use Vault Enterprise namespaces. References to namespaces in Kubernetes resources and auth-role bindings mean Kubernetes namespaces only; they are not part of the Vault secret path.
+
+The KV mount is not used as an access-control boundary. Kubernetes workloads and non-Kubernetes consumers such as VMs may read the same application path when they legitimately share a secret. Each consumer must authenticate through an appropriate Vault auth method and receive an explicit least-privilege policy; secret values should not be copied into a second mount merely to serve a different platform.
 
 A broad, shared `ClusterSecretStore` is not the default because any permitted `ExternalSecret` could otherwise request secrets belonging to another application. Any exception requires an explicit security review and documentation of the shared trust boundary.
 
-Vault Kubernetes-auth configuration and policies are administered directly in Vault until declarative Vault configuration management is introduced. They must not contain static credentials in Git.
+Vault Kubernetes-auth configuration, application roles, and policies are managed declaratively in `homelab-iac/vault-config/`. This configuration contains no static credentials or secret values. Secret values are written through a separate secure operator workflow.
 
 ### TLS
 
@@ -70,7 +74,7 @@ spec:
   provider:
     vault:
       server: https://vault.vault.svc.cluster.local:8200
-      path: secret
+      path: homelab/kv
       version: v2
       auth:
         kubernetes:
@@ -95,7 +99,7 @@ spec:
   data:
     - secretKey: <kubernetes-key>
       remoteRef:
-        key: apps/<namespace>/<application>
+        key: apps/<application>
         property: <vault-property>
 ```
 
@@ -137,6 +141,7 @@ Never delete or replace a working SealedSecret during the same unverified rollou
 - Vault Helm deployment: present.
 - External Secrets Operator Helm deployment: present.
 - Vault internal TLS: required before production use.
-- Vault Kubernetes authentication: not yet configured.
+- Vault Kubernetes authentication and per-application policy automation: declared in `homelab-iac/vault-config/`; deployment must be verified before migration.
+- Application Vault roles: added to the Terraform application map as each application is migrated.
 - Application `SecretStore` and `ExternalSecret` resources: not yet configured.
 - Existing SealedSecret migrations: not started by this decision.
