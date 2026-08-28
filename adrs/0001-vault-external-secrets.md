@@ -21,7 +21,7 @@ Sealed Secrets will remain available only for bootstrap data that cannot be obta
 
 Secret material is stored in these locations:
 
-1. **Vault KV v2** stores application values in the existing `homelab/kv` mount under `apps/<application>/...`.
+1. **Vault KV v2** stores secret values in the existing `homelab/kv` mount under owner-based `apps/`, `services/`, and `platform/` paths.
 2. **Kubernetes etcd** holds the Kubernetes Secrets materialized by ESO. Encryption at rest must be enabled and maintained for the cluster datastore.
 3. **An offline password manager** stores Vault recovery/unseal material and the initial root token. These values must never be stored in this repository or in a Kubernetes Secret managed by ESO.
 
@@ -33,6 +33,18 @@ Git stores only non-secret declarations:
 - Vault policy/configuration automation that contains no credentials.
 
 Vault paths and property names can disclose system structure. Treat this metadata as internal even though it is not secret material.
+
+### Path ownership
+
+Paths identify who owns or issues a credential, not where it is consumed:
+
+- `apps/<application>/<set>` contains secrets owned and rotated with an application.
+- `services/<service>/<identity>` contains credentials issued by another service, such as PostgreSQL, GitHub, Cloudflare, or an object store.
+- `platform/<component>/<set>` contains operational configuration with secret material that does not have a better application or service owner.
+
+There is no generic `shared/` path. When Kubernetes and a VM intentionally use the same credential, their separate policies grant access to the same owner-based path. Values must not be duplicated solely because consumers use different platforms. Independently rotated or differently scoped identities remain in separate KV documents under the same owner prefix, for example `services/cloudflare/read-only` and `services/cloudflare/dns-only`. Limited duplication is acceptable when distinct credentials reduce permissions or blast radius.
+
+Database connection components and similar source values are stored once. ESO target templates or application configuration may render consumer-specific formats such as connection URLs without storing a second copy in Vault. The detailed path rules and migration map are maintained in `homelab-iac/vault-config/PATHS.md`.
 
 ### Authentication and authorization
 
@@ -142,6 +154,6 @@ Never delete or replace a working SealedSecret during the same unverified rollou
 - External Secrets Operator Helm deployment: present.
 - Vault internal TLS: required before production use.
 - Vault Kubernetes authentication and per-application policy automation: declared in `homelab-iac/vault-config/`; deployment must be verified before migration.
-- Application Vault roles: added to the Terraform application map as each application is migrated.
+- Application Vault roles: added to the Terraform `external_secrets_roles` map as each application is migrated.
 - Application `SecretStore` and `ExternalSecret` resources: not yet configured.
 - Existing SealedSecret migrations: not started by this decision.
