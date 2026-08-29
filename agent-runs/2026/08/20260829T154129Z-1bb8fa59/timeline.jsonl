@@ -14,3 +14,5 @@
 {"schemaVersion":1,"timestamp":"2026-08-29T15:43:41.645Z","from":"governance_review","to":"final_validation","outcome":"succeeded"}
 {"schemaVersion":1,"timestamp":"2026-08-29T15:43:48.105Z","from":"final_validation","to":"awaiting_human_approval","outcome":"paused"}
 {"schemaVersion":1,"timestamp":"2026-08-29T15:49:35.402Z","from":"awaiting_human_approval","to":"commit_and_push","outcome":"succeeded"}
+{"schemaVersion":1,"timestamp":"2026-08-29T15:50:17.841Z","from":"commit_and_push","to":"create_pull_request","outcome":"succeeded"}
+{"schemaVersion":1,"timestamp":"2026-08-29T15:50:20.403Z","from":"create_pull_request","to":"record_pull_request_metadata","outcome":"succeeded"}
