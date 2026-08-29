@@ -28,12 +28,16 @@ function verdict(value: unknown): Verdict {
 function stringify(value: unknown): string { return `${JSON.stringify(value, null, 2)}\n`; }
 export class Workflow {
   private deadline = Number.POSITIVE_INFINITY;
-  constructor(private readonly repo: string, private readonly config: Config, private readonly agent: AgentAdapter) {}
+  private interactionSequence = 0;
+  constructor(private readonly repo: string, private readonly config: Config, private readonly agent: AgentAdapter, private readonly interactive = false) {}
   private beginActiveRun(): void { this.deadline = Date.now() + this.config.limits.totalRuntimeMinutes * 60_000; }
+  private progress(role: Role | "orchestrator", message: string): void { console.log(`[${new Date().toISOString()}] [${role}] ${message}`); }
   private async call(directory: string, manifest: Manifest, role: Role, prompt: string, cwd = this.repo, writable = false) {
     const remaining = this.deadline - Date.now();
     if (remaining <= 0) throw new Error("Total runtime limit exhausted");
-    const result = await this.agent.run({ role, cwd, system: systems[role], prompt, writable, timeoutMs: Math.min(remaining, this.config.limits.stageTimeoutMinutes * 60_000), maxTurns: this.config.limits.maxAgentTurnsPerStage }, this.config); addUsage(manifest, result.usage); await saveManifest(directory, manifest); return result;
+    this.progress(role, `starting ${this.config.roles[role].model} (${this.config.roles[role].reasoning})`);
+    const result = await this.agent.run({ role, cwd, system: systems[role], prompt, writable, timeoutMs: Math.min(remaining, this.config.limits.stageTimeoutMinutes * 60_000), maxTurns: this.config.limits.maxAgentTurnsPerStage, interactive: this.interactive, onProgress: (message) => this.progress(role, message), onHumanInput: async (input) => { this.interactionSequence += 1; const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); await writeArtifact(path.join(directory, "history"), `human-input/input-${timestamp}-${String(this.interactionSequence).padStart(3, "0")}-${role}.md`, `${input}\n`, this.config); } }, this.config);
+    addUsage(manifest, result.usage); await saveManifest(directory, manifest); this.progress(role, `completed; turns=${result.usage.turns} tokens in=${result.usage.input} out=${result.usage.output}`); return result;
   }
   async execute(directory: string): Promise<void> {
     this.beginActiveRun(); const release = await acquireLock(directory); try { const manifest = await loadManifest(directory); await this.agent.verify(this.config); await this.plan(directory, manifest); await this.implementation(directory, manifest); } catch (error) { const manifest = await loadManifest(directory); manifest.failure = (error as Error).message.slice(0, 500); if (manifest.state !== "failed") { try { await moveState(directory, manifest, "failed", "failed"); } catch { await saveManifest(directory, manifest); } } throw error; } finally { await release(); }
@@ -56,14 +60,14 @@ export class Workflow {
   }
   private async implementation(directory: string, manifest: Manifest): Promise<void> {
     if (manifest.state !== "implement") return; await assertCleanBase(this.repo, this.config.baseBranch);
-    const created = await createWorktree(this.repo, manifest.runId, this.config.branchPrefix); manifest.branch = created.branch; manifest.worktree = created.worktree; await saveManifest(directory, manifest);
+    this.progress("orchestrator", "creating isolated worktree"); const created = await createWorktree(this.repo, manifest.runId, this.config.branchPrefix); manifest.branch = created.branch; manifest.worktree = created.worktree; await saveManifest(directory, manifest); this.progress("orchestrator", `worktree ready on ${created.branch}`);
     const requirements = await readFile(path.join(directory, "requirements.md"), "utf8"); const history = path.join(directory, "history"); const planIndex = String(manifest.iterations.plan).padStart(3, "0"); const plan = await readFile(path.join(history, `planning/plan-${planIndex}.md`), "utf8");
     const implementation = await this.call(directory, manifest, "implementer", `Implement this approved plan. Return {"summary":string,"changedFiles":string[]}.\n\nRequirement:\n${requirements}\n\nPlan:\n${plan}`, created.worktree, true); manifest.iterations.implementation = 1;
     await writeArtifact(history, "implementation/iteration-001.md", String((implementation.structured as { summary?: unknown }).summary ?? "Implementation completed."), this.config); await this.snapshot(history, created.worktree, 1); await moveState(directory, manifest, "deterministic_validation"); await this.reviewLoops(directory, manifest, requirements, plan);
   }
   private async snapshot(history: string, worktree: string, iteration: number): Promise<void> { const patch = await diff(worktree); scanArtifact(`iteration-${iteration}.patch`, patch); const whitespaceSafePatch = patch.replace(/[ \t]+$/gm, (value) => value.replaceAll(" ", "␠").replaceAll("\t", "⇥")); await writeArtifact(history, `implementation/iteration-${String(iteration).padStart(3, "0")}.patch`, whitespaceSafePatch || "# No textual diff\n", this.config); }
   private async validation(directory: string, manifest: Manifest, iteration: number): Promise<ValidationReport> {
-    const report = await validate(manifest.worktree!); await writeArtifact(path.join(directory, "history"), `implementation/validation-${String(iteration).padStart(3, "0")}.md`, `# Validation\n\n${report.summary}\n`, this.config); return report;
+    this.progress("orchestrator", `deterministic validation ${iteration} started`); const report = await validate(manifest.worktree!); this.progress("orchestrator", `deterministic validation ${iteration} ${report.passed ? "passed" : "failed"}`); for (const check of report.checks) this.progress("orchestrator", `${check.passed ? "PASS" : "FAIL"} ${check.command}`); await writeArtifact(path.join(directory, "history"), `implementation/validation-${String(iteration).padStart(3, "0")}.md`, `# Validation\n\n${report.summary}\n`, this.config); return report;
   }
   private async reviewLoops(directory: string, manifest: Manifest, requirements: string, plan: string): Promise<void> {
     const history = path.join(directory, "history"); let report = await this.validation(directory, manifest, manifest.iterations.implementation); if (!report.passed) throw new Error("Deterministic validation failed"); await moveState(directory, manifest, "code_review");

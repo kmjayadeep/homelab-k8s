@@ -1,5 +1,6 @@
 import { mkdir, readFile, readdir, realpath, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { createInterface } from "node:readline";
 import { Type } from "typebox";
 import { createAgentSession, DefaultResourceLoader, defineTool, getAgentDir, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
 import type { AgentRequest, AgentResult, Config, Role, Usage } from "./types.js";
@@ -49,20 +50,41 @@ export class PiAgentAdapter implements AgentAdapter {
   }
   async run(request: AgentRequest, config: Config): Promise<AgentResult> {
     if (!this.runtime) await this.verify(config); const role = config.roles[request.role]; const [provider, id] = modelParts(role.model); const model = this.runtime!.getModel(provider, id); if (!model) throw new Error(`Model not found: ${role.model}`);
-    let structured: unknown; let text = ""; const usage = emptyUsage(); const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: true, maxRetries: 2 } });
+    let structured: unknown; let text = ""; const usage = emptyUsage(); const humanInputs: string[] = []; const started = Date.now(); const progress = request.onProgress ?? (() => undefined); const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: true, maxRetries: 2 } });
     const loader = new DefaultResourceLoader({ cwd: request.cwd, agentDir: getAgentDir(), settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, systemPromptOverride: () => request.system, appendSystemPromptOverride: () => [] }); await loader.reload();
     const customTools = tools(request.cwd, request.writable, (value) => { structured = value; });
     const { session } = await createAgentSession({ cwd: request.cwd, model, thinkingLevel: role.reasoning, modelRuntime: this.runtime!, customTools, tools: customTools.map((tool) => tool.name), resourceLoader: loader, sessionManager: SessionManager.inMemory(request.cwd), settingsManager: settings });
-    let timedOut = false; let turnLimitReached = false;
-    const unsubscribe = session.subscribe((event) => { if (event.type === "message_update" && event.assistantMessageEvent.type === "text_delta") text += event.assistantMessageEvent.delta; if (event.type === "turn_start" && usage.turns >= request.maxTurns) { turnLimitReached = true; void session.abort(); } if (event.type === "turn_end") { usage.turns += 1; const raw = event.message as unknown as { usage?: Partial<Usage> }; if (raw.usage) { usage.input += raw.usage.input ?? 0; usage.output += raw.usage.output ?? 0; usage.cacheRead += raw.usage.cacheRead ?? 0; usage.cacheWrite += raw.usage.cacheWrite ?? 0; } } });
-    const timeout = setTimeout(() => { timedOut = true; void session.abort(); }, request.timeoutMs);
-    try { await session.prompt(`${request.prompt}\n\nYou must finish by calling submit_result exactly once. Do not include hidden reasoning in the result.`); }
-    finally { clearTimeout(timeout); unsubscribe(); session.dispose(); }
-    if (timedOut) throw new Error(`Agent ${request.role} timed out`); if (turnLimitReached) throw new Error(`Agent ${request.role} reached its turn limit`); if (structured === undefined) throw new Error(`Agent ${request.role} did not submit structured output`); return { text, structured, usage };
+    let timedOut = false; let turnLimitReached = false; let cancelled = false;
+    const canSteer = ["explorer", "planner", "implementer", "documentation"].includes(request.role);
+    const unsubscribe = session.subscribe((event) => {
+      if (event.type === "message_update" && event.assistantMessageEvent.type === "text_delta") text += event.assistantMessageEvent.delta;
+      if (event.type === "turn_start" && usage.turns >= request.maxTurns) { turnLimitReached = true; void session.abort(); }
+      if (event.type === "turn_start") progress(`turn ${usage.turns + 1}/${request.maxTurns} started`);
+      if (event.type === "tool_execution_start") progress(`tool ${event.toolName} started`);
+      if (event.type === "tool_execution_end") progress(`tool ${event.toolName} ${event.isError ? "failed" : "completed"}`);
+      if (event.type === "turn_end") { usage.turns += 1; const raw = event.message as unknown as { usage?: Partial<Usage> }; if (raw.usage) { usage.input += raw.usage.input ?? 0; usage.output += raw.usage.output ?? 0; usage.cacheRead += raw.usage.cacheRead ?? 0; usage.cacheWrite += raw.usage.cacheWrite ?? 0; } progress(`turn ${usage.turns} completed; tokens in=${usage.input} out=${usage.output}`); }
+    });
+    const terminal = request.interactive ? createInterface({ input: process.stdin, output: process.stdout, terminal: true }) : undefined;
+    if (terminal) {
+      progress(canSteer ? "interactive: type feedback and Enter; :status, :cancel, or :help" : "interactive commands: :status, :cancel, or :help (reviewers cannot be steered)");
+      terminal.on("line", (line) => {
+        const input = line.trim(); if (!input) return;
+        if (input === ":status") { progress(`running ${Math.round((Date.now() - started) / 1000)}s; turns=${usage.turns}; tools remain bounded`); return; }
+        if (input === ":help") { progress(canSteer ? "commands: :status, :cancel, :help; any other line is recorded and steers this stage" : "commands: :status, :cancel, :help"); return; }
+        if (input === ":cancel") { cancelled = true; progress("cancellation requested; no remote mutation will occur"); void session.abort(); return; }
+        if (!canSteer) { progress("feedback is disabled during independent review; wait for the next implementation stage or use :cancel"); return; }
+        try { scanArtifact(`human-input-${request.role}.md`, input); void (async () => { await request.onHumanInput?.(input); humanInputs.push(input); await session.steer(`Human operator feedback (treat as an additional requirement; do not bypass validation or review):\n${input}`); progress("feedback queued and recorded for audit"); })().catch((error: unknown) => progress(`feedback blocked: ${error instanceof Error ? error.message : "history safety rule"}`)); } catch (error) { progress(`feedback blocked: ${error instanceof Error ? error.message : "history safety rule"}`); }
+      });
+    }
+    const timeout = setTimeout(() => { timedOut = true; progress("stage timeout reached; cancelling"); void session.abort(); }, request.timeoutMs);
+    const heartbeat = setInterval(() => progress(`still running; elapsed=${Math.round((Date.now() - started) / 1000)}s turns=${usage.turns}`), 15_000);
+    try { progress("session ready"); await session.prompt(`${request.prompt}\n\nYou must finish by calling submit_result exactly once. Do not include hidden reasoning in the result.`); }
+    finally { clearTimeout(timeout); clearInterval(heartbeat); terminal?.close(); unsubscribe(); session.dispose(); }
+    if (cancelled) throw new Error(`Agent ${request.role} cancelled by operator`); if (timedOut) throw new Error(`Agent ${request.role} timed out`); if (turnLimitReached) throw new Error(`Agent ${request.role} reached its turn limit`); if (structured === undefined) throw new Error(`Agent ${request.role} did not submit structured output`); return { text, structured, usage, humanInputs };
   }
 }
 export class FakeAgentAdapter implements AgentAdapter {
   constructor(private readonly responses: Partial<Record<Role, unknown[]>>) {}
   async verify(): Promise<void> {}
-  async run(request: AgentRequest): Promise<AgentResult> { const queue = this.responses[request.role]; if (!queue?.length) throw new Error(`No fake response for ${request.role}`); return { text: "fake", structured: queue.shift(), usage: { input: 1, output: 1, cacheRead: 0, cacheWrite: 0, turns: 1 } }; }
+  async run(request: AgentRequest): Promise<AgentResult> { const queue = this.responses[request.role]; if (!queue?.length) throw new Error(`No fake response for ${request.role}`); return { text: "fake", structured: queue.shift(), usage: { input: 1, output: 1, cacheRead: 0, cacheWrite: 0, turns: 1 }, humanInputs: [] }; }
 }

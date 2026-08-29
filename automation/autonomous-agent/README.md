@@ -36,6 +36,20 @@ node dist/cli.js resume <run-id> --decision approve
 
 `inspect --requirements` is the only normal command that prints requirements. Approval displays paths, commit title, and PR target and requires typing `yes`; `--yes` is available only when the explicit `--decision approve` invocation is itself the recorded human action.
 
+### Live progress and interaction
+
+When attached to a terminal, runs show timestamped stage, model, turn, bounded tool, token-usage, heartbeat, validation, and completion events. Raw model responses, reasoning, tool output, and requirements are not streamed because they may contain sensitive data.
+
+During exploration, planning, implementation, and documentation stages, type a line and press Enter to add operator feedback. Accepted feedback is safety-scanned, queued into the active session as an additional requirement, committed under the run's `human-input/` audit directory, and still passes all normal validation and independent review. Independent reviewer sessions cannot be steered.
+
+Interactive commands are:
+
+- `:status` — show elapsed time and completed turns.
+- `:cancel` — stop the active model stage safely without remote mutation.
+- `:help` — show available commands.
+
+Use `--non-interactive` for scripts. Non-TTY execution also disables input automatically while retaining progress output.
+
 ## Safety and lifecycle
 
 Model sessions are in-memory. Read-only roles have confined read/list/search tools; the implementer additionally has confined edit/write tools in a generated worktree. No model has shell, network, Git, cluster, or Vault tools. The orchestrator runs only fixed argument arrays—never shell interpolation—and treats missing checks as failure.

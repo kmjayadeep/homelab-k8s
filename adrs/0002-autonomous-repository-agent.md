@@ -15,6 +15,8 @@ The orchestrator owns a fixed validation and Git API. It does not expose cluster
 
 Each stage has wall-clock, turn, review-iteration, artifact-size, and run-size limits. Planning, code, and GitOps governance require structured `approved` verdicts from fresh role sessions. The code reviewer must use a different model ID from the implementer.
 
+Terminal runs expose sanitized progress metadata—stage, model, turns, tool names, token usage, heartbeats, and validation outcomes—without streaming model text, reasoning, requirements, or tool output. A human may provide safety-scanned, audited steering input during exploration, planning, implementation, and documentation. Steering is disabled for independent reviewers, and accepted input remains subject to deterministic validation and all review gates.
+
 Operational state stays in ignored `.agent-state/`. Safe, bounded artifacts are copied to `agent-runs/YYYY/MM/<run-id>/` only in the generated worktree. The implementation and run record enter `main` only if a human merges the pull request. Raw Pi sessions, hidden reasoning, provider payloads, command logs, environment dumps, secret values, and credentials are never committed.
 
 ## Consequences

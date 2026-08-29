@@ -46,6 +46,17 @@ export interface Manifest {
 }
 export interface Finding { severity: "blocking" | "non_blocking"; message: string; file?: string; line?: number }
 export interface Verdict { schemaVersion: 1; verdict: "approved" | "request_changes"; summary: string; findings: Finding[] }
-export interface AgentResult { text: string; structured?: unknown; usage: Usage }
-export interface AgentRequest { role: Role; cwd: string; system: string; prompt: string; writable: boolean; timeoutMs: number; maxTurns: number }
+export interface AgentResult { text: string; structured?: unknown; usage: Usage; humanInputs: string[] }
+export interface AgentRequest {
+  role: Role;
+  cwd: string;
+  system: string;
+  prompt: string;
+  writable: boolean;
+  timeoutMs: number;
+  maxTurns: number;
+  interactive: boolean;
+  onProgress?: (message: string) => void;
+  onHumanInput?: (input: string) => Promise<void>;
+}
 export interface TimelineEvent { schemaVersion: 1; timestamp: string; from?: RunState; to: RunState; outcome: "started" | "succeeded" | "failed" | "paused"; iteration?: number; artifact?: string }
