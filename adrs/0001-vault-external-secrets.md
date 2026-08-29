@@ -42,9 +42,9 @@ Paths identify who owns or issues a credential, not where it is consumed:
 - `services/<service>/<identity>` contains credentials issued by another service, such as PostgreSQL, GitHub, Cloudflare, or an object store.
 - `platform/<component>/<set>` contains operational configuration with secret material that does not have a better application or service owner.
 
-There is no generic `shared/` path. When Kubernetes and a VM intentionally use the same credential, their separate policies grant access to the same owner-based path. Values must not be duplicated solely because consumers use different platforms. Independently rotated or differently scoped identities remain in separate KV documents under the same owner prefix, for example `services/cloudflare/read-only` and `services/cloudflare/dns-only`. Limited duplication is acceptable when distinct credentials reduce permissions or blast radius.
+There is no generic `shared/` path. When Kubernetes and a VM intentionally use the same credential, their separate policies grant access to the same owner-based path. Values must not be duplicated solely because consumers use different platforms. Independently rotated or differently scoped identities remain in separate KV documents under the same owner prefix, for example `services/cloudflare/read-only` and `services/cloudflare/dns-cboxlab`. Limited duplication is acceptable when distinct credentials reduce permissions or blast radius.
 
-Database connection components and similar source values are stored once. ESO target templates or application configuration may render consumer-specific formats such as connection URLs without storing a second copy in Vault. The detailed path rules and migration map are maintained in `homelab-iac/vault-config/PATHS.md`.
+Database connection components and similar source values are stored once. ESO target templates or application configuration may render consumer-specific formats such as connection URLs without storing a second copy in Vault. KV custom metadata records non-secret operational context such as description, origin, owner, management method, and rotation dates; it must never contain credential material. The detailed path and metadata rules and migration map are maintained in `homelab-iac/vault-config/PATHS.md`.
 
 ### Authentication and authorization
 

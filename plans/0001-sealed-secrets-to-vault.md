@@ -59,11 +59,10 @@ that print Secret values.
 SealedSecrets. This is a high-impact change affecting DNS and certificate
 issuance, so it gets a dedicated rollout and rollback window.
 
-Vault may expose either one intentionally shared
-`services/cloudflare/dns-only` identity or separate scoped identities under
-`services/cloudflare/`, such as `cert-manager-dns` and `external-dns`. Separate
-tokens are acceptable and preferable when they reduce blast radius or allow
-independent revocation.
+Both controllers intentionally share the zone-scoped identity at
+`services/cloudflare/dns-cboxlab`. Future Cloudflare credentials with different
+permissions, zones, or rotation boundaries use sibling paths under
+`services/cloudflare/`.
 
 ### 1A: cert-manager
 
