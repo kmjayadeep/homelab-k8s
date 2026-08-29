@@ -13,6 +13,8 @@ spec:
   dependsOn:
     - name: external-secrets
       namespace: external-secrets
+    - name: reloader
+      namespace: reloader
   interval: 15m
   prune: true
   wait: true

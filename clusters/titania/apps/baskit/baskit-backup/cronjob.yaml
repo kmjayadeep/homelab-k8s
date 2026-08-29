@@ -44,7 +44,7 @@ spec:
           volumes:
             - name: firebase-credentials
               secret:
-                secretName: baskit-backup
+                secretName: baskit-backup-firebase-vault
                 items:
                   - key: firebase-credentials.json
                     path: firebase-credentials.json

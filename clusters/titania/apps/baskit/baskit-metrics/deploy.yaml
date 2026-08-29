@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: baskit-metrics
+  annotations:
+    secret.reloader.stakater.com/reload: baskit-metrics-firebase-vault
   labels:
     app: baskit-metrics
 spec:
@@ -65,5 +67,5 @@ spec:
       volumes:
         - name: firebase-credentials
           secret:
-            secretName: baskit-metrics-firebase
+            secretName: baskit-metrics-firebase-vault
 
