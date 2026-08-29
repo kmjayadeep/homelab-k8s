@@ -1,2 +1,8 @@
 **/secret.yaml
 **/*-decrypted.yaml
+
+# Local autonomous-agent operational state and build output
+.agent-state/
+.agent-worktrees/
+automation/autonomous-agent/node_modules/
+automation/autonomous-agent/dist/
