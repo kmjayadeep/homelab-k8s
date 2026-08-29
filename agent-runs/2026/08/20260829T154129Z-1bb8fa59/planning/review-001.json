@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "verdict": "approved",
+  "summary": "The plan directly satisfies the requirement by adding exactly one explicit sentence near the README introduction. Its documentation-only scope, diff-based validation, and omission of Kubernetes validation are appropriate and consistent with repository policy.",
+  "findings": []
+}
