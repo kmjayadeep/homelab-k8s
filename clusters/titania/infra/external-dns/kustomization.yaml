@@ -7,4 +7,5 @@ resources:
   - deployment.yaml
   - ./crd-dnsendpoint.yaml
   - ./secret-sealed.yaml
+  - ./external-secret.yaml
   - ./dnsendpoints.yaml
