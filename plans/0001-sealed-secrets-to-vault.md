@@ -4,6 +4,10 @@
 - Related ADR: `adrs/0001-vault-external-secrets.md`
 - Vault-side plan: `homelab-iac/plans/0001-vault-secret-migration.md`
 
+The phase checklists below preserve the original rollout procedure. The
+completion summary and remaining gates at the end are the authoritative current
+status.
+
 ## Goal
 
 Replace active SealedSecrets incrementally with namespaced ExternalSecrets. The
@@ -202,10 +206,10 @@ each configured receiver before removing the old SealedSecret.
 - Vault recovery/unseal material and the initial root token remain offline.
 - `k8s-ai-sre-env` is referenced but not declared; inventory it before planning
 migration.
-- `psuite-restic-creds` is currently neither included by its Kustomization nor
-referenced by a workload; confirm whether it is obsolete.
-- Sealed Secrets remains installed until all migrations and bootstrap exceptions
-are resolved. Removing the controller is a separate final decision.
+- The inactive `psuite-restic-creds` value was preserved in Vault without a
+Kubernetes role; it remains unreferenced.
+- Sealed Secrets remains installed temporarily even though no SealedSecret
+resources remain. Removing the controller is a separate final decision.
 
 ## Completion summary
 
@@ -216,11 +220,13 @@ cutover. Local decrypted YAML artifacts were removed. Follow-up work consists of
 Vault internal TLS, upstream credential rotation/expiry, restore drills, and a
 separate decision about removing the now-unused Sealed Secrets controller.
 
-## Completion criteria
+## Outcome and remaining gates
 
-- Every migrated workload has a Ready namespaced SecretStore and ExternalSecret.
-- No ESO identity can read an unrelated path.
-- Rotation has been demonstrated for each credential family.
-- Old SealedSecrets are removed only in post-validation commits.
-- Remaining SealedSecrets are documented bootstrap exceptions, not forgotten
-migration work.
+- [x] Every migrated workload has a Ready namespaced SecretStore and ExternalSecret.
+- [x] ESO identities use exact-path Vault policies.
+- [x] All old SealedSecrets were removed in post-validation commits.
+- [x] No SealedSecret resources or manifests remain.
+- [ ] Enable trusted internal Vault TLS and update all SecretStores.
+- [ ] Extend scoped Reloader coverage or document GitOps restarts for remaining
+  environment-variable consumers before their next rotation.
+- [ ] Remove the unused Sealed Secrets controller in a separate approved change.

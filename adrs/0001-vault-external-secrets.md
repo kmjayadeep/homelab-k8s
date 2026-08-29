@@ -5,9 +5,9 @@
 
 ## Context
 
-This repository currently uses Sealed Secrets to keep encrypted Kubernetes Secret values in Git. The cluster also runs HashiCorp Vault from `clusters/titania/apps/vault/`, and the External Secrets Operator (ESO) is installed from `clusters/titania/infra/external-secrets/`.
+This repository previously used Sealed Secrets to keep encrypted Kubernetes Secret values in Git. The migration described by this ADR is complete: HashiCorp Vault is now the source of truth and the External Secrets Operator (ESO) materializes application and infrastructure Secrets.
 
-Sealed Secrets is simple and remains useful during bootstrap, but routine rotation requires creating and committing a new sealed value. It also makes Git history the long-term store for every encrypted value. Vault provides centralized access control, auditing, and rotation, while ESO translates values from Vault into Kubernetes Secrets consumed by existing workloads.
+Sealed Secrets was simple, but routine rotation required creating and committing a new sealed value and made Git history the long-term store for encrypted values. Vault provides centralized access control, auditing, and rotation, while ESO translates values from Vault into Kubernetes Secrets consumed by workloads.
 
 ESO is a reconciler, not a secret store. Installing the operator alone does not move or create any application secrets. Vault integration and individual `ExternalSecret` resources must be configured separately.
 
@@ -15,7 +15,7 @@ ESO is a reconciler, not a secret store. Installing the operator alone does not 
 
 Vault will be the source of truth for application secrets. ESO will synchronize those values into ordinary Kubernetes Secrets.
 
-Sealed Secrets will remain available only for bootstrap data that cannot be obtained from Vault. Existing sealed secrets will be migrated incrementally rather than removed in bulk.
+No active SealedSecret resources or manifests remain. The Sealed Secrets controller is retained temporarily but must not be used for new secrets unless an explicit bootstrap exception is documented and approved. Its eventual removal is a separate operational decision.
 
 ### Secret locations
 
@@ -117,9 +117,9 @@ spec:
 
 The exact Vault service DNS name and CA reference must be verified when TLS is implemented.
 
-### Migration procedure
+### Completed migration procedure
 
-Migrate one application at a time:
+The migration followed steps 2–7 below. The operator explicitly deferred step 1 because Vault initially contained little data; internal TLS and full recovery verification therefore remain open gates rather than completed work.
 
 1. Enable Vault TLS and verify backup, restore, seal, and unseal procedures.
 2. Configure the Vault Kubernetes auth method.

@@ -2,26 +2,26 @@
 
 ## Repository
 
-Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests. Vault with External Secrets is the target architecture for application secrets, while Sealed Secrets remains available for bootstrap and unmigrated secrets.
+Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests. Vault with External Secrets is the active architecture for application and infrastructure secrets. The Sealed Secrets controller is temporarily retained, but no SealedSecret manifests remain.
 
 ## Safety rules
 
-- **Never read plaintext secrets into agent context.** `*-decrypted.yaml` is a non-encrypted plaintext secret: do not use `read`, `cat`, `grep`, decode commands, logs, or `kubectl get` to display its values, and never commit it. For debugging, use tools to extract only the required YAML structure or non-secret metadata; never echo secret values.
-- `*-sealed.yaml` is a Sealed Secret and is the version to commit. Handle decrypted files only through file-to-file pipelines (for example, `kubectl create secret ... --from-file=... | kubeseal ...`).
-- Use `kubeseal` with `kubeseal/pub-sealed-secrets.pem` to generate sealed secrets. Create the Kubernetes Secret from the decrypted file and pipe it directly to `kubeseal`; never print or decode the plaintext:
-  ```bash
-  kubectl create secret generic <name> -n <namespace> --from-file=<key>=<decrypted-file> --dry-run=client -o yaml | kubeseal --format=yaml --cert kubeseal/pub-sealed-secrets.pem > <name>-sealed.yaml
-  ```
+- **Never read plaintext secrets into agent context.** Do not use `read`, `cat`, `grep`, decode commands, logs, Terraform output, or `kubectl get` to display values. For debugging, extract only key names, hashes/equality results, readiness conditions, or other non-secret metadata.
+- Store canonical values in Vault under the taxonomy in `homelab-iac/vault-config/PATHS.md`; Git contains only ServiceAccounts, stores, paths, property mappings, policies, and roles.
+- Do not create `*-decrypted.yaml`, `*-sealed.yaml`, or new SealedSecret resources. A bootstrap exception requires explicit approval and an ADR update.
+- When importing or rotating a value, use stdin or another non-logging file-to-file workflow, suppress command output, and never place values in command arguments, shell history, plans, or agent messages.
 - **Never perform destructive operations without explicit human approval.** This includes `rm`, `kubectl delete`, pruning/removing Flux resources, force operations, database/data deletion, and destructive rewrites. Explain the impact and wait for approval.
 - Do not apply or reconcile changes to the cluster unless explicitly requested.
 
 ## Vault and External Secrets
 
-- Before changing Vault, the External Secrets Operator, `SecretStore`/`ClusterSecretStore` resources, `ExternalSecret` resources, or migrating a SealedSecret, read and follow `adrs/0001-vault-external-secrets.md`.
+- Before changing Vault, ESO, `SecretStore`/`ClusterSecretStore`, `ExternalSecret`, Reloader, or secret paths, read `adrs/0001-vault-external-secrets.md`, both migration plans, and `homelab-iac/vault-config/PATHS.md`.
 - Store application secret values in Vault, never in Git. Git may contain only non-secret references, policies, roles, and External Secrets manifests.
 - Use Vault Kubernetes authentication and least-privilege namespaced stores by default; do not introduce static Vault tokens or a broad `ClusterSecretStore` without explicit approval.
 - Keep Vault recovery/unseal material and the initial root token outside both Git and the cluster.
-- Do not remove a working SealedSecret during migration until the replacement ExternalSecret is verified and removal is explicitly approved.
+- Use a namespaced `SecretStore` and dedicated ServiceAccount per trust boundary. Shared values remain at one owner-based Vault path and are authorized to each consumer separately.
+- ESO updates Kubernetes Secrets but does not restart pods using environment variables. Add the namespace to the scoped Reloader release and annotate the workload for automatic rollout, or document a GitOps restart procedure.
+- Vault internal TLS remains follow-up work. Existing stores temporarily use `http://vault.vault.svc.cluster.local:8200`; do not treat HTTP as the final design.
 
 ## Conventions
 

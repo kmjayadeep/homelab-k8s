@@ -43,7 +43,7 @@ I used [FluxCD](https://fluxcd.io/) to automate deploying the manifests in the c
 │   │   │   ├── app1 # kustomization to apply patches
 │   │   │   │   ├── ingress.yaml
 │   │   │   │   ├── kustomization.yaml
-│   │   │   │   └── secret-sealed.yaml
+│   │   │   │   └── external-secret.yaml
 │   │   ├── bootstrap # FluxCD bootstrap manifests to initialize various components
 │   │   │   ├── apps
 │   │   │   │   └── app1.yaml
@@ -61,15 +61,14 @@ I used [FluxCD](https://fluxcd.io/) to automate deploying the manifests in the c
 │   │       ├── infra2
 │   │       │   ├── cluster-issuer.yaml
 │   │       │   ├── kustomization.yaml
-│   │       │   └── secret-sealed.yaml
+│   │       │   └── external-secret.yaml
 │   └── milkyway
 │       ├── apps
 │       ├── bootstrap
 │       └── infra
-├── kubeseal # Public key for sealed secrets
-│   ├── milkyway-sealed-secrets.pem
-│   ├── pub-sealed-secrets.pem
-│   └── README.md
+├── adrs # Architecture decisions, including Vault and ESO
+├── plans # Completed migration and operational plans
+├── kubeseal # Legacy public keys retained during controller decommissioning
 ├── README.md
 └── sources # Dockerfiles
     └── 2fauth
@@ -79,6 +78,8 @@ I used [FluxCD](https://fluxcd.io/) to automate deploying the manifests in the c
         └── README.md
 ```
 
-## Sealed secrets
+## Secret management
 
-Secrets are encrypted using [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets). The public is present in `kubeseal` folder and private key is present in the cluster.
+HashiCorp Vault is the source of truth for application and infrastructure secret values. Namespaced External Secrets Operator resources authenticate with dedicated Kubernetes ServiceAccounts and materialize ordinary Kubernetes Secrets. Git stores only non-secret paths, property mappings, roles, and policies.
+
+No SealedSecret resources remain. The Sealed Secrets controller and legacy public keys are retained temporarily pending a separate removal decision. New SealedSecrets must not be created without an explicitly approved bootstrap exception. See `adrs/0001-vault-external-secrets.md` and `plans/0001-sealed-secrets-to-vault.md`.
