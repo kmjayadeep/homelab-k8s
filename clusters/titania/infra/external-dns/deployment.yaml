@@ -50,6 +50,8 @@ kind: Deployment
 metadata:
   name: external-dns
   namespace: external-dns
+  annotations:
+    secret.reloader.stakater.com/reload: cloudflare-creds-vault
 spec:
   strategy:
     type: Recreate
