@@ -153,7 +153,8 @@ Never delete or replace a working SealedSecret during the same unverified rollou
 - Vault Helm deployment: present.
 - External Secrets Operator Helm deployment: present.
 - Vault internal TLS: required before production use.
-- Vault Kubernetes authentication and per-application policy automation: declared in `homelab-iac/vault-config/`; deployment must be verified before migration.
-- Application Vault roles: added to the Terraform `external_secrets_roles` map as each application is migrated.
-- Application `SecretStore` and `ExternalSecret` resources: not yet configured.
-- Existing SealedSecret migrations: not started by this decision.
+- Vault Kubernetes authentication and least-privilege application roles: deployed and managed by `homelab-iac/vault-config/`.
+- Application `SecretStore` and `ExternalSecret` resources: deployed for all active application and infrastructure Secrets inventoried during this migration.
+- Existing SealedSecret migrations: complete; no SealedSecret resources or manifests remain in the cluster configuration.
+- Sealed Secrets controller: retained temporarily until a separate removal decision.
+- Vault internal TLS: still required; ESO currently uses the explicitly accepted temporary HTTP endpoint.

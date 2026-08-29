@@ -1,6 +1,6 @@
 # Plan 0001: Incremental SealedSecret to ExternalSecret rollout
 
-- Status: Proposed
+- Status: Completed with follow-up work
 - Related ADR: `adrs/0001-vault-external-secrets.md`
 - Vault-side plan: `homelab-iac/plans/0001-vault-secret-migration.md`
 
@@ -206,6 +206,15 @@ migration.
 referenced by a workload; confirm whether it is obsolete.
 - Sealed Secrets remains installed until all migrations and bootstrap exceptions
 are resolved. Removing the controller is a separate final decision.
+
+## Completion summary
+
+All active SealedSecrets inventoried by this plan were migrated to Vault-backed
+ExternalSecrets and removed from Git and the cluster. Flux Kustomizations,
+ExternalSecrets, Helm releases, and workloads were verified healthy after the
+cutover. Local decrypted YAML artifacts were removed. Follow-up work consists of
+Vault internal TLS, upstream credential rotation/expiry, restore drills, and a
+separate decision about removing the now-unused Sealed Secrets controller.
 
 ## Completion criteria
 
