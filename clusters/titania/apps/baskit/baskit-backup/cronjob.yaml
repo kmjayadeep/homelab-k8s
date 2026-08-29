@@ -19,7 +19,7 @@ spec:
         spec:
           restartPolicy: OnFailure
           imagePullSecrets:
-            - name: ghcr-secret
+            - name: ghcr-secret-vault
           containers:
             - name: firestore-backup
               image: ghcr.io/kmjayadeep/baskit-server/firestore-backup:main-0d2fba6
@@ -29,7 +29,7 @@ spec:
                   value: /secrets/firebase-credentials.json
               envFrom:
                 - secretRef:
-                    name: baskit-backup
+                    name: baskit-backup-vault
               volumeMounts:
                 - name: firebase-credentials
                   mountPath: /secrets

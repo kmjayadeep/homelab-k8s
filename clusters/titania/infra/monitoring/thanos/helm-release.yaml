@@ -20,7 +20,7 @@ spec:
   values:
     image:
       repository: bitnamilegacy/thanos
-    existingObjstoreSecret: thanos-s3
+    existingObjstoreSecret: thanos-s3-vault
     query:
       enabled: true
       stores:

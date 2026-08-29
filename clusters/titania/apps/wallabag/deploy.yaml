@@ -37,7 +37,7 @@ spec:
             - name: SYMFONY__ENV__SECRET
               valueFrom:
                 secretKeyRef:
-                  name: wallabag-config
+                  name: wallabag-config-vault
                   key: SYMFONY__ENV__SECRET
           resources:
             requests:

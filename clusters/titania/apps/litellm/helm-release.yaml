@@ -22,7 +22,7 @@ spec:
     image:
       pullPolicy: IfNotPresent
 
-    masterkeySecretName: litellm-secrets
+    masterkeySecretName: litellm-secrets-vault
     masterkeySecretKey: LITELLM_MASTER_KEY
 
     environmentSecrets: []
@@ -30,12 +30,12 @@ spec:
       - name: DATABASE_URL
         valueFrom:
           secretKeyRef:
-            name: litellm-secrets
+            name: litellm-secrets-vault
             key: DATABASE_URL
       - name: LITELLM_SALT_KEY
         valueFrom:
           secretKeyRef:
-            name: litellm-secrets
+            name: litellm-secrets-vault
             key: LITELLM_SALT_KEY
       - name: STORE_MODEL_IN_DB
         value: "True"

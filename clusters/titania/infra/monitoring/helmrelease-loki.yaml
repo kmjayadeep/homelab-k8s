@@ -67,7 +67,7 @@ spec:
           value: 1500MiB
       extraEnvFrom:
         - secretRef:
-            name: loki-minio-creds
+            name: loki-minio-creds-vault
 
     chunksCache:
       enabled: false

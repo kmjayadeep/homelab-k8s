@@ -30,7 +30,7 @@ spec:
       volumes:
       - name: config
         secret:
-          secretName: restic-config
+          secretName: restic-config-vault
           items:
           - key: config.yaml
             path: config.yaml

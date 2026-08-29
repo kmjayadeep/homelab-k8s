@@ -30,7 +30,7 @@ spec:
         - name: SB_USER
           valueFrom:
             secretKeyRef:
-              name: psuite-wiki-creds
+              name: psuite-wiki-creds-vault
               key: creds
         ports:
         - containerPort: 3000

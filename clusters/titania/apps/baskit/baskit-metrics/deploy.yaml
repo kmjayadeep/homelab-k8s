@@ -23,7 +23,7 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       imagePullSecrets:
-        - name: ghcr-secret
+        - name: ghcr-secret-vault
       containers:
         - name: metrics-server
           image: ghcr.io/kmjayadeep/baskit-server/metrics-server:main-ffa61eb
