@@ -1,7 +1,7 @@
 schemaVersion: 1
 runId: 20260829T161155Z-545154d0
 createdAt: 2026-08-29T16:11:55.782Z
-state: commit_and_push
+state: record_pull_request_metadata
 baseBranch: main
 branch: agent/20260829T161155Z-545154d0
 iterations:
