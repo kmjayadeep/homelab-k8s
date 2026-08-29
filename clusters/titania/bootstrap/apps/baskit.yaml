@@ -10,6 +10,9 @@ metadata:
   namespace: baskit
 spec:
   path: clusters/titania/apps/baskit
+  dependsOn:
+    - name: external-secrets
+      namespace: external-secrets
   interval: 15m
   prune: true
   wait: true
