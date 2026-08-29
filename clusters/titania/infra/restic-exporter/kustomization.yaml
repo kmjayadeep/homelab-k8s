@@ -8,5 +8,4 @@ resources:
   - ./deploy.yaml
   - ./svc.yaml
   - ./grafana-dashboard.yaml
-  - ./secret-sealed.yaml
   - ./prometheusrule.yaml

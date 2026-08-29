@@ -13,4 +13,3 @@ resources:
   - ./ui-deploy.yaml
   - ./ui-image-update.yaml
   - ./ui-svc.yaml
-  - ./secret-sealed.yaml

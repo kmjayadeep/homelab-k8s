@@ -40,5 +40,3 @@ resources:
   - ./seerr/seerr-deploy.yaml
   - ./seerr/image-update.yaml
   - ./image-update-automation.yaml
-  - ./secret-sealed.yaml
-  - ./secret-wg-sealed.yaml

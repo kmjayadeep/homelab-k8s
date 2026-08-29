@@ -7,4 +7,3 @@ resources:
   - external-secret.yaml
   - ./helm-repo.yaml
   - ./helm-release.yaml
-  - ./secret-sealed.yaml

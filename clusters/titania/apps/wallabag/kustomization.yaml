@@ -9,4 +9,3 @@ resources:
   - service.yaml
   - ingress.yaml
   - pvc.yaml
-  - secret-sealed.yaml

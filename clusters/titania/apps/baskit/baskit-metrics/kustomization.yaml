@@ -7,4 +7,3 @@ resources:
   - ./deploy.yaml
   - ./svc.yaml
   - ./servicemonitor.yaml
-  - ./ghcr-secret-sealed.yaml

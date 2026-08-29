@@ -13,4 +13,3 @@ resources:
   - ./psuite-wiki/deploy.yaml
   - ./psuite-wiki/svc.yaml
   - ./psuite-wiki/ing.yaml
-  - ./wiki-creds-sealed.yaml

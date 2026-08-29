@@ -10,4 +10,3 @@ resources:
   - ./ing.yaml
   - ./image-update.yaml
   - ./image-update-automation.yaml
-  - ./secret-sealed.yaml
