@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "verdict": "request_changes",
+  "summary": "The README-only change is GitOps-safe, but it adds two new, redundant clarification sentences instead of the single sentence requested.",
+  "findings": [
+    {
+      "severity": "blocking",
+      "message": "Keep only one added sentence clarifying that this is a personal homelab; the first two sentences overlap in meaning and exceed the requested scope.",
+      "file": "README.md",
+      "line": 3
+    }
+  ]
+}
