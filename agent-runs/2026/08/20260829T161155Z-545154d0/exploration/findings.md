@@ -1,0 +1,1 @@
+README.md has a Local repository agent section near line 87. It can be updated with one short sentence stating that terminal runs show live progress, and no functional or manifest changes are required.
