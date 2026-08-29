@@ -13,4 +13,3 @@ resources:
   - ./baskit-metrics/deploy.yaml
   - ./baskit-metrics/svc.yaml
   - ./baskit-metrics/servicemonitor.yaml
-  - ./baskit-metrics/secret-sealed.yaml
