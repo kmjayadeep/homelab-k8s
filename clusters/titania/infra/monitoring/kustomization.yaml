@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
+- ./external-secrets.yaml
 - ./repo.yaml
 - ./helmrelease-prometheus.yaml
 

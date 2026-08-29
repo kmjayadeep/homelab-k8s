@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: taskplanner
 
 resources:
+  - external-secret.yaml
   - ./deploy.yaml
   - ./svc.yaml
   - ./ing.yaml

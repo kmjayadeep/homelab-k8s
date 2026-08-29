@@ -6,6 +6,7 @@ namespace: baskit
 resources:
   - ./ghcr-secret-sealed.yaml
   - ./firebase-external-secrets.yaml
+  - ./runtime-external-secrets.yaml
 
   - ./baskit-backup/cronjob.yaml
   - ./baskit-backup/secret-sealed.yaml

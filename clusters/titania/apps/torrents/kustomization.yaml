@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: torrents
 
 resources:
+  - ./external-secret.yaml
   - ./deluge/deluge-ing.yaml
   - ./deluge/deluge-ovpn-deploy.yaml
   - ./deluge/deluge-wireguard-deploy.yaml

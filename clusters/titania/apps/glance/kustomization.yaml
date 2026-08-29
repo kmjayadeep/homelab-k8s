@@ -9,6 +9,7 @@ configMapGenerator:
     - ./assets/glance.yml
 
 resources:
+  - external-secret.yaml
   - ./deploy.yaml
   - ./svc.yaml
   - ./ing.yaml

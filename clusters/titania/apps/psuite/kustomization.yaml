@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: psuite
 
 resources:
+  - ./external-secret.yaml
   - ./psuite-sts.yaml
   - ./psuite-ingress.yaml
   - ./psuite-pvc.yaml
