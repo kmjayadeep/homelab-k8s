@@ -1,4 +1,31 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-backup-agent
+  namespace: vault
+  labels:
+    app.kubernetes.io/name: vault-backup
+    app.kubernetes.io/instance: vault
+data:
+  config.hcl: |
+    exit_after_auth = true
+
+    auto_auth {
+      method "kubernetes" {
+        mount_path = "auth/kubernetes"
+        config = {
+          role = "vault-raft-snapshot"
+        }
+      }
+
+      sink "file" {
+        config = {
+          path = "/vault-auth/token"
+        }
+      }
+    }
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: vault-backup
@@ -31,12 +58,41 @@ spec:
             app.kubernetes.io/instance: vault
         spec:
           serviceAccountName: vault-backup
-          restartPolicy: OnFailure
+          restartPolicy: Never
           securityContext:
             fsGroup: 1000
             seccompProfile:
               type: RuntimeDefault
           initContainers:
+            - name: vault-agent-auth
+              image: hashicorp/vault:1.18.1
+              imagePullPolicy: IfNotPresent
+              args:
+                - agent
+                - -config=/etc/vault-agent/config.hcl
+              env:
+                - name: VAULT_ADDR
+                  value: http://vault-active.vault.svc.cluster.local:8200
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 32Mi
+                limits:
+                  cpu: 250m
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                runAsUser: 100
+              volumeMounts:
+                - name: agent-config
+                  mountPath: /etc/vault-agent
+                  readOnly: true
+                - name: vault-auth
+                  mountPath: /vault-auth
             - name: raft-snapshot
               image: hashicorp/vault:1.18.1
               imagePullPolicy: IfNotPresent
@@ -46,11 +102,7 @@ spec:
               args:
                 - |
                   umask 077
-                  VAULT_TOKEN="$(vault login \
-                    -method=kubernetes \
-                    -token-only \
-                    role=vault-raft-snapshot \
-                    jwt=@/var/run/secrets/kubernetes.io/serviceaccount/token)"
+                  VAULT_TOKEN="$(cat /vault-auth/token)"
                   export VAULT_TOKEN
                   vault operator raft snapshot save /snapshot/vault.snap
                   sha256sum /snapshot/vault.snap > /snapshot/vault.snap.sha256
@@ -76,6 +128,9 @@ spec:
               volumeMounts:
                 - name: snapshot
                   mountPath: /snapshot
+                - name: vault-auth
+                  mountPath: /vault-auth
+                  readOnly: true
           containers:
             - name: upload
               image: amazon/aws-cli:2.24.18
@@ -125,6 +180,13 @@ spec:
                   mountPath: /snapshot
                   readOnly: true
           volumes:
+            - name: agent-config
+              configMap:
+                name: vault-backup-agent
             - name: snapshot
               emptyDir:
                 sizeLimit: 2Gi
+            - name: vault-auth
+              emptyDir:
+                medium: Memory
+                sizeLimit: 1Mi
