@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: vault-backup
+  namespace: vault
+  labels:
+    app.kubernetes.io/name: vault-backup
+    app.kubernetes.io/instance: vault
+spec:
+  groups:
+    - name: vault-backup
+      rules:
+        - alert: VaultBackupStale
+          expr: |
+            (time() - kube_cronjob_status_last_successful_time{namespace="vault", cronjob="vault-backup"} > 93600)
+            or
+            (
+              (time() - kube_cronjob_created{namespace="vault", cronjob="vault-backup"} > 93600)
+              unless on (namespace, cronjob)
+              kube_cronjob_status_last_successful_time{namespace="vault", cronjob="vault-backup"}
+            )
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: Vault Raft snapshot backup is stale
+            description: The Vault backup CronJob has not completed successfully in the last 26 hours.
