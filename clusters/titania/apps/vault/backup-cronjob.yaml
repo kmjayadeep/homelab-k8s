@@ -67,6 +67,8 @@ spec:
             - name: vault-agent-auth
               image: hashicorp/vault:1.18.1
               imagePullPolicy: IfNotPresent
+              command:
+                - /bin/vault
               args:
                 - agent
                 - -config=/etc/vault-agent/config.hcl
