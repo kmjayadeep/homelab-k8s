@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookorbit
+  labels:
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/instance: bookorbit
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bookorbit
+      app.kubernetes.io/instance: bookorbit
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bookorbit
+        app.kubernetes.io/instance: bookorbit
+    spec:
+      containers:
+        - name: bookorbit
+          image: ghcr.io/bookorbit/bookorbit:2.7.0
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3000"
+            - name: APP_URL
+              value: https://bookorbit.cosmos.cboxlab.com
+            - name: CLIENT_URL
+              value: https://bookorbit.cosmos.cboxlab.com
+            - name: POSTGRES_HOST
+              value: bookorbit-postgres
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: bookorbit
+            - name: POSTGRES_DB
+              value: bookorbit
+            - name: LIBRARY_BROWSE_ROOT
+              value: /books
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-config
+                  key: POSTGRES_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-config
+                  key: JWT_SECRET
+            - name: SETUP_BOOTSTRAP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bookorbit-config
+                  key: SETUP_BOOTSTRAP_TOKEN
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 40
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: books
+              mountPath: /books
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bookorbit-data
+        - name: books
+          persistentVolumeClaim:
+            claimName: bookorbit-books
