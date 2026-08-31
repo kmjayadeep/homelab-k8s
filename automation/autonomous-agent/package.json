@@ -26,7 +26,7 @@
     "@types/node": "22.19.19",
     "eslint": "9.39.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.52.0",
+    "typescript-eslint": "8.69.0",
     "vitest": "4.1.9"
   }
 }
