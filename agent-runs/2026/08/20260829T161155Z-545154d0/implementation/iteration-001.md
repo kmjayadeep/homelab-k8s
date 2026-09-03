@@ -1,0 +1,1 @@
+Added a concise sentence to the README.md Local repository agent section stating that terminal runs show live progress.
