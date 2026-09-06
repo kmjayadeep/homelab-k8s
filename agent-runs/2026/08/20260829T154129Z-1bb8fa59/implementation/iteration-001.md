@@ -1,0 +1,1 @@
+Added one sentence near the README introduction explicitly stating that the repository documents and manages a personal homelab. No manifest validation was needed for this documentation-only change.

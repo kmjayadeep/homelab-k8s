@@ -1,0 +1,1 @@
+README.md already introduces the repo as a homelab manifest collection, but it does not explicitly say it is personal. The best place for the requested clarification is the opening paragraph under the title.

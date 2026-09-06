@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "verdict": "approved",
+  "summary": "The README now clearly states that the repository manages a personal homelab. The documentation-only change introduces no GitOps, secret-safety, or cluster-mutation concerns.",
+  "findings": []
+}
