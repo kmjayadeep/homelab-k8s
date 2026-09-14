@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookorbit
+  labels:
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/instance: bookorbit
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/instance: bookorbit
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookorbit-postgres
+  labels:
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: bookorbit
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: bookorbit
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP
