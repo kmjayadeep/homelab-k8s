@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "verdict": "approved",
+  "summary": "The README-only change adds the requested short sentence about live terminal progress and introduces no functional or GitOps safety changes.",
+  "findings": []
+}

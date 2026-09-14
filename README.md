@@ -86,4 +86,4 @@ No SealedSecret resources remain. The Sealed Secrets controller and legacy publi
 
 ## Local repository agent
 
-An opt-in local Pi runner can plan, implement, validate, and independently review repository requirements in an isolated worktree. It stops for explicit human approval before commit, generated-branch push, and pull-request creation; it never merges or pushes to `main`. See `adrs/0002-autonomous-repository-agent.md`, `automation/autonomous-agent/README.md`, and `agent-runs/README.md`.
+An opt-in local Pi runner can plan, implement, validate, and independently review repository requirements in an isolated worktree. Terminal runs show live progress. It stops for explicit human approval before commit, generated-branch push, and pull-request creation; it never merges or pushes to `main`. See `adrs/0002-autonomous-repository-agent.md`, `automation/autonomous-agent/README.md`, and `agent-runs/README.md`.
