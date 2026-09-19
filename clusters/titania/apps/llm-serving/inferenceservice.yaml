@@ -32,6 +32,9 @@ spec:
       env:
         - name: HF_HOME
           value: /var/cache/huggingface
+        # hf-xet crashes with SIGSEGV on this CPU; use the Hub HTTP downloader.
+        - name: HF_HUB_DISABLE_XET
+          value: "1"
         - name: HF_TOKEN
           valueFrom:
             secretKeyRef:
