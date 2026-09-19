@@ -30,6 +30,7 @@ spec:
           maxSurge: 1
       service:
         loadBalancerIP:  # Set in env specific patches
+        externalTrafficPolicy: Local
         ipFamilyPolicy: PreferDualStack
         ipFamilies:
         - IPv4
