@@ -8,3 +8,5 @@ resources:
   - helm-release-crds.yaml
   - helm-release-resources.yaml
   - helm-release-runtimes.yaml
+  - helm-release-localmodel-crds.yaml
+  - helm-release-localmodel-resources.yaml

@@ -18,6 +18,8 @@ spec:
       retries: 3
   values:
     kserve:
+      localmodel:
+        enabled: true
       controller:
         deploymentMode: Standard
         gateway:
