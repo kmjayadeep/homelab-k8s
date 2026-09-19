@@ -23,6 +23,7 @@ spec:
       args:
         - --dtype=float32
         - --max-model-len=512
+        - --gpu-memory-utilization=0.4
       resources:
         requests:
           cpu: 1
