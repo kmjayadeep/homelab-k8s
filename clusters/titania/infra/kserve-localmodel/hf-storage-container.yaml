@@ -12,6 +12,12 @@ spec:
         value: "1"
       - name: HF_HUB_ENABLE_HF_TRANSFER
         value: "0"
+      - name: HF_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: huggingface-token-vault
+            key: HF_TOKEN
+            optional: false
     resources:
       requests:
         cpu: 100m

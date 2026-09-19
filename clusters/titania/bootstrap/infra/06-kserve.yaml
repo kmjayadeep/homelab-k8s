@@ -66,6 +66,8 @@ spec:
   dependsOn:
     - name: kserve
       namespace: kserve
+    - name: external-secrets
+      namespace: external-secrets
   interval: 15m
   prune: true
   wait: true
