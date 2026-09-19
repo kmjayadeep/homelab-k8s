@@ -16,6 +16,19 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          # v0.20.0 incorrectly ties this runtime to huggingfaceserver.disabled.
+          - target:
+              group: serving.kserve.io
+              version: v1alpha1
+              kind: ClusterServingRuntime
+              name: kserve-huggingfaceserver-multinode
+            patch: |
+              - op: replace
+                path: /spec/disabled
+                value: true
   values:
     kserve:
       servingruntime:
@@ -25,11 +38,11 @@ spec:
         mlserver:
           disabled: true
         sklearnserver:
-          disabled: false
+          disabled: true
         xgbserver:
           disabled: true
         huggingfaceserver:
-          disabled: true
+          disabled: false
         huggingfaceserver_multinode:
           disabled: true
         tritonserver:

@@ -1,11 +1,11 @@
 apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
-  name: sklearn-iris
+  name: smollm2-135m
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   labels:
-    app.kubernetes.io/name: sklearn-iris
+    app.kubernetes.io/name: smollm2-135m
     app.kubernetes.io/instance: kserve-smoke
     app.kubernetes.io/component: predictor
 spec:
@@ -13,12 +13,18 @@ spec:
     minReplicas: 1
     model:
       modelFormat:
-        name: sklearn
-      storageUri: gs://kfserving-examples/models/sklearn/1.0/model
+        name: huggingface
+      runtime: kserve-huggingfaceserver
+      args:
+        - --model_name=smollm2
+        - --model_id=HuggingFaceTB/SmolLM2-135M-Instruct
+        - --backend=huggingface
+        - --dtype=bfloat16
+        - --max_model_len=512
       resources:
         requests:
-          cpu: 25m
-          memory: 128Mi
+          cpu: 1
+          memory: 1Gi
         limits:
-          cpu: 500m
-          memory: 512Mi
+          cpu: 2
+          memory: 3Gi

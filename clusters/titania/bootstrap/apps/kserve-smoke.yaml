@@ -27,5 +27,5 @@ spec:
   healthChecks:
     - apiVersion: serving.kserve.io/v1beta1
       kind: InferenceService
-      name: sklearn-iris
+      name: smollm2-135m
       namespace: kserve-smoke
