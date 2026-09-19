@@ -29,6 +29,9 @@ spec:
               - op: add
                 path: /spec/template/spec/containers/0/securityContext/runAsUser
                 value: 1000
+              - op: add
+                path: /spec/template/spec/containers/0/securityContext/runAsGroup
+                value: 1000
   values:
     kserve:
       localmodel:
