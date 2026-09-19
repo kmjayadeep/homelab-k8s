@@ -17,6 +17,18 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: DaemonSet
+              name: kserve-localmodelnode-agent
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/securityContext/runAsUser
+                value: 1000
   values:
     kserve:
       localmodel:
