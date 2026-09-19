@@ -24,6 +24,7 @@ spec:
           domain: cosmos.cboxlab.com
           domainTemplate: "{{ .Name }}-{{ .Namespace }}.{{ .IngressDomain }}"
           urlScheme: https
+          disableIstioVirtualHost: true
           disableIngressCreation: false
           ingressGateway:
             className: nginx

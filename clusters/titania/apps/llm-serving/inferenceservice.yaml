@@ -1,0 +1,50 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: smollm2-135m
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  labels:
+    app.kubernetes.io/name: smollm2-135m
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: predictor
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    securityContext:
+      runAsNonRoot: true
+      fsGroup: 1000
+      fsGroupChangePolicy: OnRootMismatch
+    volumes:
+      - name: huggingface-cache
+        persistentVolumeClaim:
+          claimName: huggingface-cache
+    model:
+      modelFormat:
+        name: huggingface
+      runtime: kserve-huggingfaceserver
+      args:
+        - --model_id=HuggingFaceTB/SmolLM2-135M-Instruct
+        - --backend=huggingface
+        - --dtype=float32
+        - --max_model_len=512
+      env:
+        - name: HF_HOME
+          value: /var/cache/huggingface
+        - name: HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: huggingface-token-vault
+              key: HF_TOKEN
+              optional: false
+      volumeMounts:
+        - name: huggingface-cache
+          mountPath: /var/cache/huggingface
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+        limits:
+          cpu: 2
+          memory: 3Gi

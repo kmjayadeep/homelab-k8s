@@ -1,19 +1,21 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kserve-smoke
+  name: llm-serving
   labels:
-    app.kubernetes.io/name: kserve-smoke
-    app.kubernetes.io/instance: kserve-smoke
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kserve-smoke
-  namespace: kserve-smoke
+  name: llm-serving
+  namespace: llm-serving
 spec:
-  path: clusters/titania/apps/kserve-smoke
+  path: clusters/titania/apps/llm-serving
   dependsOn:
+    - name: external-secrets
+      namespace: external-secrets
     - name: kserve
       namespace: kserve
   interval: 15m
@@ -28,4 +30,4 @@ spec:
     - apiVersion: serving.kserve.io/v1beta1
       kind: InferenceService
       name: smollm2-135m
-      namespace: kserve-smoke
+      namespace: llm-serving
