@@ -31,3 +31,13 @@ spec:
       kind: InferenceService
       name: smollm2-135m
       namespace: llm-serving
+  healthCheckExprs:
+    - apiVersion: serving.kserve.io/v1alpha1
+      kind: LocalModelNamespaceCache
+      current: >-
+        has(status) && has(status.copies) && has(status.copies.available) &&
+        has(status.copies.total) && status.copies.total > 0 &&
+        status.copies.available == status.copies.total
+      inProgress: >-
+        !has(status) || !has(status.copies) || !has(status.copies.available) ||
+        !has(status.copies.total) || status.copies.available < status.copies.total
