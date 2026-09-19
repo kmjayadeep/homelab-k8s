@@ -5,5 +5,4 @@ namespace: llm-serving
 
 resources:
   - external-secret.yaml
-  - local-model-cache.yaml
   - inferenceservice.yaml

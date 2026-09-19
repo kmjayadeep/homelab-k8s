@@ -5,3 +5,4 @@ resources:
   - storageclass.yaml
   - node-group.yaml
   - hf-storage-container.yaml
+  - local-model-cache.yaml
