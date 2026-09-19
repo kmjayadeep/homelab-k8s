@@ -2,6 +2,8 @@ apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
   name: sklearn-iris
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   labels:
     app.kubernetes.io/name: sklearn-iris
     app.kubernetes.io/instance: kserve-smoke

@@ -21,6 +21,8 @@ spec:
   values:
     controller:
       watchIngressWithoutClass: true
+      extraArgs:
+        default-ssl-certificate: ingress-nginx/cosmos-cboxlab-cert
       service:
         loadBalancerIP:  # Set in env specific patches
         ipFamilyPolicy: PreferDualStack

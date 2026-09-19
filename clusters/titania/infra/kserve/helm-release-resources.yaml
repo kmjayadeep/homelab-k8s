@@ -23,7 +23,8 @@ spec:
         gateway:
           domain: cosmos.cboxlab.com
           domainTemplate: "{{ .Name }}-{{ .Namespace }}.{{ .IngressDomain }}"
-          disableIngressCreation: true
+          urlScheme: https
+          disableIngressCreation: false
           ingressGateway:
             className: nginx
         resources:
