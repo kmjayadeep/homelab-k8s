@@ -16,34 +16,15 @@ spec:
       runAsNonRoot: true
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch
-    volumes:
-      - name: huggingface-cache
-        persistentVolumeClaim:
-          claimName: huggingface-cache
     model:
       modelFormat:
         name: huggingface
       runtime: kserve-huggingfaceserver
+      storageUri: "hf://HuggingFaceTB/SmolLM2-135M-Instruct:12fd25f77366fa6b3b4b768ec3050bf629380bac"
       args:
-        - --model_id=HuggingFaceTB/SmolLM2-135M-Instruct
         - --backend=huggingface
         - --dtype=float32
         - --max_model_len=512
-      env:
-        - name: HF_HOME
-          value: /var/cache/huggingface
-        # hf-xet crashes with SIGSEGV on this CPU; use the Hub HTTP downloader.
-        - name: HF_HUB_DISABLE_XET
-          value: "1"
-        - name: HF_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: huggingface-token-vault
-              key: HF_TOKEN
-              optional: false
-      volumeMounts:
-        - name: huggingface-cache
-          mountPath: /var/cache/huggingface
       resources:
         requests:
           cpu: 1

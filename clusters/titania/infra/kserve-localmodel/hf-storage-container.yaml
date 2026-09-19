@@ -1,0 +1,30 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterStorageContainer
+metadata:
+  name: hf-localmodel
+spec:
+  container:
+    name: storage-initializer
+    image: kserve/storage-initializer:v0.20.0
+    env:
+      # hf-xet crashes with SIGSEGV on this CPU; use the Hub HTTP downloader.
+      - name: HF_HUB_DISABLE_XET
+        value: "1"
+      - name: HF_HUB_ENABLE_HF_TRANSFER
+        value: "0"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      runAsNonRoot: true
+  supportedUriFormats:
+    - prefix: hf://
+  workloadType: localModelDownloadJob

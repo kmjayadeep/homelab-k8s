@@ -6,6 +6,14 @@ metadata:
     app.kubernetes.io/name: kserve
     app.kubernetes.io/instance: kserve
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kserve-localmodel-jobs
+  labels:
+    app.kubernetes.io/name: kserve-localmodel-jobs
+    app.kubernetes.io/instance: kserve
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -39,3 +47,30 @@ spec:
       kind: HelmRelease
       name: kserve-runtime-configs
       namespace: kserve
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kserve-localmodel-crd
+      namespace: kserve
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kserve-localmodel-resources
+      namespace: kserve
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kserve-localmodel
+  namespace: kserve
+spec:
+  path: clusters/titania/infra/kserve-localmodel
+  dependsOn:
+    - name: kserve
+      namespace: kserve
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 15m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system

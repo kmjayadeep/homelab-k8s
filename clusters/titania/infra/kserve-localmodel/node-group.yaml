@@ -1,0 +1,32 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: LocalModelNodeGroup
+metadata:
+  name: llm-workers
+spec:
+  storageLimit: 20Gi
+  persistentVolumeClaimSpec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: kserve-local-model
+    volumeMode: Filesystem
+  persistentVolumeSpec:
+    accessModes:
+      - ReadWriteOnce
+    capacity:
+      storage: 20Gi
+    local:
+      path: /models
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kserve/localmodel
+                operator: In
+                values:
+                  - worker
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: kserve-local-model
+    volumeMode: Filesystem

@@ -1,0 +1,13 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: LocalModelNamespaceCache
+metadata:
+  name: smollm2-135m
+  labels:
+    app.kubernetes.io/name: smollm2-135m
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+spec:
+  sourceModelUri: "hf://HuggingFaceTB/SmolLM2-135M-Instruct:12fd25f77366fa6b3b4b768ec3050bf629380bac"
+  modelSize: 6Gi
+  nodeGroups:
+    - llm-workers
