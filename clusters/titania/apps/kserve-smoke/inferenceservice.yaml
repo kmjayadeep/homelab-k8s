@@ -1,0 +1,22 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: sklearn-iris
+  labels:
+    app.kubernetes.io/name: sklearn-iris
+    app.kubernetes.io/instance: kserve-smoke
+    app.kubernetes.io/component: predictor
+spec:
+  predictor:
+    minReplicas: 1
+    model:
+      modelFormat:
+        name: sklearn
+      storageUri: gs://kfserving-examples/models/sklearn/1.0/model
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kserve
+  labels:
+    app.kubernetes.io/name: kserve
+    app.kubernetes.io/instance: kserve
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kserve
+  namespace: kserve
+spec:
+  path: clusters/titania/infra/kserve
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
+    - name: ingress-nginx
+      namespace: ingress-nginx
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 15m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kserve-crd
+      namespace: kserve
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kserve-resources
+      namespace: kserve
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kserve-runtime-configs
+      namespace: kserve

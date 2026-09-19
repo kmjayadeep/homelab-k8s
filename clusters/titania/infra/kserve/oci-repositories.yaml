@@ -1,0 +1,29 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: kserve-crd
+spec:
+  interval: 1h
+  url: oci://ghcr.io/kserve/charts/kserve-crd
+  ref:
+    tag: v0.20.0
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: kserve-resources
+spec:
+  interval: 1h
+  url: oci://ghcr.io/kserve/charts/kserve-resources
+  ref:
+    tag: v0.20.0
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: kserve-runtime-configs
+spec:
+  interval: 1h
+  url: oci://ghcr.io/kserve/charts/kserve-runtime-configs
+  ref:
+    tag: v0.20.0
