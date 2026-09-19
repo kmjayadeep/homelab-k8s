@@ -78,9 +78,9 @@ spec:
     - apiVersion: serving.kserve.io/v1alpha1
       kind: LocalModelCache
       current: >-
-        has(status) && has(status.copies) && has(status.copies.available) &&
+        has(status.copies) && has(status.copies.available) &&
         has(status.copies.total) && status.copies.total > 0 &&
         status.copies.available == status.copies.total
       inProgress: >-
-        !has(status) || !has(status.copies) || !has(status.copies.available) ||
+        !has(status.copies) || !has(status.copies.available) ||
         !has(status.copies.total) || status.copies.available < status.copies.total
