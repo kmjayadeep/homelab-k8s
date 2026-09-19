@@ -13,7 +13,6 @@ spec:
     minReplicas: 1
     maxReplicas: 1
     securityContext:
-      runAsNonRoot: true
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch
     model:
