@@ -20,19 +20,14 @@ spec:
       namespace: kserve
   interval: 15m
   prune: true
-  wait: true
+  wait: false
   timeout: 5m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   healthChecks:
-    - apiVersion: serving.kserve.io/v1beta1
-      kind: InferenceService
-      name: smollm2-135m
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: smollm2-135m-predictor
       namespace: llm-serving
-  healthCheckExprs:
-    - apiVersion: serving.kserve.io/v1beta1
-      kind: InferenceService
-      current: >-
-        status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
