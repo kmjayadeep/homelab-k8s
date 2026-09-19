@@ -31,3 +31,14 @@ spec:
       kind: InferenceService
       name: smollm2-135m
       namespace: llm-serving
+  healthCheckExprs:
+    - apiVersion: serving.kserve.io/v1beta1
+      kind: InferenceService
+      current: >-
+        has(status.conditions) &&
+        status.conditions.exists(condition,
+          condition.type == 'Ready' && condition.status == 'True')
+      inProgress: >-
+        !has(status.conditions) ||
+        !status.conditions.exists(condition,
+          condition.type == 'Ready' && condition.status == 'True')
