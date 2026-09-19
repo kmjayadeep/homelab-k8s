@@ -21,7 +21,7 @@ spec:
   interval: 15m
   prune: true
   wait: true
-  timeout: 30m
+  timeout: 5m
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -35,10 +35,4 @@ spec:
     - apiVersion: serving.kserve.io/v1beta1
       kind: InferenceService
       current: >-
-        has(status.conditions) &&
-        status.conditions.exists(condition,
-          condition.type == 'Ready' && condition.status == 'True')
-      inProgress: >-
-        !has(status.conditions) ||
-        !status.conditions.exists(condition,
-          condition.type == 'Ready' && condition.status == 'True')
+        status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
