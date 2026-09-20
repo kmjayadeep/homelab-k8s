@@ -23,7 +23,11 @@ spec:
       args:
         - --dtype=float32
         - --max-model-len=512
-        - --gpu-memory-utilization=0.4
+        # vLLM's CPU backend otherwise reserves a percentage of the whole
+        # cgroup limit. Its model warm-up consumes more than that percentage
+        # before KV-cache allocation and exits with a memory-pool error.
+        # 512 MiB is ample for this 135M model with a 512-token context.
+        - --kv-cache-memory-bytes=536870912
       resources:
         requests:
           cpu: 1
