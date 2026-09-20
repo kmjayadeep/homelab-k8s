@@ -24,12 +24,14 @@ spec:
       args:
         # Halves model-weight memory versus float32; benchmark latency on this CPU.
         - --dtype=bfloat16
-        - --max-model-len=512
+        # Keep the 128 MiB KV-cache cap; this allows one ~4K-token sequence.
+        - --max-model-len=4096
         # The gateway presents this stable alias to clients and can remap it later
         # without changing their base URL or model selection.
         - --served-model-name=chat-default
-        # SmolLM2-135M at bfloat16 and a 512-token context requires about
-        # 12 MiB of KV tensors per sequence; retain headroom for batching.
+        # SmolLM2-135M at bfloat16 needs about 96 MiB of KV tensors for a
+        # 4K-token sequence. The fixed cache cap deliberately limits this
+        # predictor to roughly one concurrent long-context request.
         - --kv-cache-memory-bytes=134217728
       resources:
         requests:

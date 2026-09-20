@@ -8,13 +8,11 @@ metadata:
     app.kubernetes.io/component: monitoring
 spec:
   selector:
-    matchExpressions:
-      - key: serving.kserve.io/inferenceservice
-        operator: Exists
+    matchLabels:
+      app.kubernetes.io/name: llm-serving
+      app.kubernetes.io/component: monitoring
   endpoints:
-    # KServe names this generated Service port after the predictor Service.
-    # vLLM runtimes do not declare a containerPort, so targetPort cannot select it.
-    - port: smollm2-135m-vllm-predictor
+    - port: metrics
       path: /metrics
       interval: 30s
       scrapeTimeout: 10s
