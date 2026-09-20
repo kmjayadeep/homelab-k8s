@@ -23,4 +23,3 @@ spec:
         - name: chat-default
       timeouts:
         request: 10m
-      streamIdleTimeout: 2m
