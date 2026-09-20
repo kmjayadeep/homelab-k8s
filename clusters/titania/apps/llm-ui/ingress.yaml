@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-ui
+  labels:
+    app.kubernetes.io/name: llm-ui
+    app.kubernetes.io/instance: llm-ui
+spec:
+  tls:
+    - hosts:
+        - llm-ui.cosmos.cboxlab.com
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: llm-ui.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llm-ui
+                port:
+                  name: http
