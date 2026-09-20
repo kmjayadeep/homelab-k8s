@@ -1,0 +1,38 @@
+apiVersion: aigateway.envoyproxy.io/v1beta1
+kind: AIGatewayRoute
+metadata:
+  name: llm-gateway
+  labels:
+    app.kubernetes.io/name: llm-gateway
+    app.kubernetes.io/instance: llm-gateway
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: llm-gateway
+  hostnames:
+    - llm-gateway.cosmos.cboxlab.com
+  rules:
+    - matches:
+        - headers:
+            - type: Exact
+              name: x-ai-eg-model
+              value: chat-default
+      modelsOwnedBy: homelab
+      backendRefs:
+        - name: chat-default
+      timeouts:
+        request: 10m
+    - matches:
+        - headers:
+            - type: Exact
+              name: x-ai-eg-model
+              value: chat-smollm2-code
+      modelsOwnedBy: homelab
+      backendRefs:
+        - name: chat-smollm2-code
+          # The shared vLLM instance currently serves chat-default. Remove this
+          # override after the Code deployment serves chat-smollm2-code.
+          modelNameOverride: chat-default
+      timeouts:
+        request: 10m
