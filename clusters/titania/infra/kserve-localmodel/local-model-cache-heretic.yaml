@@ -1,0 +1,14 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: LocalModelCache
+metadata:
+  name: smollm2-135m-heretic
+  labels:
+    app.kubernetes.io/name: smollm2-135m-heretic
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: kserve
+spec:
+  sourceModelUri: "hf://teja944/SmolLM2-135M-Instruct-heretic:125f7fe8695513a831ad7cc1f285ffd9615a8419"
+  modelSize: 6Gi
+  nodeGroups:
+    - llm-workers
