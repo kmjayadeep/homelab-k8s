@@ -15,7 +15,7 @@ spec:
       priority: 1
   containers:
     - name: kserve-container
-      image: vllm/vllm-openai-rocm:v0.24.0@sha256:3832d79d9e514ce2e072580689da078726454596d833c8ab803f29f3cea5ea28
+      image: vllm/vllm-openai-rocm:v0.29.0@sha256:e5e47f6aaab675c252c381f0dac237b31b10d87bb74d092b07fb4065efd7f5a1
       command:
         - python
         - -m
