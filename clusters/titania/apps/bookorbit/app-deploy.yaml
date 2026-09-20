@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: bookorbit
-          image: ghcr.io/bookorbit/bookorbit:2.7.0
+          image: ghcr.io/bookorbit/bookorbit:2.10.0
           env:
             - name: NODE_ENV
               value: production
