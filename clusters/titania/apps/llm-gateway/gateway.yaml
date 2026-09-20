@@ -41,6 +41,7 @@ metadata:
     app.kubernetes.io/name: llm-gateway
     app.kubernetes.io/instance: llm-gateway
 spec:
+  ipFamily: DualStack
   provider:
     type: Kubernetes
     kubernetes:
