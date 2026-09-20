@@ -29,19 +29,6 @@ spec:
               - op: replace
                 path: /spec/disabled
                 value: true
-          - target:
-              group: serving.kserve.io
-              version: v1alpha1
-              kind: ClusterServingRuntime
-              name: kserve-vllmserver
-            patch: |
-              - op: add
-                path: /spec/containers/0/env/-
-                value:
-                  name: VLLM_CPU_KVCACHE_SPACE
-                  # CPU vLLM otherwise reserves a multi-GiB KV-cache pool.
-                  # vLLM CPU accepts whole GiB values only.
-                  value: "1"
   values:
     kserve:
       servingruntime:
