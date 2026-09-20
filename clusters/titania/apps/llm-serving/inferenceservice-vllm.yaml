@@ -19,7 +19,8 @@ spec:
       modelFormat:
         name: vLLM
       runtime: kserve-vllmserver
-      storageUri: "hf://HuggingFaceTB/SmolLM2-135M-Instruct:12fd25f77366fa6b3b4b768ec3050bf629380bac"
+      # Decensored SmolLM2-135M-Instruct variant; pin the reviewed revision.
+      storageUri: "hf://teja944/SmolLM2-135M-Instruct-heretic:125f7fe8695513a831ad7cc1f285ffd9615a8419"
       args:
         # Halves model-weight memory versus float32; benchmark latency on this CPU.
         - --dtype=bfloat16
