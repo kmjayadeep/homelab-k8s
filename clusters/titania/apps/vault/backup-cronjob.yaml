@@ -136,7 +136,7 @@ spec:
                   readOnly: true
           containers:
             - name: upload
-              image: amazon/aws-cli:2.24.18
+              image: amazon/aws-cli:2.36.49
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
