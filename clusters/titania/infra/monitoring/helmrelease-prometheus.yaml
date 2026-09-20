@@ -18,6 +18,12 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    prometheus-node-exporter:
+      tolerations:
+        - key: homelab.cboxlab.com/gpu
+          operator: Equal
+          value: amd
+          effect: NoSchedule
     kubeApiServer:
       enabled: false
     kubelet:
