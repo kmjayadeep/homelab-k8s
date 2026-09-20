@@ -100,12 +100,6 @@ pages:
               - title: Vaultwarden
                 url: https://vaultwarden.cosmos.cboxlab.com
                 icon: di:bitwarden
-              - title: Wiki
-                url: https://wiki.cosmos.cboxlab.com
-                icon: di:wikijs
-              - title: Psuite
-                url: https://psuite.cosmos.cboxlab.com
-                icon: di:syncthing
               - title: IT Tools
                 url: https://ittools.cosmos.cboxlab.com
                 icon: di:it-tools
@@ -262,8 +256,6 @@ pages:
                 links:
                   - title: Backrest
                     url: http://localhost:9898
-                  - title: Psuite
-                    url: http://localhost:8384
 
   - name: Social
     columns:
