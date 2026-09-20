@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bookorbit-ingress
+  labels:
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/instance: bookorbit
+spec:
+  tls:
+    - hosts:
+        - bookorbit.cosmos.cboxlab.com
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: bookorbit.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bookorbit
+                port:
+                  name: http
