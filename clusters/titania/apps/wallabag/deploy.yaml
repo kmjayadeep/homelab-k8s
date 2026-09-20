@@ -63,6 +63,14 @@ spec:
       containers:
         - name: wallabag
           image: wallabag/wallabag:2.6.14
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              envsubst < /etc/wallabag/parameters.template.yml > app/config/parameters.yml
+              rm -rf /var/www/wallabag/var/cache
+              su -c "SYMFONY_ENV=prod composer install --no-dev -o --prefer-dist" -s /bin/sh nobody
+              exec s6-svscan /etc/s6/
           ports:
             - name: http
               containerPort: 80
