@@ -60,18 +60,4 @@ spec:
         torchserve:
           disabled: true
         vllmserver:
-          disabled: false
-          # CPU-only homelab; the default vllm/vllm-openai image is CUDA-only.
-          # The CPU image (ubuntu:22.04 base) has no non-root user in /etc/passwd,
-          # so it must run as root (the image default); capabilities are dropped.
-          image: vllm/vllm-openai-cpu
-          tag: v0.24.0
-          securityContext:
-            allowPrivilegeEscalation: false
-            privileged: false
-            capabilities:
-              drop:
-                - ALL
-          devShm:
-            enabled: true
-            sizeLimit: "2Gi"
+          disabled: true
