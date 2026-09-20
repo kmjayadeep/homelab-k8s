@@ -1,0 +1,30 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: chat-smollm2-code
+  labels:
+    app.kubernetes.io/name: llm-gateway
+    app.kubernetes.io/instance: llm-gateway
+spec:
+  # Temporary shared backend. Replace this endpoint with the Code predictor
+  # Service when InferenceService/smollm2-135m-code-vllm is deployed.
+  endpoints:
+    - fqdn:
+        hostname: smollm2-135m-vllm-predictor.llm-serving.svc.cluster.local
+        port: 80
+---
+apiVersion: aigateway.envoyproxy.io/v1beta1
+kind: AIServiceBackend
+metadata:
+  name: chat-smollm2-code
+  labels:
+    app.kubernetes.io/name: llm-gateway
+    app.kubernetes.io/instance: llm-gateway
+spec:
+  schema:
+    name: OpenAI
+    version: v1
+  backendRef:
+    group: gateway.envoyproxy.io
+    kind: Backend
+    name: chat-smollm2-code

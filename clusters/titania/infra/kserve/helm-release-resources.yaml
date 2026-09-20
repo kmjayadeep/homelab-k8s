@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kserve-resources
+spec:
+  interval: 1h
+  timeout: 10m
+  chartRef:
+    kind: OCIRepository
+    name: kserve-resources
+  dependsOn:
+    - name: kserve-crd
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    kserve:
+      localmodel:
+        enabled: true
+      controller:
+        deploymentMode: Standard
+        gateway:
+          domain: cosmos.cboxlab.com
+          domainTemplate: "{{ .Name }}-{{ .Namespace }}.{{ .IngressDomain }}"
+          urlScheme: https
+          disableIstioVirtualHost: true
+          disableIngressCreation: false
+          ingressGateway:
+            className: nginx
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
+        rbacProxy:
+          resources:
+            requests:
+              cpu: 5m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi

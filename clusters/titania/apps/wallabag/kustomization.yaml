@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: wallabag
 
 resources:
+  - external-secret.yaml
   - deploy.yaml
   - service.yaml
   - ingress.yaml
   - pvc.yaml
-  - secret-sealed.yaml

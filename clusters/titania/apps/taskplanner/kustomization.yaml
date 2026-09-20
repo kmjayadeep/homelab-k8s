@@ -4,9 +4,9 @@ kind: Kustomization
 namespace: taskplanner
 
 resources:
+  - external-secret.yaml
   - ./deploy.yaml
   - ./svc.yaml
   - ./ing.yaml
   - ./image-update.yaml
   - ./image-update-automation.yaml
-  - ./secret-sealed.yaml

@@ -1,0 +1,77 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kserve-runtime-configs
+spec:
+  interval: 1h
+  timeout: 10m
+  chartRef:
+    kind: OCIRepository
+    name: kserve-runtime-configs
+  dependsOn:
+    - name: kserve-resources
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          # v0.20.0 incorrectly ties this runtime to huggingfaceserver.disabled.
+          - target:
+              group: serving.kserve.io
+              version: v1alpha1
+              kind: ClusterServingRuntime
+              name: kserve-huggingfaceserver-multinode
+            patch: |
+              - op: replace
+                path: /spec/disabled
+                value: true
+  values:
+    kserve:
+      servingruntime:
+        enabled: true
+        tensorflow:
+          disabled: true
+        mlserver:
+          disabled: true
+        sklearnserver:
+          disabled: true
+        xgbserver:
+          disabled: true
+        huggingfaceserver:
+          disabled: false
+        huggingfaceserver_multinode:
+          disabled: true
+        tritonserver:
+          disabled: true
+        pmmlserver:
+          disabled: true
+        predictiveserver:
+          disabled: true
+        paddleserver:
+          disabled: true
+        lgbserver:
+          disabled: true
+        autogluonserver:
+          disabled: true
+        torchserve:
+          disabled: true
+        vllmserver:
+          disabled: false
+          # CPU-only homelab; the default vllm/vllm-openai image is CUDA-only.
+          # This image has no non-root user in /etc/passwd, so it uses its
+          # root default with privilege escalation disabled and capabilities dropped.
+          image: vllm/vllm-openai-cpu
+          tag: v0.24.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+          devShm:
+            enabled: true
+            sizeLimit: "2Gi"

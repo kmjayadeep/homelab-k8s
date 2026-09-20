@@ -1,0 +1,39 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: smollm2-135m-vllm
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  labels:
+    app.kubernetes.io/name: smollm2-135m-vllm
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: predictor
+spec:
+  predictor:
+    deploymentStrategy:
+      type: Recreate
+    securityContext:
+      fsGroup: 1000
+      fsGroupChangePolicy: OnRootMismatch
+    model:
+      modelFormat:
+        name: vLLM
+      runtime: kserve-vllmserver
+      storageUri: "hf://HuggingFaceTB/SmolLM2-135M-Instruct:12fd25f77366fa6b3b4b768ec3050bf629380bac"
+      args:
+        # Halves model-weight memory versus float32; benchmark latency on this CPU.
+        - --dtype=bfloat16
+        - --max-model-len=512
+        # The gateway presents this stable alias to clients and can remap it later
+        # without changing their base URL or model selection.
+        - --served-model-name=chat-default
+        # SmolLM2-135M at bfloat16 and a 512-token context requires about
+        # 12 MiB of KV tensors per sequence; retain headroom for batching.
+        - --kv-cache-memory-bytes=134217728
+      resources:
+        requests:
+          cpu: 1
+          memory: 2Gi
+        limits:
+          cpu: 2
+          memory: 3Gi

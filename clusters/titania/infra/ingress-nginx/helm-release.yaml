@@ -21,8 +21,16 @@ spec:
   values:
     controller:
       watchIngressWithoutClass: true
+      extraArgs:
+        default-ssl-certificate: ingress-nginx/cosmos-cboxlab-cert
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 0
+          maxSurge: 1
       service:
         loadBalancerIP:  # Set in env specific patches
+        externalTrafficPolicy: Local
         ipFamilyPolicy: PreferDualStack
         ipFamilies:
         - IPv4

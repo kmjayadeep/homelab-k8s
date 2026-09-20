@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
+  - ./external-secret.yaml
   - ./deploy.yaml
   - ./svc.yaml
   - ./grafana-dashboard.yaml
-  - ./secret-sealed.yaml
   - ./prometheusrule.yaml

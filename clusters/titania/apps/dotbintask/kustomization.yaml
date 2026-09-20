@@ -4,11 +4,11 @@ kind: Kustomization
 namespace: dotbintask
 
 resources:
+  - external-secret.yaml
   - ./pvc.yaml
   - ./deploy.yaml
   - ./svc.yaml
   - ./ing.yaml
-  - ./secret-sealed.yaml
 
 labels:
 - includeSelectors: true

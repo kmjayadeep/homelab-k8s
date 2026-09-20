@@ -18,4 +18,4 @@ spec:
     authSecret:
       enabled: true
       create: false
-      name: actions-runner-secret
+      name: actions-runner-secret-vault

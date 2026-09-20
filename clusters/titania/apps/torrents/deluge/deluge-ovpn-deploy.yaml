@@ -17,7 +17,7 @@ spec:
       volumes:
         - name: openvpn-config
           secret:
-            secretName: openvpn-config
+            secretName: openvpn-config-vault
             optional: false
         - name: openvpn-rw
           emptyDir: {}

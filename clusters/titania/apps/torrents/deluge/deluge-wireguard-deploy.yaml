@@ -20,7 +20,7 @@ spec:
       volumes:
         - name: wireguard-config
           secret:
-            secretName: wg-config
+            secretName: wg-config-vault
             optional: false
         - name: wireguard-rw
           emptyDir: {}

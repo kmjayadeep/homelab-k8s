@@ -88,15 +88,9 @@ pages:
                 url: https://fava.cosmos.cboxlab.com
                 icon: di:bitcoin
                 alt-status-codes: [401]
-              - title: Wordle
-                url: https://wordle.cosmos.cboxlab.com
-                icon: di:google-play-games
               - title: OTPCloud
                 url: https://totp.cosmos.cboxlab.com
                 icon: di:passwork
-              - title: Grocy
-                url: https://grocy.cosmos.cboxlab.com
-                icon: di:grocy
               - title: Wallabag
                 url: https://wallabag.cosmos.cboxlab.com
                 icon: di:wallabag
@@ -106,12 +100,6 @@ pages:
               - title: Vaultwarden
                 url: https://vaultwarden.cosmos.cboxlab.com
                 icon: di:bitwarden
-              - title: Wiki
-                url: https://wiki.cosmos.cboxlab.com
-                icon: di:wikijs
-              - title: Psuite
-                url: https://psuite.cosmos.cboxlab.com
-                icon: di:syncthing
               - title: IT Tools
                 url: https://ittools.cosmos.cboxlab.com
                 icon: di:it-tools
@@ -268,8 +256,6 @@ pages:
                 links:
                   - title: Backrest
                     url: http://localhost:9898
-                  - title: Psuite
-                    url: http://localhost:8384
 
   - name: Social
     columns:

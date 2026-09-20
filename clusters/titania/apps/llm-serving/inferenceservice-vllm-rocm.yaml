@@ -1,0 +1,43 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: qwen2-5-7b-instruct-rocm
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  labels:
+    app.kubernetes.io/name: qwen2-5-7b-instruct-rocm
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: predictor
+spec:
+  predictor:
+    deploymentStrategy:
+      type: Recreate
+    nodeSelector:
+      homelab.cboxlab.com/gpu: amd
+    tolerations:
+      - key: homelab.cboxlab.com/gpu
+        operator: Equal
+        value: amd
+        effect: NoSchedule
+    securityContext:
+      fsGroup: 1000
+      fsGroupChangePolicy: OnRootMismatch
+    model:
+      modelFormat:
+        name: vLLM
+      runtime: kserve-vllmserver-rocm
+      storageUri: "hf://Qwen/Qwen2.5-7B-Instruct"
+      args:
+        - --dtype=bfloat16
+        - --max-model-len=8192
+        - --gpu-memory-utilization=0.85
+        - --served-model-name=chat-gpu
+      resources:
+        requests:
+          cpu: 2
+          memory: 8Gi
+          amd.com/gpu: 1
+        limits:
+          cpu: 4
+          memory: 20Gi
+          amd.com/gpu: 1

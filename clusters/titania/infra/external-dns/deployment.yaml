@@ -11,6 +11,9 @@ metadata:
   name: external-dns
 rules:
   - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
     resources: ["pods", "services"]
     verbs: ["get", "watch", "list"]
   - apiGroups: ["discovery.k8s.io"]
@@ -21,6 +24,9 @@ rules:
     verbs: ["get", "watch", "list"]
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gateways", "httproutes"]
     verbs: ["get", "watch", "list"]
   - apiGroups: [""]
     resources: ["nodes"]
@@ -50,6 +56,8 @@ kind: Deployment
 metadata:
   name: external-dns
   namespace: external-dns
+  annotations:
+    secret.reloader.stakater.com/reload: cloudflare-creds-vault
 spec:
   strategy:
     type: Recreate
@@ -64,19 +72,20 @@ spec:
       serviceAccountName: external-dns
       containers:
       - name: external-dns
-        image: registry.k8s.io/external-dns/external-dns:v0.21.0
+        image: registry.k8s.io/external-dns/external-dns:v0.23.0
         # If authentication is disabled and/or you didn't create
         # a secret, you can remove this block.
         env:
         - name: CF_API_TOKEN
           valueFrom:
             secretKeyRef:
-              name: cloudflare-creds
+              name: cloudflare-creds-vault
               key: api_token
         args:
         - --source=ingress
         - --source=crd
         - --source=service
+        - --source=gateway-httproute
         - --domain-filter=cboxlab.com
         - --policy=upsert-only
         - --provider=cloudflare

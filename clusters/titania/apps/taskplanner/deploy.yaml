@@ -18,7 +18,7 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: taskplanner-config
+                  name: taskplanner-config-vault
                   key: POSTGRES_PASSWORD
             - name: DATABASE_URL
               value: "postgresql://taskplanner:$(POSTGRES_PASSWORD)@postgres.cosmos.cboxlab.com:5432/taskplanner"

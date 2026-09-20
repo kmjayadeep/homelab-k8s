@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
+- ./external-secrets.yaml
 - ./repo.yaml
 - ./helmrelease-prometheus.yaml
 
@@ -12,10 +13,6 @@ resources:
 - ./helmrelease-loki.yaml
 - ./helmrelease-promtail.yaml
 
-- ./grafana-creds-sealed.yaml
-- ./alermanager-config-sealed.yaml
-- ./thanos-s3-sealed.yaml
-- ./loki-minio-sealed.yaml
 
 configMapGenerator:
 - name: flux-grafana-dashboards

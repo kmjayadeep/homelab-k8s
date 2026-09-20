@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: llm-serving
+  namespace: llm-serving
+spec:
+  path: clusters/titania/apps/llm-serving
+  dependsOn:
+    - name: external-secrets
+      namespace: external-secrets
+    - name: kserve-localmodel
+      namespace: kserve
+    - name: kserve-rocm
+      namespace: kserve
+  interval: 15m
+  prune: true
+  wait: false
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system

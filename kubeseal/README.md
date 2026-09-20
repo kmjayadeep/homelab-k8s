@@ -1,16 +1,10 @@
-# kubeseal
+# kubeseal (legacy)
 
-public key retrieved using the command:
+This directory contains historical Sealed Secrets public keys. All active
+SealedSecrets were migrated to Vault and External Secrets; no SealedSecret
+manifests remain in the repository or cluster.
 
-```
-kubeseal --fetch-cert \
---controller-name=sealed-secrets-controller \
---controller-namespace=flux-system \
-> pub-sealed-secrets.pem
-```
-
-Encrypt secret with kubeseal:
-
-```
-cat secret.yaml| kubeseal --format=yaml --cert ../../kubeseal/pub-sealed-secrets.pem > secret-sealed.yaml
-```
+Do not use these keys to create new SealedSecrets. A new bootstrap exception
+requires explicit approval and an update to
+`adrs/0001-vault-external-secrets.md`. The keys remain only until the retained
+Sealed Secrets controller is removed in a separate change.

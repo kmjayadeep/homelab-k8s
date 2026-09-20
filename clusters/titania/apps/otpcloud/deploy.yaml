@@ -26,12 +26,12 @@ spec:
         - name: APP_KEY
           valueFrom:
             secretKeyRef:
-              name: otpcloud-secret
+              name: otpcloud-secret-vault
               key: APP_KEY
         - name: DB_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
-              name: otpcloud-secret
+              name: otpcloud-secret-vault
               key: DB_CONNECTION_STRING
         ports:
         - containerPort: 3000

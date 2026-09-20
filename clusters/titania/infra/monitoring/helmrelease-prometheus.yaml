@@ -18,6 +18,12 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    prometheus-node-exporter:
+      tolerations:
+        - key: homelab.cboxlab.com/gpu
+          operator: Equal
+          value: amd
+          effect: NoSchedule
     kubeApiServer:
       enabled: false
     kubelet:
@@ -33,7 +39,7 @@ spec:
     grafana:
       enabled: true
       admin:
-        existingSecret: grafana-creds
+        existingSecret: grafana-creds-vault
       ingress:
         enabled: true
         hosts:
@@ -214,7 +220,7 @@ spec:
         thanos:
           objectStorageConfig:
             existingSecret:
-              name: thanos-s3
+              name: thanos-s3-vault
               key: objstore.yml
 
         additionalScrapeConfigs:
@@ -284,7 +290,7 @@ spec:
           - "*.cosmos.cboxlab.com"
       alertmanagerSpec:
         useExistingSecret: true
-        configSecret: alertmanager-config
+        configSecret: alertmanager-config-vault
         storageSpec:
           volumeClaimTemplate:
             spec:

@@ -1,0 +1,45 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kserve-localmodel-resources
+spec:
+  interval: 1h
+  timeout: 10m
+  chartRef:
+    kind: OCIRepository
+    name: kserve-localmodel-resources
+  dependsOn:
+    - name: kserve-resources
+    - name: kserve-localmodel-crd
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: DaemonSet
+              name: kserve-localmodelnode-agent
+            patch: |-
+              - op: add
+                path: /spec/template/spec/tolerations
+                value:
+                  - key: homelab.cboxlab.com/gpu
+                    operator: Equal
+                    value: amd
+                    effect: NoSchedule
+              - op: add
+                path: /spec/template/spec/containers/0/securityContext/runAsUser
+                value: 1000
+              - op: add
+                path: /spec/template/spec/containers/0/securityContext/runAsGroup
+                value: 1000
+  values:
+    kserve:
+      localmodel:
+        enabled: true
