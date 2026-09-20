@@ -4,6 +4,7 @@ metadata:
   name: qwen2-5-7b-instruct-rocm
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    serving.kserve.io/stop: "true"
   labels:
     app.kubernetes.io/name: qwen2-5-7b-instruct-rocm
     app.kubernetes.io/instance: llm-serving
