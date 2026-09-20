@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manage Homelab LLM Models"
+  short_description: "Manage KServe models, caches, aliases, and rollout readiness."
+  default_prompt: "Use $manage-llm-models to add, update, or troubleshoot homelab LLM models with pinned revisions, separate caches, safe GitOps changes, and verified readiness."
