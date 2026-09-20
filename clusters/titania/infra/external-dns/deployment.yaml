@@ -11,6 +11,9 @@ metadata:
   name: external-dns
 rules:
   - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
     resources: ["pods", "services"]
     verbs: ["get", "watch", "list"]
   - apiGroups: ["discovery.k8s.io"]
@@ -21,6 +24,9 @@ rules:
     verbs: ["get", "watch", "list"]
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gateways", "httproutes"]
     verbs: ["get", "watch", "list"]
   - apiGroups: [""]
     resources: ["nodes"]
@@ -79,6 +85,7 @@ spec:
         - --source=ingress
         - --source=crd
         - --source=service
+        - --source=gateway-httproute
         - --domain-filter=cboxlab.com
         - --policy=upsert-only
         - --provider=cloudflare
