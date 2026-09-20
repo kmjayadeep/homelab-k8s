@@ -5,10 +5,12 @@ Clients select the stable `chat-default` alias; its vLLM backend can be changed
 without changing the client base URL.
 
 
-The prepared `chat-smollm2-code` alias expects a future
-`InferenceService/smollm2-135m-code-vllm`, whose predictor Service will be
-`smollm2-135m-code-vllm-predictor`. Configure that vLLM deployment with
-`--served-model-name=chat-smollm2-code` before testing the alias.
+`chat-smollm2-code` currently shares the `chat-default` vLLM predictor and
+uses `modelNameOverride: chat-default`, so its route can be exercised before
+the Code model is deployed. When
+`InferenceService/smollm2-135m-code-vllm` is available, change its Backend
+endpoint to `smollm2-135m-code-vllm-predictor` and remove the override after
+vLLM is configured with `--served-model-name=chat-smollm2-code`.
 
 After validation, switch `chat-default` to the candidate by changing only its
 `AIGatewayRoute` backend reference. Clients retain `model: chat-default` and

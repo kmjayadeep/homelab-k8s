@@ -5,5 +5,4 @@ namespace: llm-gateway
 
 resources:
   - gateway.yaml
-  - backend.yaml
-  - route.yaml
+  - routing.yaml
