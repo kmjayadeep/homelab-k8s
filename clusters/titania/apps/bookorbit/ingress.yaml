@@ -2,6 +2,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: bookorbit-ingress
+  annotations:
+    # Allow large EPUB/PDF uploads; ingress-nginx defaults to 1 MiB.
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
   labels:
     app.kubernetes.io/name: bookorbit
     app.kubernetes.io/instance: bookorbit
