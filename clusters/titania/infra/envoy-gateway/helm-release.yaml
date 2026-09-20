@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: envoy-gateway
+  namespace: envoy-gateway-system
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: envoy-gateway
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    deployment:
+      envoyGateway:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+    config:
+      envoyGateway:
+        extensionApis:
+          enableBackend: true
+          enableEnvoyPatchPolicy: true
+        extensionManager:
+          hooks:
+            xdsTranslator:
+              translation:
+                listener:
+                  includeAll: true
+                route:
+                  includeAll: true
+                cluster:
+                  includeAll: true
+                secret:
+                  includeAll: true
+              post:
+                - Translation
+                - Cluster
+                - Route
+          service:
+            fqdn:
+              hostname: ai-gateway-controller.envoy-ai-gateway-system.svc.cluster.local
+              port: 1063

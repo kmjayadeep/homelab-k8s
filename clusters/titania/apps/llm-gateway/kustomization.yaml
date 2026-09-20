@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: llm-gateway
+
+resources:
+  - external-secret.yaml
+  - gateway.yaml
+  - backend.yaml
+  - route.yaml
+  - security-policy.yaml
