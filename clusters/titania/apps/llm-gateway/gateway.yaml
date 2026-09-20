@@ -58,5 +58,3 @@ spec:
         name: llm-gateway
         type: LoadBalancer
         externalTrafficPolicy: Local
-        annotations:
-          external-dns.alpha.kubernetes.io/hostname: llm-gateway.cosmos.cboxlab.com
