@@ -4,8 +4,6 @@ kind: Kustomization
 namespace: llm-gateway
 
 resources:
-  - external-secret.yaml
   - gateway.yaml
   - backend.yaml
   - route.yaml
-  - security-policy.yaml
