@@ -27,19 +27,3 @@ spec:
   resources:
     requests:
       storage: 50Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: bookorbit-postgres
-  labels:
-    app.kubernetes.io/name: bookorbit
-    app.kubernetes.io/component: database
-    app.kubernetes.io/instance: bookorbit
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 10Gi

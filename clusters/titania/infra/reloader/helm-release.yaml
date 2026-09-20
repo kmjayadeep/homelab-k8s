@@ -20,6 +20,7 @@ spec:
       watchGlobally: false
       namespaces:
         - baskit
+        - bookorbit
         - external-dns
       ignoreJobs: true
       ignoreCronJobs: true

@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bookorbit
+  annotations:
+    secret.reloader.stakater.com/reload: bookorbit-config-vault
   labels:
     app.kubernetes.io/name: bookorbit
     app.kubernetes.io/instance: bookorbit
@@ -31,7 +33,7 @@ spec:
             - name: CLIENT_URL
               value: https://bookorbit.cosmos.cboxlab.com
             - name: POSTGRES_HOST
-              value: bookorbit-postgres
+              value: postgres.cosmos.cboxlab.com
             - name: POSTGRES_PORT
               value: "5432"
             - name: POSTGRES_USER
@@ -43,17 +45,17 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: bookorbit-config
+                  name: bookorbit-config-vault
                   key: POSTGRES_PASSWORD
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: bookorbit-config
+                  name: bookorbit-config-vault
                   key: JWT_SECRET
             - name: SETUP_BOOTSTRAP_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: bookorbit-config
+                  name: bookorbit-config-vault
                   key: SETUP_BOOTSTRAP_TOKEN
           ports:
             - name: http

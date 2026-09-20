@@ -4,9 +4,8 @@ kind: Kustomization
 namespace: bookorbit
 
 resources:
+  - external-secret.yaml
   - app-deploy.yaml
-  - postgres-deploy.yaml
   - service.yaml
   - ingress.yaml
   - pvc.yaml
-  - secret-sealed.yaml

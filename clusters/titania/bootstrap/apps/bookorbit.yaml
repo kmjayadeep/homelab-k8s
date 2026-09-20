@@ -10,6 +10,11 @@ metadata:
   namespace: bookorbit
 spec:
   path: clusters/titania/apps/bookorbit
+  dependsOn:
+    - name: external-secrets
+      namespace: external-secrets
+    - name: reloader
+      namespace: reloader
   interval: 15m
   prune: true
   wait: true
@@ -22,6 +27,3 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: bookorbit
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: bookorbit-postgres
