@@ -88,9 +88,6 @@ pages:
                 url: https://fava.cosmos.cboxlab.com
                 icon: di:bitcoin
                 alt-status-codes: [401]
-              - title: Wordle
-                url: https://wordle.cosmos.cboxlab.com
-                icon: di:google-play-games
               - title: OTPCloud
                 url: https://totp.cosmos.cboxlab.com
                 icon: di:passwork
