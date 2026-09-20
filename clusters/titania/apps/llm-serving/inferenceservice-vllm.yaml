@@ -24,6 +24,8 @@ spec:
         # Halves model-weight memory versus float32; benchmark latency on this CPU.
         - --dtype=bfloat16
         - --max-model-len=512
+        # Limit scheduler/KV-cache capacity to two concurrent generations.
+        - --max-num-seqs=2
         # SmolLM2-135M at bfloat16 and a 512-token context requires about
         # 12 MiB of KV tensors per sequence; retain headroom for batching.
         - --kv-cache-memory-bytes=134217728
