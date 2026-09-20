@@ -16,9 +16,6 @@ Provide one TLS-protected OpenAI-compatible endpoint at
 - Envoy Gateway `v1.8.1` and Agent Router `v1.0.0` are declared through Flux.
 - `chat-default` routes to the KServe vLLM predictor Service.
 - vLLM is configured to serve the `chat-default` alias.
-- API-key authentication is temporarily deferred at operator direction. The
-  gateway is not protected by client authentication until the Vault-backed
-  `SecurityPolicy` is restored.
 - The controller security-context fix is on
   `fix/agent-router-controller-security-context`; it must be merged before the
   rollout can continue.
@@ -33,19 +30,6 @@ because the controller image declares a non-numeric `nonroot` user.
 
 Confirm the Agent Router controller pod becomes Ready. Do not inspect pod logs
 for this check; use pod readiness and event metadata only.
-
-### 2. Provision the gateway API key (deferred)
-
-1. Add one client API key to Vault at `apps/llm-gateway/core`, property
-   `api_key`, using the approved non-logging secret-import workflow.
-2. Apply the `homelab-iac` Terraform change that creates the least-privilege
-   `llm-gateway` Vault Kubernetes-auth role.
-3. Confirm the `llm-gateway` `SecretStore` and `ExternalSecret` are Ready using
-   status conditions only. Never read the generated Secret value.
-
-This step is explicitly deferred for the current bring-up. Do not expose the
-unauthenticated endpoint beyond trusted network boundaries. Restore and verify
-API-key enforcement before treating it as a general client endpoint.
 
 ### 3. Verify Flux resources and TLS
 
