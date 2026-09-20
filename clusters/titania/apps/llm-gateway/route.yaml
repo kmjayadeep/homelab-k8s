@@ -23,3 +23,13 @@ spec:
         - name: chat-default
       timeouts:
         request: 10m
+    - matches:
+        - headers:
+            - type: Exact
+              name: x-ai-eg-model
+              value: chat-smollm2-code
+      modelsOwnedBy: homelab
+      backendRefs:
+        - name: chat-smollm2-code
+      timeouts:
+        request: 10m

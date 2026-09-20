@@ -26,3 +26,34 @@ spec:
     group: gateway.envoyproxy.io
     kind: Backend
     name: chat-default
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: chat-smollm2-code
+  labels:
+    app.kubernetes.io/name: llm-gateway
+    app.kubernetes.io/instance: llm-gateway
+spec:
+  endpoints:
+    - fqdn:
+        # Expected KServe predictor Service for the future
+        # InferenceService/smollm2-135m-code-vllm deployment.
+        hostname: smollm2-135m-code-vllm-predictor.llm-serving.svc.cluster.local
+        port: 80
+---
+apiVersion: aigateway.envoyproxy.io/v1beta1
+kind: AIServiceBackend
+metadata:
+  name: chat-smollm2-code
+  labels:
+    app.kubernetes.io/name: llm-gateway
+    app.kubernetes.io/instance: llm-gateway
+spec:
+  schema:
+    name: OpenAI
+    version: v1
+  backendRef:
+    group: gateway.envoyproxy.io
+    kind: Backend
+    name: chat-smollm2-code
