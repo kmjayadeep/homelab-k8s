@@ -1,11 +1,11 @@
 apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
-  name: smollm2-135m
+  name: smollm2-135m-vllm
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   labels:
-    app.kubernetes.io/name: smollm2-135m
+    app.kubernetes.io/name: smollm2-135m-vllm
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: predictor
 spec:
@@ -15,22 +15,23 @@ spec:
     deploymentStrategy:
       type: Recreate
     securityContext:
-      runAsNonRoot: true
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch
     model:
       modelFormat:
-        name: huggingface
-      runtime: kserve-huggingfaceserver
+        name: vLLM
+      runtime: kserve-vllmserver
       storageUri: "hf://HuggingFaceTB/SmolLM2-135M-Instruct:12fd25f77366fa6b3b4b768ec3050bf629380bac"
       args:
-        - --backend=huggingface
         - --dtype=float32
-        - --max_model_len=512
+        - --max-model-len=512
+        # SmolLM2-135M at float32 and a 512-token context requires about
+        # 23 MiB of KV tensors per sequence; retain headroom for batching.
+        - --kv-cache-memory-bytes=134217728
       resources:
         requests:
           cpu: 1
-          memory: 1Gi
+          memory: 2Gi
         limits:
           cpu: 2
           memory: 3Gi

@@ -60,4 +60,18 @@ spec:
         torchserve:
           disabled: true
         vllmserver:
-          disabled: true
+          disabled: false
+          # CPU-only homelab; the default vllm/vllm-openai image is CUDA-only.
+          # This image has no non-root user in /etc/passwd, so it uses its
+          # root default with privilege escalation disabled and capabilities dropped.
+          image: vllm/vllm-openai-cpu
+          tag: v0.24.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+          devShm:
+            enabled: true
+            sizeLimit: "2Gi"
