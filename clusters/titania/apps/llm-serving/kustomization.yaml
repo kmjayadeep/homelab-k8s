@@ -7,3 +7,4 @@ resources:
   - inferenceservice.yaml
   - inferenceservice-vllm.yaml
   - inferenceservice-vllm-rocm.yaml
+  - servicemonitor.yaml

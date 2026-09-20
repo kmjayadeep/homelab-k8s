@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: monitoring
+spec:
+  groups:
+    - name: llm-serving
+      rules:
+        - alert: VllmTargetDown
+          expr: up{job="llm-serving-vllm"} == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "vLLM metrics target is unavailable"
+            description: "The vLLM predictor metrics endpoint for {{ $labels.service }} in {{ $labels.namespace }} has been unavailable for 10 minutes."
+        - alert: VllmRequestQueueing
+          expr: histogram_quantile(0.95, sum by (le, service, namespace) (rate(vllm:request_queue_time_seconds_bucket{job="llm-serving-vllm"}[5m]))) > 30
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "vLLM requests are spending too long in queue"
+            description: "The p95 request queue time for {{ $labels.service }} in {{ $labels.namespace }} exceeds 30 seconds."

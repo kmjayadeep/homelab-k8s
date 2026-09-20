@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: llm-serving-vllm
+  labels:
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: monitoring
+spec:
+  selector:
+    matchExpressions:
+      - key: serving.kserve.io/inferenceservice
+        operator: Exists
+  endpoints:
+    - targetPort: 8080
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - targetLabel: job
+          replacement: llm-serving-vllm

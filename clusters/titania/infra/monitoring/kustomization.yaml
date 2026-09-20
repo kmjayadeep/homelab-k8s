@@ -7,6 +7,8 @@ resources:
 - ./external-secrets.yaml
 - ./repo.yaml
 - ./helmrelease-prometheus.yaml
+- ./llm-prometheusrule.yaml
+- ./llm-grafana-dashboard.yaml
 
 # loki
 - ./repo-grafana.yaml

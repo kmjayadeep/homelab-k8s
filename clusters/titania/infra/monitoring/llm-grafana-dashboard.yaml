@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-serving-grafana-dashboard
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: monitoring
+data:
+  llm-serving.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Requests in flight",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "sum by (service) (vllm:num_requests_running{job=\"llm-serving-vllm\"})", "legendFormat": "{{service}}"}],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Request throughput",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "sum by (service) (rate(vllm:request_success_total{job=\"llm-serving-vllm\"}[5m]))", "legendFormat": "{{service}}"}],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Time to first token (p95)",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "histogram_quantile(0.95, sum by (le, service) (rate(vllm:time_to_first_token_seconds_bucket{job=\"llm-serving-vllm\"}[5m])))", "legendFormat": "{{service}}"}],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Request queue time (p95)",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "histogram_quantile(0.95, sum by (le, service) (rate(vllm:request_queue_time_seconds_bucket{job=\"llm-serving-vllm\"}[5m])))", "legendFormat": "{{service}}"}],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Prompt and generated tokens / second",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {"expr": "sum by (service) (rate(vllm:prompt_tokens_total{job=\"llm-serving-vllm\"}[5m]))", "legendFormat": "prompt {{service}}"},
+            {"expr": "sum by (service) (rate(vllm:generation_tokens_total{job=\"llm-serving-vllm\"}[5m]))", "legendFormat": "generation {{service}}"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+        },
+        {
+          "type": "timeseries",
+          "title": "GPU KV-cache utilization",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "max by (service) (vllm:gpu_cache_usage_perc{job=\"llm-serving-vllm\"})", "legendFormat": "{{service}}"}],
+          "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": ["llm", "vllm", "kserve"],
+      "templating": {"list": []},
+      "time": {"from": "now-6h", "to": "now"},
+      "timezone": "browser",
+      "title": "LLM Serving",
+      "uid": "llm-serving",
+      "version": 1
+    }
