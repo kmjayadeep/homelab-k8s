@@ -17,6 +17,8 @@ spec:
       labels:
         app.kubernetes.io/name: wallabag
         app.kubernetes.io/instance: wallabag
+      annotations:
+        secret.reloader.stakater.com/reload: wallabag-config-vault
     spec:
       containers:
         - name: wallabag
@@ -27,9 +29,20 @@ spec:
               protocol: TCP
           env:
             - name: SYMFONY__ENV__DATABASE_DRIVER
-              value: pdo_sqlite
-            - name: SYMFONY__ENV__DATABASE_PATH
-              value: /var/www/wallabag/data/db/wallabag.sqlite
+              value: pdo_pgsql
+            - name: SYMFONY__ENV__DATABASE_HOST
+              value: postgres.cosmos.cboxlab.com
+            - name: SYMFONY__ENV__DATABASE_PORT
+              value: "5432"
+            - name: SYMFONY__ENV__DATABASE_NAME
+              value: wallabag
+            - name: SYMFONY__ENV__DATABASE_USER
+              value: wallabag
+            - name: SYMFONY__ENV__DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wallabag-config-vault
+                  key: POSTGRES_PASSWORD
             - name: SYMFONY__ENV__DOMAIN_NAME
               value: https://wallabag.cosmos.cboxlab.com
             - name: SYMFONY__ENV__FOSUSER_REGISTRATION
@@ -59,14 +72,9 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 20
           volumeMounts:
-            - name: data
-              mountPath: /var/www/wallabag/data
             - name: images
               mountPath: /var/www/wallabag/web/assets/images
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: wallabag-data
         - name: images
           persistentVolumeClaim:
             claimName: wallabag-images
