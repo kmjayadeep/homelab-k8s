@@ -20,6 +20,11 @@ spec:
         app.kubernetes.io/name: bookorbit
         app.kubernetes.io/instance: bookorbit
     spec:
+      securityContext:
+        # BookOrbit drops privileges to its default PUID/PGID (1000:1000).
+        # Grant that group write access to both Longhorn-backed volumes.
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: bookorbit
           image: ghcr.io/bookorbit/bookorbit:2.10.0
