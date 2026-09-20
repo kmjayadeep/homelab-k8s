@@ -4,14 +4,13 @@ metadata:
   name: smollm2-135m
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    serving.kserve.io/stop: "true"
   labels:
     app.kubernetes.io/name: smollm2-135m
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: predictor
 spec:
   predictor:
-    minReplicas: 0
-    maxReplicas: 0
     deploymentStrategy:
       type: Recreate
     securityContext:
