@@ -13,8 +13,7 @@ spec:
   hostnames:
     - llm.cosmos.cboxlab.com
   rules:
-    - name: chat-default
-      matches:
+    - matches:
         - headers:
             - type: Exact
               name: x-ai-eg-model
