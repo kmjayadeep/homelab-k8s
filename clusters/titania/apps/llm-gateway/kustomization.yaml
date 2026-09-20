@@ -7,4 +7,5 @@ resources:
   - gateway.yaml
   - chat-default.yaml
   - chat-smollm2-code.yaml
+  - qwen.yaml
   - route.yaml
