@@ -43,19 +43,17 @@ data:
         },
         {
           "type": "timeseries",
-          "title": "Prompt and generated tokens / second",
+          "title": "User-visible output rate",
+          "description": "Completion tokens divided by end-to-end request duration, matching the UI's output tok/s calculation. This differs from aggregate cluster throughput, which includes idle time.",
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "targets": [
-            {"expr": "sum by (service) (rate(vllm:prompt_tokens_total{job=\"llm-serving-vllm\"}[5m]))", "legendFormat": "prompt {{service}}"},
-            {"expr": "sum by (service) (rate(vllm:generation_tokens_total{job=\"llm-serving-vllm\"}[5m]))", "legendFormat": "generation {{service}}"}
-          ],
+          "targets": [{"expr": "sum by (service) (rate(vllm:request_generation_tokens_sum{job=\"llm-serving-vllm\"}[$__rate_interval])) / sum by (service) (rate(vllm:e2e_request_latency_seconds_sum{job=\"llm-serving-vllm\"}[$__rate_interval]))", "legendFormat": "{{service}}"}],
           "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
         },
         {
           "type": "timeseries",
-          "title": "GPU KV-cache utilization",
+          "title": "KV-cache utilization",
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "targets": [{"expr": "max by (service) (vllm:gpu_cache_usage_perc{job=\"llm-serving-vllm\"})", "legendFormat": "{{service}}"}],
+          "targets": [{"expr": "max by (service) (vllm:kv_cache_usage_perc{job=\"llm-serving-vllm\"})", "legendFormat": "{{service}}"}],
           "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []},
           "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
         }
