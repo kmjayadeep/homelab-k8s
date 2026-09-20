@@ -94,9 +94,6 @@ pages:
               - title: OTPCloud
                 url: https://totp.cosmos.cboxlab.com
                 icon: di:passwork
-              - title: Grocy
-                url: https://grocy.cosmos.cboxlab.com
-                icon: di:grocy
               - title: Wallabag
                 url: https://wallabag.cosmos.cboxlab.com
                 icon: di:wallabag
