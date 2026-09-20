@@ -40,7 +40,8 @@ spec:
                 value:
                   name: VLLM_CPU_KVCACHE_SPACE
                   # CPU vLLM otherwise reserves a multi-GiB KV-cache pool.
-                  value: "0.25"
+                  # vLLM CPU accepts whole GiB values only.
+                  value: "1"
   values:
     kserve:
       servingruntime:
