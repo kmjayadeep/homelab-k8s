@@ -20,6 +20,46 @@ spec:
       annotations:
         secret.reloader.stakater.com/reload: wallabag-config-vault
     spec:
+      initContainers:
+        - name: initialize-database
+          image: wallabag/wallabag:2.6.14
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              envsubst < /etc/wallabag/parameters.template.yml > app/config/parameters.yml
+              export PGPASSWORD="$SYMFONY__ENV__DATABASE_PASSWORD"
+              if ! psql -qAt -h "$SYMFONY__ENV__DATABASE_HOST" -p "$SYMFONY__ENV__DATABASE_PORT" -U "$SYMFONY__ENV__DATABASE_USER" -d "$SYMFONY__ENV__DATABASE_NAME" -c "SELECT to_regclass('public.wallabag_user');" | grep -qx 'wallabag_user'; then
+                su -c "php bin/console wallabag:install --env=prod -n" -s /bin/sh nobody
+              fi
+          env:
+            - name: SYMFONY__ENV__DATABASE_DRIVER
+              value: pdo_pgsql
+            - name: SYMFONY__ENV__DATABASE_HOST
+              value: postgres.cosmos.cboxlab.com
+            - name: SYMFONY__ENV__DATABASE_PORT
+              value: "5432"
+            - name: SYMFONY__ENV__DATABASE_NAME
+              value: wallabag
+            - name: SYMFONY__ENV__DATABASE_USER
+              value: wallabag
+            - name: SYMFONY__ENV__DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wallabag-config-vault
+                  key: POSTGRES_PASSWORD
+            - name: SYMFONY__ENV__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: wallabag-config-vault
+                  key: SYMFONY__ENV__SECRET
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
       containers:
         - name: wallabag
           image: wallabag/wallabag:2.6.14
@@ -63,13 +103,13 @@ spec:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 15
+            initialDelaySeconds: 60
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 30
+            initialDelaySeconds: 90
             periodSeconds: 20
           volumeMounts:
             - name: images
