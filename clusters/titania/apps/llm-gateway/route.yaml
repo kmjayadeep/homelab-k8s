@@ -11,7 +11,7 @@ spec:
       kind: Gateway
       name: llm-gateway
   hostnames:
-    - llm.cosmos.cboxlab.com
+    - llm-gateway.cosmos.cboxlab.com
   rules:
     - matches:
         - headers:

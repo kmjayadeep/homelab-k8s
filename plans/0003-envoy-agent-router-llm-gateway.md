@@ -7,7 +7,7 @@
 ## Goal
 
 Provide one TLS-protected OpenAI-compatible endpoint at
-`https://llm.cosmos.cboxlab.com/v1`. Clients use stable aliases such as
+`https://llm-gateway.cosmos.cboxlab.com/v1`. Clients use stable aliases such as
 `chat-default`; model backend changes do not require a client endpoint change.
 
 ## Current implementation
@@ -55,7 +55,7 @@ After the required Git changes are merged and Flux has reconciled:
   generated Envoy data-plane workload are Ready.
 - Confirm the reflected `cosmos-cboxlab-cert` is available in `llm-gateway` and
   that the HTTPS listener is programmed.
-- Confirm ExternalDNS publishes `llm.cosmos.cboxlab.com` for the generated
+- Confirm ExternalDNS publishes `llm-gateway.cosmos.cboxlab.com` for the generated
   LoadBalancer Service.
 - Confirm the KServe vLLM predictor Service remains Ready before testing the
   gateway.

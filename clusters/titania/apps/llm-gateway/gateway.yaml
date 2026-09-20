@@ -21,7 +21,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: llm.cosmos.cboxlab.com
+      hostname: llm-gateway.cosmos.cboxlab.com
       tls:
         mode: Terminate
         certificateRefs:
@@ -58,4 +58,4 @@ spec:
         type: LoadBalancer
         externalTrafficPolicy: Local
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: llm.cosmos.cboxlab.com
+          external-dns.alpha.kubernetes.io/hostname: llm-gateway.cosmos.cboxlab.com
