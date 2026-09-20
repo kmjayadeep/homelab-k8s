@@ -1,0 +1,21 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: agent-router-crds
+  namespace: envoy-ai-gateway-system
+spec:
+  interval: 1h
+  url: oci://docker.io/envoyproxy/ai-gateway-crds-helm
+  ref:
+    tag: v1.0.0
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: agent-router
+  namespace: envoy-ai-gateway-system
+spec:
+  interval: 1h
+  url: oci://docker.io/envoyproxy/ai-gateway-helm
+  ref:
+    tag: v1.0.0

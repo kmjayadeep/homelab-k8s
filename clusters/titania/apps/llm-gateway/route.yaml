@@ -1,0 +1,27 @@
+apiVersion: aigateway.envoyproxy.io/v1beta1
+kind: AIGatewayRoute
+metadata:
+  name: llm-gateway
+  labels:
+    app.kubernetes.io/name: llm-gateway
+    app.kubernetes.io/instance: llm-gateway
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: llm-gateway
+  hostnames:
+    - llm.cosmos.cboxlab.com
+  rules:
+    - name: chat-default
+      matches:
+        - headers:
+            - type: Exact
+              name: x-ai-eg-model
+              value: chat-default
+      modelsOwnedBy: homelab
+      backendRefs:
+        - name: chat-default
+      timeouts:
+        request: 10m
+      streamIdleTimeout: 2m
