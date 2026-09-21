@@ -18,12 +18,6 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    prometheus-node-exporter:
-      tolerations:
-        - key: homelab.cboxlab.com/gpu
-          operator: Equal
-          value: amd
-          effect: NoSchedule
     kubeApiServer:
       enabled: false
     kubelet:
@@ -224,11 +218,6 @@ spec:
               key: objstore.yml
 
         additionalScrapeConfigs:
-        - job_name: jd-pc
-          static_configs:
-          - targets:
-            - 100.108.88.96:9100 ## Node exporter from jd-pc
-            - 100.108.88.96:18080 ## taskwarrior metrics from jd-pc
         # Postgres node
         - job_name: helios
           static_configs:

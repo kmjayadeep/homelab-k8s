@@ -18,8 +18,6 @@ spec:
       namespace: external-secrets
     - name: kserve-localmodel
       namespace: kserve
-    - name: kserve-rocm
-      namespace: kserve
   interval: 15m
   prune: true
   wait: false

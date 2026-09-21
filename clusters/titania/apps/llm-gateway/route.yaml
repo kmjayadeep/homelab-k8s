@@ -27,17 +27,6 @@ spec:
         - headers:
             - type: Exact
               name: x-ai-eg-model
-              value: qwen
-      modelsOwnedBy: homelab
-      backendRefs:
-        - name: qwen
-          modelNameOverride: chat-gpu
-      timeouts:
-        request: 10m
-    - matches:
-        - headers:
-            - type: Exact
-              name: x-ai-eg-model
               value: chat-smollm2-code
       modelsOwnedBy: homelab
       backendRefs:

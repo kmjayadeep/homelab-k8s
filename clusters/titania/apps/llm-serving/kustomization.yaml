@@ -6,6 +6,5 @@ namespace: llm-serving
 resources:
   - inferenceservice.yaml
   - inferenceservice-vllm.yaml
-  - inferenceservice-vllm-rocm.yaml
   - metrics-service.yaml
   - servicemonitor.yaml

@@ -27,13 +27,6 @@ spec:
               name: kserve-localmodelnode-agent
             patch: |-
               - op: add
-                path: /spec/template/spec/tolerations
-                value:
-                  - key: homelab.cboxlab.com/gpu
-                    operator: Equal
-                    value: amd
-                    effect: NoSchedule
-              - op: add
                 path: /spec/template/spec/containers/0/securityContext/runAsUser
                 value: 1000
               - op: add
