@@ -25,9 +25,6 @@ rules:
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
     verbs: ["get", "watch", "list"]
-  - apiGroups: ["gateway.networking.k8s.io"]
-    resources: ["gateways", "httproutes"]
-    verbs: ["get", "watch", "list"]
   - apiGroups: [""]
     resources: ["nodes"]
     verbs: ["watch", "list"]
@@ -85,7 +82,6 @@ spec:
         - --source=ingress
         - --source=crd
         - --source=service
-        - --source=gateway-httproute
         - --domain-filter=cboxlab.com
         - --policy=upsert-only
         - --provider=cloudflare

@@ -1,6 +1,6 @@
 # Plan 0003: Complete the Envoy Agent Router LLM gateway rollout
 
-- Status: In progress
+- Status: Superseded by direct KServe vLLM ingress retirement plan
 - Date: 2026-09-20
 - Scope: KServe vLLM exposed through Envoy Gateway and Agent Router (formerly Envoy AI Gateway)
 

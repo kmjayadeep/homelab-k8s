@@ -10,9 +10,6 @@ metadata:
   namespace: flux-system
 spec:
   path: clusters/titania/apps/llm-ui
-  dependsOn:
-    - name: llm-gateway
-      namespace: llm-gateway
   interval: 15m
   prune: true
   wait: true
