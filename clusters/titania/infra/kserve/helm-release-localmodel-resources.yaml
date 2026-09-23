@@ -32,6 +32,16 @@ spec:
               - op: add
                 path: /spec/template/spec/containers/0/securityContext/runAsGroup
                 value: 1000
+              # The AI node is intentionally tainted workload=ai:NoSchedule.
+              # Permit the cache node agent to run there so LocalModelCache
+              # downloads can complete before predictors are scheduled there.
+              - op: add
+                path: /spec/template/spec/tolerations
+                value:
+                  - key: workload
+                    operator: Equal
+                    value: ai
+                    effect: NoSchedule
   values:
     kserve:
       localmodel:
