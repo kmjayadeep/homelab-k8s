@@ -13,6 +13,13 @@ spec:
   predictor:
     deploymentStrategy:
       type: Recreate
+    nodeSelector:
+      workload: ai
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: ai
+        effect: NoSchedule
     securityContext:
       runAsNonRoot: true
       fsGroup: 1000

@@ -12,6 +12,13 @@ spec:
   predictor:
     deploymentStrategy:
       type: Recreate
+    nodeSelector:
+      workload: ai
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: ai
+        effect: NoSchedule
     securityContext:
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch
