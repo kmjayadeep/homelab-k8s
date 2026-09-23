@@ -23,10 +23,10 @@ spec:
       required:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: kserve/localmodel
+              - key: kubernetes.io/hostname
                 operator: In
                 values:
-                  - worker
+                  - titania-gpu
     persistentVolumeReclaimPolicy: Retain
     storageClassName: kserve-local-model
     volumeMode: Filesystem
