@@ -39,8 +39,8 @@ spec:
             - |
               test -f /models/model.gguf || {
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502/Qwen3.8-27B-UD-Q4_K_M.gguf
-                echo '322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/Greatjedi/Qwen3.8-27B-Intel-Arc-Tuned-GGUF/resolve/6a9a3bafa13a8ba51c6ccd124855b9cb51026bad/Qwen3.8-27B-GSQ-RCO-IQ3_S-Intel-Arc-Tuned-MTP-Q4_K.gguf
+                echo '2170ff045d36dfa1ac5cad5a9f4f1945f5a784a93466a0449dbb6ed8ec1eacce  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               }
           command:
@@ -87,6 +87,10 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "3"
           ports:
             - name: http
               containerPort: 8080
