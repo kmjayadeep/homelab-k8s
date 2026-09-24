@@ -4,7 +4,5 @@ kind: Kustomization
 namespace: llm-serving
 
 resources:
-  - inferenceservice.yaml
-  - inferenceservice-vllm.yaml
   - metrics-service.yaml
   - servicemonitor.yaml
