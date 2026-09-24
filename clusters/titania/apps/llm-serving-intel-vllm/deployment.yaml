@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # The B60 is exclusively assigned to this llm-scaler-vLLM experiment.
-  replicas: 1
+  # Kept installed for rollback; llama.cpp owns the sole B60 allocation.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
