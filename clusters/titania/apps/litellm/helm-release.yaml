@@ -1,0 +1,116 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: litellm
+  labels:
+    app.kubernetes.io/name: litellm
+    app.kubernetes.io/instance: litellm
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: litellm-helm
+      version: "1.90.0"
+      sourceRef:
+        kind: HelmRepository
+        name: litellm
+      interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    deploymentAnnotations:
+      secret.reloader.stakater.com/reload: litellm-secrets-vault
+
+    image:
+      pullPolicy: IfNotPresent
+
+    masterkeySecretName: litellm-secrets-vault
+    masterkeySecretKey: LITELLM_MASTER_KEY
+
+    extraEnvVars:
+      - name: DATABASE_URL
+        valueFrom:
+          secretKeyRef:
+            name: litellm-secrets-vault
+            key: DATABASE_URL
+      - name: LITELLM_SALT_KEY
+        valueFrom:
+          secretKeyRef:
+            name: litellm-secrets-vault
+            key: LITELLM_SALT_KEY
+      - name: STORE_MODEL_IN_DB
+        value: "True"
+
+    db:
+      useExisting: false
+      deployStandalone: false
+
+    proxy_config:
+      model_list:
+        - model_name: chat-default
+          litellm_params:
+            model: openai/chat-default
+            api_base: http://smollm2-135m-vllm-predictor.llm-serving.svc.cluster.local/v1
+            api_key: not-used
+        - model_name: qwen3.8-27b-intel
+          litellm_params:
+            model: openai/qwen3.8-27b-intel
+            api_base: http://intel-llama.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+      litellm_settings:
+        json_logs: true
+        request_timeout: 600
+      general_settings:
+        master_key: os.environ/PROXY_MASTER_KEY
+        disable_master_key_return: true
+
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      hosts:
+        - host: litellm.cosmos.cboxlab.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - litellm.cosmos.cboxlab.com
+          secretName: cosmos-cboxlab-cert
+
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+    migrationJob:
+      enabled: true
+      resources:
+        requests:
+          cpu: 250m
+          memory: 1Gi
+        limits:
+          cpu: "1"
+          memory: 4Gi
+
+    autoscaling:
+      enabled: false
+
+    redis:
+      enabled: false

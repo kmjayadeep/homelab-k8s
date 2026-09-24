@@ -22,6 +22,7 @@ spec:
         - baskit
         - bookorbit
         - external-dns
+        - litellm
         - wallabag
       ignoreJobs: true
       ignoreCronJobs: true
