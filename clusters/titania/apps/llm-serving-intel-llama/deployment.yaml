@@ -69,13 +69,13 @@ spec:
             - --model
             - /models/model.gguf
             - --alias
-            - qwen3.8-27b-intel
+            - qwen3-coder-30b-a3b-intel
             - --host
             - 0.0.0.0
             - --port
             - "8080"
-            # Q8 KV cache preserves the 27B IQ3_S weights while making a
-            # single 64K-token context fit in the B60's 24 GiB VRAM.
+            # Q8 KV cache preserves coding quality while making one 64K-token
+            # context fit alongside the 30B-A3B Q4_K_M MoE weights in B60 VRAM.
             - --ctx-size
             - "65536"
             - --cache-type-k
