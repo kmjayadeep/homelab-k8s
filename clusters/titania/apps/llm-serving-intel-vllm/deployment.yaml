@@ -33,7 +33,8 @@ spec:
           effect: NoSchedule
       containers:
         - name: vllm
-          image: vllm/vllm-openai-xpu@sha256:9b6dd7db65a02a3611fd6645b358780c71105f8d037ea4bc73fd00202d370125
+          # v0.30.0 includes a newer Intel compute runtime for Battlemage (Xe2).
+          image: vllm/vllm-openai-xpu@sha256:e4446310b1d30015e8fdc1a0a2ef1669ac6bef857cbe772487571ed5c1a926a9
           imagePullPolicy: IfNotPresent
           args:
             - --model=Qwen/Qwen3-0.6B
