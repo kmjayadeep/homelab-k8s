@@ -31,6 +31,9 @@ spec:
       resizerReplicaCount: 1
       snapshotterReplicaCount: 1
     defaultSettings:
+      # System-managed components, including the CSI node plugin, must be able
+      # to mount and unmount volumes for workloads on the dedicated AI node.
+      taintToleration: workload=ai:NoSchedule
       defaultReplicaCount: 1
       replicaAutoBalance: true
     defaultBackupStore:
