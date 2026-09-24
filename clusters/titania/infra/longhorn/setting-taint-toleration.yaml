@@ -1,0 +1,5 @@
+apiVersion: longhorn.io/v1beta2
+kind: Setting
+metadata:
+  name: taint-toleration
+value: workload=ai:NoSchedule
