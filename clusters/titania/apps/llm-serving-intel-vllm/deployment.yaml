@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Kept installed for rollback; llama.cpp now owns the sole B60 allocation.
-  replicas: 0
+  # The B60 is exclusively assigned to this llm-scaler-vLLM experiment.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -34,18 +34,27 @@ spec:
           effect: NoSchedule
       containers:
         - name: vllm
-          # v0.30.0 includes a newer Intel compute runtime for Battlemage (Xe2).
-          image: vllm/vllm-openai-xpu@sha256:e4446310b1d30015e8fdc1a0a2ef1669ac6bef857cbe772487571ed5c1a926a9
+          # Intel's llm-scaler-vLLM B60 image, pinned to the upstream beta digest.
+          image: intel/llm-scaler-vllm@sha256:52218ad85513ab6686d4c090c83c2bd8c5b02423c63aa4dabd41837fe641fe3b
           imagePullPolicy: IfNotPresent
+          env:
+            - name: VLLM_ALLOW_LONG_MAX_MODEL_LEN
+              value: "1"
+            - name: VLLM_WORKER_MULTIPROC_METHOD
+              value: spawn
           args:
-            # Qwen3-8B BF16 weights are 15.25 GiB. The 23.91 GiB B60 retains
-            # headroom for runtime overhead and an 8K-token KV cache.
-            - --model=Qwen/Qwen3-8B
-            - --revision=b968826d9c46dd6066d109eabc6255188de91218
-            - --served-model-name=qwen3-8b-intel
-            - --dtype=bfloat16
-            - --max-model-len=8192
-            - --gpu-memory-utilization=0.80
+            # Qwen2.5-14B-AWQ is a 4-bit model. YaRN extends its shipped 32K
+            # configuration to 128K; use one sequence while validating B60 VRAM.
+            - --model=Qwen/Qwen2.5-14B-Instruct-AWQ
+            - --revision=539535859b135b0244c91f3e59816150c8056698
+            - --served-model-name=qwen2.5-14b-awq-intel
+            - --max-model-len=131072
+            - --max-num-seqs=1
+            - --gpu-memory-utilization=0.90
+            - --kv-cache-dtype=fp8
+            - --enforce-eager
+            - --disable-sliding-window
+            - --hf-overrides={"rope_parameters":{"rope_type":"yarn","factor":4.0,"original_max_position_embeddings":32768,"rope_theta":1000000.0}}
           ports:
             - name: http
               containerPort: 8000

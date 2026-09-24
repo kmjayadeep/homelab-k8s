@@ -8,7 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  replicas: 1
+  # Paused while the B60 is assigned to the llm-scaler-vLLM experiment.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
