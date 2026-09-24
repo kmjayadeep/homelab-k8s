@@ -1,25 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: intel-vllm
+  name: intel-llama
   labels:
-    app.kubernetes.io/name: intel-vllm
+    app.kubernetes.io/name: intel-llama
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Kept installed for rollback; llama.cpp now owns the sole B60 allocation.
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: intel-vllm
+      app.kubernetes.io/name: intel-llama
       app.kubernetes.io/instance: llm-serving
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: intel-vllm
+        app.kubernetes.io/name: intel-llama
         app.kubernetes.io/instance: llm-serving
         app.kubernetes.io/component: inference
         app.kubernetes.io/part-of: llm-serving
@@ -32,23 +31,50 @@ spec:
           operator: Equal
           value: ai
           effect: NoSchedule
-      containers:
-        - name: vllm
-          # v0.30.0 includes a newer Intel compute runtime for Battlemage (Xe2).
-          image: vllm/vllm-openai-xpu@sha256:e4446310b1d30015e8fdc1a0a2ef1669ac6bef857cbe772487571ed5c1a926a9
-          imagePullPolicy: IfNotPresent
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:43ebaa53d3806db6b1ce4353b6b26ae638ec1c167ee351524b05690f988bb20d
           args:
-            # Qwen3-8B BF16 weights are 15.25 GiB. The 23.91 GiB B60 retains
-            # headroom for runtime overhead and an 8K-token KV cache.
-            - --model=Qwen/Qwen3-8B
-            - --revision=b968826d9c46dd6066d109eabc6255188de91218
-            - --served-model-name=qwen3-8b-intel
-            - --dtype=bfloat16
-            - --max-model-len=8192
-            - --gpu-memory-utilization=0.80
+            - -ec
+            - |
+              test -f /models/model.gguf || {
+                curl --fail --location --retry 5 --output /models/model.gguf.partial \
+                  https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d562806dbafae37109975e970aae91b43e73b440/Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf
+                echo '64b53b64c7aa39f20a7e54bd80582fe595b1d745624ee8a72e92508c0326d810  /models/model.gguf.partial' | sha256sum -c -
+                mv /models/model.gguf.partial /models/model.gguf
+              }
+          command:
+            - sh
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      containers:
+        - name: llama-server
+          image: ghcr.io/ggml-org/llama.cpp@sha256:2ce301ccfe0a960c6836c56755cad692a3515f4eca2112191c75520b00f17406
+          args:
+            - --model=/models/model.gguf
+            - --alias=qwen3.8-27b-intel
+            - --host=0.0.0.0
+            - --port=8080
+            - --ctx-size=8192
+            - --parallel=1
+            - --n-gpu-layers=99
           ports:
             - name: http
-              containerPort: 8000
+              containerPort: 8080
           resources:
             requests:
               cpu: 4
@@ -64,14 +90,13 @@ spec:
             httpGet:
               path: /health
               port: http
-            failureThreshold: 60
+            failureThreshold: 90
             periodSeconds: 10
             timeoutSeconds: 3
           readinessProbe:
             httpGet:
               path: /health
               port: http
-            initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 3
           livenessProbe:
@@ -83,16 +108,15 @@ spec:
             timeoutSeconds: 3
           volumeMounts:
             - name: model-cache
-              mountPath: /root/.cache/huggingface
+              mountPath: /models
             - name: dshm
               mountPath: /dev/shm
-            # vLLM's XPU image requires the DRM render nodes and by-path links.
             - name: dri
               mountPath: /dev/dri
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-vllm-model-cache
+            claimName: intel-llama-model-cache
         - name: dshm
           emptyDir:
             medium: Memory
