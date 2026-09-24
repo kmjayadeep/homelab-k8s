@@ -74,10 +74,10 @@ spec:
             - 0.0.0.0
             - --port
             - "8080"
-            # Native 128K context trial. Q8 KV cache is the highest-fidelity
-            # practical cache format for the B60's narrow remaining VRAM margin.
+            # 64K is the highest stable context on this B60 with Q8 KV cache.
+            # The 128K Q8 trial caused host-memory OOM and k3s-agent failure.
             - --ctx-size
-            - "131072"
+            - "65536"
             - --cache-type-k
             - q8_0
             - --cache-type-v
