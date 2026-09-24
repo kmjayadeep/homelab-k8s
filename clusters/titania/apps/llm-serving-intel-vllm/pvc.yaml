@@ -14,4 +14,5 @@ spec:
     requests:
       # Qwen3-8B safetensors are 15.25 GiB; retain download and compile headroom.
       storage: 30Gi
-  storageClassName: longhorn
+  # Node-local cache; the predictor is pinned to titania-gpu.
+  storageClassName: local-path
