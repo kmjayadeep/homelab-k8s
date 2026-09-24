@@ -7,6 +7,7 @@ resources:
   - pvc.yaml
   - pvc-coder.yaml
   - pvc-qwen36.yaml
+  - pvc-qwen36-mtp.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml

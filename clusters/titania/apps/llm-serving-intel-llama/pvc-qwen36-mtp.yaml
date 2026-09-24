@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-qwen36-mtp-model-cache
+  labels:
+    app.kubernetes.io/name: intel-llama
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # MTP Q4_K_XL is 17.9 GB; checksum-verified download briefly needs 2x.
+      storage: 40Gi
+  storageClassName: local-path
