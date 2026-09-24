@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: intel-gpu-plugin
+  labels:
+    app.kubernetes.io/name: intel-gpu-plugin
+    app.kubernetes.io/instance: intel-gpu
+    app.kubernetes.io/component: device-plugin
+    app.kubernetes.io/part-of: intel-gpu
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-gpu-plugin
+      app.kubernetes.io/instance: intel-gpu
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-gpu-plugin
+        app.kubernetes.io/instance: intel-gpu
+        app.kubernetes.io/component: device-plugin
+        app.kubernetes.io/part-of: intel-gpu
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        kubernetes.io/arch: amd64
+      containers:
+        - name: intel-gpu-plugin
+          image: intel/intel-gpu-plugin:0.36.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - -v=4
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          resources:
+            requests:
+              cpu: 40m
+              memory: 45Mi
+            limits:
+              cpu: 100m
+              memory: 90Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: devfs
+              mountPath: /dev/dri
+              readOnly: true
+            - name: sysfsdrm
+              mountPath: /sys/class/drm
+              readOnly: true
+            - name: kubelet-sockets
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: cdi-path
+              mountPath: /var/run/cdi
+      volumes:
+        - name: devfs
+          hostPath:
+            path: /dev/dri
+        - name: sysfsdrm
+          hostPath:
+            path: /sys/class/drm
+        - name: kubelet-sockets
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: cdi-path
+          hostPath:
+            path: /var/run/cdi
+            type: DirectoryOrCreate
