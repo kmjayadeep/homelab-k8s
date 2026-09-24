@@ -6,6 +6,7 @@ namespace: llm-serving
 resources:
   - pvc.yaml
   - pvc-coder.yaml
+  - pvc-qwen36.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
