@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # The B60 is exclusively assigned to the Qwen3.6 coding-model evaluation.
+  # The B60 is exclusively assigned to the proven Qwen3.8 coding model.
   replicas: 1
   strategy:
     type: Recreate
@@ -40,8 +40,8 @@ spec:
             - |
               test -f /models/model.gguf || {
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF/resolve/5cb35eb3dcbf52dbce5f87dbc64df6aaffadcace/Qwen3.6-27B-UD-Q4_K_XL.gguf
-                echo '4085665ee36d82a672a238a43f0e5643f2f0e39f2d7bd5d373f0ef10ecf53095  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/Greatjedi/Qwen3.8-27B-Intel-Arc-Tuned-GGUF/resolve/6a9a3bafa13a8ba51c6ccd124855b9cb51026bad/Qwen3.8-27B-GSQ-RCO-IQ3_S-Intel-Arc-Tuned-MTP-Q4_K.gguf
+                echo '2170ff045d36dfa1ac5cad5a9f4f1945f5a784a93466a0449dbb6ed8ec1eacce  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               }
           command:
@@ -69,13 +69,12 @@ spec:
             - --model
             - /models/model.gguf
             - --alias
-            - qwen3.6-27b-intel
+            - qwen3.8-27b-intel
             - --host
             - 0.0.0.0
             - --port
             - "8080"
-            # Qwen3.6-27B supports 256K natively; retain the B60's proven
-            # 64K context limit while this model/runtime combination is evaluated.
+            # 64K is the B60's proven stable context limit with Q8 KV cache.
             - --ctx-size
             - "65536"
             - --cache-type-k
@@ -91,7 +90,7 @@ spec:
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
-            - "2"
+            - "3"
           ports:
             - name: http
               containerPort: 8080
@@ -136,7 +135,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-qwen36-mtp-model-cache
+            claimName: intel-llama-model-cache
         - name: dshm
           emptyDir:
             medium: Memory
