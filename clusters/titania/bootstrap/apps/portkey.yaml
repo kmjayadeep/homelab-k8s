@@ -14,8 +14,8 @@ metadata:
 spec:
   path: clusters/titania/apps/portkey
   dependsOn:
-    - name: llm-serving
-      namespace: llm-serving
+    - name: ingress-nginx
+      namespace: ingress-nginx
   interval: 15m
   prune: true
   wait: true
