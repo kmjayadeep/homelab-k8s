@@ -37,21 +37,25 @@ spec:
           image: vllm/vllm-openai-xpu@sha256:e4446310b1d30015e8fdc1a0a2ef1669ac6bef857cbe772487571ed5c1a926a9
           imagePullPolicy: IfNotPresent
           args:
-            - --model=Qwen/Qwen3-0.6B
-            - --served-model-name=qwen3-0.6b-intel
-            - --max-model-len=4096
-            - --gpu-memory-utilization=0.75
+            # Qwen3-8B BF16 weights are 15.25 GiB. The 23.91 GiB B60 retains
+            # headroom for runtime overhead and an 8K-token KV cache.
+            - --model=Qwen/Qwen3-8B
+            - --revision=b968826d9c46dd6066d109eabc6255188de91218
+            - --served-model-name=qwen3-8b-intel
+            - --dtype=bfloat16
+            - --max-model-len=8192
+            - --gpu-memory-utilization=0.80
           ports:
             - name: http
               containerPort: 8000
           resources:
             requests:
-              cpu: 2
-              memory: 6Gi
+              cpu: 4
+              memory: 8Gi
               gpu.intel.com/xe: 1
             limits:
-              cpu: 4
-              memory: 10Gi
+              cpu: 6
+              memory: 16Gi
               gpu.intel.com/xe: 1
           securityContext:
             privileged: true

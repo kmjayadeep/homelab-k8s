@@ -12,5 +12,6 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      # Qwen3-8B safetensors are 15.25 GiB; retain download and compile headroom.
+      storage: 30Gi
   storageClassName: longhorn
