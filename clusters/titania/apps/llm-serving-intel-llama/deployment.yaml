@@ -65,13 +65,20 @@ spec:
         - name: llama-server
           image: ghcr.io/ggml-org/llama.cpp@sha256:2ce301ccfe0a960c6836c56755cad692a3515f4eca2112191c75520b00f17406
           args:
-            - --model=/models/model.gguf
-            - --alias=qwen3.8-27b-intel
-            - --host=0.0.0.0
-            - --port=8080
-            - --ctx-size=8192
-            - --parallel=1
-            - --n-gpu-layers=99
+            - --model
+            - /models/model.gguf
+            - --alias
+            - qwen3.8-27b-intel
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --ctx-size
+            - "8192"
+            - --parallel
+            - "1"
+            - --n-gpu-layers
+            - "99"
           ports:
             - name: http
               containerPort: 8080
