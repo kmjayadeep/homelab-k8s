@@ -80,6 +80,9 @@ spec:
               mountPath: /root/.cache/huggingface
             - name: dshm
               mountPath: /dev/shm
+            # vLLM's XPU image requires the DRM render nodes and by-path links.
+            - name: dri
+              mountPath: /dev/dri
       volumes:
         - name: model-cache
           persistentVolumeClaim:
@@ -88,3 +91,7 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 2Gi
+        - name: dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
