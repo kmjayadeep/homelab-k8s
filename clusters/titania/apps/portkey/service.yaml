@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: portkey
+  labels:
+    app.kubernetes.io/name: portkey
+    app.kubernetes.io/instance: portkey
+    app.kubernetes.io/component: gateway
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: portkey
+    app.kubernetes.io/instance: portkey
+  ports:
+    - name: http
+      port: 8787
+      targetPort: http
+      protocol: TCP
