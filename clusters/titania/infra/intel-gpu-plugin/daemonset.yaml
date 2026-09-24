@@ -28,6 +28,11 @@ spec:
       nodeSelector:
         gpu.intel.com/product: arc-pro-b60
         kubernetes.io/arch: amd64
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
       containers:
         - name: intel-gpu-plugin
           image: intel/intel-gpu-plugin:0.36.0
