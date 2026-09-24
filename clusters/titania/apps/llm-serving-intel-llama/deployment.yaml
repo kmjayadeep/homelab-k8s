@@ -74,10 +74,10 @@ spec:
             - 0.0.0.0
             - --port
             - "8080"
-            # Q8 KV cache preserves coding quality while making one 64K-token
-            # context fit alongside the 30B-A3B Q4_K_M MoE weights in B60 VRAM.
+            # Native 128K context trial. Q8 KV cache is the highest-fidelity
+            # practical cache format for the B60's narrow remaining VRAM margin.
             - --ctx-size
-            - "65536"
+            - "131072"
             - --cache-type-k
             - q8_0
             - --cache-type-v
