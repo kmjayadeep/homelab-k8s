@@ -39,8 +39,8 @@ spec:
             - |
               test -f /models/model.gguf || {
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d562806dbafae37109975e970aae91b43e73b440/Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf
-                echo '64b53b64c7aa39f20a7e54bd80582fe595b1d745624ee8a72e92508c0326d810  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d562806dbafae37109975e970aae91b43e73b440/Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf
+                echo '58fd826723939933dc86f45b7fe04545cbc2de1c70f6fe2cdd3858c87a98c12f  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               }
           command:
@@ -87,6 +87,10 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "3"
           ports:
             - name: http
               containerPort: 8080
