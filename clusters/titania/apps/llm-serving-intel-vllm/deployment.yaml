@@ -35,7 +35,7 @@ spec:
       containers:
         - name: vllm
           # v0.30.0 includes a newer Intel compute runtime for Battlemage (Xe2).
-          image: vllm/vllm-openai-xpu@sha256:e4446310b1d30015e8fdc1a0a2ef1669ac6bef857cbe772487571ed5c1a926a9
+          image: vllm/vllm-openai-xpu@sha256:1db27a8b75ae1d6b3cbf16ebbb88310c2b5548221c8df1335082b2a54dba209a
           imagePullPolicy: IfNotPresent
           args:
             # Qwen3-8B BF16 weights are 15.25 GiB. The 23.91 GiB B60 retains
