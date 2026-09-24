@@ -73,8 +73,16 @@ spec:
             - 0.0.0.0
             - --port
             - "8080"
+            # Q8 KV cache preserves the 27B IQ3_S weights while making a
+            # single 64K-token context fit in the B60's 24 GiB VRAM.
             - --ctx-size
-            - "8192"
+            - "65536"
+            - --cache-type-k
+            - q8_0
+            - --cache-type-v
+            - q8_0
+            - --flash-attn
+            - on
             - --parallel
             - "1"
             - --n-gpu-layers
