@@ -50,7 +50,8 @@ spec:
             - --served-model-name=qwen2.5-14b-awq-intel
             - --max-model-len=131072
             - --max-num-seqs=1
-            - --gpu-memory-utilization=0.90
+            # Startup measured 12.0 GiB KV need versus 11.37 GiB at 0.90.
+            - --gpu-memory-utilization=0.95
             - --kv-cache-dtype=fp8
             - --enforce-eager
             - --disable-sliding-window
