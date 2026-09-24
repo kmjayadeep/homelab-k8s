@@ -33,7 +33,7 @@ spec:
           effect: NoSchedule
       initContainers:
         - name: model-download
-          image: curlimages/curl@sha256:43ebaa53d3806db6b1ce4353b6b26ae638ec1c167ee351524b05690f988bb20d
+          image: curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a
           args:
             - -ec
             - |
