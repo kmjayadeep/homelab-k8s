@@ -97,11 +97,13 @@ spec:
           resources:
             requests:
               cpu: 4
-              memory: 8Gi
+              # Reserve most of the GPU node's ~19.9 GiB allocatable memory.
+              memory: 18Gi
               gpu.intel.com/xe: 1
             limits:
               cpu: 6
-              memory: 16Gi
+              # 20 GiB leaves ~3.4 GiB of physical RAM for the host.
+              memory: 20Gi
               gpu.intel.com/xe: 1
           securityContext:
             privileged: true
