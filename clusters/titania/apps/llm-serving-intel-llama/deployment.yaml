@@ -74,9 +74,9 @@ spec:
             - 0.0.0.0
             - --port
             - "8080"
-            # 64K is the B60's proven stable context limit with Q8 KV cache.
+            # Incremental 72K context trial with Q8 KV cache on the B60.
             - --ctx-size
-            - "65536"
+            - "73728"
             - --cache-type-k
             - q8_0
             - --cache-type-v
