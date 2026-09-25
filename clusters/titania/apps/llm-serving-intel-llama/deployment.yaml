@@ -74,9 +74,9 @@ spec:
             - 0.0.0.0
             - --port
             - "8080"
-            # Incremental 96K context trial with Q8 KV cache on the B60.
+            # Incremental 112K context trial with Q8 KV cache on the B60.
             - --ctx-size
-            - "98304"
+            - "114688"
             - --cache-type-k
             - q8_0
             - --cache-type-v
