@@ -52,9 +52,9 @@ spec:
 
     proxy_config:
       model_list:
-        - model_name: qwen3-coder-30b-a3b-intel
+        - model_name: qwen3.8-27b-intel
           litellm_params:
-            model: openai/qwen3-coder-30b-a3b-intel
+            model: openai/qwen3.8-27b-intel
             api_base: http://intel-llama.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
       litellm_settings:
