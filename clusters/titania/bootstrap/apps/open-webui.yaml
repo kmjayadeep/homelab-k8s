@@ -16,7 +16,7 @@ spec:
     - name: reloader
       namespace: reloader
     - name: litellm
-      namespace: litellm
+      namespace: flux-system
   interval: 15m
   prune: true
   wait: true
