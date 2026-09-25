@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: intel-llama
+  labels:
+    app.kubernetes.io/name: intel-llama
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-llama
+      app.kubernetes.io/component: monitoring
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - targetLabel: job
+          replacement: llama-cpp

@@ -74,6 +74,7 @@ spec:
             - 0.0.0.0
             - --port
             - "8080"
+            - --metrics
             # 128K context validated incrementally with Q8 KV cache on the B60.
             - --ctx-size
             - "131072"

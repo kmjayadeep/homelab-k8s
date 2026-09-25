@@ -10,4 +10,6 @@ resources:
   - pvc-qwen36-mtp.yaml
   - deployment.yaml
   - service.yaml
+  - metrics-service.yaml
+  - servicemonitor.yaml
   - ingress.yaml
