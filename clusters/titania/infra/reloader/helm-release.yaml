@@ -23,6 +23,7 @@ spec:
         - bookorbit
         - external-dns
         - litellm
+        - open-webui
         - wallabag
       ignoreJobs: true
       ignoreCronJobs: true

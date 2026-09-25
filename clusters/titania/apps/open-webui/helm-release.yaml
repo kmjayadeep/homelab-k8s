@@ -1,0 +1,96 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+  labels:
+    app.kubernetes.io/name: open-webui
+    app.kubernetes.io/instance: open-webui
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: open-webui
+      version: "16.6.0"
+      sourceRef:
+        kind: HelmRepository
+        name: open-webui
+      interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    ollama:
+      enabled: false
+
+    pipelines:
+      enabled: false
+
+    websocket:
+      manager: ""
+      redis:
+        enabled: false
+
+    annotations:
+      secret.reloader.stakater.com/reload: open-webui-secrets-vault
+
+    openaiBaseApiUrl: http://litellm.litellm.svc.cluster.local/v1
+    openaiApiKeyExistingSecret: open-webui-secrets-vault
+    openaiApiKeyExistingSecretKey: LITELLM_API_KEY
+
+    extraEnvVars:
+      - name: WEBUI_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: open-webui-secrets-vault
+            key: WEBUI_SECRET_KEY
+      - name: WEBUI_URL
+        value: https://openwebui.cosmos.cboxlab.com
+
+    persistence:
+      enabled: true
+      size: 10Gi
+      accessModes:
+        - ReadWriteOnce
+      storageClass: longhorn
+
+    ingress:
+      enabled: true
+      class: nginx
+      host: openwebui.cosmos.cboxlab.com
+      tls: true
+      existingSecret: cosmos-cboxlab-cert
+
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 20
+      failureThreshold: 3
+
+    readinessProbe:
+      httpGet:
+        path: /health/db
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      failureThreshold: 6
+
+    startupProbe:
+      httpGet:
+        path: /health
+        port: http
+      periodSeconds: 10
+      failureThreshold: 30
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 2Gi
