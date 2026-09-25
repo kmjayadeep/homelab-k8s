@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llama-cpp-grafana-dashboard
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/name: llama-cpp
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: llm-serving
+data:
+  llama-cpp-serving.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Requests processing and deferred",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {"expr": "sum by (service) (llamacpp:requests_processing{job=\"llama-cpp\"})", "legendFormat": "{{service}} processing"},
+            {"expr": "sum by (service) (llamacpp:requests_deferred{job=\"llama-cpp\"})", "legendFormat": "{{service}} deferred"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Prompt and generation throughput",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {"expr": "max by (service) (llamacpp:prompt_tokens_seconds{job=\"llama-cpp\"})", "legendFormat": "{{service}} prompt tok/s"},
+            {"expr": "max by (service) (llamacpp:predicted_tokens_seconds{job=\"llama-cpp\"})", "legendFormat": "{{service}} generation tok/s"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Prompt-cache reuse",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "sum by (service) (rate(llamacpp:prompt_tokens_cached_total{job=\"llama-cpp\"}[$__rate_interval])) / clamp_min(sum by (service) (rate(llamacpp:prompt_tokens_cached_total{job=\"llama-cpp\"}[$__rate_interval]) + rate(llamacpp:prompt_tokens_total{job=\"llama-cpp\"}[$__rate_interval])), 1)", "legendFormat": "{{service}}"}],
+          "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Prompt and generated token rates",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [
+            {"expr": "sum by (service) (rate(llamacpp:prompt_tokens_total{job=\"llama-cpp\"}[$__rate_interval]))", "legendFormat": "{{service}} prompt tok/s"},
+            {"expr": "sum by (service) (rate(llamacpp:tokens_predicted_total{job=\"llama-cpp\"}[$__rate_interval]))", "legendFormat": "{{service}} generated tok/s"}
+          ],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Largest observed sequence",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "targets": [{"expr": "max by (service) (llamacpp:n_tokens_max{job=\"llama-cpp\"})", "legendFormat": "{{service}} tokens"}],
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": ["llm", "llama.cpp", "intel"],
+      "templating": {"list": []},
+      "time": {"from": "now-6h", "to": "now"},
+      "timezone": "browser",
+      "title": "llama.cpp Serving",
+      "uid": "llama-cpp-serving",
+      "version": 1
+    }

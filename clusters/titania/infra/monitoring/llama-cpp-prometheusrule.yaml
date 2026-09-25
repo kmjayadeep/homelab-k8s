@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: llama-cpp-serving
+  labels:
+    app.kubernetes.io/name: llama-cpp
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  groups:
+    - name: llama-cpp-serving
+      rules:
+        - alert: LlamaCppTargetDown
+          expr: up{job="llama-cpp"} == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "llama.cpp metrics target is unavailable"
+            description: "The llama.cpp metrics endpoint for {{ $labels.service }} in {{ $labels.namespace }} has been unavailable for 10 minutes."
+        - alert: LlamaCppRequestsDeferred
+          expr: max_over_time(llamacpp:requests_deferred{job="llama-cpp"}[5m]) > 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "llama.cpp requests are deferred"
+            description: "The llama.cpp predictor for {{ $labels.service }} has deferred requests for at least 10 minutes."
