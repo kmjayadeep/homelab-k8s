@@ -37,7 +37,7 @@ spec:
     annotations:
       secret.reloader.stakater.com/reload: open-webui-secrets-vault
 
-    openaiBaseApiUrl: http://litellm.litellm.svc.cluster.local/v1
+    openaiBaseApiUrl: https://litellm.cosmos.cboxlab.com/v1
     openaiApiKeyExistingSecret: open-webui-secrets-vault
     openaiApiKeyExistingSecretKey: LITELLM_API_KEY
 

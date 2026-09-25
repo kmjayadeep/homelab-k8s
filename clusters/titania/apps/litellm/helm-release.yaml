@@ -57,6 +57,9 @@ spec:
             model: openai/qwen3.8-27b-intel
             api_base: http://intel-llama.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
+          model_info:
+            max_input_tokens: 49152
+            max_output_tokens: 16384
       litellm_settings:
         json_logs: true
         request_timeout: 600
