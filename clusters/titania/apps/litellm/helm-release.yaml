@@ -65,6 +65,9 @@ spec:
             model: openai/qwen3.8-27b-intel
             api_base: http://intel-llama.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
+            input_cost_per_token: 0.0000001
+            cache_read_input_token_cost: 0.00000001
+            output_cost_per_token: 0.000001
           model_info:
             max_input_tokens: 49152
             max_output_tokens: 16384
