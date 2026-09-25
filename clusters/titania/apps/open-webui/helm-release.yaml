@@ -42,6 +42,12 @@ spec:
     openaiApiKeyExistingSecretKey: LITELLM_API_KEY
 
     extraEnvVars:
+      - name: RAG_EMBEDDING_ENGINE
+        value: openai
+      - name: USER_PERMISSIONS_CHAT_FILE_UPLOAD
+        value: "False"
+      - name: ENABLE_IMAGE_GENERATION
+        value: "False"
       - name: WEBUI_SECRET_KEY
         valueFrom:
           secretKeyRef:
