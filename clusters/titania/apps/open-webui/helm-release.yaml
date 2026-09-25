@@ -50,6 +50,22 @@ spec:
         value: "False"
       - name: ENABLE_IMAGE_GENERATION
         value: "False"
+      - name: ENABLE_CODE_INTERPRETER
+        value: "False"
+      - name: ENABLE_WEB_SEARCH
+        value: "False"
+      - name: ENABLE_MEMORIES
+        value: "False"
+      - name: ENABLE_TITLE_GENERATION
+        value: "False"
+      - name: ENABLE_FOLLOW_UP_GENERATION
+        value: "False"
+      - name: ENABLE_AUTOCOMPLETE_GENERATION
+        value: "False"
+      - name: AIOHTTP_POOL_CONNECTIONS
+        value: "1"
+      - name: AIOHTTP_POOL_CONNECTIONS_PER_HOST
+        value: "1"
       - name: WEBUI_SECRET_KEY
         valueFrom:
           secretKeyRef:
