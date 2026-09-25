@@ -75,6 +75,9 @@ The shared downloader currently disables HF Xet because it crashed on the CPU. P
 - Set resource requests/limits and verify effective startup/readiness/liveness probes in the runtime. Allow enough startup time for download/model loading. Avoid unrelated runtime changes.
 - Existing predictors use Recreate: replacing one can interrupt service while it restarts. Warn about this before live rollout.
 - Add/update the gateway Backend hostname (`<inferenceservice>-predictor.llm-serving.svc.cluster.local`), AIServiceBackend, and route when introducing an alias.
+- Update `clusters/titania/apps/litellm/helm-release.yaml` for every model LiteLLM should expose. Its `model_name` and `litellm_params.model` must match the serving runtime's `--served-model-name`; set the exact internal service URL and port in `api_base`.
+- Add LiteLLM `model_info.max_input_tokens` and `model_info.max_output_tokens` that together do not exceed the runtime context window. For a 64K server with a 16K generation budget, use 49,152 input and 16,384 output tokens.
+- Record supplied model pricing in LiteLLM under `litellm_params` as USD per token: `input_cost_per_token`, `cache_read_input_token_cost`, and `output_cost_per_token`. Convert any per-million-token price by dividing it by 1,000,000; do not invent costs when none are supplied.
 - Route `modelNameOverride` must match the backend's `--served-model-name`; do not confuse the public alias with the internal name.
 - Inspect shared aliases: `chat-smollm2-code` historically shares the `chat-default` backend and is not evidence that a separate code model exists. Changing that predictor affects both aliases.
 - Update the gateway README with client selection and any limitations.
@@ -96,6 +99,7 @@ Run relevant builds and client dry-runs, using `set -o pipefail` so build failur
 set -o pipefail
 kustomize build clusters/titania/infra/kserve-localmodel | kubectl apply --dry-run=client -f -
 kustomize build clusters/titania/apps/llm-serving | kubectl apply --dry-run=client -f -
+kustomize build clusters/titania/apps/litellm | kubectl apply --dry-run=client -f -
 kustomize build clusters/titania/apps/llm-gateway | kubectl apply --dry-run=client -f -
 git diff --check
 ```
