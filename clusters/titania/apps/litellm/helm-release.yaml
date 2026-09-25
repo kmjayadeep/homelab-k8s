@@ -45,6 +45,8 @@ spec:
             key: LITELLM_SALT_KEY
       - name: STORE_MODEL_IN_DB
         value: "True"
+      - name: NUM_WORKERS
+        value: "1"
       - name: NO_DOCS
         value: "True"
       - name: NO_REDOC
@@ -71,6 +73,7 @@ spec:
         request_timeout: 600
       general_settings:
         master_key: os.environ/PROXY_MASTER_KEY
+        database_connection_pool_limit: 2
         disable_master_key_return: true
 
     ingress:
