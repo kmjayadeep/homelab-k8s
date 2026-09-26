@@ -14,6 +14,8 @@ spec:
       app.kubernetes.io/name: glance
   template:
     metadata:
+      annotations:
+        secret.reloader.stakater.com/reload: glance-secret-vault
       labels:
         app.kubernetes.io/instance: glance
         app.kubernetes.io/name: glance
