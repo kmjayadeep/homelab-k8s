@@ -2,13 +2,13 @@
 
 ## Repository
 
-Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests. Vault with External Secrets is the active architecture for application and infrastructure secrets. The Sealed Secrets controller is temporarily retained, but no SealedSecret manifests remain.
+Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests. Vault with External Secrets is the active architecture for application and infrastructure secrets. The Sealed Secrets controller has been decommissioned.
 
 ## Safety rules
 
 - **Never read plaintext secrets into agent context.** Do not use `read`, `cat`, `grep`, decode commands, logs, Terraform output, or `kubectl get` to display values. For debugging, extract only key names, hashes/equality results, readiness conditions, or other non-secret metadata.
 - Store canonical values in Vault under the taxonomy in `homelab-iac/vault-config/PATHS.md`; Git contains only ServiceAccounts, stores, paths, property mappings, policies, and roles.
-- Do not create `*-decrypted.yaml`, `*-sealed.yaml`, or new SealedSecret resources. A bootstrap exception requires explicit approval and an ADR update.
+- Do not create `*-decrypted.yaml`, `*-sealed.yaml`, or new SealedSecret resources. The Sealed Secrets controller has been decommissioned; creating new sealed secrets requires explicit approval and an ADR update.
 - When importing or rotating a value, use stdin or another non-logging file-to-file workflow, suppress command output, and never place values in command arguments, shell history, plans, or agent messages.
 - **Never perform destructive operations without explicit human approval.** This includes `rm`, `kubectl delete`, pruning/removing Flux resources, force operations, database/data deletion, and destructive rewrites. Explain the impact and wait for approval.
 - Do not apply or reconcile changes to the cluster unless explicitly requested.

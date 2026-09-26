@@ -6,8 +6,6 @@ metadata:
 spec:
   path: clusters/titania/infra/restic-exporter
   dependsOn:
-  - name: sealed-secrets
-    namespace: flux-system
   - name: monitoring
     namespace: monitoring
   interval: 15m

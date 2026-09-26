@@ -11,8 +11,6 @@ metadata:
 spec:
   path: clusters/titania/infra/external-dns
   dependsOn:
-  - name: sealed-secrets
-    namespace: flux-system
   - name: external-secrets
     namespace: external-secrets
   - name: reloader

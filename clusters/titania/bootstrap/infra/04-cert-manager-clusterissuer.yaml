@@ -8,8 +8,6 @@ spec:
   dependsOn:
   - name: cert-manager
     namespace: cert-manager
-  - name: sealed-secrets
-    namespace: flux-system
   - name: external-secrets
     namespace: external-secrets
   interval: 15m
