@@ -1,6 +1,6 @@
 # Plan 0004: Retire Envoy LLM gateway for direct KServe vLLM ingress
 
-- Status: Implemented in Git; pending Flux reconciliation
+- Status: Completed
 - Date: 2026-09-20
 - Scope: Remove Envoy Gateway, Envoy Agent Router, and their LLM Gateway resources. Use the existing KServe-generated vLLM ingress.
 
