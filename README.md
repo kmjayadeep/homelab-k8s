@@ -14,7 +14,7 @@ A mini pc sitting at my home
 K3s running in hetzner cloud
 
 ### Cosmos
-Migrated from Andromeda to use cilium as CNI. I moved from bare metal to proxmox LXC and made a copy of the manifests with the name `cosmos`.
+Migrated from Andromeda to use Cilium as CNI. Infrastructure moved from bare metal to Proxmox LXC. Manifests are under `clusters/titania/` in Git; the running cluster is named `cosmos` with domain `cosmos.cboxlab.com`.
 
 ## Automation
 

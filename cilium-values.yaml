@@ -1,6 +1,9 @@
 ipv6:
   enabled: true
 
+# NOTE: cluster name is 'cosmos' (matching cosmos.cboxlab.com domain).
+# The GitOps manifests live under clusters/titania/ — this was the name
+# chosen when the Andromeda manifests were copied to the Proxmox LXC cluster.
 cluster:
   name: cosmos
 
