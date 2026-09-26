@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/part-of: llm-serving
 spec:
   # The B60 is exclusively assigned to the measured Qwen3-Coder MoE model.
-  # Paused for the single-B60 Qwen3.6-35B-A3B MTP trial; keep the cache for rollback.
-  replicas: 0
+  # Restore the public coder endpoint after the isolated Qwen3.6 MTP trial.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
