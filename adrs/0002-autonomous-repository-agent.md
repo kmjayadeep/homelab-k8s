@@ -1,6 +1,6 @@
 # ADR 0002: Use a local Pi runner for reviewed repository changes
 
-- Status: Accepted design; implementation not present in this tree
+- Status: Accepted; implementation pending
 - Date: 2026-08-29
 
 ## Context
@@ -37,4 +37,4 @@ Operational state stays in ignored `.agent-state/`. Safe, bounded artifacts are 
 
 ## Implementation
 
-The approved design and incremental acceptance criteria are in [plan 0002](../plans/0002-autonomous-ai-agent.md). The planned `automation/autonomous-agent/README.md` and `agent-runs/README.md` are not present in this tree; do not use this ADR as evidence that the runner has been installed.
+The approved design and incremental acceptance criteria are in [plan 0002](../plans/0002-autonomous-ai-agent.md). Installation and operation documentation (`automation/autonomous-agent/README.md`) and run record conventions (`agent-runs/README.md`) are pending implementation; do not use this ADR as evidence that the runner has been installed.

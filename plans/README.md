@@ -9,3 +9,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0003: Envoy agent router](0003-envoy-agent-router-llm-gateway.md) | Superseded by plan 0004 |
 | [0004: Direct vLLM ingress](0004-retire-envoy-for-direct-vllm-ingress.md) | Completed (per plan); verify current manifests before relying on it |
 | [0005: Intel B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md) | Active evaluation; [ADR 0003](../adrs/0003-intel-b60-llm-serving.md) contains decision history |
+| [0006: Longhorn restore runbook](0006-longhorn-restore-runbook.md) | Recovery procedures; requires explicit approval before any live or destructive steps |
