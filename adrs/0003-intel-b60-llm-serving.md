@@ -1,11 +1,15 @@
 # ADR 0003: Retain Qwen3.8-27B llama.cpp serving while evaluating vLLM
 
-- Status: Accepted for the current deployment; vLLM trial pending
+- Status: Superseded for model selection by the Qwen3-Coder-30B-A3B deployment; vLLM trial pending
 - Date: 2026-09-26
+
+## Deployment update
+
+The selected llama.cpp/SYCL model is now the previously measured Qwen3-Coder-30B-A3B Q4_K_M at 64K context. This ADR records the earlier Qwen3.8 decision and trial rationale; its GGUF cache remains available for rollback. See [the evaluation](../plans/0005-intel-arc-b60-llm-serving-evaluation.md) for measured throughput and the 128K OOM warning.
 
 ## Context
 
-`titania-gpu` has one Intel Arc Pro B60 (23.91 GiB VRAM), 24 GiB guest RAM, and 8 vCPUs. The coding workload needs useful long context without sacrificing model quality. Only one inference Deployment can allocate the GPU at a time. `intel-llama` currently serves a pinned, Intel-Arc-tuned Qwen3.8-27B IQ3_S GGUF with Q4 MTP through llama.cpp SYCL. Its deployment is configured for one parallel slot, Q8 KV, Flash Attention, and a 131,072-token maximum; configuration alone does not demonstrate performance or safety at that depth.
+`titania-gpu` has one Intel Arc Pro B60 (23.91 GiB VRAM), 24 GiB guest RAM, and 8 vCPUs. The coding workload needs useful long context without sacrificing model quality. Only one inference Deployment can allocate the GPU at a time. At the time of this decision, `intel-llama` served a pinned, Intel-Arc-tuned Qwen3.8-27B IQ3_S GGUF with Q4 MTP through llama.cpp SYCL. Its deployment is configured for one parallel slot, Q8 KV, Flash Attention, and a 131,072-token maximum; configuration alone does not demonstrate performance or safety at that depth.
 
 The local measurements below were recorded in [the B60 evaluation](../plans/0005-intel-arc-b60-llm-serving-evaluation.md). The Qwen3.8 measurements used short, benign 128-output-token requests at a **64K configured context**, not 64K-token active prompts. They are decode throughput, not quality scores or long-context throughput.
 

@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # The B60 is exclusively assigned to the proven Qwen3.8 coding model.
+  # The B60 is exclusively assigned to the measured Qwen3-Coder MoE model.
   replicas: 1
   strategy:
     type: Recreate
@@ -40,8 +40,8 @@ spec:
             - |
               test -f /models/model.gguf || {
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/Greatjedi/Qwen3.8-27B-Intel-Arc-Tuned-GGUF/resolve/6a9a3bafa13a8ba51c6ccd124855b9cb51026bad/Qwen3.8-27B-GSQ-RCO-IQ3_S-Intel-Arc-Tuned-MTP-Q4_K.gguf
-                echo '2170ff045d36dfa1ac5cad5a9f4f1945f5a784a93466a0449dbb6ed8ec1eacce  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/mradermacher/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/e8ae3e1c21d36f9c57cee690115c06934aca03d9/Qwen3-Coder-30B-A3B-Instruct.Q4_K_M.gguf
+                echo '050b8e7977edd2644093b691c899beb156deffdfe20cc33df7fa9ece3aaba257  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               }
           command:
@@ -69,15 +69,15 @@ spec:
             - --model
             - /models/model.gguf
             - --alias
-            - qwen3.8-27b-intel
+            - qwen3-coder-30b-a3b-intel
             - --host
             - 0.0.0.0
             - --port
             - "8080"
             - --metrics
-            # 128K context validated incrementally with Q8 KV cache on the B60.
+            # 64K was measured with this artifact; 128K Q8 caused host-wide OOM.
             - --ctx-size
-            - "131072"
+            - "65536"
             - --cache-type-k
             - q8_0
             - --cache-type-v
@@ -88,23 +88,17 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
-            - --spec-type
-            - draft-mtp
-            - --spec-draft-n-max
-            - "3"
           ports:
             - name: http
               containerPort: 8080
           resources:
             requests:
               cpu: 4
-              # Reserve most of the GPU node's ~19.9 GiB allocatable memory.
-              memory: 18Gi
+              memory: 8Gi
               gpu.intel.com/xe: 1
             limits:
               cpu: 6
-              # 20 GiB leaves ~3.4 GiB of physical RAM for the host.
-              memory: 20Gi
+              memory: 16Gi
               gpu.intel.com/xe: 1
           securityContext:
             privileged: true
@@ -138,7 +132,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-model-cache
+            claimName: intel-llama-coder-model-cache
         - name: dshm
           emptyDir:
             medium: Memory

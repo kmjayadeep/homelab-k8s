@@ -35,7 +35,7 @@ Measurements below used a benign 128-output-token request unless otherwise noted
 
 ### Current selected model
 
-The current `intel-llama` manifest selects the pinned Qwen3.8-27B Intel-Arc-tuned IQ3_S + Q4 MTP GGUF artifact, with `draft-mtp`, draft width 3, Q8 KV cache, Flash Attention, one parallel slot, and a **128K configured maximum**. The 25.93 tok/s measurement above was taken with a 64K configured context and a short request; it is not a 128K or near-64K active-prompt result. The earlier 64K recommendation predates the manifest's 128K setting. No comparable Qwen3.8 128K active-context performance or host-pressure result is recorded here. The model remains the preferred coding-quality configuration based on available evidence, not an independent deployment-specific quality benchmark.
+The `intel-llama` manifest selects the previously measured, pinned Qwen3-Coder-30B-A3B-Instruct Q4_K_M GGUF under llama.cpp SYCL, with Q8 KV cache, Flash Attention, one parallel slot, and a 64K maximum. The previous Qwen3.8-27B Intel-Arc-tuned GGUF remains in its separate cache for rollback. The 48.44 tok/s short-request measurement is not a long-context SLA: at ~60K active prompt tokens decode fell to 13.10 tok/s. The switch prioritizes measured MoE throughput; no head-to-head coding-quality comparison establishes that it matches Qwen3.8.
 
 The separate Qwen3.6 MTP cache is retained only for a future controlled comparison; its MTP variant was deployed but not benchmarked.
 
@@ -61,7 +61,7 @@ The Qwen3.8 IQ3_S quant publisher also reported 85.71 on LiveCodeBench v6, equal
 - The Qwen3-Coder-30B-A3B Q4_K_M file is 18.56 GB (about 17.28 GiB). It has 48 layers, four KV heads, and a Q8 KV cache of roughly 3 GiB at 64K.
 - Its observed B60 allocation at 64K was about 20 GiB, leaving little runtime headroom.
 - One true 64K session is the safe concurrency target. `--parallel 1` is intentional.
-- A literal 128K context is not equivalent to merely configuring a 128K maximum. Decode speed with a heavily occupied cache can be much lower than an empty/short prompt benchmark; Qwen3.8 active-context throughput has not been measured here.
+- A literal 128K context is not equivalent to merely configuring a 128K maximum. Decode speed with a heavily occupied cache can be much lower than an empty/short prompt benchmark.
 - vLLM can improve prefill and concurrent scheduling, but it cannot remove the B60's VRAM and memory-bandwidth limits. It cannot serve GGUF directly.
 
 ## 128K failure and recovery
@@ -83,7 +83,7 @@ Recovery required a Proxmox `qm reset 100` from `orion`. The safe recovery seque
 3. Reconcile the Git revision restoring 64K.
 4. Resume the Kustomization and verify the Deployment and `/v1/models`.
 
-That Qwen3-Coder 128K Q8 configuration must not be retried on this node without host-level OOM containment and a controlled canary. This failure does not prove the current Qwen3.8 128K setting fails, but neither does that setting prove near-128K prompts are safe.
+That Qwen3-Coder 128K Q8 configuration must not be retried on this node without host-level OOM containment and a controlled canary.
 
 ## Resilience work still needed
 
@@ -103,8 +103,8 @@ Kubernetes GPU device limits allocate a GPU device; they do not impose a strict 
 
 ## vLLM comparison and decision
 
-Keep the currently serving Qwen3.8 GGUF and its cache available for rollback. The stopped trial manifest under `clusters/titania/apps/llm-serving-intel-vllm/` selects a separately pinned Qwen3.8-27B AWQ safetensors checkpoint, since Intel llm-scaler-vLLM cannot directly reuse the GGUF. It starts at a 16K maximum with one sequence and has **no measured inference results yet**. This third-party AWQ checkpoint is not weight-identical to the Intel-Arc-tuned GGUF and cannot be assumed to preserve its quality or MTP speedup. A Kustomize dry-run is not an inference test.
+Keep the previously serving Qwen3.8 GGUF and its cache available for rollback. The stopped trial manifest under `clusters/titania/apps/llm-serving-intel-vllm/` selects a separately pinned Qwen3.8-27B AWQ safetensors checkpoint, since Intel llm-scaler-vLLM cannot directly reuse the GGUF. It starts at a 16K maximum with one sequence and has **no measured inference results yet**. This third-party AWQ checkpoint is not weight-identical to the Intel-Arc-tuned GGUF and cannot be assumed to preserve its quality or MTP speedup. A Kustomize dry-run is not an inference test.
 
 A live comparison requires stopping the current owner of the sole B60, interrupting its endpoint, with a rollback path. Measure model load and readiness, host and GPU pressure, short and deep-prompt prefill/decode, and representative coding and tool tasks before claiming comparable quality or a usable 64K context. Increase context incrementally; startup at 64K is not evidence that a near-64K active prompt is safe.
 
-For the fixed B60, the strongest measured Qwen3.8 configuration is the Intel-Arc-tuned MTP variant at approximately 25.9 tok/s on a short decode benchmark at 64K *configured* context, not a long-context SLA. Prefer Qwen3.8 for difficult coding/agentic work based on the available evidence. Use RAG, summaries, and context management rather than assuming a literal 128K active context is safe until the node-resilience work is completed.
+For the fixed B60, the selected Qwen3-Coder-30B-A3B Q4_K_M was measured at 48.44 tok/s on a short request and 13.10 tok/s decode with ~60K active prompt tokens. The Qwen3.8 Intel-tuned MTP variant remains a rollback option (25.93 tok/s on a short request at 64K configured context). Use RAG, summaries, and context management rather than assuming a literal 128K active context is safe until the node-resilience work is completed.
