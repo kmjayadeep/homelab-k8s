@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Kept installed for rollback; llama.cpp owns the sole B60 allocation.
+  # Trial only: leave stopped until the sole B60 is explicitly released.
   replicas: 0
   strategy:
     type: Recreate
@@ -34,8 +34,8 @@ spec:
           effect: NoSchedule
       containers:
         - name: vllm
-          # Intel's llm-scaler-vLLM B60 image, pinned to the upstream beta digest.
-          image: intel/llm-scaler-vllm@sha256:032916bd9264da44cab3e99092ffaf12331072ec51c3b380cbbe5fd98eb0254b
+          # Intel llm-scaler-vLLM 0.26.0-b2 (upstream release image digest).
+          image: intel/llm-scaler-vllm@sha256:52218ad85513ab6686d4c090c83c2bd8c5b02423c63aa4dabd41837fe641fe3b
           imagePullPolicy: IfNotPresent
           env:
             - name: VLLM_ALLOW_LONG_MAX_MODEL_LEN
@@ -43,30 +43,28 @@ spec:
             - name: VLLM_WORKER_MULTIPROC_METHOD
               value: spawn
           args:
-            # Qwen2.5-14B-AWQ is a 4-bit model. YaRN extends its shipped 32K
-            # configuration to 128K; use one sequence while validating B60 VRAM.
-            - --model=Qwen/Qwen2.5-14B-Instruct-AWQ
-            - --revision=539535859b135b0244c91f3e59816150c8056698
-            - --served-model-name=qwen2.5-14b-awq-intel
-            - --max-model-len=131072
+            # Third-party AWQ safetensors; do not reuse the GGUF cache.
+            # One session, 16K startup gate; expand only after measured capacity.
+            - --model=mattbucci/Qwen3.8-27B-AWQ
+            - --revision=2cc4cffb391645c9be52f3fe50ff595ac7df3e38
+            - --served-model-name=qwen3.8-27b-awq-intel-trial
+            - --max-model-len=16384
             - --max-num-seqs=1
-            # Startup measured 12.0 GiB KV need versus 11.37 GiB at 0.90.
-            - --gpu-memory-utilization=0.95
-            - --kv-cache-dtype=fp8
+            - --max-num-batched-tokens=4096
+            - --gpu-memory-utilization=0.80
+            - --kv-cache-dtype=fp8_e4m3
             - --enforce-eager
-            - --disable-sliding-window
-            - --hf-overrides={"rope_parameters":{"rope_type":"yarn","factor":4.0,"original_max_position_embeddings":32768,"rope_theta":1000000.0}}
           ports:
             - name: http
               containerPort: 8000
           resources:
             requests:
               cpu: 4
-              memory: 8Gi
+              memory: 12Gi
               gpu.intel.com/xe: 1
             limits:
               cpu: 6
-              memory: 16Gi
+              memory: 20Gi
               gpu.intel.com/xe: 1
           securityContext:
             privileged: true
@@ -102,7 +100,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-vllm-model-cache
+            claimName: intel-vllm-qwen38-awq-model-cache
         - name: dshm
           emptyDir:
             medium: Memory

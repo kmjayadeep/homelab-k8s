@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-vllm-qwen38-awq-model-cache
+  labels:
+    app.kubernetes.io/name: intel-vllm
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # AWQ checkpoint is ~18.7 GB; separate node-local cache preserves rollback.
+      storage: 30Gi
+  storageClassName: local-path
