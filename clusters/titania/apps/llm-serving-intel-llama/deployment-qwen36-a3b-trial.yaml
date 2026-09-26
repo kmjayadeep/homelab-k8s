@@ -1,26 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: intel-llama
+  name: intel-llama-qwen36-a3b-trial
   labels:
-    app.kubernetes.io/name: intel-llama
+    app.kubernetes.io/name: intel-llama-qwen36-a3b-trial
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # The B60 is exclusively assigned to the measured Qwen3-Coder MoE model.
-  # Paused for the single-B60 Qwen3.6-35B-A3B MTP trial; keep the cache for rollback.
-  replicas: 0
+  # Trial only: the coder workload is paused; restore it after comparison.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: intel-llama
+      app.kubernetes.io/name: intel-llama-qwen36-a3b-trial
       app.kubernetes.io/instance: llm-serving
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: intel-llama
+        app.kubernetes.io/name: intel-llama-qwen36-a3b-trial
         app.kubernetes.io/instance: llm-serving
         app.kubernetes.io/component: inference
         app.kubernetes.io/part-of: llm-serving
@@ -36,17 +35,17 @@ spec:
       initContainers:
         - name: model-download
           image: curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a
+          command:
+            - sh
           args:
             - -ec
             - |
               test -f /models/model.gguf || {
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/mradermacher/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/e8ae3e1c21d36f9c57cee690115c06934aca03d9/Qwen3-Coder-30B-A3B-Instruct.Q4_K_M.gguf
-                echo '050b8e7977edd2644093b691c899beb156deffdfe20cc33df7fa9ece3aaba257  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-UD-IQ3_S.gguf
+                echo 'ab639a7f330f96c47d3e6c2dd2d6445182e7b763e17e6048dc850a71bbc9f27f  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               }
-          command:
-            - sh
           resources:
             requests:
               cpu: 100m
@@ -70,15 +69,14 @@ spec:
             - --model
             - /models/model.gguf
             - --alias
-            - qwen3-coder-30b-a3b-intel
+            - qwen3.6-35b-a3b-mtp-intel-trial
             - --host
             - 0.0.0.0
             - --port
             - "8080"
             - --metrics
-            # Controlled 96K trial; 128K Q8 previously caused host-wide OOM.
             - --ctx-size
-            - "98304"
+            - "16384"
             - --cache-type-k
             - q8_0
             - --cache-type-v
@@ -89,6 +87,10 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "2"
           ports:
             - name: http
               containerPort: 8080
@@ -133,7 +135,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-coder-model-cache
+            claimName: intel-llama-qwen36-a3b-model-cache
         - name: dshm
           emptyDir:
             medium: Memory

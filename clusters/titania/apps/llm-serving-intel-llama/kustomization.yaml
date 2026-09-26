@@ -6,9 +6,11 @@ namespace: llm-serving
 resources:
   - pvc.yaml
   - pvc-coder.yaml
+  - pvc-qwen36-a3b.yaml
   - pvc-qwen36.yaml
   - pvc-qwen36-mtp.yaml
   - deployment.yaml
+  - deployment-qwen36-a3b-trial.yaml
   - service.yaml
   - metrics-service.yaml
   - servicemonitor.yaml

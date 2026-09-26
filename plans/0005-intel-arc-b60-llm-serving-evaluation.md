@@ -35,9 +35,27 @@ Measurements below used a benign 128-output-token request unless otherwise noted
 
 ### Current selected model
 
-The `intel-llama` manifest selects the previously measured, pinned Qwen3-Coder-30B-A3B-Instruct Q4_K_M GGUF under llama.cpp SYCL, with Q8 KV cache, Flash Attention, one parallel slot, and a 64K maximum. The previous Qwen3.8-27B Intel-Arc-tuned GGUF remains in its separate cache for rollback. The 48.44 tok/s short-request measurement is not a long-context SLA: at ~60K active prompt tokens decode fell to 13.10 tok/s. The switch prioritizes measured MoE throughput; no head-to-head coding-quality comparison establishes that it matches Qwen3.8.
+The `intel-llama` manifest selects the previously measured, pinned Qwen3-Coder-30B-A3B-Instruct Q4_K_M GGUF under llama.cpp SYCL, with Q8 KV cache, Flash Attention, one parallel slot, and a **96K configured maximum** after the staged trials below. The previous Qwen3.8-27B Intel-Arc-tuned GGUF remains in its separate cache for rollback. The 48.44 tok/s short-request measurement is not a long-context SLA: at ~60K active prompt tokens decode fell to 13.10 tok/s. The switch prioritizes measured MoE throughput; no head-to-head coding-quality comparison establishes that it matches Qwen3.8.
 
-The separate Qwen3.6 MTP cache is retained only for a future controlled comparison; its MTP variant was deployed but not benchmarked.
+The separate Qwen3.6-27B MTP cache is retained only for a future controlled comparison; its MTP variant was deployed but not benchmarked. It is **not** a Qwen3.6-35B-A3B cache.
+
+### Qwen3-Coder long-context trial and MTP findings (2026-09-26)
+
+All new tests used one llama.cpp/SYCL session, Q8 KV, Flash Attention, benign synthetic repeated text, and 128 generated tokens. TTFT is client-observed streaming time to first output; prefill/decode are server timings. VRAM is sampled using `ssh ansible@titania-gpu` and `xpu-smi stats -d 0 -j` (memory use, **not** compute utilization; that metric was N/A). Single-run results are not a quality or latency SLA.
+
+| Configured context | Actual prompt tokens | TTFT | Prefill | Decode | Idle / peak sampled VRAM |
+|---:|---:|---:|---:|---:|---:|
+| 64K | 63,022 | 98.2 s | 643 tok/s | 13.4 tok/s | 21,428 MiB idle; peak not sampled |
+| 80K | 78,016 | 137.4 s | 568 tok/s | 10.5 tok/s | 22,230 / 22,557 MiB (92.1% peak) |
+| 96K | 94,018 | 187.3 s | 502 tok/s | 9.0 tok/s | 23,094 / 23,156 MiB (94.6% peak) |
+
+Host available RAM stayed above 21 GiB in the 80K and 96K sampling windows. At the end the node was Ready, MemoryPressure False, and the serving pod had zero restarts. **112K was not attempted** because 96K already used 94.6% of VRAM in this limited sample. **128K was not repeated**: a previous 128K Q8 trial with this model caused global host OOM and k3s loss. More context is not proof of a usable near-limit prompt or safe host memory behavior.
+
+The stock Qwen3-Coder-30B-A3B-Instruct GGUF has **no MTP/NextN head**; `--spec-type draft-mtp` cannot add one. A separately loaded draft model would be conventional speculative decoding, not MTP, and is poorly suited to the 96K VRAM headroom. Do not enable MTP flags for this checkpoint.
+
+### Candidate: Qwen3.6-35B-A3B MTP (unmeasured)
+
+[Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B) is a distinct 35B-total/3B-active MoE with native MTP support. [Unsloth's MTP GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF) bundles MTP tensors and documents llama.cpp `--spec-type draft-mtp --spec-draft-n-max 2`. At revision `5bc3e238d916f48a861bac2f8a1990a0e9b7e98d`, its UD-IQ4_XS file is 18,209,036,576 bytes (~16.96 GiB; SHA-256 `df27a780435b7b45c2597536112ea3cb091f8544c3d0c3318d9f4258b31f7adf`); UD-IQ3_S is 15,346,432,288 bytes (~14.29 GiB; SHA-256 `ab639a7f330f96c47d3e6c2dd2d6445182e7b763e17e6048dc850a71bbc9f27f`). These are publisher artifacts, not local B60 results. Unsloth estimates ~24 GB total memory for 4-bit MTP; that is **not** a promise of 64K context in 23.91 GiB VRAM. Start with a separate cache, shorter context, and the existing single-GPU runtime only after verifying hybrid-model support in the installed llama.cpp build; measure with MTP off and on and retain coder rollback. A separate `intel-llama-qwen36-a3b-trial` Deployment and 40Gi cache PVC are prepared at **zero replicas** in `clusters/titania/apps/llm-serving-intel-llama/` using the pinned UD-IQ3_S artifact, 16K context, and draft-MTP width 2. For the controlled trial, the coder workload is paused without deleting its cache, and this Deployment is set to one replica. The old ingress targets only the paused coder workload, so its endpoint is interrupted during the trial; measurements use a local port-forward to the trial pod. The MTP speed claims are publisher results on different hardware, not B60 measurements. Check installed llama.cpp build 11151 for Qwen3.6-35B-A3B MTP compatibility at startup, monitor `xpu-smi` and host pressure, test short/deep prompts and MTP off/on, and roll back to the existing coder cache on failure.
 
 ## Quality evidence
 
@@ -60,7 +78,7 @@ The Qwen3.8 IQ3_S quant publisher also reported 85.71 on LiveCodeBench v6, equal
 
 - The Qwen3-Coder-30B-A3B Q4_K_M file is 18.56 GB (about 17.28 GiB). It has 48 layers, four KV heads, and a Q8 KV cache of roughly 3 GiB at 64K.
 - Its observed B60 allocation at 64K was about 20 GiB, leaving little runtime headroom.
-- One true 64K session is the safe concurrency target. `--parallel 1` is intentional.
+- `--parallel 1` is intentional. 96K has been exercised with one ~94K prompt but is close to the VRAM limit; 64K had more measured headroom.
 - A literal 128K context is not equivalent to merely configuring a 128K maximum. Decode speed with a heavily occupied cache can be much lower than an empty/short prompt benchmark.
 - vLLM can improve prefill and concurrent scheduling, but it cannot remove the B60's VRAM and memory-bandwidth limits. It cannot serve GGUF directly.
 
@@ -87,11 +105,11 @@ That Qwen3-Coder 128K Q8 configuration must not be retried on this node without 
 
 ## Resilience work still needed
 
-A 64K maximum is a workload capacity decision, not a complete node safeguard. The required protections are:
+A 96K maximum is a workload capacity decision, not a complete node safeguard. The required protections are:
 
 1. Configure kubelet `system-reserved` / `kube-reserved` memory and memory-pressure eviction thresholds on `titania-gpu`.
 2. Give node services higher protection than inference and configure cgroup/systemd-oomd pressure handling so the inference workload is terminated before `containerd` or k3s fails.
-3. Install supported Intel telemetry (`xpu-smi`) and alert on GPU memory pressure, memory PSI, OOM events, node NotReady, and k3s-agent failure.
+3. `xpu-smi` is installed on `titania-gpu` and can sample VRAM over SSH; add continuous alerting on GPU memory pressure, memory PSI, OOM events, node NotReady, and k3s-agent failure. GPU compute utilization reported N/A in this trial.
 4. Add Proxmox/monitoring health checks for the guest and Kubernetes node, with a documented controlled-reset procedure.
 5. Test new model/context combinations through a canary allocation process before changing the production deployment.
 
@@ -107,4 +125,4 @@ Keep the previously serving Qwen3.8 GGUF and its cache available for rollback. T
 
 A live comparison requires stopping the current owner of the sole B60, interrupting its endpoint, with a rollback path. Measure model load and readiness, host and GPU pressure, short and deep-prompt prefill/decode, and representative coding and tool tasks before claiming comparable quality or a usable 64K context. Increase context incrementally; startup at 64K is not evidence that a near-64K active prompt is safe.
 
-For the fixed B60, the selected Qwen3-Coder-30B-A3B Q4_K_M was measured at 48.44 tok/s on a short request and 13.10 tok/s decode with ~60K active prompt tokens. The Qwen3.8 Intel-tuned MTP variant remains a rollback option (25.93 tok/s on a short request at 64K configured context). Use RAG, summaries, and context management rather than assuming a literal 128K active context is safe until the node-resilience work is completed.
+For the fixed B60, the selected Qwen3-Coder-30B-A3B Q4_K_M was measured at 48.44 tok/s on a short request and 9.0 tok/s decode with ~94K active prompt tokens at the current 96K setting. The Qwen3.8 Intel-tuned MTP variant remains a rollback option (25.93 tok/s on a short request at 64K configured context). Use RAG, summaries, and context management rather than assuming a literal 128K active context is safe until the node-resilience work is completed.

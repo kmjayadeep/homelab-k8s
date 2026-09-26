@@ -5,7 +5,9 @@
 
 ## Deployment update
 
-The selected llama.cpp/SYCL model is now the previously measured Qwen3-Coder-30B-A3B Q4_K_M at 64K context. This ADR records the earlier Qwen3.8 decision and trial rationale; its GGUF cache remains available for rollback. See [the evaluation](../plans/0005-intel-arc-b60-llm-serving-evaluation.md) for measured throughput and the 128K OOM warning.
+The selected llama.cpp/SYCL model is now Qwen3-Coder-30B-A3B Q4_K_M at **96K configured context**, following validated 80K and 96K single-session trials. The 96K test used 94,018 prompt tokens: TTFT 187.3 s, prefill 502 tok/s, decode 9.0 tok/s, and peak sampled VRAM 23,156 MiB (94.6%). The 80K test used 78,016 prompt tokens: TTFT 137.4 s, prefill 568 tok/s, decode 10.5 tok/s, and peak 22,557 MiB (92.1%). The node remained Ready with no serving-pod restarts. GPU compute utilization was unavailable from `xpu-smi`; these are memory readings. **112K was not tested** due to low VRAM headroom, and **128K Q8 was not repeated** because this model previously caused host-wide OOM and k3s loss there.
+
+Qwen3-Coder-30B-A3B-Instruct has no native MTP head. `draft-mtp` cannot be enabled by flags alone; a separate draft model is a different mechanism and would use more memory. A future Qwen3.6-35B-A3B MTP GGUF trial is a **new model evaluation**, not an MTP upgrade of this checkpoint. The approved 16K trial uses a separate pinned cache and releases the sole B60 by pausing the coder workload without deleting its PVC; the coder endpoint is interrupted during the trial. Verify installed llama.cpp support, measure MTP on/off and memory pressure, and preserve the coder and Qwen3.8 caches for rollback. This ADR records the earlier Qwen3.8 decision and trial rationale; see [the evaluation](../plans/0005-intel-arc-b60-llm-serving-evaluation.md) for detailed measurements and the proposed candidate.
 
 ## Context
 
