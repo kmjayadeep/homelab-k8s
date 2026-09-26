@@ -75,9 +75,9 @@ spec:
             - --port
             - "8080"
             - --metrics
-            # 64K was measured with this artifact; 128K Q8 caused host-wide OOM.
+            # Controlled 80K trial; 128K Q8 previously caused host-wide OOM.
             - --ctx-size
-            - "65536"
+            - "81920"
             - --cache-type-k
             - q8_0
             - --cache-type-v
