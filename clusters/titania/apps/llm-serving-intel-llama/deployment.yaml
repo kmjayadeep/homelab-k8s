@@ -8,8 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # The B60 is exclusively assigned to the measured Qwen3-Coder MoE model.
-  # Restore the public coder endpoint after the isolated Qwen3.6 MTP trial.
+  # Use the measured Qwen3.6-35B-A3B MTP artifact; retain the coder PVC for rollback.
   replicas: 1
   strategy:
     type: Recreate
@@ -41,8 +40,8 @@ spec:
             - |
               test -f /models/model.gguf || {
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/mradermacher/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/e8ae3e1c21d36f9c57cee690115c06934aca03d9/Qwen3-Coder-30B-A3B-Instruct.Q4_K_M.gguf
-                echo '050b8e7977edd2644093b691c899beb156deffdfe20cc33df7fa9ece3aaba257  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-UD-IQ3_S.gguf
+                echo 'ab639a7f330f96c47d3e6c2dd2d6445182e7b763e17e6048dc850a71bbc9f27f  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               }
           command:
@@ -70,15 +69,16 @@ spec:
             - --model
             - /models/model.gguf
             - --alias
-            - qwen3-coder-30b-a3b-intel
+            - qwen3.6-35b-a3b-intel
             - --host
             - 0.0.0.0
             - --port
             - "8080"
             - --metrics
-            # Controlled 96K trial; 128K Q8 previously caused host-wide OOM.
+            # Qwen3.6 IQ3_S + MTP passed a 126K-token prompt at 128K on the B60.
+            # This does not make the earlier Coder 128K Q8 configuration safe.
             - --ctx-size
-            - "98304"
+            - "131072"
             - --cache-type-k
             - q8_0
             - --cache-type-v
@@ -89,6 +89,10 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "2"
           ports:
             - name: http
               containerPort: 8080
@@ -133,7 +137,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-coder-model-cache
+            claimName: intel-llama-qwen36-a3b-model-cache
         - name: dshm
           emptyDir:
             medium: Memory
