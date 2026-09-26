@@ -10,9 +10,6 @@ metadata:
   namespace: monitoring
 spec:
   path: clusters/titania/infra/monitoring
-  dependsOn:
-  - name: sealed-secrets
-    namespace: flux-system
   interval: 15m
   prune: true
   wait: true
