@@ -44,6 +44,7 @@ spec:
     extraEnvVars:
       - name: ENABLE_PERSISTENT_CONFIG
         value: "False"
+      # Avoid downloading a local embedding model; chat file uploads are disabled below.
       - name: RAG_EMBEDDING_ENGINE
         value: openai
       - name: USER_PERMISSIONS_CHAT_FILE_UPLOAD
@@ -53,7 +54,9 @@ spec:
       - name: ENABLE_CODE_INTERPRETER
         value: "False"
       - name: ENABLE_WEB_SEARCH
-        value: "False"
+        value: "True"
+      - name: WEB_SEARCH_ENGINE
+        value: duckduckgo
       - name: ENABLE_MEMORIES
         value: "False"
       - name: ENABLE_TITLE_GENERATION

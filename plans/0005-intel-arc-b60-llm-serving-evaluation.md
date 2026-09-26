@@ -134,7 +134,7 @@ Kubernetes GPU device limits allocate a GPU device; they do not impose a strict 
 
 ## Pi local-model configuration
 
-`~/.pi/agent/models.json` was corrected to use the `intel-llama` OpenAI-compatible provider and no longer contains the stale `ollama/qwen` entry. `~/.pi/agent/settings.json` enables that provider model. The configuration should match the currently selected served-model alias and context limit before using Pi against the local endpoint.
+After promotion, the public `intel-llama` endpoint and LiteLLM serve the alias `qwen3.6-35b-a3b-intel`. LiteLLM advertises 114,688 input plus 16,384 output tokens (128K total); no Qwen3-Coder-specific pricing was copied to the new model. OpenClaw on `openclaw` uses `litellm/qwen3.6-35b-a3b-intel` as its primary model with 131,072 context and 16,384 max output tokens; its gateway was restarted and was active. Local Pi's `~/.pi/agent/models.json` lists `litellm-intel/qwen3.6-35b-a3b-intel` through LiteLLM with 131,072 context, 16,384 max output tokens and Qwen chat-template thinking support; `settings.json` enables it while retaining the existing cloud default. Pi listed the new model, and a benign chat request to the public llama endpoint succeeded. **OpenClaw and Pi were not end-to-end inference-tested**, and successful configuration/model listing is not proof of coding/tool reliability.
 
 ## vLLM comparison and decision
 
