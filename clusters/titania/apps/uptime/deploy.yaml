@@ -4,6 +4,8 @@ metadata:
   name: uptime
   labels:
     app: uptime
+    app.kubernetes.io/instance: uptime
+    app.kubernetes.io/name: uptime
 spec:
   replicas: 1
   strategy:
@@ -15,6 +17,8 @@ spec:
     metadata:
       labels:
         app: uptime
+        app.kubernetes.io/instance: uptime
+        app.kubernetes.io/name: uptime
     spec:
       containers:
         - name: uptime
@@ -24,6 +28,26 @@ spec:
             - name: http
               containerPort: 3001
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
           volumeMounts:
             - name: data
               mountPath: /app/data

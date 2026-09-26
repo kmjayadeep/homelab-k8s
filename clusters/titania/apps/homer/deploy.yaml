@@ -43,6 +43,13 @@ spec:
           tcpSocket:
             port: 8080
           timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
         securityContext:
           runAsGroup: 1000
           runAsNonRoot: true
