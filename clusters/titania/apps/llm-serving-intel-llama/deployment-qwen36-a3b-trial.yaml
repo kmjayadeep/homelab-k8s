@@ -76,7 +76,7 @@ spec:
             - "8080"
             - --metrics
             - --ctx-size
-            - "16384"
+            - "32768"
             - --cache-type-k
             - q8_0
             - --cache-type-v
