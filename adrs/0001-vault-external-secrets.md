@@ -115,13 +115,13 @@ spec:
         property: <vault-property>
 ```
 
-The exact Vault service DNS name and CA reference must be verified when TLS is implemented.
+The exact Vault service DNS name and CA reference are set to `https://vault.vault.svc.cluster.local:8200` with CA cert trust via ConfigMap `vault-ca-cert`.
 
 ### Completed migration procedure
 
-The migration followed steps 2–7 below. The operator explicitly deferred step 1 because Vault initially contained little data; internal TLS and full recovery verification therefore remain open gates rather than completed work.
+The migration followed steps 1–7 below. Step 1 (internal TLS) was deferred initially but is now deployed.
 
-1. Enable Vault TLS and verify backup, restore, seal, and unseal procedures.
+1. Enable Vault TLS and verify backup, restore, seal, and unseal procedures. **Deployed.** A self-signed/cluster CA cert is provisioned by cert-manager via `tls-certificate.yaml`; CA trust is configured in `vault-ca-cert-configmap.yaml` for ESO validation. The CA cert in the ConfigMap must be populated with the actual CA.
 2. Configure the Vault Kubernetes auth method.
 3. Create a least-privilege Vault policy and role for the application.
 4. Write the secret value to Vault through a secure operator workflow. Never pass it through agent output, shell history, logs, or Git.
@@ -152,9 +152,8 @@ Never delete or replace a working SealedSecret during the same unverified rollou
 
 - Vault Helm deployment: present.
 - External Secrets Operator Helm deployment: present.
-- Vault internal TLS: required before production use.
+- Vault internal TLS: deployed. ESO connects via HTTPS with CA cert trust via ConfigMap `vault-ca-cert`.
 - Vault Kubernetes authentication and least-privilege application roles: deployed and managed by `homelab-iac/vault-config/`.
 - Application `SecretStore` and `ExternalSecret` resources: deployed for all active application and infrastructure Secrets inventoried during this migration.
 - Existing SealedSecret migrations: complete; no SealedSecret resources or manifests remain in the cluster configuration.
-- Sealed Secrets controller: retained temporarily until a separate removal decision.
-- Vault internal TLS: still required; ESO currently uses the explicitly accepted temporary HTTP endpoint.
+- Sealed Secrets controller: decommissioned (PR #193).

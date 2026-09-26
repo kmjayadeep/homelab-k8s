@@ -1,0 +1,21 @@
+# vault-ca-cert ConfigMap
+# Populated with the CA cert that signed the vault-tls-cert Certificate.
+# If using cert-manager with an in-cluster CA, extract it from:
+#   kubectl get configmap -n cert-manager -o jsonpath='{.data.ca\.crt}' cert-manager-ca
+# Or if the cluster uses a private CA, copy the CA cert here.
+# The CA cert must match the issuer of vault-tls-cert.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-ca-cert
+  namespace: vault
+data:
+  # Replace with the actual CA cert:
+  # ca.crt: |
+  #   -----BEGIN CERTIFICATE-----
+  #   <cluster-ca-or-vault-ca-cert-pem>
+  #   -----END CERTIFICATE-----
+  ca.crt: |
+    # TODO: Populate with the CA cert that signed vault-tls-cert.
+    # This can be extracted from the cluster CA or copied from the Vault CA bundle.
+    # Example: kubectl get configmap cert-manager-ca -n cert-manager -o jsonpath='{.data.ca\.crt}' | base64 -d

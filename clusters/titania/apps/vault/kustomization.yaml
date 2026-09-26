@@ -6,6 +6,8 @@ namespace: vault
 resources:
   - helm-repo.yaml
   - helm-release.yaml
+  - tls-certificate.yaml
+  - vault-ca-cert-configmap.yaml
   - backup-external-secret.yaml
   - backup-cronjob.yaml
   - backup-prometheusrule.yaml
