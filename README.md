@@ -24,58 +24,33 @@ I used [FluxCD](https://fluxcd.io/) to automate deploying the manifests in the c
 
 ```bash
 .
-├── bases # Common bases across all clusters
-│   ├── apps
-│   │   ├── app1 # Application manifests (kustomization or helm)
-│   │   │   ├── deployment.yaml
-│   │   │   ├── ingress.yaml
-│   │   │   ├── kustomization.yaml
-│   │   │   └── service.yaml
-│   └── infra # Infrastructure components
-│       ├── infra-app1
-│       │   ├── helm-release.yaml
-│       │   ├── helm-repo.yaml
-│       │   ├── kustomization.yaml
-│       │   └── namespace.yaml
 ├── clusters
-│   ├── cosmos # Customizations specific to cosmos cluster
-│   │   ├── apps
-│   │   │   ├── app1 # kustomization to apply patches
-│   │   │   │   ├── ingress.yaml
-│   │   │   │   ├── kustomization.yaml
-│   │   │   │   └── external-secret.yaml
-│   │   ├── bootstrap # FluxCD bootstrap manifests to initialize various components
-│   │   │   ├── apps
-│   │   │   │   └── app1.yaml
-│   │   │   ├── flux-system # FluxCD system components
-│   │   │   │   ├── gotk-components.yaml
-│   │   │   │   ├── gotk-sync.yaml
-│   │   │   │   └── kustomization.yaml
-│   │   │   └── infra
-│   │   │       ├── 01-cilium.yaml
-│   │   │       ├── 02-metallb.yaml
-│   │   │       ├── ...
-│   │   └── infra # Infra customizations for cosmos
-│   │       ├── infra1
-│   │       │   └── kustomization.yaml
-│   │       ├── infra2
-│   │       │   ├── cluster-issuer.yaml
-│   │       │   ├── kustomization.yaml
-│   │       │   └── external-secret.yaml
-│   └── milkyway
-│       ├── apps
-│       ├── bootstrap
-│       └── infra
+│   └── titania
+│       ├── apps # Application manifests (kustomization or helm)
+│       │   └── <app> # One directory per app
+│       │       ├── deployment.yaml
+│       │       ├── external-secret.yaml
+│       │       ├── kustomization.yaml
+│       │       └── svc.yaml
+│       ├── bootstrap # FluxCD bootstrap manifests
+│       │   ├── apps # Flux Kustomization per app (plus Namespace)
+│       │   │   └── <app>.yaml
+│       │   ├── flux-system # FluxCD system components
+│       │   │   ├── gotk-components.yaml
+│       │   │   ├── gotk-sync.yaml
+│       │   │   └── kustomization.yaml
+│       │   └── infra # Flux Kustomization per infra component
+│       │       ├── 01-cilium.yaml
+│       │       └── ...
+│       └── infra # Infrastructure components
+│           └── <component>
+│               ├── helm-release.yaml
+│               ├── helm-repo.yaml
+│               └── kustomization.yaml
 ├── adrs # Architecture decisions, including Vault and ESO
-├── plans # Completed migration and operational plans
+├── plans # Migration and operational plans
 ├── kubeseal # Legacy public keys retained during controller decommissioning
-├── README.md
-└── sources # Dockerfiles
-    └── 2fauth
-        ├── docker-compose.yml
-        ├── Dockerfile
-        ├── entrypoint.sh
-        └── README.md
+└── README.md
 ```
 
 ## Secret management
