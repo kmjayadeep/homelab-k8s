@@ -4,6 +4,10 @@ kind: Deployment
 metadata:
   name: fava
   namespace: beancount
+  labels:
+    app: fava
+    app.kubernetes.io/instance: fava
+    app.kubernetes.io/name: fava
 spec:
   selector:
     matchLabels:
@@ -12,6 +16,8 @@ spec:
     metadata:
       labels:
         app: fava
+        app.kubernetes.io/instance: fava
+        app.kubernetes.io/name: fava
     spec:
       containers:
       - image: yegle/fava:v1.30
@@ -23,6 +29,26 @@ spec:
         - containerPort: 5000
           protocol: TCP
           name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          periodSeconds: 10
+          timeoutSeconds: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         volumeMounts:
         - name: data
           mountPath: /bean
