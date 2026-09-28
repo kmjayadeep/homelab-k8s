@@ -14,4 +14,3 @@ resources:
   - service.yaml
   - metrics-service.yaml
   - servicemonitor.yaml
-  - ingress.yaml

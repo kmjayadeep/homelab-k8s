@@ -44,6 +44,8 @@ spec:
     extraEnvVars:
       - name: ENABLE_PERSISTENT_CONFIG
         value: "False"
+      - name: DEFAULT_MODELS
+        value: qwen-intel
       # Avoid downloading a local embedding model; chat file uploads are disabled below.
       - name: RAG_EMBEDDING_ENGINE
         value: openai
