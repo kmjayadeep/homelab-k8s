@@ -11,10 +11,10 @@ Serve a high-quality coding model through an OpenAI-compatible endpoint with a u
 ## Serving architecture
 
 - Intel GPU device plugin advertises `gpu.intel.com/xe: 1`; this is the correct resource for the B60 `xe` driver.
-- Models are served by a privileged, single-GPU `llama.cpp` SYCL deployment in `llm-serving`.
-- The public endpoint is `https://intel-llama.cosmos.cboxlab.com/v1`.
-- Exactly one inference Deployment may request the B60 at a time. The experimental `intel-vllm` Deployment is kept at zero replicas when llama.cpp is active.
-- Model caches use node-local `local-path` PVCs. Separate 40 GiB PVCs preserve previous model artifacts for rollback rather than deleting them.
+- The selected Intel trial is served by a privileged single-GPU `llm-scaler-vLLM` deployment in `llm-serving`; the previous llama.cpp SYCL deployment is retained at zero replicas for rollback.
+- The selected client route is LiteLLM's `qwen-intel` alias; the old direct `intel-llama` Ingress is no longer managed.
+- Exactly one inference Deployment may request the B60 at a time. The `intel-vllm` Deployment currently owns it and `intel-llama` is stopped.
+- Model caches use node-local `local-path` PVCs. Separate 35–40 GiB PVCs preserve tested artifacts for rollback rather than deleting them.
 - SmolLM2 KServe InferenceServices and LocalModelCaches were retired in commit `64e51192`.
 
 ## Models and measured results
@@ -33,9 +33,9 @@ Measurements below used a benign 128-output-token request unless otherwise noted
 | Qwen2.5-14B-Instruct-AWQ, Intel llm-scaler-vLLM | ~120K active prompt | 18.74 tok/s decode | Accepted 120,045 prompt tokens. Initial uncached 120K prefill was ~546 prompt tok/s. |
 | Qwen3.6-27B UD-Q4_K_XL, llama.cpp SYCL | 64K, Q8 KV | 8.51 tok/s | Measured before switching to its MTP artifact. |
 
-### Current selected model
+### Retained llama.cpp rollback model
 
-The `intel-llama` manifest now selects the pinned Qwen3.6-35B-A3B UD-IQ3_S + MTP GGUF under llama.cpp SYCL, with Q8 KV cache, Flash Attention, one parallel slot, and a **128K configured maximum**. The Qwen3-Coder-30B-A3B Q4_K_M and Qwen3.8-27B GGUF caches remain separate and intact for rollback. The previous 96K Coder measurements below remain historical baselines, not a quality comparison. Qwen3.6's 128K near-limit synthetic-prompt result and memory readings are recorded below; agentic coding quality and MTP-off performance remain untested on the B60.
+The stopped `intel-llama` rollback manifest selects the pinned Qwen3.6-35B-A3B UD-IQ3_S + MTP GGUF under llama.cpp SYCL, with Q8 KV cache, Flash Attention, one parallel slot, and a **128K configured maximum**. The Qwen3-Coder-30B-A3B Q4_K_M and Qwen3.8-27B GGUF caches remain separate and intact for rollback. The previous 96K Coder measurements below remain historical baselines, not a quality comparison. Qwen3.6's 128K near-limit synthetic-prompt result and memory readings are recorded below; agentic coding quality and MTP-off performance remain untested on the B60.
 
 The separate Qwen3.6-27B MTP cache is retained only for a future controlled comparison; its MTP variant was deployed but not benchmarked. It is **not** a Qwen3.6-35B-A3B cache.
 
@@ -138,7 +138,34 @@ After promotion, the public `intel-llama` endpoint and LiteLLM serve the alias `
 
 ## vLLM comparison and decision
 
-Keep the previously serving Qwen3.8 GGUF and its cache available for rollback. The stopped trial manifest under `clusters/titania/apps/llm-serving-intel-vllm/` selects a separately pinned Qwen3.8-27B AWQ safetensors checkpoint, since Intel llm-scaler-vLLM cannot directly reuse the GGUF. It starts at a 16K maximum with one sequence and has **no measured inference results yet**. This third-party AWQ checkpoint is not weight-identical to the Intel-Arc-tuned GGUF and cannot be assumed to preserve its quality or MTP speedup. A Kustomize dry-run is not an inference test.
+### Qwen3.8 quantized checkpoint startup attempts (2026-09-29)
+
+With the sole B60 released from `intel-llama`, the pinned `intel/llm-scaler-vllm` image failed to start both the existing Qwen3.8-27B AWQ trial and a separate Qwen3.8-27B GPTQ-Int4 attempt. The AWQ trial exited with a quantization validation error (the exact cause was not captured). The GPTQ attempt used `palmfuture/Qwen3.8-27B-GPTQ-Int4` at revision `d85a556c59b2959d083d685a8d1db100f4aeb88d` (20,984,859,696 bytes of safetensors, including MTP), with 8K maximum context, one sequence, 2,048 batched tokens, FP8 KV, 0.90 GPU-memory utilization, and no MTP or remote model code. The first GPTQ startup failed because the image defaulted to BF16, while GPTQ here supports only FP16. After adding `--dtype=float16`, initialization reached a different failure: `AttributeError: 'RowParallelLinear' object has no attribute 'weight'. Did you mean: 'qweight'?`. This matches the GDN ESIMD quantized out-projection incompatibility in [Intel llm-scaler issue #533](https://github.com/intel/llm-scaler/issues/533); [PR #557](https://github.com/intel/llm-scaler/pull/557) proposes a two-site fallback guard but was unmerged when checked. Neither attempt reached readiness or produced TTFT, prefill, decode, or quality measurements. The GPTQ attempt used a separate 35Gi node-local PVC; it was not removed. The live trial Deployment was scaled back to zero to stop its crash loop. Do not interpret these failures as GPU memory limits or model-quality results; diagnose or fix runtime/checkpoint compatibility before another startup attempt.
+
+After these failures, a rerun with `--dtype=float16` and `DISABLE_ESIMD_GDN_OUTPROJ=1` reached Ready for the GPTQ checkpoint, but was superseded before benchmarking. A temporary attempt to patch the same guard in the trial container failed its path assertion and was stopped without running model code; the environment switch worked without that patch.
+
+### Intel AutoRound Qwen3.6-27B live trial (2026-09-29)
+
+The trial selected Intel's `Intel/Qwen3.6-27B-int4-AutoRound` at revision `abc86de19eb1ebbf6a7df4582341325c22ddcb7d` (18,996,705,768 bytes of safetensors) on a separate 35Gi node-local PVC. The pinned llm-scaler image ran with FP16, FP8 E4M3 KV, one sequence, eager mode, no MTP, and `DISABLE_ESIMD_GDN_OUTPROJ=1` plus `DISABLE_ESIMD_PAGE_ATTN=1`. These measurements began as **live-only** Deployment/PVC changes while the two Intel serving Flux Kustomizations were suspended. The later manifest change records the pinned AutoRound PVC and vLLM Deployment as the sole GPU owner, leaving the AWQ PVC and old GGUF caches intact. Before resuming Flux, verify that its Git source contains the matching revision and that no other inference Deployment requests the B60.
+
+Each row is one benign synthetic streaming completions request through localhost port-forward, with 128 output tokens requested but fewer actually generated. TTFT and decode are client-observed; prefill seconds and tokens/second are derived from the server's `vllm:request_prefill_time_seconds_sum` and `vllm:request_prefill_kv_computed_tokens_sum` deltas. The short request's ~8-second prefill includes per-request vLLM overhead and only 14 tokens, so its ~1.7 tok/s ratio is not meaningful throughput. These are single-run timings, not quality tests or SLAs; repeated/varied and coding/tool tests are still needed. 8K ran at 0.90 GPU-memory utilization; 16K/32K/64K at 0.94; 80K at 0.95.
+
+| Max context | Prompt tokens | Output tokens | TTFT | Server prefill | Server prefill tok/s | Client decode tok/s |
+|---:|---:|---:|---:|---:|---:|---:|
+| 8K short | 14 | 43 | 8.45 s | 8.42 s | 1.7 | 23.9 |
+| 8K near-limit | 7,933 | 23 | 6.93 s | 6.91 s | 1,147.8 | 22.7 |
+| 16K short | 14 | 43 | 8.33 s | 8.30 s | 1.7 | 23.9 |
+| 16K near-limit | 16,123 | 23 | 14.73 s | 14.70 s | 1,096.9 | 22.1 |
+| 32K short | 14 | 43 | 8.37 s | 8.34 s | 1.7 | 24.0 |
+| 32K near-limit | 32,503 | 23 | 34.03 s | 33.97 s | 956.8 | 21.7 |
+| 64K short | 14 | 43 | 8.20 s | 8.19 s | 1.7 | 23.9 |
+| 64K near-limit | 65,263 | 23 | 87.41 s | 87.30 s | 747.6 | 20.4 |
+| 80K short | 14 | 43 | 8.36 s | 8.34 s | 1.7 | 24.0 |
+| 80K near-limit | 81,661 | 23 | 121.38 s | 121.24 s | 673.6 | 19.7 |
+
+vLLM reported 77,608 KV-cache token capacity at 0.94 GPU-memory utilization; 80K startup and near-limit request succeeded at 0.95. Idle VRAM after the 80K request was 23,327 MiB of 24,480 MiB (95.29%). The node remained Ready with MemoryPressure False; no sustained-load or peak-during-request sampling was recorded. 96K and 128K were **not attempted**: they exceed the observed KV capacity, and pushing GPU-memory utilization higher with this single B60 would leave too little safety margin. Compared with the separate Qwen3.6-35B-A3B llama.cpp GGUF synthetic trial above, this 27B AutoRound checkpoint is a different model/quantization and did not demonstrate a quality or speed improvement. The 80K configuration was left running for further evaluation at the operator's request; the accompanying manifest change records it as Git desired state, but pushing alone does not resume the suspended serving Kustomizations. The previous llama.cpp Deployment is stopped but its cache is retained. After enabling `--enable-auto-tool-choice --tool-call-parser=qwen3_coder`, a benign non-executed `lookup_city_timezone` request with `tool_choice: auto` returned HTTP 200, `finish_reason: tool_calls`, the expected function name and a JSON argument object with key `city` (292 prompt / 29 completion tokens, 9.73 seconds client elapsed). One successful tool structure is not a reliability or answer-quality evaluation. The live endpoint is `intel-vllm.llm-serving.svc.cluster.local:8000`; LiteLLM's stable `qwen-intel` alias was changed to route to it while preserving the versioned 35B entry on the stopped llama.cpp service. Both `qwen-intel` and `qwen3.6-27b-intel` returned HTTP 200 through LiteLLM on repeated benign requests; an earlier alias request timed out. The 27B entry reuses the established internal accounting rates, not measured operating cost. Flux application of the committed revision and sustained quality remain to be verified.
+
+Keep the previously serving Qwen3.8 GGUF and its cache available for rollback. The original trial manifest selected a separately pinned Qwen3.8-27B AWQ safetensors checkpoint; the new Git manifest instead records the running Intel AutoRound trial while preserving the old AWQ cache for rollback. This third-party AWQ checkpoint is not weight-identical to the Intel-Arc-tuned GGUF and cannot be assumed to preserve its quality or MTP speedup. A Kustomize dry-run is not an inference test.
 
 A live comparison requires stopping the current owner of the sole B60, interrupting its endpoint, with a rollback path. Measure model load and readiness, host and GPU pressure, short and deep-prompt prefill/decode, and representative coding and tool tasks before claiming comparable quality or a usable 64K context. Increase context incrementally; startup at 64K is not evidence that a near-64K active prompt is safe.
 

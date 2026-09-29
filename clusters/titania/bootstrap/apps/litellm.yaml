@@ -12,6 +12,8 @@ metadata:
   name: litellm
   namespace: flux-system
 spec:
+  # Hold the directly applied trial route until serving Flux ownership is resumed.
+  suspend: true
   path: clusters/titania/apps/litellm
   dependsOn:
     - name: external-secrets

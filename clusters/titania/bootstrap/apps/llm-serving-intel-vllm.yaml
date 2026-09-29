@@ -4,6 +4,8 @@ metadata:
   name: llm-serving-intel-vllm
   namespace: llm-serving
 spec:
+  # Keep the already running trial stable until an explicit Flux handoff.
+  suspend: true
   path: clusters/titania/apps/llm-serving-intel-vllm
   dependsOn:
     - name: intel-gpu

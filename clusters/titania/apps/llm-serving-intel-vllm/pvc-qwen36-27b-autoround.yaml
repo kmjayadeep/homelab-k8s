@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-vllm-qwen36-27b-autoround-model-cache
+  labels:
+    app.kubernetes.io/name: intel-vllm
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # Intel AutoRound weights are ~19 GB; retain a separate local cache.
+      storage: 35Gi
+  storageClassName: local-path

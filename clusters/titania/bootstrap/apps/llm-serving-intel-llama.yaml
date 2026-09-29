@@ -4,6 +4,8 @@ metadata:
   name: llm-serving-intel-llama
   namespace: llm-serving
 spec:
+  # Keep the sole B60 with vLLM during the comparison.
+  suspend: true
   path: clusters/titania/apps/llm-serving-intel-llama
   dependsOn:
     - name: intel-gpu

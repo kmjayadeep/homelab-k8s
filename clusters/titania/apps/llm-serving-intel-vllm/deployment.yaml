@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Trial only: leave stopped until the sole B60 is explicitly released.
-  replicas: 0
+  # Sole B60 owner; keep intel-llama at zero replicas while this is running.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -42,18 +42,25 @@ spec:
               value: "1"
             - name: VLLM_WORKER_MULTIPROC_METHOD
               value: spawn
+            - name: DISABLE_ESIMD_GDN_OUTPROJ
+              value: "1"
+            - name: DISABLE_ESIMD_PAGE_ATTN
+              value: "1"
           args:
-            # Third-party AWQ safetensors; do not reuse the GGUF cache.
-            # One session, 16K startup gate; expand only after measured capacity.
-            - --model=mattbucci/Qwen3.8-27B-AWQ
-            - --revision=2cc4cffb391645c9be52f3fe50ff595ac7df3e38
-            - --served-model-name=qwen3.8-27b-awq-intel-trial
-            - --max-model-len=16384
+            # Pinned Intel AutoRound weights on a separate cache; single-B60
+            # 80K near-limit prompt passed, but sustained quality is untested.
+            - --model=Intel/Qwen3.6-27B-int4-AutoRound
+            - --revision=abc86de19eb1ebbf6a7df4582341325c22ddcb7d
+            - --served-model-name=qwen3.6-27b-intel-trial
+            - --dtype=float16
+            - --max-model-len=81920
             - --max-num-seqs=1
-            - --max-num-batched-tokens=4096
-            - --gpu-memory-utilization=0.80
+            - --max-num-batched-tokens=2048
+            - --gpu-memory-utilization=0.95
             - --kv-cache-dtype=fp8_e4m3
             - --enforce-eager
+            - --enable-auto-tool-choice
+            - --tool-call-parser=qwen3_coder
           ports:
             - name: http
               containerPort: 8000
@@ -100,7 +107,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-vllm-qwen38-awq-model-cache
+            claimName: intel-vllm-qwen36-27b-autoround-model-cache
         - name: dshm
           emptyDir:
             medium: Memory
