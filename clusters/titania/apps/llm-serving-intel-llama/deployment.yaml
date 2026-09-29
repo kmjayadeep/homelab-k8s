@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Paused for the sole B60's vLLM owner; retain GGUF PVCs for rollback.
-  replicas: 0
+  # Restore the measured Qwen3.6-35B-A3B MTP artifact; retain rollback PVCs.
+  replicas: 1
   strategy:
     type: Recreate
   selector:

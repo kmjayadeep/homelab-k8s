@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Sole B60 owner; keep intel-llama at zero replicas while this is running.
-  replicas: 1
+  # Retained Intel AutoRound trial; the sole B60 is owned by intel-llama.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
