@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-qwen38-arc-mtp-model-cache
+  labels:
+    app.kubernetes.io/name: intel-llama-qwen38-arc-mtp-trial
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 14.31 GiB artifact; leave room for a partial download alongside the verified file.
+      storage: 40Gi
+  storageClassName: local-path

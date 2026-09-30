@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: intel-llama
+  name: intel-llama-qwen38-arc-mtp-trial
   labels:
-    app.kubernetes.io/name: intel-llama
+    app.kubernetes.io/name: intel-llama-qwen38-arc-mtp-trial
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Restored measured Qwen3.6-35B-A3B MTP as sole B60 owner; retain trial PVCs.
-  replicas: 1
+  # Retained with its cache for future comparisons; the Qwen3.6 A3B Deployment owns the B60.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: intel-llama
+      app.kubernetes.io/name: intel-llama-qwen38-arc-mtp-trial
       app.kubernetes.io/instance: llm-serving
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: intel-llama
+        app.kubernetes.io/name: intel-llama-qwen38-arc-mtp-trial
         app.kubernetes.io/instance: llm-serving
         app.kubernetes.io/component: inference
         app.kubernetes.io/part-of: llm-serving
@@ -35,17 +35,19 @@ spec:
       initContainers:
         - name: model-download
           image: curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a
+          command:
+            - sh
           args:
             - -ec
             - |
-              test -f /models/model.gguf || {
+              if test -f /models/model.gguf; then
+                echo '2170ff045d36dfa1ac5cad5a9f4f1945f5a784a93466a0449dbb6ed8ec1eacce  /models/model.gguf' | sha256sum -c -
+              else
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-UD-IQ3_S.gguf
-                echo 'ab639a7f330f96c47d3e6c2dd2d6445182e7b763e17e6048dc850a71bbc9f27f  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/Greatjedi/Qwen3.8-27B-Intel-Arc-Tuned-GGUF/resolve/6a9a3bafa13a8ba51c6ccd124855b9cb51026bad/Qwen3.8-27B-GSQ-RCO-IQ3_S-Intel-Arc-Tuned-MTP-Q4_K.gguf
+                echo '2170ff045d36dfa1ac5cad5a9f4f1945f5a784a93466a0449dbb6ed8ec1eacce  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
-              }
-          command:
-            - sh
+              fi
           resources:
             requests:
               cpu: 100m
@@ -69,30 +71,42 @@ spec:
             - --model
             - /models/model.gguf
             - --alias
-            - qwen3.6-35b-a3b-intel
+            - qwen3.8-27b-intel-test
             - --host
             - 0.0.0.0
             - --port
             - "8080"
             - --metrics
-            # Qwen3.6 IQ3_S + MTP passed a 126K-token prompt at 128K on the B60.
-            # This does not make the earlier Coder 128K Q8 configuration safe.
+            # Publisher-style q4_0 KV and combined speculation, retaining the 128K limit.
+            # Near-limit prompt quality, speed, and memory safety still need measurement.
             - --ctx-size
             - "131072"
             - --cache-type-k
-            - q8_0
+            - q4_0
             - --cache-type-v
-            - q8_0
+            - q4_0
             - --flash-attn
-            - on
+            - "on"
             - --parallel
             - "1"
             - --n-gpu-layers
             - "99"
+            - --batch-size
+            - "1024"
+            - --ubatch-size
+            - "1024"
             - --spec-type
-            - draft-mtp
+            - ngram-mod,draft-mtp
+            - --spec-ngram-mod-n-match
+            - "24"
+            - --spec-ngram-mod-n-min
+            - "1"
+            - --spec-ngram-mod-n-max
+            - "3"
             - --spec-draft-n-max
-            - "2"
+            - "3"
+            - --spec-draft-p-min
+            - "0.5"
           ports:
             - name: http
               containerPort: 8080
@@ -137,7 +151,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-qwen36-a3b-model-cache
+            claimName: intel-llama-qwen38-arc-mtp-model-cache
         - name: dshm
           emptyDir:
             medium: Memory

@@ -60,6 +60,21 @@ spec:
 
     proxy_config:
       model_list:
+        - model_name: qwen3.8-27b-intel-test
+          litellm_params:
+            model: openai/qwen3.8-27b-intel-test
+            api_base: http://intel-llama-qwen38-arc-mtp-trial.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            # Reuse existing internal accounting rates (USD/token), not measured costs.
+            input_cost_per_token: 0.0000001
+            cache_read_input_token_cost: 0.00000001
+            output_cost_per_token: 0.000001
+            # Tool reliability has not been evaluated for this artifact.
+            max_input_tokens: 114688
+            max_output_tokens: 16384
         - model_name: qwen3.6-35b-a3b-intel
           litellm_params:
             model: openai/qwen3.6-35b-a3b-intel
