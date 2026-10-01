@@ -7,6 +7,7 @@ resources:
   - pvc.yaml
   - pvc-coder.yaml
   - pvc-qwen36-a3b.yaml
+  - pvc-qwen36-a3b-iq4-xs.yaml
   - pvc-qwen36.yaml
   - pvc-qwen36-mtp.yaml
   - pvc-qwen38-arc-mtp.yaml

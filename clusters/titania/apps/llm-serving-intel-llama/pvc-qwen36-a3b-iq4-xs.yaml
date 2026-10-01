@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-qwen36-a3b-iq4-xs-model-cache
+  labels:
+    app.kubernetes.io/name: intel-llama
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 18,209,036,576-byte artifact; temporary download and final file need ~34 GiB.
+      storage: 40Gi
+  storageClassName: local-path

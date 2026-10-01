@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Restored measured Qwen3.6-35B-A3B MTP as sole B60 owner; retain trial PVCs.
+  # Qwen3.6-35B-A3B IQ4_XS + MTP trial; keep the measured IQ3_S PVC for rollback.
   replicas: 1
   strategy:
     type: Recreate
@@ -38,12 +38,14 @@ spec:
           args:
             - -ec
             - |
-              test -f /models/model.gguf || {
+              if test -f /models/model.gguf; then
+                echo 'df27a780435b7b45c2597536112ea3cb091f8544c3d0c3318d9f4258b31f7adf  /models/model.gguf' | sha256sum -c -
+              else
                 curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-UD-IQ3_S.gguf
-                echo 'ab639a7f330f96c47d3e6c2dd2d6445182e7b763e17e6048dc850a71bbc9f27f  /models/model.gguf.partial' | sha256sum -c -
+                  https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-UD-IQ4_XS.gguf
+                echo 'df27a780435b7b45c2597536112ea3cb091f8544c3d0c3318d9f4258b31f7adf  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
-              }
+              fi
           command:
             - sh
           resources:
@@ -75,8 +77,8 @@ spec:
             - --port
             - "8080"
             - --metrics
-            # Qwen3.6 IQ3_S + MTP passed a 126K-token prompt at 128K on the B60.
-            # This does not make the earlier Coder 128K Q8 configuration safe.
+            # IQ3_S + MTP passed a 126K-token prompt at 128K; IQ4_XS has not.
+            # Monitor node pressure and test active context before claiming 128K capacity.
             - --ctx-size
             - "131072"
             - --cache-type-k
@@ -137,7 +139,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-qwen36-a3b-model-cache
+            claimName: intel-llama-qwen36-a3b-iq4-xs-model-cache
         - name: dshm
           emptyDir:
             medium: Memory
