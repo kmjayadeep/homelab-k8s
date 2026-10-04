@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-04",
+  "model": "qwen3.6-35b-a3b-intel",
+  "endpoint": "https://litellm.cosmos.cboxlab.com/v1",
+  "configuration": "Git desired state: Unsloth Qwen3.6-35B-A3B UD-IQ4_XS + MTP GGUF, llama.cpp SYCL, Q8 K/V, Flash Attention, one slot, configured 131072-token maximum. The live model ID was authenticated through LiteLLM; exact live checkpoint/flags were not verified.",
+  "settings": {
+    "temperature": 0,
+    "max_tokens": 256,
+    "trials_per_depth": 3,
+    "concurrency": 1,
+    "profile_lines": {"short": 0, "medium": 260, "long": 780}
+  },
+  "samples": [
+    {"case": "short", "trial": 1, "prompt_tokens": 31, "output_tokens": 256, "ttft_s": 0.339, "decode_s": 5.212, "decode_tps": 48.93, "total_s": 5.551, "finish_reason": "length", "chunks": 256},
+    {"case": "short", "trial": 2, "prompt_tokens": 31, "output_tokens": 256, "ttft_s": 0.125, "decode_s": 5.211, "decode_tps": 48.94, "total_s": 5.336, "finish_reason": "length", "chunks": 256},
+    {"case": "short", "trial": 3, "prompt_tokens": 31, "output_tokens": 256, "ttft_s": 0.093, "decode_s": 5.206, "decode_tps": 48.99, "total_s": 5.299, "finish_reason": "length", "chunks": 256},
+    {"case": "medium", "trial": 1, "prompt_tokens": 8411, "output_tokens": 256, "ttft_s": 13.013, "decode_s": 5.344, "decode_tps": 47.72, "total_s": 18.358, "finish_reason": "length", "chunks": 256},
+    {"case": "medium", "trial": 2, "prompt_tokens": 8411, "output_tokens": 256, "ttft_s": 13.382, "decode_s": 5.421, "decode_tps": 47.04, "total_s": 18.803, "finish_reason": "length", "chunks": 256},
+    {"case": "medium", "trial": 3, "prompt_tokens": 8411, "output_tokens": 256, "ttft_s": 13.162, "decode_s": 5.388, "decode_tps": 47.33, "total_s": 18.550, "finish_reason": "length", "chunks": 256},
+    {"case": "long", "trial": 1, "prompt_tokens": 25171, "output_tokens": 256, "ttft_s": 40.905, "decode_s": 5.819, "decode_tps": 43.82, "total_s": 46.745, "finish_reason": "length", "chunks": 256},
+    {"case": "long", "trial": 2, "prompt_tokens": 25171, "output_tokens": 256, "ttft_s": 40.978, "decode_s": 5.973, "decode_tps": 42.69, "total_s": 46.971, "finish_reason": "length", "chunks": 256},
+    {"case": "long", "trial": 3, "prompt_tokens": 25171, "output_tokens": 256, "ttft_s": 41.108, "decode_s": 5.839, "decode_tps": 43.67, "total_s": 46.966, "finish_reason": "length", "chunks": 256}
+  ]
+}
