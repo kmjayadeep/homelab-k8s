@@ -11,9 +11,9 @@ Serve a high-quality coding model through an OpenAI-compatible endpoint with a u
 ## Serving architecture
 
 - Intel GPU device plugin advertises `gpu.intel.com/xe: 1`; this is the correct resource for the B60 `xe` driver.
-- As of the 2026-10-05 performance comparison, the Intel Qwen3.6-27B AutoRound model is served by `intel-vllm` on the sole B60. The Qwen3.6-35B-A3B llama.cpp Deployment is stopped with its caches retained for rollback; see [plan 0007](0007-local-llm-performance-comparison.md).
-- The selected benchmark route is LiteLLM's versioned `qwen3.6-27b-intel` model. Git maps the stable `qwen-intel` alias to the 27B versioned entry; the database-backed mapping was separately aligned and a benign alias request succeeded on 2026-10-05. Recheck effective routing after future changes. The old direct `intel-llama` Ingress is no longer managed.
-- Exactly one inference Deployment may request the B60 at a time. Git declares `intel-vllm` at one replica and `intel-llama` at zero as of the comparison; verify live state before acting.
+- The subsequent Intel Qwen3.8-27B Q4_K_M trial is declared as sole B60 owner (`intel-llama-qwen38-autoround-trial`); the Qwen3.6-27B AutoRound vLLM and Qwen3.6-35B-A3B llama.cpp Deployments are stopped with caches retained for rollback. See [plan 0007](0007-local-llm-performance-comparison.md).
+- The new benchmark route is LiteLLM's versioned `qwen3.8-27b-autoround-intel` entry. Git maps `qwen-intel` to it; verify that the database-backed mapping and a benign alias request match after rollout. Historical Qwen3.6-27B results are in [plan 0007](0007-local-llm-performance-comparison.md). The old direct `intel-llama` Ingress is no longer managed.
+- Exactly one inference Deployment may request the B60 at a time. Git declares the Qwen3.8 AutoRound trial at one replica and `intel-vllm`/`intel-llama` at zero; verify live state before acting.
 - Model caches use node-local `local-path` PVCs. Separate 35–40 GiB PVCs preserve tested artifacts for rollback rather than deleting them.
 - SmolLM2 KServe InferenceServices and LocalModelCaches were retired in commit `64e51192`.
 

@@ -8,12 +8,12 @@ Requirements: Python 3.10+, `pass` with `litellm/evals`, HTTPS access to LiteLLM
 
 ```bash
 python3 automation/llm-performance/bench.py run \
-  --model qwen3.6-27b-intel \
+  --model qwen3.8-27b-autoround-intel \
   --configuration 'Verified model/revision and runtime flags, if independently checked'
 python3 automation/llm-performance/bench.py report
 ```
 
-Use the **versioned model ID**, not the `qwen-intel` alias. As of the 2026-10-05 comparison, Git leaves the Intel AutoRound 27B predictor running and the 35B predictor stopped; verify live readiness before re-running. The stable `qwen-intel` alias is intended for the running 27B service in Git, but use the versioned ID for reproducible comparisons and verify effective database-backed routing. The `--configuration` value must be a non-secret note, never a token or a claim of live verification based only on Git. An HTTPS endpoint is mandatory. The token is taken in-process from the first line of `pass show litellm/evals`; it is not passed through a shell, command argument, log, environment variable, result JSON, or HTML. Never use `set -x`, print environment variables, or run through an HTTP redirect. If auth fails, inspect only status/error classes, not secret-bearing response bodies.
+Use the **versioned model ID**, not the `qwen-intel` alias. The Intel Qwen3.8 AutoRound Q4_K_M trial is declared running in Git, and earlier Intel predictors are stopped; verify live readiness before re-running. Git maps the stable `qwen-intel` alias to the Qwen3.8 entry, but use the versioned ID for reproducible comparisons and verify effective database-backed routing. The `--configuration` value must be a non-secret note, never a token or a claim of live verification based only on Git. An HTTPS endpoint is mandatory. The token is taken in-process from the first line of `pass show litellm/evals`; it is not passed through a shell, command argument, log, environment variable, result JSON, or HTML. Never use `set -x`, print environment variables, or run through an HTTP redirect. If auth fails, inspect only status/error classes, not secret-bearing response bodies.
 
 The runner saves each run as a new, non-overwriting numeric-only JSON file in `results/` and prints only metrics/error categories; review before staging. The report command regenerates **one standalone** `report.html` from stored runs, picking the newest run per model. Retain prior runs for comparison/audit; do not treat a stopped model as zero. Both files should be reviewed before committing. No run is committed automatically.
 
