@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-qwen38-autoround-model-cache
+  labels:
+    app.kubernetes.io/name: intel-llama-qwen38-autoround-trial
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 16.81 GB GGUF; checksum-verified downloads need room for a partial file.
+      storage: 40Gi
+  storageClassName: local-path

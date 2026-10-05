@@ -60,6 +60,21 @@ spec:
 
     proxy_config:
       model_list:
+        - model_name: qwen3.8-27b-autoround-intel
+          litellm_params:
+            model: openai/qwen3.8-27b-autoround-intel
+            api_base: http://intel-llama-qwen38-autoround-trial.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            # Internal accounting rates only, not measured operating cost.
+            input_cost_per_token: 0.0000001
+            cache_read_input_token_cost: 0.00000001
+            output_cost_per_token: 0.000001
+            # 32K context; no tool-use reliability or vision support established.
+            max_input_tokens: 24576
+            max_output_tokens: 8192
         - model_name: qwen3.8-27b-intel-test
           litellm_params:
             model: openai/qwen3.8-27b-intel-test
