@@ -12,12 +12,15 @@ resources:
   - pvc-qwen36-mtp.yaml
   - pvc-qwen38-arc-mtp.yaml
   - pvc-qwen38-autoround.yaml
+  - pvc-tiel-coder.yaml
   - deployment.yaml
   - deployment-qwen36-a3b-trial.yaml
   - deployment-qwen38-arc-mtp-trial.yaml
   - deployment-qwen38-autoround-trial.yaml
+  - deployment-tiel-coder-trial.yaml
   - service.yaml
   - service-qwen38-arc-mtp-trial.yaml
   - service-qwen38-autoround-trial.yaml
+  - service-tiel-coder-trial.yaml
   - metrics-service.yaml
   - servicemonitor.yaml
