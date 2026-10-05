@@ -73,8 +73,8 @@ spec:
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
             # 32K context; no tool-use reliability or vision support established.
-            max_input_tokens: 24576
-            max_output_tokens: 8192
+            max_input_tokens: 28672
+            max_output_tokens: 4096
         - model_name: qwen3.8-27b-intel-test
           litellm_params:
             model: openai/qwen3.8-27b-intel-test
