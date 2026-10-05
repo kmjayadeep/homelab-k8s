@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/part-of: llm-serving
 spec:
   # Qwen3.6-35B-A3B IQ4_XS + MTP trial; keep the measured IQ3_S PVC for rollback.
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
