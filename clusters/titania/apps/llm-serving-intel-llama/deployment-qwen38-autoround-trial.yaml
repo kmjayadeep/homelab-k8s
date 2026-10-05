@@ -77,13 +77,14 @@ spec:
             - --port
             - "8080"
             - --metrics
-            # Conservative first trial: 32K context and q4_0 KV; no speculative MTP.
+            # 80K configured context and Q8 K/V trial; active depth remains unproven.
+            # Keep MTP disabled and one slot; monitor VRAM and host pressure.
             - --ctx-size
-            - "32768"
+            - "81920"
             - --cache-type-k
-            - q4_0
+            - q8_0
             - --cache-type-v
-            - q4_0
+            - q8_0
             - --flash-attn
             - "on"
             - --parallel
