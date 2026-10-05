@@ -19,5 +19,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: intel-llama
+      name: intel-llama-qwen38-autoround-trial
       namespace: llm-serving
