@@ -139,7 +139,7 @@ spec:
             max_output_tokens: 16384
       router_settings:
         model_group_alias:
-          qwen-intel: qwen3.8-27b-autoround-intel
+          qwen-intel: tiel-coder-35b-a3b-intel
       litellm_settings:
         json_logs: true
         request_timeout: 600
