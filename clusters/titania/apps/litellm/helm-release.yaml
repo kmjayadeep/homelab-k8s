@@ -72,9 +72,10 @@ spec:
             input_cost_per_token: 0.0000001
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
-            # 32K context; no tool-use reliability or vision support established.
-            max_input_tokens: 28672
-            max_output_tokens: 4096
+            # 80K configured context; deep active prompts still need safety validation.
+            # No tool-use reliability or vision support established.
+            max_input_tokens: 65536
+            max_output_tokens: 16384
         - model_name: qwen3.8-27b-intel-test
           litellm_params:
             model: openai/qwen3.8-27b-intel-test
