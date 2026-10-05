@@ -1,0 +1,128 @@
+{
+  "configuration": "Intel/Qwen3.6-27B-int4-AutoRound abc86de19eb1ebbf6a7df4582341325c22ddcb7d; llm-scaler-vllm FP16 FP8 KV 80K one sequence, 0.95 GPU utilization; GitOps verified, no GPU VRAM sampling",
+  "created_utc": "2026-10-05T17:01:27.958949+00:00",
+  "endpoint": "https://litellm.cosmos.cboxlab.com/v1",
+  "model": "qwen3.6-27b-intel",
+  "samples": [
+    {
+      "case": "short",
+      "chunks": 256,
+      "decode_s": 10.809,
+      "decode_tps": 23.59,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 31,
+      "total_s": 10.948,
+      "trial": 1,
+      "ttft_s": 0.139
+    },
+    {
+      "case": "short",
+      "chunks": 256,
+      "decode_s": 10.809,
+      "decode_tps": 23.59,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 31,
+      "total_s": 10.937,
+      "trial": 2,
+      "ttft_s": 0.128
+    },
+    {
+      "case": "short",
+      "chunks": 256,
+      "decode_s": 10.807,
+      "decode_tps": 23.6,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 31,
+      "total_s": 10.933,
+      "trial": 3,
+      "ttft_s": 0.126
+    },
+    {
+      "case": "medium",
+      "chunks": 256,
+      "decode_s": 11.239,
+      "decode_tps": 22.69,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8411,
+      "total_s": 18.763,
+      "trial": 1,
+      "ttft_s": 7.524
+    },
+    {
+      "case": "medium",
+      "chunks": 256,
+      "decode_s": 11.241,
+      "decode_tps": 22.69,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8411,
+      "total_s": 18.169,
+      "trial": 2,
+      "ttft_s": 6.928
+    },
+    {
+      "case": "medium",
+      "chunks": 256,
+      "decode_s": 11.235,
+      "decode_tps": 22.7,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8411,
+      "total_s": 18.176,
+      "trial": 3,
+      "ttft_s": 6.941
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 11.654,
+      "decode_tps": 21.88,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25171,
+      "total_s": 36.096,
+      "trial": 1,
+      "ttft_s": 24.442
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 11.653,
+      "decode_tps": 21.88,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25171,
+      "total_s": 36.086,
+      "trial": 2,
+      "ttft_s": 24.433
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 11.659,
+      "decode_tps": 21.87,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25171,
+      "total_s": 36.103,
+      "trial": 3,
+      "ttft_s": 24.443
+    }
+  ],
+  "schema": 1,
+  "settings": {
+    "concurrency": 1,
+    "max_tokens": 256,
+    "profile_lines": {
+      "long": 780,
+      "medium": 260,
+      "short": 0
+    },
+    "temperature": 0,
+    "trials_per_depth": 3
+  }
+}
