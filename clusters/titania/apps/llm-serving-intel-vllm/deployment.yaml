@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Retained Intel AutoRound trial; the sole B60 is owned by intel-llama.
-  replicas: 0
+  # Intel AutoRound benchmark; the stopped intel-llama PVC is retained for rollback.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
