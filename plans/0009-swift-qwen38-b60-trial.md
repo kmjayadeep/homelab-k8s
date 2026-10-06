@@ -1,6 +1,6 @@
 # Plan 0009: Swift-Qwen3.8-27B Q4_K_S trial on the sole B60
 
-- Status: Active trial
+- Status: Completed trial; Swift left running
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [Tiel trial](0008-tiel-coder-b60-trial.md), [performance comparison](0007-local-llm-performance-comparison.md)
 
@@ -26,4 +26,8 @@ With operator approval, temporarily stop the sole B60 Tiel predictor, serve a se
 
 Use `kustomize build <entry> | kubectl apply --dry-run=client -f -` with `pipefail`, `git diff --check`, exact Flux revisions, and narrowly filtered Kubernetes conditions. Record failures and observed limits here. Do not delete any PVC, model files or prior benchmark work.
 
-Pending live trial.
+The versioned LiteLLM entry was applied at `04b5b7c2`; Tiel was stopped at `77e20959` and its pod exited before the Swift Deployment/PVC/Service and health check were applied at `234a9c4d`. The download/checksum init exited 0; the 40Gi PVC bound and the Swift Deployment became 1/1 Ready with zero restarts. The serving Flux Kustomization later reported Ready at the applied revision. A benign versioned LiteLLM request succeeded (73 prompt / 32 output tokens) before the alias switch. At idle, GPU memory was 21,673 MiB (88.53%) and host available memory 21,410 MiB.
+
+Git mapped `qwen-intel` to Swift at `0424cc92`; the LiteLLM HelmRelease reported Ready. The persisted Router Settings initially still mapped to Tiel, so an authenticated `/config/update` aligned the **complete** alias map. `/router/settings` confirmed `qwen-intel` → `swift-qwen3.8-27b-q4ks-intel`, and a benign alias request succeeded (73 prompt / 32 output tokens). Tiel and its cache remain stopped and available for rollback. Swift was **left running**.
+
+An initial benchmark attempt was interrupted without writing a result. The repeat run completed **9/9** requests to the versioned Swift route. Numeric-only evidence: `automation/llm-performance/results/20261006T041748484644Z-swift-qwen3.8-27b-q4ks-intel.json`; the standalone HTML report includes this run without removing earlier results. Median short (73 prompt tokens): 16.67 s TTFT / 33.35 decode tok/s / 23.08 s total; medium (8,453 tokens): 28.43 s / 29.01 tok/s / 37.54 s; long (25,213 tokens): 66.80 s / 24.64 tok/s / 77.85 s. All medium/long outputs reached the **256-token cap** (`finish_reason=length`), so they are throughput observations, not completed-answer or quality results. One short/long request had pronounced TTFT variance; inspect individual report rows rather than equating medians with steady performance. Safety samples during requests recorded peak GPU use **90.15%** and minimum host available memory **9,882 MiB**; the pod remained 1/1 Ready with zero restarts, and the node Ready without observed MemoryPressure. None of this establishes safe 128K **active** prompts, quality parity, tool-call reliability, or the publisher's claimed speedup. The prior uncommitted performance changes and historical results remain unstaged.

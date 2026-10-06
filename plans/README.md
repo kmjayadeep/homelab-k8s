@@ -12,4 +12,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0006: Longhorn restore runbook](0006-longhorn-restore-runbook.md) | Recovery procedures; requires explicit approval before any live or destructive steps |
 | [0007: Local LLM performance comparison](0007-local-llm-performance-comparison.md) | Active client-side evaluation with repeatable runner and HTML comparison |
 | [0008: Tiel Coder B60 trial](0008-tiel-coder-b60-trial.md) | Completed staged 80K/MTP trial; predictor and cache retained for rollback |
-| [0009: Swift Qwen3.8 B60 trial](0009-swift-qwen38-b60-trial.md) | Active staged 128K/Q4_K_S/MTP sole-GPU trial |
+| [0009: Swift Qwen3.8 B60 trial](0009-swift-qwen38-b60-trial.md) | Completed staged 128K/Q4_K_S/MTP trial; Swift left running, earlier caches retained |
