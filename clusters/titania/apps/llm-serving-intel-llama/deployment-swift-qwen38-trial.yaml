@@ -88,9 +88,9 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # Reduce to 80K for the projector; near-limit active depth is unverified.
+            # 96K with the projector; near-limit active depth is unverified.
             - --ctx-size
-            - "81920"
+            - "98304"
             - --cache-type-k
             - q8_0
             - --cache-type-v
