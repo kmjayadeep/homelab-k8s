@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intel-llama-swift-qwen38-trial
+  labels:
+    app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # Sole B60 owner; Tiel and earlier caches/workloads remain stopped for rollback.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+      app.kubernetes.io/instance: llm-serving
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+        app.kubernetes.io/instance: llm-serving
+        app.kubernetes.io/component: inference
+        app.kubernetes.io/part-of: llm-serving
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:43366cd60f226c7655181a0f7e85c468a41d182fdd2dc2c1c3b872a2b9d05d7a
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              if test -f /models/model.gguf; then
+                echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/model.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q4_K_S.gguf
+                echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model.gguf.partial' | sha256sum -c -
+                mv /models/model.gguf.partial /models/model.gguf
+              fi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      containers:
+        - name: llama-server
+          image: ghcr.io/ggml-org/llama.cpp@sha256:2ce301ccfe0a960c6836c56755cad692a3515f4eca2112191c75520b00f17406
+          args:
+            - --model
+            - /models/model.gguf
+            - --alias
+            - swift-qwen3.8-27b-q4ks-intel
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --metrics
+            - --jinja
+            # 128K configured, not an active-depth safety guarantee.
+            - --ctx-size
+            - "131072"
+            - --cache-type-k
+            - q8_0
+            - --cache-type-v
+            - q8_0
+            - --flash-attn
+            - "on"
+            - --parallel
+            - "1"
+            - --n-gpu-layers
+            - "99"
+            # Publisher-recommended sampling defaults; explicit API parameters override them.
+            - --temp
+            - "1.0"
+            - --top-p
+            - "0.95"
+            - --top-k
+            - "20"
+            - --min-p
+            - "0"
+            - --presence-penalty
+            - "0"
+            - --repeat-penalty
+            - "1.0"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "3"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 4
+              memory: 8Gi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 6
+              memory: 16Gi
+              gpu.intel.com/xe: 1
+          securityContext:
+            privileged: true
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 90
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: dshm
+              mountPath: /dev/shm
+            - name: dri
+              mountPath: /dev/dri
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: intel-llama-swift-qwen38-model-cache
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+        - name: dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
