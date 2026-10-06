@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Sole B60 owner; keep the stopped Qwen3.8 predictor and cache for rollback.
-  replicas: 1
+  # Retain Tiel and its cache for rollback; release the sole B60 before Swift starts.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
