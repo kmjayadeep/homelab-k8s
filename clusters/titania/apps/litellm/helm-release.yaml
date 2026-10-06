@@ -72,8 +72,8 @@ spec:
             input_cost_per_token: 0.0000001
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
-            # 128K configured, not validated at active 128K depth. Text-only trial.
-            max_input_tokens: 114688
+            # 80K configured with mmproj; active depth and vision still need testing.
+            max_input_tokens: 65536
             max_output_tokens: 16384
         - model_name: tiel-coder-35b-a3b-intel
           litellm_params:

@@ -48,6 +48,14 @@ spec:
                 echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               fi
+              if test -f /models/mmproj.gguf; then
+                echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/mmproj.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/mmproj-Swift-Qwen3.8-27B-F16.gguf
+                echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj.gguf.partial' | sha256sum -c -
+                mv /models/mmproj.gguf.partial /models/mmproj.gguf
+              fi
           resources:
             requests:
               cpu: 100m
@@ -70,6 +78,8 @@ spec:
           args:
             - --model
             - /models/model.gguf
+            - --mmproj
+            - /models/mmproj.gguf
             - --alias
             - swift-qwen3.8-27b-q4ks-intel
             - --host
@@ -78,9 +88,9 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # 128K configured, not an active-depth safety guarantee.
+            # Reduce to 80K for the projector; near-limit active depth is unverified.
             - --ctx-size
-            - "131072"
+            - "81920"
             - --cache-type-k
             - q8_0
             - --cache-type-v
