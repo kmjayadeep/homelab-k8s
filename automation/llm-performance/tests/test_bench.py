@@ -66,6 +66,19 @@ class BenchmarkTests(unittest.TestCase):
         self.assertIn("Not tested", html)
         self.assertNotIn("<script>", html)
 
+    def test_report_preserves_multiple_configurations_for_same_model(self):
+        path = MODULE_PATH.parent / "results" / "20261005T192618268181Z-qwen3.8-27b-autoround-intel.json"
+        older = json.loads(path.read_text())
+        newer = json.loads(path.read_text())
+        newer["created_utc"] = "2026-10-06T00:00:00+00:00"
+        newer["configuration"] = "80K q8_0 K/V <new>"
+        html = bench.render([older, newer])
+        self.assertIn("32K q4_0 KV", html)
+        self.assertIn("80K q8_0 K/V &lt;new&gt;", html)
+        self.assertIn('id="model-3-run-0"', html)
+        self.assertIn('id="model-3-run-1"', html)
+        self.assertEqual(html.count("9/9 completed"), 2)
+
     def test_report_from_results_is_single_html_file(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

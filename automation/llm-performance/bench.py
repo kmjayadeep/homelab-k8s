@@ -203,52 +203,53 @@ def render(results):
     # Order names for stable comparisons; new models are discovered from the run files.
     names = list(dict(DEFAULT_CANDIDATES))
     names.extend(sorted(set(r["model"] for r in results) - set(names)))
-    latest = {model: max((r for r in results if r["model"] == model),
-                         key=lambda r: r["created_utc"], default=None) for model in names}
+    runs_by_model = {model: sorted((r for r in results if r["model"] == model),
+                                   key=lambda r: r["created_utc"]) for model in names}
     statuses = dict(DEFAULT_CANDIDATES)
     overview = []
     details = []
     reference = next((r for r in results if r["model"] == "qwen3.6-35b-a3b-intel"),
                      results[0] if results else None)
     for index, model in enumerate(names):
-        run_result = latest[model]
-        link = f'model-{index}'
-        cells = [f'<td><a href="#{link}">{escape(model)}</a></td>']
-        if run_result is None:
-            cells += [f'<td>{escape(statuses.get(model, "Not tested"))}</td>']
-            cells += ["<td>Not tested</td>"] * 4
-            details.append(f'<section id="{link}"><h2>{escape(model)}</h2><p>Not tested in this suite. '
-                           'A stopped backend must not be started on the sole GPU without explicit approval '
-                           'and a rollback plan.</p></section>')
-        else:
-            rows = run_result["samples"]
-            passed = sum("error" not in r for r in rows)
-            cells.append(f'<td>{passed}/{len(rows)} completed</td>')
-            for case, _ in PROFILE:
-                stats = summarize(rows, case)
-                if stats:
-                    prompt = str(stats["prompt_min"]) if stats["prompt_min"] == stats["prompt_max"] else f'{stats["prompt_min"]}–{stats["prompt_max"]}'
-                    cells.append(f'<td>{escape(prompt)} tokens: {stats["ttft_s"]:.2f} s TTFT / {stats["decode_tps"]:.2f} tok/s decode / {stats["total_s"]:.2f} s total ({stats["completed"]} runs)</td>')
-                else:
-                    cells.append("<td>Not measured</td>")
-            configuration = escape(str(run_result.get("configuration", "Unknown")))
-            info = escape(str(run_result["created_utc"]))
-            comparable = (run_result.get("settings") == reference.get("settings")
-                          and run_result.get("endpoint") == reference.get("endpoint"))
-            if not comparable:
-                cells.append("<td>Different settings/endpoint; do not compare directly</td>")
+        for run_index, run_result in enumerate(runs_by_model[model] or [None]):
+            link = f'model-{index}-run-{run_index}'
+            cells = [f'<td><a href="#{link}">{escape(model)}</a></td>']
+            if run_result is None:
+                cells += ["<td>—</td>", f'<td>{escape(statuses.get(model, "Not tested"))}</td>']
+                cells += ["<td>Not tested</td>"] * 4
+                details.append(f'<section id="{link}"><h2>{escape(model)}</h2><p>Not tested in this suite. '
+                               'A stopped backend must not be started on the sole GPU without explicit approval '
+                               'and a rollback plan.</p></section>')
             else:
-                cells.append("<td>Same profile settings</td>")
-            details.append(f'''<section id="{link}"><h2>{escape(model)}</h2><p>Run: {info}. Configuration noted at collection: {configuration}
+                rows = run_result["samples"]
+                configuration = escape(str(run_result.get("configuration", "Unknown")))
+                info = escape(str(run_result["created_utc"]))
+                cells.append(f'<td>{info}<br>{configuration}</td>')
+                passed = sum("error" not in r for r in rows)
+                cells.append(f'<td>{passed}/{len(rows)} completed</td>')
+                for case, _ in PROFILE:
+                    stats = summarize(rows, case)
+                    if stats:
+                        prompt = str(stats["prompt_min"]) if stats["prompt_min"] == stats["prompt_max"] else f'{stats["prompt_min"]}–{stats["prompt_max"]}'
+                        cells.append(f'<td>{escape(prompt)} tokens: {stats["ttft_s"]:.2f} s TTFT / {stats["decode_tps"]:.2f} tok/s decode / {stats["total_s"]:.2f} s total ({stats["completed"]} runs)</td>')
+                    else:
+                        cells.append("<td>Not measured</td>")
+                comparable = (run_result.get("settings") == reference.get("settings")
+                              and run_result.get("endpoint") == reference.get("endpoint"))
+                if not comparable:
+                    cells.append("<td>Different request settings/endpoint; do not compare directly</td>")
+                else:
+                    cells.append("<td>Same request profile; model/runtime configuration may differ</td>")
+                details.append(f'''<section id="{link}"><h2>{escape(model)}</h2><p>Run: {info}. Configuration noted at collection: {configuration}
 Git metadata and endpoint naming do not independently verify live artifact or runtime flags.</p>
 <div class="scroll"><table><thead><tr><th>Case</th><th>Trial</th><th>Prompt tokens</th><th>TTFT (s)</th><th>Decode tok/s</th><th>Total (s)</th><th>Output tokens</th><th>Finish / error class</th></tr></thead><tbody>
 {metrics_table(rows)}</tbody></table></div></section>''')
-        overview.append("<tr>" + "".join(cells) + "</tr>")
+            overview.append("<tr>" + "".join(cells) + "</tr>")
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Homelab LLM performance comparison</title>
 <style>:root{{color-scheme:dark;font-family:system-ui;background:#121821;color:#eaf0f7}}body{{max-width:1200px;margin:2rem auto;padding:0 1rem;line-height:1.55}}a{{color:#9dd2ff}}table{{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem}}th,td{{border:1px solid #45556a;padding:.6rem;text-align:left;vertical-align:top}}th{{background:#243246}}tbody tr:nth-child(even){{background:#1b2633}}.scroll{{overflow-x:auto}}section{{margin-top:2rem}}.note{{background:#243246;padding:1rem;border-radius:6px}}</style></head>
-<body><h1>Homelab LLM performance comparison</h1><p>Performance only. Each measured cell shows actual reported prompt tokens, median client-observed TTFT, median streamed decode rate and median end-to-end duration. Only the latest stored run per model is shown. Unavailable candidates are <strong>not tested</strong>, not zero.</p>
-<div class="scroll"><table><thead><tr><th>Model</th><th>Completed</th><th>Short</th><th>Medium</th><th>Long</th><th>Profile settings</th></tr></thead><tbody>{''.join(overview)}</tbody></table></div>
-<p class="note">Method: sequential HTTPS LiteLLM chat requests, synthetic shuffled prompts at 0, 260 and 780 lines, temperature 0, 256-token output limit and three repetitions by default. TTFT is request start to first streamed content/reasoning delta. Decode tok/s = (reported completion tokens − 1) / first-to-last streamed-output duration. Completion tokens may include reasoning; finish_reason=length does not imply a finished user-facing answer. Client timings include network, queueing and prompt processing; this does not isolate engine prefill, VRAM, host pressure or 128K safety. The identical short prompt may benefit from caching. Compare runs only when settings match.</p>
+<body><h1>Homelab LLM performance comparison</h1><p>Performance only. Each measured cell shows actual reported prompt tokens, median client-observed TTFT, median streamed decode rate and median end-to-end duration. Every stored run has its own row, including earlier configurations of the same model. Unavailable candidates are <strong>not tested</strong>, not zero.</p>
+<div class="scroll"><table><thead><tr><th>Model</th><th>Run / configuration</th><th>Completed</th><th>Short</th><th>Medium</th><th>Long</th><th>Request profile</th></tr></thead><tbody>{''.join(overview)}</tbody></table></div>
+<p class="note">Method: sequential HTTPS LiteLLM chat requests, synthetic shuffled prompts at 0, 260 and 780 lines, temperature 0, 256-token output limit and three repetitions by default. TTFT is request start to first streamed content/reasoning delta. Decode tok/s = (reported completion tokens − 1) / first-to-last streamed-output duration. Completion tokens may include reasoning; finish_reason=length does not imply a finished user-facing answer. Client timings include network, queueing and prompt processing; this does not isolate engine prefill, VRAM, host pressure or 128K safety. The identical short prompt may benefit from caching. Compare request profiles only when settings match; model, runtime, context and KV-cache settings can still differ.</p>
 {''.join(details)}<footer><small>Self-contained HTML generated from numeric-only JSON. No secrets, prompts, or completions are stored here. Running this script never scales/reconciles GPU workloads.</small></footer></body></html>'''
 
 

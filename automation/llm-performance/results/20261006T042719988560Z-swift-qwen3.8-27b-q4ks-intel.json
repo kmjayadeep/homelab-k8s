@@ -1,0 +1,128 @@
+{
+  "configuration": "repeat run; ukisai/Swift-Qwen3.8-27B-GGUF revision 98a6100719e3aafa186041089b71c7b48390dbe1 Q4_K_S llama.cpp SYCL 128K Q8 K/V Flash Attention one slot jinja draft-mtp width 3; fixed profile temperature 0; operator temporarily changed mutable alias to reduce interference; measured through versioned route",
+  "created_utc": "2026-10-06T04:27:19.988493+00:00",
+  "endpoint": "https://litellm.cosmos.cboxlab.com/v1",
+  "model": "swift-qwen3.8-27b-q4ks-intel",
+  "samples": [
+    {
+      "case": "short",
+      "chunks": 126,
+      "decode_s": 3.159,
+      "decode_tps": 40.52,
+      "finish_reason": "stop",
+      "output_tokens": 129,
+      "prompt_tokens": 73,
+      "total_s": 6.338,
+      "trial": 1,
+      "ttft_s": 3.082
+    },
+    {
+      "case": "short",
+      "chunks": 126,
+      "decode_s": 3.157,
+      "decode_tps": 40.54,
+      "finish_reason": "stop",
+      "output_tokens": 129,
+      "prompt_tokens": 73,
+      "total_s": 3.647,
+      "trial": 2,
+      "ttft_s": 0.392
+    },
+    {
+      "case": "short",
+      "chunks": 126,
+      "decode_s": 3.157,
+      "decode_tps": 40.55,
+      "finish_reason": "stop",
+      "output_tokens": 129,
+      "prompt_tokens": 73,
+      "total_s": 3.456,
+      "trial": 3,
+      "ttft_s": 0.202
+    },
+    {
+      "case": "medium",
+      "chunks": 256,
+      "decode_s": 9.246,
+      "decode_tps": 27.58,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8453,
+      "total_s": 24.95,
+      "trial": 1,
+      "ttft_s": 15.683
+    },
+    {
+      "case": "medium",
+      "chunks": 254,
+      "decode_s": 8.259,
+      "decode_tps": 30.87,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8453,
+      "total_s": 24.553,
+      "trial": 2,
+      "ttft_s": 16.294
+    },
+    {
+      "case": "medium",
+      "chunks": 256,
+      "decode_s": 9.017,
+      "decode_tps": 28.28,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8453,
+      "total_s": 25.141,
+      "trial": 3,
+      "ttft_s": 16.124
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 9.788,
+      "decode_tps": 26.05,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25213,
+      "total_s": 58.431,
+      "trial": 1,
+      "ttft_s": 48.624
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 11.166,
+      "decode_tps": 22.84,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25213,
+      "total_s": 60.326,
+      "trial": 2,
+      "ttft_s": 49.16
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 10.256,
+      "decode_tps": 24.86,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25213,
+      "total_s": 59.203,
+      "trial": 3,
+      "ttft_s": 48.947
+    }
+  ],
+  "schema": 1,
+  "settings": {
+    "concurrency": 1,
+    "max_tokens": 256,
+    "profile_lines": {
+      "long": 780,
+      "medium": 260,
+      "short": 0
+    },
+    "temperature": 0,
+    "trials_per_depth": 3
+  }
+}
