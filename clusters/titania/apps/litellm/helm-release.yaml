@@ -68,11 +68,13 @@ spec:
           model_info:
             mode: chat
             supports_reasoning: true
+            # Pinned F16 projector: one benign image request succeeded; broader vision quality untested.
+            supports_vision: true
             # Reuse internal accounting rates; not an upstream charge or measured cost.
             input_cost_per_token: 0.0000001
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
-            # 80K configured with mmproj; active depth and vision still need testing.
+            # 80K configured with mmproj; near-limit active depth is untested.
             max_input_tokens: 65536
             max_output_tokens: 16384
         - model_name: tiel-coder-35b-a3b-intel
