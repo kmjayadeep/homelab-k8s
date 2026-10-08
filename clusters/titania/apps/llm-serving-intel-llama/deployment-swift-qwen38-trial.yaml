@@ -88,7 +88,7 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # Baseline: 128K per slot, 256K aggregate; active vision capacity unverified.
+            # 128K per slot, 256K aggregate; active vision/MTP capacity unverified.
             # Memory/quality gates and benchmark matrix: plans/0010-swift-qwen38-concurrency.md.
             - --ctx-size
             - "262144"
@@ -120,7 +120,11 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            # MTP disabled for baseline; compare draft-mtp / draft width 3 after gates pass.
+            # Operator requested MTP restored before full-load verification.
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "3"
           ports:
             - name: http
               containerPort: 8080

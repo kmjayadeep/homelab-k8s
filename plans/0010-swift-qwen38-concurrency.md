@@ -1,6 +1,6 @@
 # Plan 0010: Swift Qwen3.8 two-slot vision baseline on B60
 
-- Status: Source prepared; rollout and benchmarks pending approval
+- Status: MTP-off baseline deployed; operator requested MTP restored, full-load verification deferred
 - Owner: Homelab operator
 - Related: [Swift trial](0009-swift-qwen38-b60-trial.md), [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [performance comparison](0007-local-llm-performance-comparison.md)
 
@@ -8,7 +8,7 @@
 
 Prepare the existing `intel-llama-swift-qwen38-trial` GitOps Deployment for two 131,072-token slots: aggregate context 262,144, Q4_0 K/V, continuous batching, batch 512, microbatch 128, MTP off. Preserve the pinned Q4_K_S model, F16 projector, sampling defaults, Flash Attention, full GPU offload, Service, PVC and Recreate strategy. Do not modify stopped rollback workloads or claim coding-quality parity from throughput alone. Q4 KV may affect long-context accuracy even though model weights are unchanged.
 
-Source edits do not deploy the configuration. No push, apply, Flux reconciliation, restart, cache deletion or MTP-on rollout is authorized by this preparation. A Recreate rollout interrupts the endpoint. Obtain explicit approval before rollout and before any destructive rollback/scale action.
+The operator subsequently approved committing, pushing and reconciling the baseline, then requested restoring MTP before further testing. A Recreate rollout interrupts the endpoint. Cache deletion and other destructive actions remain unauthorized.
 
 ## Starting state and read-only evidence (2026-10-08)
 
@@ -24,7 +24,7 @@ Source edits do not deploy the configuration. No push, apply, Flux reconciliatio
 
 The pinned model file is 16,575,850,592 bytes (~15.44 GiB), projector 927,607,232 bytes (~0.86 GiB). File sizes are not device allocations. The earlier Swift plan estimated Q8 KV at ~4 GiB for 128K. Assuming the same cache layout and linear scaling, Q4_0's 18 bytes per 32 values versus Q8_0's 34 gives about **4.24 GiB at 256K**, versus ~3 GiB Q8 at 96K. This is only a sizing hypothesis: hybrid/recurrent buffers, padding, MTP state and vision compute are not covered. The old observed ~21.28 GiB device use leaves limited headroom; startup alone cannot verify loaded two-slot vision capacity.
 
-After approved rollout, extract only allocation categories, device identifiers and byte/MiB totals from startup logs; never print raw logs or request content. Record device model buffers, projector weights/compute, K/V cache, recurrent state, compute/scratch and MTP allocations separately. Verify effective `n_ctx_per_seq=131072`, two slots, Q4 cache and no active speculation. Check that GPU offload did not silently fall back to host RAM. Sample device use and host/container RAM during concurrent near-limit image requests, not just at idle.
+After approved rollout, extract only allocation categories, device identifiers and byte/MiB totals from startup logs; never print raw logs or request content. Record device model buffers, projector weights/compute, K/V cache, recurrent state, compute/scratch and MTP allocations separately. Verify effective `n_ctx_per_seq=131072`, two slots, Q4 cache and the intended speculation mode (off for a baseline; draft-MTP width 3 for the current desired state). Check that GPU offload did not silently fall back to host RAM. Sample device use and host/container RAM during concurrent near-limit image requests, not just at idle.
 
 Stop testing on OOM, restart, allocation failure, node pressure, eviction, unsafe host headroom or device memory approaching exhaustion. A suggested conservative device gate is at least 1 GiB free during measured peaks; this is not a driver guarantee. Do not deliberately repeat an OOM to obtain a measurement.
 
@@ -39,14 +39,14 @@ If 256K fails, report **actual** allocation totals first. Keep model and project
 5. For each request capture server computed prompt tokens/time and prefill tok/s, output tokens/time and per-request decode tok/s, client TTFT and monotonic stream-event timestamps. Report median/p95/max inter-token latency, labelling event/chunk latency if multiple tokens arrive per event. Aggregate throughput is total generated tokens divided by the shared measured wall-time window; do not simply sum rates measured over different windows. Record total completion elapsed time as well.
 6. Sample GPU used/total memory with xpu-smi at ~1 second intervals where practical; record host available RAM/PSI, container working set and cgroup current/peak memory when available, and kernel/cgroup OOM counters. Record maxima/minima and sampler coverage gaps. Compare restart count and termination reason before/after each cell and monitor Ready/MemoryPressure; zero sampled events alone does not prove no transient spike.
 7. Explicit mixed-phase test: let A begin sustained decoding, then submit B's uncached 64K/128K prefill (repeat with vision). Align A's timestamped output with B's prefill interval; report A's before/during/after median/p95/max output gaps and whether A produced any tokens during that interval. Continuous batching enables scheduling but does **not** guarantee non-blocking prefill on this runtime/backend. Microbatch 128 is a tuning hypothesis, not proof of overlap.
-8. Only after memory gates pass, obtain approval for a second GitOps rollout adding `--spec-type draft-mtp --spec-draft-n-max 3`. Keep all other settings and test inputs identical; re-run the matrix and mixed-phase test, capturing draft/acceptance counters if available plus extra RAM/VRAM. Compare against MTP-off and the supplied reference. The source intentionally remains MTP-off until this comparison is approved and complete.
+8. Only after memory gates pass, obtain approval for a second GitOps rollout adding `--spec-type draft-mtp --spec-draft-n-max 3`. Keep all other settings and test inputs identical; re-run the matrix and mixed-phase test, capturing draft/acceptance counters if available plus extra RAM/VRAM. Compare against MTP-off and the supplied reference. The operator subsequently requested MTP restored without completing this comparison; current source enables draft-MTP width 3. A future matched MTP-off comparison needs another approved GitOps rollout.
 9. Compare fixed coding, long-context retrieval, structured tool-call and vision tasks against Q8/one-slot historical configuration using the same prompts, sampling and scoring. Do not execute returned tool calls. Q4 KV and concurrency throughput are not quality evidence; any regression requires reporting and reconsidering KV precision/context trade-offs.
 
 ## Results and outcome
 
 | Configuration | 64K / 128K, 1 / 2 requests, text / vision | Prefill / decode / ITL | RAM / VRAM / OOM | Mixed-phase stalls |
 | --- | --- | --- | --- | --- |
-| Q4 KV, 256K aggregate, MTP off | Not run: requires rollout approval | Unknown | Unknown | Unknown |
-| Same, MTP draft width 3 | Not run: requires second rollout approval | Unknown | Unknown | Unknown |
+| Q4 KV, 256K aggregate, MTP off | Long-context runner interrupted before saving results | Short text/vision decode ~21 tok/s; not a long-context benchmark | Point-in-time GPU 21,954 MiB, container ~10.2 GiB, zero pod restarts | Unknown |
+| Same, MTP draft width 3 | Operator requested restoration; full-load testing deferred | Unknown | Unknown pending rollout inspection | Unknown |
 
-Source-only preparation and read-only OOM investigation are complete. 256K aggregate plus vision fit, concurrency throughput, prefill/decode overlap, coding quality and MTP speedup remain unverified. Record validation results in the change report; update this plan with numeric-only evidence after approved live tests.
+Baseline commit `f780fa3e` was pushed and applied by Flux. The pod reached Ready with zero restarts; server metadata reported two 131,072-token slots. Short text and 32×32 image requests completed. The long-context benchmark was interrupted before producing a result file; the uncommitted numeric-only runner is retained for later review. On the operator's follow-up request, source now restores `--spec-type draft-mtp --spec-draft-n-max 3` without further benchmarking. Startup fit is not evidence of two fully occupied slots plus vision fitting safely. 256K aggregate active vision fit, concurrency throughput, prefill/decode overlap, coding quality and MTP speedup remain unverified.
