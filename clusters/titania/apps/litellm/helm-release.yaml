@@ -106,10 +106,10 @@ spec:
             input_cost_per_token: 0.0000001
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
-            # Text-only 80K retry; tool reliability and near-limit capacity are unverified.
-            supports_vision: false
+            # 128K configured; one benign image check passed, near-limit safety untested.
+            supports_vision: true
             supports_function_calling: false
-            max_input_tokens: 65536
+            max_input_tokens: 114688
             max_output_tokens: 16384
         - model_name: qwen3.8-27b-autoround-intel
           litellm_params:
