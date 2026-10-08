@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Sole B60 owner for the approved trial; Swift remains stopped with its cache intact.
-  replicas: 1
+  # Safety-paused: 256K/MTP/vision startup consumed 99.45% VRAM before requests.
+  replicas: 0
   strategy:
     type: Recreate
   selector:

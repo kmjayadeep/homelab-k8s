@@ -1,6 +1,6 @@
 # Plan 0011: Empero Qwen3.8-35B-A3B distill 256K vision/MTP trial
 
-- Status: Approved; GitOps activation in progress, runtime and 256K tests pending
+- Status: Safety-paused after startup VRAM gate failure; no inference tests run
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [Swift trial](0009-swift-qwen38-b60-trial.md), [abandoned concurrency experiment](0010-swift-qwen38-concurrency.md)
 
@@ -8,7 +8,7 @@
 
 Evaluate [Empero's GGUF](https://huggingface.co/empero-ai/Qwen3.8-35B-A3B-Distill-GGUF) with one native 262,144-token slot, embedded MTP, and its matching F16 vision projector on the sole B60. Select IQ4_XS to retain approximately four-bit weight quality while leaving more memory headroom than Q4_K_M. This is a distilled Qwen3.6-architecture MoE, not the dense Swift Qwen3.8-27B checkpoint. Do not assume equivalent coding quality.
 
-Trial files are under `clusters/titania/apps/llm-serving-intel-llama/empero-qwen38-trial/`. The operator approved interrupting Swift and committing/pushing the GPU switch. Commit `4e6bedec` paused Swift through Flux; no serving pods remained before Empero activation. The parent now references the trial, its Deployment requests one replica, and the Flux health check targets Empero. Swift rollback revision is `0a83bbbd`; retain both caches. Predictor readiness and active-depth tests remain pending.
+Trial files are under `clusters/titania/apps/llm-serving-intel-llama/empero-qwen38-trial/`. The operator approved interrupting Swift and committing/pushing the GPU switch. Commit `4e6bedec` paused Swift through Flux; no serving pods remained before Empero activation. The parent now references the trial, its Deployment is safety-paused at zero replicas, and the Flux health check targets Empero. Swift rollback revision is `0a83bbbd`; retain both caches. Activation revision `75bf4a44` was applied by Flux and reached Ready with zero restarts, but idle VRAM failed the safety gate before inference tests.
 
 ## Verified artifact evidence
 
@@ -51,4 +51,4 @@ If insufficient memory, report measured model/projector/main KV/MTP/recurrent/co
 
 ## Validation and outcome
 
-Standalone trial Kustomize build and Kubernetes client dry-run passed again with the article-derived batch 2048, Q8 K/V, Flash Attention and one-slot settings present. `git diff --check` also passed. The approved activation follows a separate, confirmed Swift-stop revision before assigning the GPU to Empero. No live Empero tests have run; native metadata/MTP tensor presence and projector availability are recorded above, while runtime compatibility, active 256K fit, vision quality and coding quality remain unverified.
+Standalone trial Kustomize build and Kubernetes client dry-run passed again with the article-derived batch 2048, Q8 K/V, Flash Attention and one-slot settings present. `git diff --check` also passed. The approved activation follows a separate, confirmed Swift-stop revision before assigning the GPU to Empero. Activation revision `75bf4a44` reached Ready with a Bound 40Gi PVC and zero restarts. On 2026-10-08, `xpu-smi` measured idle GPU usage at **24,344.55 MiB (99.45%)**, leaving approximately 135 MiB free: below the 1 GiB safety gate. Host available memory was 21,235 MiB. Pause the trial through GitOps before any requests; Swift remains stopped pending rollback approval. No text, vision, tool or active-depth inference tests were run. Startup allocation categories were not recovered by the initial strict log filter; do not infer their breakdown from file sizes. Native metadata/MTP tensor presence and projector availability are recorded above, while MTP correctness/speedup, active 256K fit, vision quality and coding quality remain unverified. Retain both caches. A smaller weight quant (IQ3_M), lower context, or measured scratch reduction needs review before restarting; do not silently lower the requested context or quantization quality.
