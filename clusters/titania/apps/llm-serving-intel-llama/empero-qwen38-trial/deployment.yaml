@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Safety-paused: 256K/MTP/vision startup consumed 99.45% VRAM before requests.
-  replicas: 0
+  # Approved IQ3_M retry; retain IQ4_XS and Swift files for rollback.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -40,13 +40,13 @@ spec:
           args:
             - -ec
             - |
-              if test -f /models/model.gguf; then
-                echo 'b645af45431ef9b41f43cae51c9323b2d0ca84f23031d483d2105c643ae58d65  /models/model.gguf' | sha256sum -c -
+              if test -f /models/model-iq3m.gguf; then
+                echo '0ad7b253ecee6de7b38ecaf82ea5553d302c3f924961b7091b7088cc99a30f95  /models/model-iq3m.gguf' | sha256sum -c -
               else
-                curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/empero-ai/Qwen3.8-35B-A3B-Distill-GGUF/resolve/b1f9d1dcc3de8aa867669b0ab919384aeeb9b8d5/Qwen3.8-35B-A3B-IQ4_XS.gguf
-                echo 'b645af45431ef9b41f43cae51c9323b2d0ca84f23031d483d2105c643ae58d65  /models/model.gguf.partial' | sha256sum -c -
-                mv /models/model.gguf.partial /models/model.gguf
+                curl --fail --location --retry 5 --output /models/model-iq3m.gguf.partial \
+                  https://huggingface.co/empero-ai/Qwen3.8-35B-A3B-Distill-GGUF/resolve/b1f9d1dcc3de8aa867669b0ab919384aeeb9b8d5/Qwen3.8-35B-A3B-IQ3_M.gguf
+                echo '0ad7b253ecee6de7b38ecaf82ea5553d302c3f924961b7091b7088cc99a30f95  /models/model-iq3m.gguf.partial' | sha256sum -c -
+                mv /models/model-iq3m.gguf.partial /models/model-iq3m.gguf
               fi
               if test -f /models/mmproj.gguf; then
                 echo '4381cb5110074396c2c7b39221fffae0c31886aa95b674de8e103d97edf58b94  /models/mmproj.gguf' | sha256sum -c -
@@ -77,11 +77,11 @@ spec:
           image: ghcr.io/ggml-org/llama.cpp@sha256:2ce301ccfe0a960c6836c56755cad692a3515f4eca2112191c75520b00f17406
           args:
             - --model
-            - /models/model.gguf
+            - /models/model-iq3m.gguf
             - --mmproj
             - /models/mmproj.gguf
             - --alias
-            - empero-qwen3.8-35b-a3b-iq4xs-intel
+            - empero-qwen3.8-35b-a3b-iq3m-intel
             - --host
             - 0.0.0.0
             - --port

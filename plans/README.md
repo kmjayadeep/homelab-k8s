@@ -14,4 +14,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0008: Tiel Coder B60 trial](0008-tiel-coder-b60-trial.md) | Completed staged 80K/MTP trial; predictor and cache retained for rollback |
 | [0009: Swift Qwen3.8 B60 trial](0009-swift-qwen38-b60-trial.md) | Completed staged 128K/Q4_K_S/MTP trial; Swift left running, earlier caches retained |
 | [0010: Swift two-slot vision baseline](0010-swift-qwen38-concurrency.md) | Abandoned for current serving; operator requested rollback to 96K/Q8/one-slot/MTP after prefill regression; incomplete evidence retained |
-| [0011: Empero Qwen3.8 distill 256K trial](0011-empero-qwen38-distill-b60-trial.md) | Safety-paused after Ready startup used 99.45% VRAM; IQ4_XS/256K/Q8/MTP/vision inference untested, caches retained |
+| [0011: Empero Qwen3.8 distill 256K trial](0011-empero-qwen38-distill-b60-trial.md) | Approved IQ3_M retry at 256K/Q8/MTP/vision after IQ4_XS used 99.45% idle VRAM; caches retained |

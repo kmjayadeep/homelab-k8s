@@ -1,6 +1,6 @@
 # Plan 0011: Empero Qwen3.8-35B-A3B distill 256K vision/MTP trial
 
-- Status: Safety-paused after startup VRAM gate failure; no inference tests run
+- Status: Approved IQ3_M retry in progress after IQ4_XS startup VRAM gate failure
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [Swift trial](0009-swift-qwen38-b60-trial.md), [abandoned concurrency experiment](0010-swift-qwen38-concurrency.md)
 
@@ -8,7 +8,7 @@
 
 Evaluate [Empero's GGUF](https://huggingface.co/empero-ai/Qwen3.8-35B-A3B-Distill-GGUF) with one native 262,144-token slot, embedded MTP, and its matching F16 vision projector on the sole B60. Select IQ4_XS to retain approximately four-bit weight quality while leaving more memory headroom than Q4_K_M. This is a distilled Qwen3.6-architecture MoE, not the dense Swift Qwen3.8-27B checkpoint. Do not assume equivalent coding quality.
 
-Trial files are under `clusters/titania/apps/llm-serving-intel-llama/empero-qwen38-trial/`. The operator approved interrupting Swift and committing/pushing the GPU switch. Commit `4e6bedec` paused Swift through Flux; no serving pods remained before Empero activation. The parent now references the trial, its Deployment is safety-paused at zero replicas, and the Flux health check targets Empero. Swift rollback revision is `0a83bbbd`; retain both caches. Activation revision `75bf4a44` was applied by Flux and reached Ready with zero restarts, but idle VRAM failed the safety gate before inference tests.
+Trial files are under `clusters/titania/apps/llm-serving-intel-llama/empero-qwen38-trial/`. The operator approved interrupting Swift and committing/pushing the GPU switch. Commit `4e6bedec` paused Swift through Flux; no serving pods remained before Empero activation. The parent now references the trial, its Deployment requests one replica for the approved IQ3_M retry, and the Flux health check targets Empero. Swift rollback revision is `0a83bbbd`; retain both caches. Activation revision `75bf4a44` was applied by Flux and reached Ready with zero restarts, but idle VRAM failed the safety gate before inference tests.
 
 ## Verified artifact evidence
 
@@ -48,6 +48,10 @@ If insufficient memory, report measured model/projector/main KV/MTP/recurrent/co
 4. Use a private direct service port-forward for incremental active-depth tests: 16K, 64K, 128K, 192K, then near 256K only if gates pass. Reserve room for image/template/output tokens. Measure uncached prefill, decode, TTFT, stream-event gap distributions, RAM/VRAM and OOM metadata; include vision near the target depth. No quality or sustained-load claims from single synthetic runs.
 5. Add a distinct versioned LiteLLM route only after predictor readiness. Advertise 245,760 input plus 16,384 output if 256K serving is validated; `supports_vision` and function calling require successful checks. Stable alias changes must preserve old versioned routes and align the persisted database-backed alias only when explicitly requested. Leave Swift's versioned route intact for rollback.
 6. On failure stop and obtain rollback approval if not already granted. Stop Empero first, verify release, restore Swift replicas and Flux health check in Git, verify readiness and versioned routing before restoring a stable alias. Never delete either PVC.
+
+## IQ3_M retry
+
+The operator approved IQ3_M after the IQ4_XS safety pause. Keep context 262,144, Q8 K/V, MTP width 3, vision projector and batch 2048 unchanged. Use `/models/model-iq3m.gguf` and served alias `empero-qwen3.8-35b-a3b-iq3m-intel`; retain `/models/model.gguf` (IQ4_XS) and Swift's separate PVC. IQ3_M checksum was checked against the pinned publisher `SHA256SUMS`. Both model files plus the projector total approximately 36.87 GB, within the existing 40Gi claim; no deletion or overwrite of the prior model is needed. Repeat memory gates before inference, then short text/vision/tool checks and incremental depth tests. No public route promotion until tested.
 
 ## Validation and outcome
 
