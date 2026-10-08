@@ -1,6 +1,6 @@
 # Plan 0008: Trial Tiel Coder 35B-A3B MTP on the sole B60
 
-- Status: Original trial completed; 80K retry deployed and public qwen-intel smoke-tested
+- Status: 128K vision deployed; LiteLLM metadata/public vision smoke verified, initial eviction and near-limit safety follow-up remain
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [client performance profile](0007-local-llm-performance-comparison.md)
 
@@ -27,6 +27,16 @@ Switch the sole B60 from Intel Qwen3.8-27B Q4_K_M to a separate, pinned Tiel Cod
 ## Validation and rollback
 
 Use `kustomize build <serving-or-litellm-path> | kubectl apply --dry-run=client -f -`, the bootstrap Flux resource client dry-run, `git diff --check`, and the Python performance runner tests for any runner changes. Report exact source/applied revision, actual readiness, alias routing and validation failures; never treat dry-run as live evidence. For rollback, update the stable alias away from a broken backend only after restoring a healthy versioned route: stop Tiel (leave cache intact), verify its pod exited, resume Qwen3.8 on the sole GPU, confirm its versioned request, then restore Git **and** persisted LiteLLM alias and confirm `qwen-intel` works. Never prune/delete retained PVCs as a shortcut.
+
+## 128K vision follow-up
+
+The operator requested vision and a modest context increase after the 80K retry. Prepare 131,072 context with unchanged IQ4_XS weights, Q8 K/V, one slot, Flash Attention, batch 2048 and MTP width 3. No lower quantization, extra GPU claimant or cache replacement. Add `--mmproj /models/mmproj-bf16.gguf` and checksum-verified download from the same immutable revision `bbe9e566f39e4fc9652ac66b71968289a03c520a`. HF blob metadata confirms `mmproj-BF16.gguf` is 902,822,016 bytes, SHA-256 `d9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837`. Combined weights/projector are ~19.02 GB within the existing 40Gi PVC; preserve all files. This is the publisher's matching Ornith projector, not Empero's projector.
+
+The operator approved commit/push and the live rollout for this follow-up. Recreate will interrupt the current endpoint. After approval, deploy serving changes first, verify the checksum init exit, Ready/zero restarts, node pressure, host memory and at least 1 GiB GPU headroom before requests. Run short text and a benign small-image check, then incremental text/image prompts at 32K, 64K, 96K and near 128K only while memory gates pass; include output/image/template tokens in the budget and sample memory during load. Stop on memory pressure or restarts rather than silently changing precision or limits. Update LiteLLM to 114,688 input + 16,384 output only after readiness; keep `supports_vision: false` until a successful image request, then enable it and verify through the versioned and public alias routes. Tool reliability remains conservative. Verify persisted alias via `/router/settings.current_values.model_group_alias`; do not modify it unnecessarily.
+
+Rollback to the 80K no-projector Deployment at `44966652` and prior LiteLLM token limits; leave the downloaded projector and all caches intact. Serving revision `42d98d76` was pushed/applied. Its first pod was evicted for host-memory pressure after checksum init exit 0; the replacement reached Ready with zero restarts. MemoryPressure cleared; sampled GPU usage was 21,306 MiB (87.04%) with ~19.7 GiB host available memory. The operator initially approved rollback, but it remained local/unpushed while the replacement recovered; subsequent requests retained the configuration and fixed LiteLLM. Local rollback edits were replaced with the running 128K vision desired state. Recent safely classified logs showed no OOM/errors, decode 34–45 tok/s and one unclassified warning; this is not sustained-load evidence.
+
+A benign 32×32 red-square image request through the versioned LiteLLM route returned HTTP 200/correct color in 5.69 s. Metadata revision `1bf62824` was pushed/applied; Flux and HelmRelease 1.90.0 reconciled. `/model/info` confirmed vision true, 114,688 input and 16,384 output; the persisted alias remained Tiel without an alias-map mutation. A public `qwen-intel` image request returned 200/correct color in 10.23 s (215 input/19 output tokens). Node Ready/MemoryPressure False afterward. Local `~/.pi/agent/models.json` was updated from Empero/256K to Tiel/128K; kept 16K output, image input, compatibility, auth and startup defaults. JSON and selected metadata validated without reading credentials into context. No near-limit active-context or progressive-depth matrix was run; successful short image requests do not establish active 128K or broad vision safety/quality.
 
 ## 80K retry
 
