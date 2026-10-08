@@ -60,6 +60,21 @@ spec:
 
     proxy_config:
       model_list:
+        - model_name: empero-qwen3.8-35b-a3b-iq3m-intel
+          litellm_params:
+            model: openai/empero-qwen3.8-35b-a3b-iq3m-intel
+            api_base: http://intel-llama-empero-qwen38-trial.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            # Benign image tests passed at short and near-256K active context.
+            supports_vision: true
+            # Two direct tool tests failed to return structured calls; do not advertise tools.
+            supports_function_calling: false
+            # 256K total; reserve 16K generation. No pricing supplied for this trial.
+            max_input_tokens: 245760
+            max_output_tokens: 16384
         - model_name: swift-qwen3.8-27b-q4ks-intel
           litellm_params:
             model: openai/swift-qwen3.8-27b-q4ks-intel

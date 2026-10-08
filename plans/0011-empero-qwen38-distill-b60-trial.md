@@ -1,6 +1,6 @@
 # Plan 0011: Empero Qwen3.8-35B-A3B distill 256K vision/MTP trial
 
-- Status: Approved IQ3_M retry in progress after IQ4_XS startup VRAM gate failure
+- Status: IQ3_M running; synthetic near-256K text/vision passed, tools failed; versioned LiteLLM route rollout pending
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [Swift trial](0009-swift-qwen38-b60-trial.md), [abandoned concurrency experiment](0010-swift-qwen38-concurrency.md)
 
@@ -51,7 +51,21 @@ If insufficient memory, report measured model/projector/main KV/MTP/recurrent/co
 
 ## IQ3_M retry
 
-The operator approved IQ3_M after the IQ4_XS safety pause. Keep context 262,144, Q8 K/V, MTP width 3, vision projector and batch 2048 unchanged. Use `/models/model-iq3m.gguf` and served alias `empero-qwen3.8-35b-a3b-iq3m-intel`; retain `/models/model.gguf` (IQ4_XS) and Swift's separate PVC. IQ3_M checksum was checked against the pinned publisher `SHA256SUMS`. Both model files plus the projector total approximately 36.87 GB, within the existing 40Gi claim; no deletion or overwrite of the prior model is needed. Repeat memory gates before inference, then short text/vision/tool checks and incremental depth tests. No public route promotion until tested.
+The operator approved IQ3_M after the IQ4_XS safety pause. Keep context 262,144, Q8 K/V, MTP width 3, vision projector and batch 2048 unchanged. Use `/models/model-iq3m.gguf` and served alias `empero-qwen3.8-35b-a3b-iq3m-intel`; retain `/models/model.gguf` (IQ4_XS) and Swift's separate PVC. IQ3_M checksum was checked against the pinned publisher `SHA256SUMS`. Both model files plus the projector total approximately 36.87 GB, within the existing 40Gi claim; no deletion or overwrite of the prior model is needed. Retry commit `3e8d9e7e` was pushed and applied by Flux. Checksum init exited 0, predictor Ready with zero restarts. Server `/props` reported one slot and 262,144 context; `/v1/models` reported 262,144 training context and the expected alias. Idle VRAM was 21,257.98 MiB (86.84%), passing the safety gate. Short text and 32×32 red-square vision checks passed. A forced named tool request produced no structured call; a second `tool_choice: required` request also produced none and hit the 512-token cap. No returned tools were executed. Do not advertise function calling.
+
+Single uncached synthetic text retrieval runs through a private direct port-forward:
+
+| Actual prompt tokens | TTFT seconds | Prefill tok/s | Short decode tok/s | Peak sampled VRAM MiB |
+| ---: | ---: | ---: | ---: | ---: |
+| 16,384 | 15.24 | 1,083.1 | 39.5 | 21,377.50 |
+| 65,536 | 61.50 | 1,066.8 | 33.0 | 21,377.50 |
+| 131,072 | 147.77 | 887.7 | 27.0 | 21,377.50 |
+| 196,608 | 268.86 | 731.7 | 22.9 | 21,377.50 |
+| 261,120 | 419.66 | 622.5 | 19.9 | 21,377.50 |
+
+Every run retrieved the benign marker, reported no truncation and zero cached prompt tokens; output was only eight tokens, so decode rates are not sustained-generation benchmarks. MTP counters showed six drafts/six accepted for these short completions; this proves the mechanism ran, not speedup versus MTP-off. Near-limit vision used 260,938 prompt plus two output tokens, correctly returned red, and took 423.55 s total with 619.6 tok/s prefill. Its 125 memory samples peaked at 21,377.62 MiB (87.3269%); minimum sampled host available RAM was 14,950 MiB. The serving pod remained Ready with zero restarts and node Ready without MemoryPressure. Sampling was approximately every three seconds plus SSH overhead; transient peaks may be missed. No coding-quality, varied vision, large-image, 16K output or sustained-load guarantee follows from these single repetitive synthetic runs.
+
+Add only the distinct versioned LiteLLM entry with 245,760 input/16,384 output and vision true/tools false after these tests. Leave `qwen-intel` and persisted routing unchanged pending explicit alias-promotion approval; Swift's alias remains unavailable while paused.
 
 ## Validation and outcome
 
