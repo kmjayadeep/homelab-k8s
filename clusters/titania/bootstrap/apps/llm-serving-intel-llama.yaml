@@ -19,5 +19,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: intel-llama-empero-qwen38-trial
+      name: intel-llama-tiel-coder-trial
       namespace: llm-serving

@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Retain Tiel and its cache for rollback; release the sole B60 before Swift starts.
-  replicas: 0
+  # Approved 80K retry; stop Empero and verify GPU release before deployment.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -78,7 +78,7 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # 80K is configured, not validated active depth; MTP width mirrors original A3B.
+            # Approved 80K retry; near-limit safety remains unverified.
             - --ctx-size
             - "81920"
             - --cache-type-k
@@ -89,12 +89,28 @@ spec:
             - "on"
             - --parallel
             - "1"
+            - --cont-batching
             - --n-gpu-layers
             - "99"
+            # Match Empero batching and sampling; physical microbatch stays at default.
+            - --batch-size
+            - "2048"
+            - --temp
+            - "0.6"
+            - --top-p
+            - "0.95"
+            - --top-k
+            - "20"
+            - --min-p
+            - "0"
+            - --presence-penalty
+            - "0"
+            - --repeat-penalty
+            - "1.0"
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
-            - "2"
+            - "3"
           ports:
             - name: http
               containerPort: 8080
