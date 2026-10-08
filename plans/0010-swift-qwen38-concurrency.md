@@ -1,6 +1,6 @@
 # Plan 0010: Swift Qwen3.8 two-slot vision baseline on B60
 
-- Status: MTP restored; operator requested runtime-default microbatch, full-load verification deferred
+- Status: Abandoned for current serving configuration; operator requested rollback to pre-experiment 96K/Q8/one-slot/MTP
 - Owner: Homelab operator
 - Related: [Swift trial](0009-swift-qwen38-b60-trial.md), [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [performance comparison](0007-local-llm-performance-comparison.md)
 
@@ -41,6 +41,10 @@ If 256K fails, report **actual** allocation totals first. Keep model and project
 7. Explicit mixed-phase test: let A begin sustained decoding, then submit B's uncached 64K/128K prefill (repeat with vision). Align A's timestamped output with B's prefill interval; report A's before/during/after median/p95/max output gaps and whether A produced any tokens during that interval. Continuous batching enables scheduling but does **not** guarantee non-blocking prefill on this runtime/backend. Microbatch 128 is a tuning hypothesis, not proof of overlap.
 8. Only after memory gates pass, obtain approval for a second GitOps rollout adding `--spec-type draft-mtp --spec-draft-n-max 3`. Keep all other settings and test inputs identical; re-run the matrix and mixed-phase test, capturing draft/acceptance counters if available plus extra RAM/VRAM. Compare against MTP-off and the supplied reference. The operator subsequently requested MTP restored without completing this comparison; current source enables draft-MTP width 3. A future matched MTP-off comparison needs another approved GitOps rollout.
 9. Compare fixed coding, long-context retrieval, structured tool-call and vision tasks against Q8/one-slot historical configuration using the same prompts, sampling and scoring. Do not execute returned tool calls. Q4 KV and concurrency throughput are not quality evidence; any regression requires reporting and reconsidering KV precision/context trade-offs.
+
+## Rollback decision
+
+After reporting worse prompt processing, the operator requested reverting and pushing the last working configuration. Restore the Swift Deployment exactly to its pre-experiment contents at `083c5be9`: 98,304 context, one slot, Q8 K/V, MTP draft width 3, runtime-default batching, unchanged Q4_K_S weights and F16 projector. Preserve Recreate, 16Gi memory limit, Service and PVC. This rollback abandons the two-slot experiment for current serving; it does not establish the older configuration as OOM-safe (11 prior restarts were observed). Preserve this plan and the uncommitted benchmark runner as incomplete evidence. No completed long-context benchmark or MTP comparison was obtained.
 
 ## Results and outcome
 

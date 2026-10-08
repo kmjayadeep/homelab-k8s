@@ -88,22 +88,17 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # 128K per slot, 256K aggregate; active vision/MTP capacity unverified.
-            # Memory/quality gates and benchmark matrix: plans/0010-swift-qwen38-concurrency.md.
+            # 96K with the projector; near-limit active depth is unverified.
             - --ctx-size
-            - "262144"
+            - "98304"
             - --cache-type-k
-            - q4_0
+            - q8_0
             - --cache-type-v
-            - q4_0
+            - q8_0
             - --flash-attn
             - "on"
             - --parallel
-            - "2"
-            - --cont-batching
-            - --batch-size
-            - "512"
-            # Use the runtime-default microbatch size for prefill throughput.
+            - "1"
             - --n-gpu-layers
             - "99"
             # Publisher-recommended sampling defaults; explicit API parameters override them.
@@ -119,7 +114,6 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            # Operator requested MTP restored before full-load verification.
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
@@ -134,7 +128,6 @@ spec:
               gpu.intel.com/xe: 1
             limits:
               cpu: 6
-              # Node has ~20.4Gi allocatable RAM; 32Gi requires a node RAM upgrade.
               memory: 16Gi
               gpu.intel.com/xe: 1
           securityContext:
