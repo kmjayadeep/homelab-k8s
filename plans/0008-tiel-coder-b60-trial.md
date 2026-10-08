@@ -1,6 +1,6 @@
 # Plan 0008: Trial Tiel Coder 35B-A3B MTP on the sole B60
 
-- Status: Completed trial; Tiel stopped for the subsequent [Swift trial](0009-swift-qwen38-b60-trial.md)
+- Status: Original trial completed; 80K retry deployed and public qwen-intel smoke-tested
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [client performance profile](0007-local-llm-performance-comparison.md)
 
@@ -27,6 +27,14 @@ Switch the sole B60 from Intel Qwen3.8-27B Q4_K_M to a separate, pinned Tiel Cod
 ## Validation and rollback
 
 Use `kustomize build <serving-or-litellm-path> | kubectl apply --dry-run=client -f -`, the bootstrap Flux resource client dry-run, `git diff --check`, and the Python performance runner tests for any runner changes. Report exact source/applied revision, actual readiness, alias routing and validation failures; never treat dry-run as live evidence. For rollback, update the stable alias away from a broken backend only after restoring a healthy versioned route: stop Tiel (leave cache intact), verify its pod exited, resume Qwen3.8 on the sole GPU, confirm its versioned request, then restore Git **and** persisted LiteLLM alias and confirm `qwen-intel` works. Never prune/delete retained PVCs as a shortcut.
+
+## 80K retry
+
+The operator requested returning from Empero to Tiel and switching LiteLLM, and confirmed 80K context. The operator subsequently approved commit/push and the staged live rollout. Preserve the original trial evidence below and both model caches. Reuse pinned revision `bbe9e566f39e4fc9652ac66b71968289a03c520a`, IQ4_XS checksum and runtime image. Keep 81,920 context, Q8 K/V, Flash Attention, full GPU offload, one slot and existing resource/probe limits. Match Empero's continuous batching, batch 2048, MTP width 3, temperature 0.6/top-p 0.95/top-k 20/min-p 0/presence penalty 0/repeat penalty 1.0. No projector; do not advertise vision or unverified tools. LiteLLM keeps 65,536 input plus 16,384 output tokens and the existing accounting rates.
+
+Prepared final desired state stops Empero, activates Tiel, targets Tiel in the Flux health check, and maps `qwen-intel` to Tiel. **Do not push all of these changes together:** after explicit approval, publish a separate Empero-stop revision first (preserve the alias), verify pod exit and GPU release, then activate Tiel and change the health check. Verify checksum init exit, readiness, zero restarts, node pressure, host memory and at least 1 GiB free GPU memory before inference. A failed gate needs an approved pause/rollback, not PVC deletion. Smoke-test the versioned LiteLLM entry and a benign required-tool request without executing tools. Only then publish the alias change and align the complete database-backed alias map using in-process authentication without displaying credentials or unrelated settings. Confirm a public `qwen-intel` smoke request. Old 25K measurements do not validate the changed batching/MTP settings or near-80K active depth.
+
+Rollback requires stopping Tiel and confirming GPU release before resuming Empero, verifying its versioned route, then restoring Git and persisted alias mapping. Retain all caches and versioned registrations. Stop revision `47474ded` was pushed and applied; Empero's pod exited and sampled GPU use fell to 26 MiB. Activation `44966652` was pushed/applied, with Tiel 1/1 Ready, checksum init exit 0 and zero restarts. Idle GPU use was 18,617 MiB (76.05%), host available memory 21,603 MiB, node Ready without MemoryPressure. A versioned LiteLLM smoke request returned HTTP 200 in 2.73 s. Alias revision `58696038` was pushed/applied; LiteLLM HelmRelease 1.90.0 reconciled. Authenticated `/config/update` returned 200; an initial verification used the wrong response nesting, then `/router/settings.current_values.model_group_alias` confirmed `qwen-intel` targets Tiel. The verified effective map contains only `qwen-intel`; the pre-update map was not correctly captured, so preservation of any prior non-Git aliases was not independently established. The public alias request returned 200 in 1.49 s (193 input/23 output tokens). A direct required-tool check returned `get_weather` with valid Paris arguments; no tool was executed. This single check is not broad tool reliability evidence; keep the conservative LiteLLM metadata pending varied tests. Both caches remain intact. No near-80K, vision or MTP-off comparison was performed.
 
 ## Outcome (2026-10-05)
 
