@@ -173,7 +173,7 @@ spec:
             max_output_tokens: 16384
       router_settings:
         model_group_alias:
-          qwen-intel: swift-qwen3.8-27b-q4ks-intel
+          qwen-intel: empero-qwen3.8-35b-a3b-iq3m-intel
       litellm_settings:
         json_logs: true
         request_timeout: 600
