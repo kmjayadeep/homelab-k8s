@@ -103,8 +103,7 @@ spec:
             - --cont-batching
             - --batch-size
             - "512"
-            - --ubatch-size
-            - "128"
+            # Use the runtime-default microbatch size for prefill throughput.
             - --n-gpu-layers
             - "99"
             # Publisher-recommended sampling defaults; explicit API parameters override them.
