@@ -1,6 +1,6 @@
 # Plan 0011: Empero Qwen3.8-35B-A3B distill 256K vision/MTP trial
 
-- Status: IQ3_M running; synthetic near-256K text/vision passed, tools failed; versioned LiteLLM route rollout pending
+- Status: IQ3_M running; versioned public LiteLLM route tested; synthetic near-256K text/vision passed, tools failed
 - Owner: Homelab operator
 - Related: [B60 evaluation](0005-intel-arc-b60-llm-serving-evaluation.md), [Swift trial](0009-swift-qwen38-b60-trial.md), [abandoned concurrency experiment](0010-swift-qwen38-concurrency.md)
 
@@ -65,7 +65,7 @@ Single uncached synthetic text retrieval runs through a private direct port-forw
 
 Every run retrieved the benign marker, reported no truncation and zero cached prompt tokens; output was only eight tokens, so decode rates are not sustained-generation benchmarks. MTP counters showed six drafts/six accepted for these short completions; this proves the mechanism ran, not speedup versus MTP-off. Near-limit vision used 260,938 prompt plus two output tokens, correctly returned red, and took 423.55 s total with 619.6 tok/s prefill. Its 125 memory samples peaked at 21,377.62 MiB (87.3269%); minimum sampled host available RAM was 14,950 MiB. The serving pod remained Ready with zero restarts and node Ready without MemoryPressure. Sampling was approximately every three seconds plus SSH overhead; transient peaks may be missed. No coding-quality, varied vision, large-image, 16K output or sustained-load guarantee follows from these single repetitive synthetic runs.
 
-Add only the distinct versioned LiteLLM entry with 245,760 input/16,384 output and vision true/tools false after these tests. Leave `qwen-intel` and persisted routing unchanged pending explicit alias-promotion approval; Swift's alias remains unavailable while paused.
+Commit `84dfb670` added the distinct versioned LiteLLM entry with 245,760 input/16,384 output and vision true/tools false. Kustomize/client dry-run and diff checks passed; Flux applied it and HelmRelease 1.90.0 reconciled successfully. The model was visible through the public `https://litellm.cosmos.cboxlab.com/v1/models`; an authenticated benign versioned chat request returned HTTP 200 in 1.13 s (16 input/two output tokens). Authentication stayed inside the existing LiteLLM container; no credentials were displayed or changed. A narrowly filtered `/router/settings` check confirmed persisted `qwen-intel` still targets `swift-qwen3.8-27b-q4ks-intel`. Leave Git and persisted routing unchanged pending explicit alias-promotion approval; Swift's alias remains unavailable while paused. Both caches and the unrelated uncommitted benchmark script are preserved.
 
 ## Validation and outcome
 
