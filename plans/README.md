@@ -13,3 +13,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0007: Local LLM performance comparison](0007-local-llm-performance-comparison.md) | Active client-side evaluation with repeatable runner and HTML comparison |
 | [0008: Tiel Coder B60 trial](0008-tiel-coder-b60-trial.md) | Completed staged 80K/MTP trial; predictor and cache retained for rollback |
 | [0009: Swift Qwen3.8 B60 trial](0009-swift-qwen38-b60-trial.md) | Completed staged 128K/Q4_K_S/MTP trial; Swift left running, earlier caches retained |
+| [0010: Swift two-slot vision baseline](0010-swift-qwen38-concurrency.md) | Source prepared for 256K aggregate/Q4 KV/MTP off; OOM investigation recorded, rollout and benchmarks pending approval |

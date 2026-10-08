@@ -88,17 +88,23 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # 96K with the projector; near-limit active depth is unverified.
+            # Baseline: 128K per slot, 256K aggregate; active vision capacity unverified.
+            # Memory/quality gates and benchmark matrix: plans/0010-swift-qwen38-concurrency.md.
             - --ctx-size
-            - "98304"
+            - "262144"
             - --cache-type-k
-            - q8_0
+            - q4_0
             - --cache-type-v
-            - q8_0
+            - q4_0
             - --flash-attn
             - "on"
             - --parallel
-            - "1"
+            - "2"
+            - --cont-batching
+            - --batch-size
+            - "512"
+            - --ubatch-size
+            - "128"
             - --n-gpu-layers
             - "99"
             # Publisher-recommended sampling defaults; explicit API parameters override them.
@@ -114,10 +120,7 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            - --spec-type
-            - draft-mtp
-            - --spec-draft-n-max
-            - "3"
+            # MTP disabled for baseline; compare draft-mtp / draft width 3 after gates pass.
           ports:
             - name: http
               containerPort: 8080
@@ -128,6 +131,7 @@ spec:
               gpu.intel.com/xe: 1
             limits:
               cpu: 6
+              # Node has ~20.4Gi allocatable RAM; 32Gi requires a node RAM upgrade.
               memory: 16Gi
               gpu.intel.com/xe: 1
           securityContext:
