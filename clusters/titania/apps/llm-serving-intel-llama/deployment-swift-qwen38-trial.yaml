@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Sole B60 owner; Tiel and earlier caches/workloads remain stopped for rollback.
-  replicas: 1
+  # Paused for the Empero trial; preserve model and projector cache for rollback.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
