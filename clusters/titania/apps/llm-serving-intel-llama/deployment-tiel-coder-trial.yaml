@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Approved 80K retry; stop Empero and verify GPU release before deployment.
+  # 128K vision trial; preserve the 80K configuration and cache for rollback.
   replicas: 1
   strategy:
     type: Recreate
@@ -48,6 +48,14 @@ spec:
                 echo '96b4c5430b5a693447a0aafce58840466829e1788e46fc037b23dfbafab009bf  /models/model.gguf.partial' | sha256sum -c -
                 mv /models/model.gguf.partial /models/model.gguf
               fi
+              if test -f /models/mmproj-bf16.gguf; then
+                echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/mmproj-bf16.gguf.partial \
+                  https://huggingface.co/peculiar-ragdoll/Tiel-Coder-35B-A3B-GGUF-MTP/resolve/bbe9e566f39e4fc9652ac66b71968289a03c520a/mmproj-BF16.gguf
+                echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf.partial' | sha256sum -c -
+                mv /models/mmproj-bf16.gguf.partial /models/mmproj-bf16.gguf
+              fi
           resources:
             requests:
               cpu: 100m
@@ -70,6 +78,8 @@ spec:
           args:
             - --model
             - /models/model.gguf
+            - --mmproj
+            - /models/mmproj-bf16.gguf
             - --alias
             - tiel-coder-35b-a3b-intel
             - --host
@@ -78,9 +88,9 @@ spec:
             - "8080"
             - --metrics
             - --jinja
-            # Approved 80K retry; near-limit safety remains unverified.
+            # 128K with vision is a target, not validated active-context capacity.
             - --ctx-size
-            - "81920"
+            - "131072"
             - --cache-type-k
             - q8_0
             - --cache-type-v

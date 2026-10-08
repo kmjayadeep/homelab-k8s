@@ -12,6 +12,6 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      # 18.12 GB GGUF; checksum-verified downloads need space for a partial file.
+      # 18.12 GB weights + 0.90 GB projector; allow checksum-verified partial downloads.
       storage: 40Gi
   storageClassName: local-path
