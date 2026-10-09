@@ -27,7 +27,7 @@ Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `
 - Keep Vault recovery/unseal material and the initial root token outside both Git and the cluster.
 - Use a namespaced `SecretStore` and dedicated ServiceAccount per trust boundary. Shared values remain at one owner-based Vault path and are authorized to each consumer separately.
 - ESO updates Kubernetes Secrets but does not restart pods using environment variables. Add the namespace to the scoped Reloader release and annotate the workload for automatic rollout, or document a GitOps restart procedure.
-- Vault internal TLS remains follow-up work. Existing stores temporarily use `http://vault.vault.svc.cluster.local:8200`; do not treat HTTP as the final design.
+- Vault internal TLS is deployed. ESO connects to `https://vault.vault.svc.cluster.local:8200` with CA cert trust via ConfigMap `vault-ca-cert`. The CA cert in the ConfigMap must be populated with the actual CA that signed the Vault TLS cert (see `clusters/titania/apps/vault/vault-ca-cert-configmap.yaml`).
 
 ## Conventions
 
