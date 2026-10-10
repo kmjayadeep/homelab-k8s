@@ -120,7 +120,7 @@ spec:
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
-            - "3"
+            - "2"
           ports:
             - name: http
               containerPort: 8080
