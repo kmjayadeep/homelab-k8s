@@ -40,7 +40,11 @@ A benign 32×32 red-square image request through the versioned LiteLLM route ret
 
 ## MTP width reduction
 
-The operator reported that MTP width 3 was not working well and requested width 2. Current desired state changes only Tiel's `--spec-draft-n-max` to `2`; 128K context, vision, batching, sampling and paused rollback workloads remain unchanged. The operator approved commit/push for the GitOps rollout. Kustomize build, client dry-run and diff checks passed; rollout verification is pending and no matched performance comparison has been performed.
+The operator reported that MTP width 3 was not working well and requested width 2. The width-reduction change altered only Tiel's `--spec-draft-n-max` to `2`; 128K context, vision, batching, sampling and paused rollback workloads remained unchanged. Commit `fa6a7363` was pushed and applied by Flux; Tiel reached 1/1 Ready with zero restarts and the Deployment reported MTP width 2. No matched performance comparison was performed.
+
+## Runtime-default batch sizes
+
+The operator subsequently requested removing explicit batch-size parameters and pushing without running a benchmark. Current desired state removes `--batch-size 2048`; `--ubatch-size` was already unset, so both sizes use the pinned runtime's defaults. Continuous batching, MTP width 2, 128K context, vision, sampling and paused rollback workloads remain unchanged. Performance impact is unmeasured; no benchmark is authorized for this change.
 
 ## 80K retry
 

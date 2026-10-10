@@ -102,9 +102,7 @@ spec:
             - --cont-batching
             - --n-gpu-layers
             - "99"
-            # Match Empero batching and sampling; physical microbatch stays at default.
-            - --batch-size
-            - "2048"
+            # Use runtime-default batch and microbatch sizes; preserve sampling.
             - --temp
             - "0.6"
             - --top-p
