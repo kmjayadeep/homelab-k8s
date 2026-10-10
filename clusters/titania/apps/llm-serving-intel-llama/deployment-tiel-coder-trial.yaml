@@ -74,7 +74,8 @@ spec:
               mountPath: /models
       containers:
         - name: llama-server
-          image: ghcr.io/ggml-org/llama.cpp@sha256:2ce301ccfe0a960c6836c56755cad692a3515f4eca2112191c75520b00f17406
+          # Official server-intel b11515, oneAPI 2026.1.1 / FP16; pin the published image index.
+          image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
           args:
             - --model
             - /models/model.gguf
