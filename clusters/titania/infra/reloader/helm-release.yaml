@@ -22,8 +22,11 @@ spec:
         - baskit
         - bookorbit
         - external-dns
+        - glance
         - litellm
         - open-webui
+        - otpcloud
+        - taskplanner
         - wallabag
       ignoreJobs: true
       ignoreCronJobs: true
