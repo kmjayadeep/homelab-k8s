@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: llm-serving-ingress
+  labels:
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: network-policy
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # Inference servers have no auth; only LiteLLM and Prometheus may reach them.
+  # Kubelet probes come from the host and stay allowed under Cilium defaults.
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: litellm
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8000

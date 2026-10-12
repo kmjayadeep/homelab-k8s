@@ -28,3 +28,4 @@ resources:
   - empero-qwen38-trial
   - metrics-service.yaml
   - servicemonitor.yaml
+  - networkpolicy.yaml
