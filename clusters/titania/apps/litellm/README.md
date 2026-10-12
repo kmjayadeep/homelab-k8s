@@ -1,6 +1,6 @@
 # LiteLLM
 
-LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, Pi) use `https://litellm.cosmos.cboxlab.com` with LiteLLM keys. The inference servers in `llm-serving` have no authentication and are reachable only through LiteLLM.
+LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, Pi) use `https://litellm.cosmos.cboxlab.com` with LiteLLM keys. The inference servers in `llm-serving` have no authentication and no Ingress. No NetworkPolicy restricts them, so any in-cluster pod can still reach them directly.
 
 ## Current model
 
