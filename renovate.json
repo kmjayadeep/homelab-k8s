@@ -6,6 +6,9 @@
   "kubernetes": {
     "managerFilePatterns": ["/clusters/.+\\.yaml$/"]
   },
+  "flux": {
+    "managerFilePatterns": ["/clusters/.+\\.yaml$/"]
+  },
   "packageRules": [
     {
       "matchPackageNames": ["ghcr.io/fluxcd/*"],
