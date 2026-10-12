@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # 128K vision trial; preserve the 80K configuration and cache for rollback.
+  # Sole B60 owner: 128K context with BF16 vision projector and MTP.
   replicas: 1
   strategy:
     type: Recreate
@@ -100,7 +100,6 @@ spec:
             - "on"
             - --parallel
             - "1"
-            - --cont-batching
             - --n-gpu-layers
             - "99"
             # Use runtime-default batch and microbatch sizes; preserve sampling.
