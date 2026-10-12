@@ -20,7 +20,7 @@ Recorded observations:
 
 - Serve local models as plain Kubernetes Deployments running pinned official `ghcr.io/ggml-org/llama.cpp` SYCL images. Each Deployment has a checksum-verified, pinned Hugging Face GGUF on a node-local PVC.
 - Keep exactly one B60 inference Deployment in Git: at present, `intel-llama-tiel-coder-trial` (Tiel-Coder 35B-A3B IQ4_XS, BF16 mmproj, MTP, 128K, one slot, Q8 KV).
-- Expose models only through LiteLLM, using the stable `qwen-intel` alias plus a versioned name. `llm-serving` has no Ingress, and a NetworkPolicy admits only the `litellm` and `monitoring` namespaces.
+- Expose models only through LiteLLM, using the stable `qwen-intel` alias plus a versioned name. `llm-serving` has no Ingress. An ingress NetworkPolicy was proposed but not adopted, so in-cluster pods can still reach the unauthenticated servers.
 - Do not keep stopped trial Deployments or caches as standing rollback. Rollback means re-adding manifests from Git history and downloading the pinned artifacts again.
 - Remove KServe, the vLLM app and the direct vLLM Ingress.
 
@@ -39,4 +39,4 @@ Recorded observations:
 
 ## Implementation status
 
-Tiel is the Git-declared B60 owner in `clusters/titania/apps/llm-serving-intel-llama/`. Removing the stopped trials, vLLM, KServe and the stale LiteLLM entries, and adding the NetworkPolicy, are separate pull requests. This ADR does not prove they are merged or reconciled; check `flux get ks -A` and `kubectl -n llm-serving get deploy,svc,pvc` for live state.
+Tiel is the Git-declared B60 owner in `clusters/titania/apps/llm-serving-intel-llama/`. The stopped trials, vLLM, KServe and the stale LiteLLM entries were removed in separate pull requests; the NetworkPolicy pull request was closed unmerged. This ADR does not prove live state; check `flux get ks -A` and `kubectl -n llm-serving get deploy,svc,pvc` for live state.
