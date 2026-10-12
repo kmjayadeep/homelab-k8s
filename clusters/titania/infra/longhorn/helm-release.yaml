@@ -3,6 +3,10 @@ kind: HelmRelease
 metadata:
   name: longhorn
   namespace: longhorn-system
+  annotations:
+    # Stateful: never let Flux garbage-collect this, even if the manifest is
+    # renamed or removed. Deleting it must be a deliberate manual action.
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   chart:
     spec:
