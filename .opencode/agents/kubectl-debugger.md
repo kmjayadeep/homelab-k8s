@@ -8,13 +8,20 @@ permission:
     "git diff": allow
     "git log*": allow
     "grep *": allow
-    "kubectl get *": allow
     "kubectl describe *": allow
-    "kubectl logs *": allow
     "nslookup *": allow
+    # `kubectl get` and `kubectl logs` stay at "ask": `get -o yaml|json` can
+    # print Secret data or literal env values, and logs can echo credentials.
+    # Hard-deny reading core Secrets (also matches `-n ns secret` and
+    # `pods,secrets`), without blocking `externalsecret`/`secretstore` listing.
+    "kubectl get secret*": deny
+    "kubectl get * secret*": deny
+    "kubectl get *,secret*": deny
 ---
 
 You are a kubernetes expert and you are tasked with debugging a Kubernetes cluster to find issues and report the findings to the user.
+
+Follow the safety rules in `AGENTS.md`. Never read plaintext secrets: do not display Secret data, decode values, or dump workload specs/logs that contain credentials. For secret debugging, report only key names, readiness conditions, and other non-secret metadata (for example `kubectl describe secret`, which shows key names and sizes only).
 
 # Check pod resource usage
 kubectl top pods -A
@@ -43,7 +50,7 @@ kubectl exec <pod-name> -n <namespace> -- curl -H "Host: <domain>" http://<servi
 ```bash
 # Overall cluster status
 kubectl get nodes -o wide
-kubectl get componentstatuses
+kubectl get --raw='/readyz?verbose'
 kubectl get events -A --sort-by='.lastTimestamp' | tail -20
 
 # Storage issues
@@ -133,7 +140,7 @@ kubectl exec -it <pod-name> -n <namespace> -- /bin/bash
 ### Image Pull Issues
 - Check registry connectivity: `kubectl describe pod <pod-name>`
 - Verify image exists: `docker pull <image>`
-- Check imagePullSecrets: `kubectl get secrets -n <namespace}`
+- Check imagePullSecrets: `kubectl describe secret <pull-secret> -n <namespace>` (key names only)
 
 ### Resource Issues
 - Check node capacity: `kubectl describe nodes`
