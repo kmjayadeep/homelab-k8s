@@ -132,8 +132,9 @@ spec:
               cpu: 6
               memory: 16Gi
               gpu.intel.com/xe: 1
+          # The GPU device plugin injects the allocated DRM nodes; no privileged access needed.
           securityContext:
-            privileged: true
+            allowPrivilegeEscalation: false
           startupProbe:
             httpGet:
               path: /health
@@ -159,8 +160,6 @@ spec:
               mountPath: /models
             - name: dshm
               mountPath: /dev/shm
-            - name: dri
-              mountPath: /dev/dri
       volumes:
         - name: model-cache
           persistentVolumeClaim:
@@ -169,7 +168,3 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 2Gi
-        - name: dri
-          hostPath:
-            path: /dev/dri
-            type: Directory
