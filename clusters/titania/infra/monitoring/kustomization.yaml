@@ -7,8 +7,6 @@ resources:
 - ./external-secrets.yaml
 - ./repo.yaml
 - ./helmrelease-prometheus.yaml
-- ./llm-prometheusrule.yaml
-- ./llm-grafana-dashboard.yaml
 - ./llama-cpp-prometheusrule.yaml
 - ./llama-cpp-grafana-dashboard.yaml
 
