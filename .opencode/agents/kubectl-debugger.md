@@ -13,9 +13,13 @@ permission:
     # `kubectl get` and `kubectl logs` stay at "ask": `get -o yaml|json` can
     # print Secret data or literal env values, and logs can echo credentials.
     # Hard-deny reading core Secrets (also matches `-n ns secret` and
-    # `pods,secrets`), without blocking `externalsecret`/`secretstore` listing.
-    "kubectl get secret*": deny
-    "kubectl get * secret*": deny
+    # `pods,secrets`), without blocking `externalsecrets`/`secretstores`.
+    "kubectl get secret": deny
+    "kubectl get secret *": deny
+    "kubectl get secrets*": deny
+    "kubectl get * secret": deny
+    "kubectl get * secret *": deny
+    "kubectl get * secrets*": deny
     "kubectl get *,secret*": deny
 ---
 
