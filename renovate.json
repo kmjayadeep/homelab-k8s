@@ -14,6 +14,32 @@
       "matchPackageNames": ["ghcr.io/fluxcd/*"],
       "groupName": "fluxcd controllers",
       "groupSlug": "fluxcd-controllers"
+    },
+    {
+      "description": "Helm charts: one PR per minor step, no automerge, let releases settle first",
+      "matchManagers": ["flux"],
+      "separateMultipleMinor": true,
+      "separateMultipleMajor": true,
+      "minimumReleaseAge": "7 days",
+      "automerge": false,
+      "addLabels": ["helm-chart"]
+    },
+    {
+      "description": "Major chart bumps wait for approval on the Dependency Dashboard",
+      "matchManagers": ["flux"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "CNI, storage, secrets, TLS and ingress: every non-patch bump needs Dependency Dashboard approval and goes one minor at a time",
+      "matchManagers": ["flux"],
+      "matchPackageNames": ["cilium", "longhorn", "vault", "external-secrets", "cert-manager", "ingress-nginx"],
+      "matchUpdateTypes": ["major", "minor"],
+      "dependencyDashboardApproval": true,
+      "addLabels": ["critical-infra"],
+      "prBodyNotes": [
+        "⚠️ Critical infrastructure chart. Merge one minor step at a time, read the upstream upgrade notes first, and confirm cluster health (`flux get all -A`, all pods Ready, ingress serving) before approving the next step. A Cilium upgrade can orphan existing pod endpoints; plan to restart pods afterwards."
+      ]
     }
   ]
 }

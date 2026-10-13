@@ -28,3 +28,9 @@ Numbers are unique **within each directory**, assigned from the next available n
 ## Validate and report
 
 For changed manifests, run `kustomize build <affected-entry-point> | kubectl apply --dry-run=client -f -` as required by AGENTS.md. A client dry-run can still depend on local tooling and cluster discovery; report failures, not a guessed pass. Review the build output **without exposing secret values**. For docs-only changes, check relative links and any touched examples; do not claim cluster validation. Report what changed, tests run, and open risks or approvals needed. Never apply/reconcile just to validate a documentation change.
+
+## Dependency updates (Renovate)
+
+Renovate proposes container image tags (`kubernetes` manager) and HelmRelease chart versions (`flux` manager) under `clusters/`. Chart updates are split into one PR per minor step and wait 7 days after an upstream release. Major chart bumps, and minor bumps to `cilium`, `longhorn`, `vault`, `external-secrets`, `cert-manager`, and `ingress-nginx`, open only after approval on the Dependency Dashboard issue and carry the `critical-infra` label.
+
+Merge critical-infra PRs one at a time: read the upstream upgrade notes, merge, and confirm cluster health (`flux get all -A`, all pods Ready, ingress serving) before approving the next step. Never skip minor versions for Cilium or Longhorn. After a Cilium agent upgrade, check that existing pods still have Cilium endpoints; pods without one have no network and must be restarted.
