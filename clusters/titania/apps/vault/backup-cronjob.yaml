@@ -74,7 +74,9 @@ spec:
                 - -config=/etc/vault-agent/config.hcl
               env:
                 - name: VAULT_ADDR
-                  value: http://vault-active.vault.svc.cluster.local:8200
+                  value: https://vault-active.vault.svc.cluster.local:8200
+                - name: VAULT_CACERT
+                  value: /vault-ca/ca.crt
               resources:
                 requests:
                   cpu: 25m
@@ -92,6 +94,9 @@ spec:
               volumeMounts:
                 - name: agent-config
                   mountPath: /etc/vault-agent
+                  readOnly: true
+                - name: vault-ca
+                  mountPath: /vault-ca
                   readOnly: true
                 - name: vault-auth
                   mountPath: /vault-auth
@@ -111,7 +116,9 @@ spec:
                   chmod 0640 /snapshot/vault.snap /snapshot/vault.snap.sha256
               env:
                 - name: VAULT_ADDR
-                  value: http://vault-active.vault.svc.cluster.local:8200
+                  value: https://vault-active.vault.svc.cluster.local:8200
+                - name: VAULT_CACERT
+                  value: /vault-ca/ca.crt
                 - name: VAULT_CLIENT_TIMEOUT
                   value: 10m
               resources:
@@ -131,6 +138,9 @@ spec:
               volumeMounts:
                 - name: snapshot
                   mountPath: /snapshot
+                - name: vault-ca
+                  mountPath: /vault-ca
+                  readOnly: true
                 - name: vault-auth
                   mountPath: /vault-auth
                   readOnly: true
@@ -183,6 +193,10 @@ spec:
                   mountPath: /snapshot
                   readOnly: true
           volumes:
+            - name: vault-ca
+              configMap:
+                # Published by trust-manager (infra/vault-pki).
+                name: vault-ca-cert
             - name: agent-config
               configMap:
                 name: vault-backup-agent

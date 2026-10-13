@@ -64,7 +64,7 @@ Vault Kubernetes-auth configuration, application roles, and policies are managed
 
 ESO must connect to Vault over TLS and validate Vault's CA. The CA certificate may be stored in a ConfigMap because it is public material. Certificate private keys remain Kubernetes Secrets managed by cert-manager or another bootstrap-safe mechanism.
 
-The current Vault configuration uses `tls_disable = 1`; therefore Vault must be given a trusted internal TLS configuration before ESO is used for production application secrets. Plain HTTP is not an accepted steady state.
+Vault originally ran with `tls_disable = 1`. Plain HTTP is not an accepted steady state. The internal TLS design is a cert-manager self-signed root (`vault-internal-ca`, key kept in the `cert-manager` namespace) that issues the Vault listener certificate; trust-manager distributes only the public CA certificate as ConfigMap `vault-ca-cert` to every namespace. Rollout and verification are tracked in [plan 0012](../plans/0012-vault-internal-tls.md).
 
 ### GitOps layout
 
@@ -115,11 +115,11 @@ spec:
         property: <vault-property>
 ```
 
-The exact Vault service DNS name and CA reference must be verified when TLS is implemented.
+Stores use `https://vault.vault.svc.cluster.local:8200` with `caProvider` ConfigMap `vault-ca-cert`, key `ca.crt`, in the store's own namespace.
 
 ### Completed migration procedure
 
-The migration followed steps 2–7 below. The operator explicitly deferred step 1 because Vault initially contained little data; internal TLS and full recovery verification therefore remain open gates rather than completed work.
+The migration followed steps 2–7 below. The operator explicitly deferred step 1 because Vault initially contained little data; internal TLS and full recovery verification therefore remain open gates rather than completed work. Step 1 is tracked in [plan 0012](../plans/0012-vault-internal-tls.md).
 
 1. Enable Vault TLS and verify backup, restore, seal, and unseal procedures.
 2. Configure the Vault Kubernetes auth method.
@@ -152,9 +152,8 @@ Never delete or replace a working SealedSecret during the same unverified rollou
 
 - Vault Helm deployment: present.
 - External Secrets Operator Helm deployment: present.
-- Vault internal TLS: required before production use.
+- Vault internal TLS: manifests defined (Vault listener, `vault-pki` CA, trust-manager, HTTPS SecretStores); live rollout and verification pending per [plan 0012](../plans/0012-vault-internal-tls.md).
 - Vault Kubernetes authentication and least-privilege application roles: deployed and managed by `homelab-iac/vault-config/`.
 - Application `SecretStore` and `ExternalSecret` resources: deployed for all active application and infrastructure Secrets inventoried during this migration.
 - Existing SealedSecret migrations: complete; no SealedSecret resources or manifests remain in the cluster configuration.
 - Sealed Secrets controller: retained temporarily until a separate removal decision.
-- Vault internal TLS: still required; ESO currently uses the explicitly accepted temporary HTTP endpoint.
