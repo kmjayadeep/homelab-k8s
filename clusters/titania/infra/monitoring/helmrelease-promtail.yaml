@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: monitoring
-      version: "6.16.6"
+      version: "6.17.1"
   interval: 1h0m0s
   values:
     onfig:
