@@ -14,6 +14,10 @@ metadata:
   namespace: vault
 spec:
   path: clusters/titania/apps/vault
+  dependsOn:
+  # Issues the listener certificate and publishes ConfigMap vault-ca-cert.
+  - name: vault-pki
+    namespace: cert-manager
   interval: 15m
   prune: true
   wait: true

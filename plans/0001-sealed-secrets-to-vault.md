@@ -226,7 +226,8 @@ separate decision about removing the now-unused Sealed Secrets controller.
 - [x] ESO identities use exact-path Vault policies.
 - [x] All old SealedSecrets were removed in post-validation commits.
 - [x] No SealedSecret resources or manifests remain.
-- [ ] Enable trusted internal Vault TLS and update all SecretStores.
+- [ ] Enable trusted internal Vault TLS and update all SecretStores (tracked in
+  [plan 0012](0012-vault-internal-tls.md)).
 - [ ] Extend scoped Reloader coverage or document GitOps restarts for remaining
   environment-variable consumers before their next rotation. glance, otpcloud,
   and taskplanner were added to the scoped Reloader release, and their

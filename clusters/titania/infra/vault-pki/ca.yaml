@@ -1,0 +1,52 @@
+# Private CA for Vault's internal listener. The CA key stays in the
+# cert-manager namespace; only the public certificate is distributed.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: vault-pki-selfsigned
+  namespace: cert-manager
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-internal-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: titania-vault-internal-ca
+  secretName: vault-internal-ca
+  duration: 87600h # 10 years
+  renewBefore: 720h # 30 days
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: vault-pki-selfsigned
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-internal-ca
+spec:
+  ca:
+    # Resolved in the cert-manager cluster resource namespace.
+    secretName: vault-internal-ca
+---
+# Publishes the CA certificate (not the key) as ConfigMap vault-ca-cert/ca.crt
+# in every namespace for ESO SecretStore caProvider and Vault clients.
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: vault-ca-cert
+spec:
+  sources:
+    - secret:
+        name: vault-internal-ca
+        key: tls.crt
+  target:
+    configMap:
+      key: ca.crt

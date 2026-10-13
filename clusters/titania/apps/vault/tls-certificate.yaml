@@ -5,16 +5,31 @@ metadata:
   namespace: vault
 spec:
   secretName: vault-tls-cert
-  duration: 2160h # 90 days
-  renewBefore: 360h # 15 days
+  # Vault reads the listener certificate at startup and on SIGHUP only; a
+  # renewed certificate is not served until each pod is signalled or restarted.
+  duration: 8760h # 1 year
+  renewBefore: 720h # 30 days
   issuerRef:
-    name: cluster-ca
+    name: vault-internal-ca
     kind: ClusterIssuer
     group: cert-manager.io
   dnsNames:
+    - vault
+    - vault.vault
+    - vault.vault.svc
     - vault.vault.svc.cluster.local
-    - vault.vault.cluster.local
-    - vault.cosmos.cboxlab.com
+    - vault-active
+    - vault-active.vault
+    - vault-active.vault.svc
+    - vault-active.vault.svc.cluster.local
+    - vault-standby.vault.svc.cluster.local
+    - vault-internal
+    - vault-internal.vault.svc.cluster.local
+    - "*.vault-internal"
+    - "*.vault-internal.vault.svc.cluster.local"
+    - localhost
+  ipAddresses:
+    - 127.0.0.1
   usages:
     - server auth
     - client auth

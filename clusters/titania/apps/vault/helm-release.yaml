@@ -22,6 +22,10 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    global:
+      # Serve the API over TLS; the chart switches VAULT_ADDR, probes, Service
+      # port names, and the ServiceMonitor scheme to HTTPS.
+      tlsDisable: false
     ui:
       enabled: true
     serverTelemetry:
@@ -45,13 +49,12 @@ spec:
               description: "Vault is sealed and unable to serve requests."
 
     server:
+      # Mounted by the chart at /vault/userconfig/vault-tls-cert.
       extraVolumes:
-        - type: Secret
+        - type: secret
           name: vault-tls-cert
-      extraVolumeMounts:
-        - name: vault-tls
-          mountPath: /vault/tls
-          readOnly: true
+      extraEnvironmentVars:
+        VAULT_CACERT: /vault/userconfig/vault-tls-cert/ca.crt
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -75,8 +78,8 @@ spec:
               address = "0.0.0.0:8200"
               cluster_address = "0.0.0.0:8201"
               tls_disable = 0
-              tls_cert_file = "/vault/tls/tls.crt"
-              tls_cert_key = "/vault/tls/tls.key"
+              tls_cert_file = "/vault/userconfig/vault-tls-cert/tls.crt"
+              tls_key_file = "/vault/userconfig/vault-tls-cert/tls.key"
               tls_min_version = "tls12"
               telemetry {
                 unauthenticated_metrics_access = "true"
@@ -90,12 +93,15 @@ spec:
               path = "/vault/data"
               retry_join {
                 leader_api_addr = "https://vault-0.vault-internal:8200"
+                leader_ca_cert_file = "/vault/userconfig/vault-tls-cert/ca.crt"
               }
               retry_join {
                 leader_api_addr = "https://vault-1.vault-internal:8200"
+                leader_ca_cert_file = "/vault/userconfig/vault-tls-cert/ca.crt"
               }
               retry_join {
                 leader_api_addr = "https://vault-2.vault-internal:8200"
+                leader_ca_cert_file = "/vault/userconfig/vault-tls-cert/ca.crt"
               }
             }
 
@@ -107,6 +113,7 @@ spec:
         enabled: true
         annotations:
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
         hosts:
         - host: vault.cosmos.cboxlab.com
         tls:
