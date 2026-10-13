@@ -72,6 +72,7 @@ Prefer this order when multiple Renovate PRs are open:
 1. Container image tag bumps (single-service tag updates).
 2. Terraform provider/module patch or minor updates with clear lockfile diffs.
 3. CI/action updates, especially majors, after reviewing diff scope.
+4. HelmRelease chart bumps last, one at a time, with a full cluster health check (`flux get all -A`, pods Ready, ingress serving) after each.
 
 ## Merge Decision Rules
 
@@ -89,6 +90,8 @@ Skip and report when any are true:
 - Failing or flaky checks.
 - Large dependency fan-out or lockfile churn that obscures review.
 - Security or runtime implications requiring human approval.
+
+- HelmRelease chart bump labeled `critical-infra` (Cilium, Longhorn, Vault, External Secrets, cert-manager, ingress-nginx), or any chart bump that skips minor versions. These need a human to merge one step at a time after reading upstream upgrade notes; see `docs/change-workflow.md`.
 
 Major bump exception:
 
