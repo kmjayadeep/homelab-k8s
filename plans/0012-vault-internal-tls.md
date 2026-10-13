@@ -1,6 +1,6 @@
 # Plan 0012: Vault internal TLS
 
-- Status: Draft
+- Status: Completed (2026-10-13); recovery drills deferred
 - Owner: homelab operator
 - Related ADR: [ADR 0001](../adrs/0001-vault-external-secrets.md); follow-up from [plan 0001](0001-sealed-secrets-to-vault.md)
 
@@ -53,4 +53,18 @@ This plan does not cover Vault internal raft cluster TLS (port 8201), which Vaul
 
 ## Outcome
 
-Pending.
+Steps 1 to 7 were completed and verified on 2026-10-13. Step 8 was deferred.
+
+- **Merge and CA:** PR #197 was merged as `1c947aa2`. trust-manager is running, and the `vault-internal-ca` Certificate and ClusterIssuer are Ready. Bundle `vault-ca-cert` synced to all namespaces, and each copy matches the CA certificate (compared by hash, ignoring a trailing newline).
+- **Vault:** HelmRelease upgrade v12 succeeded and Certificate `vault/vault-tls` is Ready. The operator restarted and unsealed all three pods. They run the new StatefulSet revision with `VAULT_ADDR=https://127.0.0.1:8200`, `vault status` verifies the certificate, and the standbys follow the active node at matching raft commit indexes.
+- **Outage window:** SecretStores failed with "server gave HTTP response to HTTPS client" from about 17:55 to 19:20 UTC, between Flux applying the change and the pod restarts. Existing Secrets were kept.
+- **Clients:** all 20 SecretStores became `Valid` and all 23 ExternalSecrets reached `SecretSynced`. `external-dns/cloudflare-creds-vault` needed a `force-sync` annotation because its 1h refresh interval held back the retry.
+- **Monitoring and ingress:** Prometheus `up{job="vault-active"}` and `vault_core_unsealed` are both 1, and no Vault alerts fired. `https://vault.cosmos.cboxlab.com/ui/` returns 200.
+- **Backup:** a manual run, `vault-backup-tls-verify-2123`, completed over HTTPS and uploaded `vault-2026-10-13T19-23-29Z.snap`.
+- **Restore drill (step 8), partial then deferred:** a temporary isolated pod downloaded that snapshot, its checksum matched, and `vault operator raft snapshot restore -force` succeeded into a fresh single-node instance, which then sealed. The unseal with the production key shares was not performed, at the operator's choice. The pod and its temporary storage were deleted afterwards. A full restore and seal/unseal drill is still outstanding.
+
+Follow-up:
+
+- nginx proxies to Vault over HTTPS but does not verify the upstream certificate. Enabling verification needs `proxy-ssl-secret`, `proxy-ssl-verify` and `proxy-ssl-name` annotations.
+- The listener certificate expires around 2027-10. After cert-manager renews it, `SIGHUP` or restart each Vault pod (see Certificate renewal).
+- The Vault agent injector is configured for HTTPS without a CA. Nothing in the repo uses it.
