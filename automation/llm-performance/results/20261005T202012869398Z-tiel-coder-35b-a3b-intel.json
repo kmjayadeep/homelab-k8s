@@ -1,0 +1,128 @@
+{
+  "configuration": "peculiar-ragdoll/Tiel-Coder-35B-A3B-GGUF-MTP revision bbe9e566f39e4fc9652ac66b71968289a03c520a; UD-IQ4_XS llama.cpp SYCL 80K Q8 K/V Flash Attention one slot jinja draft-mtp width 2; Flux Ready and LiteLLM route verified",
+  "created_utc": "2026-10-05T20:20:12.869332+00:00",
+  "endpoint": "https://litellm.cosmos.cboxlab.com/v1",
+  "model": "tiel-coder-35b-a3b-intel",
+  "samples": [
+    {
+      "case": "short",
+      "chunks": 102,
+      "decode_s": 2.451,
+      "decode_tps": 42.43,
+      "finish_reason": "stop",
+      "output_tokens": 105,
+      "prompt_tokens": 210,
+      "total_s": 45.573,
+      "trial": 1,
+      "ttft_s": 43.122
+    },
+    {
+      "case": "short",
+      "chunks": 102,
+      "decode_s": 2.45,
+      "decode_tps": 42.45,
+      "finish_reason": "stop",
+      "output_tokens": 105,
+      "prompt_tokens": 210,
+      "total_s": 2.58,
+      "trial": 2,
+      "ttft_s": 0.13
+    },
+    {
+      "case": "short",
+      "chunks": 102,
+      "decode_s": 2.452,
+      "decode_tps": 42.42,
+      "finish_reason": "stop",
+      "output_tokens": 105,
+      "prompt_tokens": 210,
+      "total_s": 2.583,
+      "trial": 3,
+      "ttft_s": 0.131
+    },
+    {
+      "case": "medium",
+      "chunks": 145,
+      "decode_s": 3.403,
+      "decode_tps": 43.19,
+      "finish_reason": "stop",
+      "output_tokens": 148,
+      "prompt_tokens": 8590,
+      "total_s": 3.644,
+      "trial": 1,
+      "ttft_s": 0.229
+    },
+    {
+      "case": "medium",
+      "chunks": 237,
+      "decode_s": 5.216,
+      "decode_tps": 45.82,
+      "finish_reason": "stop",
+      "output_tokens": 240,
+      "prompt_tokens": 8590,
+      "total_s": 19.352,
+      "trial": 2,
+      "ttft_s": 14.136
+    },
+    {
+      "case": "medium",
+      "chunks": 184,
+      "decode_s": 4.049,
+      "decode_tps": 45.94,
+      "finish_reason": "stop",
+      "output_tokens": 187,
+      "prompt_tokens": 8590,
+      "total_s": 18.247,
+      "trial": 3,
+      "ttft_s": 14.129
+    },
+    {
+      "case": "long",
+      "chunks": 169,
+      "decode_s": 4.497,
+      "decode_tps": 38.03,
+      "finish_reason": "stop",
+      "output_tokens": 172,
+      "prompt_tokens": 25350,
+      "total_s": 4.951,
+      "trial": 1,
+      "ttft_s": 0.441
+    },
+    {
+      "case": "long",
+      "chunks": 215,
+      "decode_s": 5.393,
+      "decode_tps": 40.24,
+      "finish_reason": "stop",
+      "output_tokens": 218,
+      "prompt_tokens": 25350,
+      "total_s": 49.403,
+      "trial": 2,
+      "ttft_s": 43.934
+    },
+    {
+      "case": "long",
+      "chunks": 179,
+      "decode_s": 4.612,
+      "decode_tps": 39.25,
+      "finish_reason": "stop",
+      "output_tokens": 182,
+      "prompt_tokens": 25350,
+      "total_s": 48.615,
+      "trial": 3,
+      "ttft_s": 43.929
+    }
+  ],
+  "schema": 1,
+  "settings": {
+    "concurrency": 1,
+    "max_tokens": 256,
+    "profile_lines": {
+      "long": 780,
+      "medium": 260,
+      "short": 0
+    },
+    "temperature": 0,
+    "trials_per_depth": 3
+  }
+}

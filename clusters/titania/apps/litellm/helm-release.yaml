@@ -60,17 +60,26 @@ spec:
 
     proxy_config:
       model_list:
-        - model_name: qwen3.6-35b-a3b-intel
+        - model_name: tiel-coder-35b-a3b-intel
           litellm_params:
-            model: openai/qwen3.6-35b-a3b-intel
-            api_base: http://intel-llama.llm-serving.svc.cluster.local:8080/v1
+            model: openai/tiel-coder-35b-a3b-intel
+            api_base: http://intel-llama-tiel-coder-trial.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            # Existing local internal accounting rates, not measured operating cost.
             input_cost_per_token: 0.0000001
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
-          model_info:
+            # 128K configured; one benign image check passed, near-limit safety untested.
+            supports_vision: true
+            supports_function_calling: false
             max_input_tokens: 114688
             max_output_tokens: 16384
+      router_settings:
+        model_group_alias:
+          qwen-intel: tiel-coder-35b-a3b-intel
       litellm_settings:
         json_logs: true
         request_timeout: 600

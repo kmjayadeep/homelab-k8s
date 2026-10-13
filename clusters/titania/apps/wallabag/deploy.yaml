@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wallabag
+  annotations:
+    secret.reloader.stakater.com/reload: wallabag-config-vault
   labels:
     app.kubernetes.io/name: wallabag
     app.kubernetes.io/instance: wallabag
@@ -17,8 +19,6 @@ spec:
       labels:
         app.kubernetes.io/name: wallabag
         app.kubernetes.io/instance: wallabag
-      annotations:
-        secret.reloader.stakater.com/reload: wallabag-config-vault
     spec:
       initContainers:
         - name: initialize-database

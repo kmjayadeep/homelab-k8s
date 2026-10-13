@@ -8,9 +8,11 @@ metadata:
     app.kubernetes.io/component: monitoring
     app.kubernetes.io/part-of: llm-serving
 spec:
+  # Scrape whichever llama.cpp Deployment currently owns the B60.
   selector:
-    app.kubernetes.io/name: intel-llama
     app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
   ports:
     - name: metrics
       port: 80

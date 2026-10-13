@@ -1,6 +1,6 @@
 # ADR 0003: Retain Qwen3.8-27B llama.cpp serving while evaluating vLLM
 
-- Status: Superseded for model selection by the Qwen3.6-35B-A3B deployment; vLLM trial pending
+- Status: Superseded by [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md); the vLLM evaluation completed and vLLM was retired
 - Date: 2026-09-26
 
 ## Deployment update

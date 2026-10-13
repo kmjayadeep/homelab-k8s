@@ -4,6 +4,12 @@
 
 Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `clusters/titania/`; Kustomize manages manifests. Vault with External Secrets is the active architecture for application and infrastructure secrets. The Sealed Secrets controller is temporarily retained, but no SealedSecret manifests remain.
 
+## Where to start
+
+- Read [the documentation map](docs/README.md) and [repository map](docs/repository-map.md) to locate the affected Flux and Kustomize paths. For changes, follow [the change workflow](docs/change-workflow.md).
+- `AGENTS.md` is the safety and validation contract; `docs/` explains current behavior, `adrs/` records durable decisions, and `plans/` tracks work in progress or retained historical evidence. Read relevant pages, not every plan in the repository. Manifests are desired state; do not assume they prove live cluster state.
+- Keep docs and their indexes current when behavior or decisions change. Use an ADR for a consequential long-lived trade-off, a plan for multi-step or risky work, and neither for a routine manifest edit. See the templates and lifecycle rules in the change workflow.
+
 ## Safety rules
 
 - **Never read plaintext secrets into agent context.** Do not use `read`, `cat`, `grep`, decode commands, logs, Terraform output, or `kubectl get` to display values. For debugging, extract only key names, hashes/equality results, readiness conditions, or other non-secret metadata.
@@ -15,7 +21,7 @@ Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `
 
 ## Vault and External Secrets
 
-- Before changing Vault, ESO, `SecretStore`/`ClusterSecretStore`, `ExternalSecret`, Reloader, or secret paths, read `adrs/0001-vault-external-secrets.md`, both migration plans, and `homelab-iac/vault-config/PATHS.md`.
+- Before changing Vault, ESO, `SecretStore`/`ClusterSecretStore`, `ExternalSecret`, Reloader, or secret paths, read `adrs/0001-vault-external-secrets.md`, `plans/0001-sealed-secrets-to-vault.md`, and the sibling repository's `../homelab-iac/plans/0001-vault-secret-migration.md` and `../homelab-iac/vault-config/PATHS.md`. If the sibling repo is unavailable, stop and request the missing context instead of guessing paths or policy.
 - Store application secret values in Vault, never in Git. Git may contain only non-secret references, policies, roles, and External Secrets manifests.
 - Use Vault Kubernetes authentication and least-privilege namespaced stores by default; do not introduce static Vault tokens or a broad `ClusterSecretStore` without explicit approval.
 - Keep Vault recovery/unseal material and the initial root token outside both Git and the cluster.

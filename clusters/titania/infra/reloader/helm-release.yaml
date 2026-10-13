@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: reloader
-      version: "2.2.16"
+      version: "2.2.18"
       sourceRef:
         kind: HelmRepository
         name: stakater
@@ -22,8 +22,11 @@ spec:
         - baskit
         - bookorbit
         - external-dns
+        - glance
         - litellm
         - open-webui
+        - otpcloud
+        - taskplanner
         - wallabag
       ignoreJobs: true
       ignoreCronJobs: true

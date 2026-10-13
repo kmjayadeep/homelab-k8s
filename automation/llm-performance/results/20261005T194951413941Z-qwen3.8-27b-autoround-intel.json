@@ -1,0 +1,128 @@
+{
+  "configuration": "Intel/Qwen3.8-27B-q4km-AutoRound revision 4b30b30e0ac2cc54a2f50738cfccd6c608f94ad4; llama.cpp SYCL Q4_K_M 80K q8_0 K/V one slot MTP off; Flux Ready and LiteLLM alias verified",
+  "created_utc": "2026-10-05T19:49:51.413875+00:00",
+  "endpoint": "https://litellm.cosmos.cboxlab.com/v1",
+  "model": "qwen3.8-27b-autoround-intel",
+  "samples": [
+    {
+      "case": "short",
+      "chunks": 225,
+      "decode_s": 10.702,
+      "decode_tps": 21.21,
+      "finish_reason": "stop",
+      "output_tokens": 228,
+      "prompt_tokens": 73,
+      "total_s": 11.646,
+      "trial": 1,
+      "ttft_s": 0.879
+    },
+    {
+      "case": "short",
+      "chunks": 225,
+      "decode_s": 10.694,
+      "decode_tps": 21.23,
+      "finish_reason": "stop",
+      "output_tokens": 228,
+      "prompt_tokens": 73,
+      "total_s": 11.143,
+      "trial": 2,
+      "ttft_s": 0.384
+    },
+    {
+      "case": "short",
+      "chunks": 225,
+      "decode_s": 10.701,
+      "decode_tps": 21.21,
+      "finish_reason": "stop",
+      "output_tokens": 228,
+      "prompt_tokens": 73,
+      "total_s": 10.967,
+      "trial": 3,
+      "ttft_s": 0.201
+    },
+    {
+      "case": "medium",
+      "chunks": 238,
+      "decode_s": 13.609,
+      "decode_tps": 17.64,
+      "finish_reason": "stop",
+      "output_tokens": 241,
+      "prompt_tokens": 8453,
+      "total_s": 28.567,
+      "trial": 1,
+      "ttft_s": 14.882
+    },
+    {
+      "case": "medium",
+      "chunks": 256,
+      "decode_s": 14.53,
+      "decode_tps": 17.55,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 8453,
+      "total_s": 29.794,
+      "trial": 2,
+      "ttft_s": 15.264
+    },
+    {
+      "case": "medium",
+      "chunks": 246,
+      "decode_s": 14.048,
+      "decode_tps": 17.65,
+      "finish_reason": "stop",
+      "output_tokens": 249,
+      "prompt_tokens": 8453,
+      "total_s": 29.422,
+      "trial": 3,
+      "ttft_s": 15.298
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 19.352,
+      "decode_tps": 13.18,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25213,
+      "total_s": 20.379,
+      "trial": 1,
+      "ttft_s": 1.008
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 19.36,
+      "decode_tps": 13.17,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25213,
+      "total_s": 65.808,
+      "trial": 2,
+      "ttft_s": 46.429
+    },
+    {
+      "case": "long",
+      "chunks": 256,
+      "decode_s": 19.358,
+      "decode_tps": 13.17,
+      "finish_reason": "length",
+      "output_tokens": 256,
+      "prompt_tokens": 25213,
+      "total_s": 65.798,
+      "trial": 3,
+      "ttft_s": 46.42
+    }
+  ],
+  "schema": 1,
+  "settings": {
+    "concurrency": 1,
+    "max_tokens": 256,
+    "profile_lines": {
+      "long": 780,
+      "medium": 260,
+      "short": 0
+    },
+    "temperature": 0,
+    "trials_per_depth": 3
+  }
+}

@@ -1,4 +1,4 @@
 interface:
   display_name: "Manage Homelab LLM Models"
-  short_description: "Manage KServe models, caches, aliases, and rollout readiness."
-  default_prompt: "Use $manage-llm-models to add, update, or troubleshoot homelab LLM models with pinned revisions, separate caches, safe GitOps changes, and verified readiness."
+  short_description: "Manage llama.cpp B60 models, LiteLLM aliases, and rollout readiness."
+  default_prompt: "Use $manage-llm-models to add, switch, or troubleshoot homelab llama.cpp models on the B60 with pinned checksummed GGUFs, staged one-GPU switches, LiteLLM aliases, and verified readiness."

@@ -10,6 +10,11 @@ metadata:
   namespace: otpcloud
 spec:
   path: clusters/titania/apps/otpcloud
+  dependsOn:
+    - name: external-secrets
+      namespace: external-secrets
+    - name: reloader
+      namespace: reloader
   interval: 15m
   prune: true
   wait: true

@@ -228,5 +228,9 @@ separate decision about removing the now-unused Sealed Secrets controller.
 - [x] No SealedSecret resources or manifests remain.
 - [ ] Enable trusted internal Vault TLS and update all SecretStores.
 - [ ] Extend scoped Reloader coverage or document GitOps restarts for remaining
-  environment-variable consumers before their next rotation.
+  environment-variable consumers before their next rotation. glance, otpcloud,
+  and taskplanner were added to the scoped Reloader release, and their
+  Deployment-level reload annotations (with wallabag's) were corrected. Still
+  uncovered: Loki (`loki-minio-creds-vault`) and the KServe Hugging Face
+  storage container (`huggingface-token-vault`).
 - [ ] Remove the unused Sealed Secrets controller in a separate approved change.
