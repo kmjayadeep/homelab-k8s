@@ -15,4 +15,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0009: Swift Qwen3.8 B60 trial](0009-swift-qwen38-b60-trial.md) | Completed staged 128K/Q4_K_S/MTP trial; Swift left running, earlier caches retained |
 | [0010: Swift two-slot vision baseline](0010-swift-qwen38-concurrency.md) | Abandoned for current serving; operator requested rollback to 96K/Q8/one-slot/MTP after prefill regression; incomplete evidence retained |
 | [0011: Empero Qwen3.8 distill 256K trial](0011-empero-qwen38-distill-b60-trial.md) | IQ3_M serving verified qwen-intel alias; near-256K synthetic text/vision passed at 87.33% peak sampled VRAM, structured tools failed |
-| [0012: Vault internal TLS](0012-vault-internal-tls.md) | Draft; manifests defined, live rollout and recovery verification pending |
+| [0012: Vault internal TLS](0012-vault-internal-tls.md) | Completed 2026-10-13 for TLS; restore and seal/unseal drills deferred |

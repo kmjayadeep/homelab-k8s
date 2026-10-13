@@ -45,7 +45,7 @@ ExternalSecret or Vault value is not part of rollback.
 
 **Impact:** no production secret changes.
 
-- [ ] Vault serves trusted internal TLS and ESO has its CA reference.
+- [x] Vault serves trusted internal TLS and ESO has its CA reference.
 - [ ] Vault and External Secrets Flux Kustomizations are healthy and ordered
 before consumers.
 - [ ] The Vault Kubernetes auth backend is applied and TokenReview works.
@@ -226,8 +226,8 @@ separate decision about removing the now-unused Sealed Secrets controller.
 - [x] ESO identities use exact-path Vault policies.
 - [x] All old SealedSecrets were removed in post-validation commits.
 - [x] No SealedSecret resources or manifests remain.
-- [ ] Enable trusted internal Vault TLS and update all SecretStores (tracked in
-  [plan 0012](0012-vault-internal-tls.md)).
+- [x] Enable trusted internal Vault TLS and update all SecretStores (completed
+  2026-10-13 in [plan 0012](0012-vault-internal-tls.md)).
 - [ ] Extend scoped Reloader coverage or document GitOps restarts for remaining
   environment-variable consumers before their next rotation. glance, otpcloud,
   and taskplanner were added to the scoped Reloader release, and their

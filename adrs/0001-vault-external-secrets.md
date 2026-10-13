@@ -119,7 +119,7 @@ Stores use `https://vault.vault.svc.cluster.local:8200` with `caProvider` Config
 
 ### Completed migration procedure
 
-The migration followed steps 2–7 below. The operator explicitly deferred step 1 because Vault initially contained little data; internal TLS and full recovery verification therefore remain open gates rather than completed work. Step 1 is tracked in [plan 0012](../plans/0012-vault-internal-tls.md).
+The migration followed steps 2–7 below. The operator explicitly deferred step 1 because Vault initially contained little data; internal TLS and full recovery verification therefore remain open gates rather than completed work. Internal TLS was completed on 2026-10-13 per [plan 0012](../plans/0012-vault-internal-tls.md); the restore and seal/unseal drills from step 1 remain open.
 
 1. Enable Vault TLS and verify backup, restore, seal, and unseal procedures.
 2. Configure the Vault Kubernetes auth method.
@@ -152,7 +152,7 @@ Never delete or replace a working SealedSecret during the same unverified rollou
 
 - Vault Helm deployment: present.
 - External Secrets Operator Helm deployment: present.
-- Vault internal TLS: manifests defined (Vault listener, `vault-pki` CA, trust-manager, HTTPS SecretStores); live rollout and verification pending per [plan 0012](../plans/0012-vault-internal-tls.md).
+- Vault internal TLS: deployed and verified on 2026-10-13 (Vault listener, `vault-pki` CA, trust-manager, HTTPS SecretStores, backup job); see [plan 0012](../plans/0012-vault-internal-tls.md). Restore and seal/unseal drills remain open.
 - Vault Kubernetes authentication and least-privilege application roles: deployed and managed by `homelab-iac/vault-config/`.
 - Application `SecretStore` and `ExternalSecret` resources: deployed for all active application and infrastructure Secrets inventoried during this migration.
 - Existing SealedSecret migrations: complete; no SealedSecret resources or manifests remain in the cluster configuration.
