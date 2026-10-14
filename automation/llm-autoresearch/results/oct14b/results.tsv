@@ -1,0 +1,8 @@
+commit	passed	total	quality_seconds	decode_tps	ttft_8k_s	prefill_tps_24k	mtp_accept	min_free_gib	status	description
+159d87b	44	49	448.6	61.3	10.5	1164.0	0.698	12.09	keep	baseline (main: ubatch 1024, reasoning-budget 2048, draft 3)
+709aef9	45	49	465.7	62.9	10.74	1164.0	0.705	12.18	discard	threads 6: 45/49, +4% time (speed-only; discard under old and new rule)
+0c653f1	43	49	532.4	61.2	10.74	1163.0	0.683	12.07	discard	poll 100: 43/49, +19% time, decode unchanged (speed-only; discard)
+810537c	43	49	440.6	61.7	10.74	1164.0	0.694	12.16	discard	reasoning-budget 1536: 43/49 (code 25/30), -2% time; discard
+cd70ae6	40	49	525.1	61.9	10.75	1164.0	0.701	12.04	discard	spec-draft-p-min 0.2: 40/49, +17% time (p-min hurts quality: 0.6 also 40); discard
+652fa89	43	49	524.2	62.1	10.74	1164.0	0.691	12.07	discard	spec-draft-n-min 2: 43/49, +17% time; discard
+8e9cfac	42	49	484.7	61.7	10.75	1164.0	0.698	12.23	discard	noise check, kept config unchanged: 42/49, 485s (+8%) vs baseline 44/449s

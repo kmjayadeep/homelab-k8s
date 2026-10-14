@@ -73,7 +73,29 @@ PR [#253](https://github.com/kmjayadeep/homelab-k8s/pull/253) (merged; draft len
   - `--ubatch-size 1024`: prefill at 24K rose from 959 to 1165 tok/s, TTFT at 8K fell from 12.7 to 10.7 s, and `quality_seconds` dropped 22%. This is a clear win.
   - `--reasoning-budget 2048`: a further 11% less `quality_seconds` at equal quality (45/49). Budget 1024 was 4.9% faster still but lost 2 code tasks.
   - `--spec-draft-n-max 4`: **probably noise.** It was kept on +2 homelab tasks while MTP acceptance fell from 0.675 to 0.58 and time rose 4.5%. Draft length 3 was later as fast or faster. Dropped before merge; production stays on draft length 3.
-- **Keep-rule finding:** settings that shouldn't change answers (draft length, micro-batch) moved quality by ±2 tasks between runs, which equals the +2 quality-keep threshold. That caused one likely false keep (draft length 4), and it inflated "best" to 45, which then rejected a 6%-faster draft length of 3. Fixed in PR [#255](https://github.com/kmjayadeep/homelab-k8s/pull/255) (see `program.md` → The goal), which replayed `oct14` to the hand-merged config:
+- **Keep-rule finding:** settings that shouldn't change answers (draft length, micro-batch) moved quality by ±2 tasks between runs, which equals the +2 quality-keep threshold. That caused one likely false keep (draft length 4), and it inflated "best" to 45, which then rejected a 6%-faster draft length of 3. Fixed in PR [#256](https://github.com/kmjayadeep/homelab-k8s/pull/256) (see `program.md` → The goal), which replayed `oct14` to the hand-merged config:
   - speed-only flags are judged on time, with quality only as a guard
   - quality is compared against a reference, the mean of the last 3 kept runs, rather than a single best run, and quality keeps need +3
   - comparing against the single baseline run instead was tried in the replay and rejected, because one lucky keep then made every later run look like +3
+
+### 2026-10-14 `oct14b` (16:39–18:28 CEST, operator present)
+
+Results: [`results/oct14b/`](../automation/llm-autoresearch/results/oct14b/). The session branch predated the merge of PR #256, so `verdict` still ran the old rule; each run was also scored with the new rule's `decide()`, and the two agreed every time.
+
+- **Run:** baseline plus 5 experiments and one repeat of the unchanged kept config, all discarded, with no crashes. Host memory never fell below 12.0 GiB free.
+- **Baseline:** 44/49 in 449 s on the `oct14` config (micro-batch 1024, reasoning budget 2048, draft length 3).
+- **Discarded:**
+  - `--threads 6`: 45/49, +4% time.
+  - `--poll 100`: 43/49, +19% time, decode unchanged.
+  - `--reasoning-budget 1536`: 43/49, code 25/30, −2% time. Together with 1024 in `oct14`, 2048 looks like the floor for code quality.
+  - `--spec-draft-p-min 0.2`: 40/49, +17% time. Both p-min values tried (0.2 and 0.6) scored 40, so this flag changes answers on this build and should not count as speed-only.
+  - `--spec-draft-n-min 2`: 43/49, +17% time.
+- **Evaluator noise finding:** the repeat of the unchanged kept config scored 42/49 in 485 s, against the baseline's 44/49 in 449 s. On an identical config, quality moved by 2 tasks (homelab 6/8 → 4/8) and time by 8%. A per-suite breakdown showed two causes:
+  - **Warm cache:** the baseline ran on a pod the smoke check had just used, and its long-context suite took 4 s instead of the 25 s seen in every other run.
+  - **Reasoning length:** wall time follows how many tokens the model writes (homelab 2.3K–4.9K, code 20K–26K completion tokens) at a constant decode speed of about 61–63 tok/s.
+
+  Wall time is therefore too noisy for the 5% speed threshold, and three of the five discards may have been judged on noise.
+- **Proposed evaluator changes before the next session:**
+  - judge speed-only flags on the per-token rates (`decode_tps`, `prefill_tps_24k`, `ttft_8k_s`), not on `quality_seconds`
+  - start the baseline from a fresh restart, or send a warm-up request after every rollout, so every run starts from the same cache state
+  - consider two evaluation passes per config, or a larger task set, before tightening quality margins
