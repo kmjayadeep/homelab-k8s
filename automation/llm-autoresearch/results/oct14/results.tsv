@@ -1,0 +1,12 @@
+commit	passed	total	quality_seconds	decode_tps	ttft_8k_s	prefill_tps_24k	mtp_accept	min_free_gib	status	description
+175da3f	41	49	632.0	62.0	12.69	959.0	0.675	11.71	keep	baseline (production config)
+ff07e95	43	49	660.7	61.1	13.01	957.0	0.58	12.28	keep	spec-draft-n-max 3->4: +2 homelab (likely noise; accept 0.675->0.58, +4.5% time)
+88cf720	45	49	516.4	60.2	10.72	1165.0	0.611	12.24	keep	ubatch-size 1024: prefill +22%, quality_seconds -22% (quality +2 likely noise)
+7e4388c	45	49	539.9	62.4	10.5	1187.0	0.604	11.4	discard	ubatch/batch 2048: prefill only +2% vs 1024, VRAM 90%, time +5%
+4859853	43	49	487.8	61.8	10.72	1166.0	0.699	12.08	discard	spec-draft-n-max 3 (w/ ubatch 1024): -6% time, accept 0.699, but 43 vs best 45 (noise?)
+1608d2a	45	49	460.2	60.4	10.74	1164.0	0.625	12.03	keep	reasoning-budget 2048: -11% time, quality held 45 (code 28/30)
+d5b0d0a	43	49	461.1	62.1	10.74	1165.0	0.682	12.01	discard	spec-draft-n-max 3 (w/ budget): no time gain (461 vs 460s), quality 43
+e0299e1	43	49	437.5	60.7	10.74	1164.0	0.605	12.03	discard	reasoning-budget 1024: -4.9% time (just under 5%), code 28->26
+22eac32	46	49	467.9	61.7	10.77	1162.0	0.633	12.15	discard	temp 0.3: 46 (+1, best so far but under +2 margin), time +2%
+ae1d758	40	49	513.0	63.2	10.75	1164.0	0.824	12.07	discard	spec-draft-p-min 0.6: accept 0.82 but quality 40 (-5), time +11%
+83fd131	42	49	449.9	61.9	10.73	1165.0	0.612	12.21	discard	min-p 0.05: 42 (-3), time -2%

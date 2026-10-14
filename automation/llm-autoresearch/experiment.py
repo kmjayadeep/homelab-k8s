@@ -6,6 +6,7 @@
   run      apply, then evaluate.py (redirect to run.log)
   record   append the latest run to results.tsv
   verdict  print KEEP / DISCARD / CRASH for the latest run
+  archive  move the session's results into results/<tag>/ (tracked) for the PR
   finish   resume Flux (production returns to the Git main config)
 """
 
@@ -29,6 +30,8 @@ APP_DIR = REPO / "clusters/titania/apps/llm-serving-intel-llama"
 MANIFEST = "clusters/titania/apps/llm-serving-intel-llama/deployment-tiel-coder-trial.yaml"
 MARKER = "llm-autoresearch.cboxlab.com/suspended-by"
 RESULTS = ROOT / "results.tsv"
+RUNS = ROOT / "runs"
+ARCHIVE = ROOT / "results"
 COLUMNS = ["commit", "passed", "total", "quality_seconds", "decode_tps", "ttft_8k_s",
            "prefill_tps_24k", "mtp_accept", "min_free_gib", "status", "description"]
 
@@ -202,6 +205,8 @@ def start():
     deploy = kget("deployment", DEPLOY)
     if deploy.get("status", {}).get("availableReplicas", 0) < 1:
         raise SystemExit("REJECTED: production Deployment is not available")
+    if read_rows():
+        raise SystemExit("REJECTED: results.tsv holds an unarchived session; run `experiment.py archive --tag <old tag>` first")
     free = evaluate.free_memory_bytes()
     if free is None or free < 2 * evaluate.MIN_FREE_BYTES:
         raise SystemExit("REJECTED: titania-gpu has less than 4 GiB free")
@@ -210,6 +215,40 @@ def start():
     if not RESULTS.exists():
         RESULTS.write_text("\t".join(COLUMNS) + "\n")
     log(f"Flux suspended for {KS} by {branch}; results in {RESULTS.relative_to(REPO)}")
+
+
+def archive(tag=None):
+    """Move the working session files into results/<tag>/ so they can be committed.
+
+    results.tsv stays untracked during the loop because discards run `git reset --hard`.
+    Non-smoke run summaries are kept with it; completions and smoke runs go to the
+    git-ignored runs/archive/<tag>/.
+    """
+    if not tag:
+        branch = sh("git", "-C", str(REPO), "rev-parse", "--abbrev-ref", "HEAD").strip()
+        if not branch.startswith("autoresearch/"):
+            raise SystemExit("REJECTED: pass --tag or run on an autoresearch/<tag> branch")
+        tag = branch.removeprefix("autoresearch/")
+    if not read_rows():
+        raise SystemExit("REJECTED: results.tsv has no rows to archive")
+    dest = ARCHIVE / tag
+    if dest.exists():
+        raise SystemExit(f"REJECTED: {dest.relative_to(REPO)} already exists")
+    local = RUNS / "archive" / tag
+    (dest / "runs").mkdir(parents=True)
+    local.mkdir(parents=True, exist_ok=True)
+    RESULTS.rename(dest / "results.tsv")
+    kept = 0
+    for f in sorted(RUNS.glob("*.json*")):
+        if f.name == "latest.json":
+            continue
+        if f.suffix == ".json" and not json.loads(f.read_text()).get("smoke"):
+            f.rename(dest / "runs" / f.name)
+            kept += 1
+        else:
+            f.rename(local / f.name)
+    log(f"archived {tag}: results.tsv and {kept} run summaries in {dest.relative_to(REPO)}; "
+        f"completions in {local.relative_to(REPO)} (untracked)")
 
 
 def finish():
@@ -292,6 +331,8 @@ def main():
     r.add_argument("status", choices=["keep", "discard", "crash"])
     r.add_argument("description")
     sub.add_parser("verdict")
+    ar = sub.add_parser("archive")
+    ar.add_argument("--tag", help="Session tag (defaults to the autoresearch/<tag> branch)")
     sub.add_parser("finish")
     args = parser.parse_args()
     if args.cmd == "start":
@@ -307,6 +348,8 @@ def main():
         record(args.status, args.description)
     elif args.cmd == "verdict":
         verdict()
+    elif args.cmd == "archive":
+        archive(args.tag)
     elif args.cmd == "finish":
         finish()
     return 0

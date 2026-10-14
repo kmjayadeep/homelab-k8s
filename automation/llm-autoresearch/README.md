@@ -9,14 +9,17 @@ This is a local, Claude Code–driven hill-climb over the B60 llama-server flags
 | [`evaluate.py`](evaluate.py) | Fixed evaluator (ground truth) | nobody during a session |
 | [`experiment.py`](experiment.py) | `start`/`apply`/`run`/`verdict`/`record`/`finish` tooling | nobody during a session |
 | `tasks/`, `sandbox/` | Eval data and the network-less grading container | nobody during a session |
-| `results.tsv`, `run.log`, `runs/` | Session output (git-ignored) | tooling |
+| `results.tsv`, `run.log`, `runs/` | Working session output (git-ignored, because discards run `git reset --hard`) | tooling |
+| [`results/<tag>/`](results/) | Archived sessions: `results.tsv` plus per-run summaries, committed at session end | tooling (`experiment.py archive`) |
 
 ## Running a session
 
 1. Stop agents and other consumers that use `qwen-intel`.
 2. Start Claude Code in the repo root and tell it: *"Read automation/llm-autoresearch/program.md and let's kick off a new experiment. Do the setup first."*
 3. Confirm the run tag and the baseline, then leave it running.
-4. Interrupt it when you're done. It summarizes, opens a PR with any kept changes, and resumes Flux.
+4. Interrupt it when you're done. It summarizes, archives the results into `results/<tag>/`, opens a PR with the results and any kept changes, and resumes Flux.
+
+Because results are committed, a session can be started from any clone of the repo that meets the requirements below.
 
 Each experiment takes about 35 minutes: a 3–5 minute rollout plus about 30 minutes of evaluation. An 8-hour night gives roughly 12–14 experiments.
 
