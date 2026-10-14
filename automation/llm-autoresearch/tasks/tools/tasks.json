@@ -1,0 +1,111 @@
+{
+  "_comment": "Structured tool-call checks. expect=null means the model must answer without calling a tool.",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a city.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {"type": "string"},
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+          },
+          "required": ["city", "unit"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "kubectl_get",
+        "description": "Fetch a Kubernetes object.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "kind": {"type": "string", "description": "Singular resource kind, e.g. deployment"},
+            "name": {"type": "string"},
+            "namespace": {"type": "string"}
+          },
+          "required": ["kind", "name", "namespace"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "create_calendar_event",
+        "description": "Create a calendar event.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": {"type": "string"},
+            "start": {"type": "string", "description": "ISO 8601 local date-time, e.g. 2026-01-31T09:00"},
+            "duration_minutes": {"type": "integer"}
+          },
+          "required": ["title", "start", "duration_minutes"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "search_docs",
+        "description": "Search technical documentation.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {"type": "string"},
+            "max_results": {"type": "integer"}
+          },
+          "required": ["query"]
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "weather-zurich",
+      "prompt": "What's the weather in Zurich right now? Use celsius.",
+      "expect": {"name": "get_weather", "args": {"city": {"icontains": "zurich"}, "unit": {"eq": "celsius"}}}
+    },
+    {
+      "id": "weather-bern-f",
+      "prompt": "Is it raining in Bern? I prefer fahrenheit.",
+      "expect": {"name": "get_weather", "args": {"city": {"icontains": "bern"}, "unit": {"eq": "fahrenheit"}}}
+    },
+    {
+      "id": "kubectl-deployment",
+      "prompt": "Show me the litellm deployment in the litellm namespace.",
+      "expect": {"name": "kubectl_get", "args": {"kind": {"in": ["deployment", "deployments", "deploy"]}, "name": {"eq": "litellm"}, "namespace": {"eq": "litellm"}}}
+    },
+    {
+      "id": "kubectl-pod",
+      "prompt": "Get pod vault-0 from the vault namespace.",
+      "expect": {"name": "kubectl_get", "args": {"kind": {"in": ["pod", "pods", "po"]}, "name": {"eq": "vault-0"}, "namespace": {"eq": "vault"}}}
+    },
+    {
+      "id": "calendar-event",
+      "prompt": "Put 'Dentist' in my calendar on 2026-11-03 at 14:30 for 45 minutes.",
+      "expect": {"name": "create_calendar_event", "args": {"title": {"icontains": "dentist"}, "start": {"startswith": "2026-11-03T14:30"}, "duration_minutes": {"eq": 45}}}
+    },
+    {
+      "id": "search-docs",
+      "prompt": "Find the top 3 documentation pages about Flux drift detection.",
+      "expect": {"name": "search_docs", "args": {"query": {"icontains": "drift"}, "max_results": {"eq": 3}}}
+    },
+    {
+      "id": "no-tool-greeting",
+      "prompt": "Say good morning in German. Just the phrase.",
+      "expect": null,
+      "content_contains": ["guten morgen"]
+    },
+    {
+      "id": "no-tool-arithmetic",
+      "prompt": "What is 17 multiplied by 23? Answer with the number.",
+      "expect": null,
+      "content_contains": ["391"]
+    }
+  ]
+}

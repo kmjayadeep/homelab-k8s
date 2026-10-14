@@ -1,6 +1,6 @@
 # Plan 0013: Nightly B60 LLM parameter evaluation
 
-- Status: Deployed; phase 0 (sampling mode) running nightly, phase 1 handoff not yet tested
+- Status: Superseded by [plan 0014](0014-b60-autoresearch.md) (2026-10-14); pipeline removed before its first scheduled night
 - Owner: Homelab operator
 - Related ADR: [ADR 0005](../adrs/0005-nightly-b60-eval-handoff.md), [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md); related plans: [0007](0007-local-llm-performance-comparison.md), [0008](0008-tiel-coder-b60-trial.md)
 
@@ -130,3 +130,11 @@ Implemented in Git on 2026-10-14.
   - the homelab Deployment task failed correctly: the model mis-indented `containerPort`
 
 Still open: the phase 0 gate (3 complete scheduled nights) and all of phase 1, which needs the supervised GPU handoff, the watchdog recovering a cancelled `full` run, and Flux reapplying replicas on resume.
+
+### 2026-10-14: superseded
+
+Before the first scheduled night, the operator chose a local autoresearch loop instead ([ADR 0006](../adrs/0006-local-b60-autoresearch.md), [plan 0014](0014-b60-autoresearch.md)).
+
+- **Cluster:** `clusters/titania/apps/llm-eval/` and `bootstrap/apps/llm-eval.yaml` were removed, and Flux prunes the runner, RBAC, admission policy, Service, watchdog and alerts.
+- **Private repository:** the `nightly-eval` workflow in `kmjayadeep/homelab-llm-evals` was disabled. Deleting the repository is left to the operator.
+- **Reused:** the eval tasks, the sandbox design and the verification evidence above carry over to plan 0014.
