@@ -1,6 +1,6 @@
 # Plan 0014: B60 llama-server autoresearch
 
-- Status: Ready; no session run yet
+- Status: Active; first session 2026-10-14 (`oct14`)
 - Owner: Homelab operator
 - Related ADR: [ADR 0006](../adrs/0006-local-b60-autoresearch.md)
 
@@ -61,3 +61,16 @@ Before each session:
 ## Outcome
 
 Record each session here: date, tag, number of experiments, kept changes and the PR link.
+
+### 2026-10-14 `oct14` (11:02–14:17 CEST, daytime, operator present)
+
+- **Run:** baseline plus 10 experiments, 3 kept and 7 discarded, with no crashes. Every rollout took 174–184 s.
+- **Memory:** `titania-gpu` never had less than 11.4 GiB of host memory free. B60 VRAM (`xpu-smi` over SSH) was 86.6% on the kept config and 90.3% with `--ubatch-size 2048`. Power peaked at 143 W of the 200 W limit.
+- **Mechanisms exercised live:** `start`, a no-op apply, real rollouts, keep, discard with `git reset` and `apply --restore`, and `finish`.
+- **Kept changes** (in the PR from `autoresearch/oct14`):
+  - `--ubatch-size 1024`: prefill at 24K rose from 959 to 1165 tok/s, TTFT at 8K fell from 12.7 to 10.7 s, and `quality_seconds` dropped 22%. This is a clear win.
+  - `--reasoning-budget 2048`: a further 11% less `quality_seconds` at equal quality (45/49). Budget 1024 was 4.9% faster still but lost 2 code tasks.
+  - `--spec-draft-n-max 4`: **probably noise.** It was kept on +2 homelab tasks while MTP acceptance fell from 0.675 to 0.58 and time rose 4.5%. Draft length 3 was later as fast or faster. Dropped before merge; production stays on draft length 3.
+- **Keep-rule finding:** settings that shouldn't change answers (draft length, micro-batch) moved quality by ±2 tasks between runs, which equals the +2 quality-keep threshold. That caused one likely false keep (draft length 4), and it inflated "best" to 45, which then rejected a 6%-faster draft length of 3. Proposed fix before overnight runs:
+  - judge speed-only flags on time, with quality only as a guard against the baseline
+  - require +3 for quality keeps, compared against the baseline rather than the best

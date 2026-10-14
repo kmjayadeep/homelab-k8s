@@ -102,7 +102,11 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
-            # Use runtime-default batch and microbatch sizes; preserve sampling.
+            - --ubatch-size
+            - "1024"
+            - --reasoning-budget
+            - "2048"
+            # ubatch 1024 and reasoning budget 2048 from autoresearch oct14 (plan 0014); preserve sampling.
             - --temp
             - "0.6"
             - --top-p
