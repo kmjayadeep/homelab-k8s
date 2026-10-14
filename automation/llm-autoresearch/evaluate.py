@@ -37,6 +37,10 @@ MAX_TOKENS = 4096
 SPEED_DEPTHS = (0, 8000, 24000)
 SPEED_TRIALS = 2
 LONGCTX_TOKENS = 16000
+# One request near LiteLLM's 114,688-token input cap: decode there is the binding target
+# (>= 30 tok/s), and it was 21.8-22.7 tok/s at 105-111K on 2026-10-14 (ADR 0004).
+DEEP_TOKENS = 100_000
+FILLER_TOKENS_PER_LINE = 28.5  # measured through LiteLLM; the "~17" used by speed() undercounts
 PROM_PATH = "/api/v1/namespaces/monitoring/services/http:kube-prometheus-stack-prometheus:9090/proxy/api/v1/query"
 MEMORY_QUERY = 'node_memory_MemAvailable_bytes{instance="192.168.1.145:9100"}'
 MIN_FREE_BYTES = 2 * 2**30
@@ -187,6 +191,15 @@ def speed(client, smoke):
     return out
 
 
+def deep(client):
+    """Prefill and decode near the context limit, with a cache-busting first line."""
+    prompt = (f"Run {time.time_ns()}. Here is a sensor log.\n\n"
+              + filler(int(DEEP_TOKENS / FILLER_TOKENS_PER_LINE), "deep")
+              + "\n\nIn about 250 words, describe what kinds of entries this log contains.")
+    _, rec = client.chat([{"role": "user", "content": prompt}], seed=0, max_tokens=256, thinking=False)
+    return [{"id": "deep-100k", **rec}]
+
+
 def match(value, rule):
     if "eq" in rule:
         if isinstance(rule["eq"], str):
@@ -321,7 +334,9 @@ def rounded(x, digits):
 def summarize(result):
     q = [i for s in ("tools", "longctx", "homelab", "code") for i in result["suites"].get(s, [])]
     graded = [i for i in q if i.get("pass") is not None]
-    timed = [i.get("timings", {}) for s in result["suites"].values() for i in s]
+    # deep is reported separately so decode_tps/mtp_accept stay comparable with earlier sessions.
+    timed = [i.get("timings", {}) for name, s in result["suites"].items() if name != "deep" for i in s]
+    deep_t = (result["suites"].get("deep") or [{}])[0].get("timings", {})
     draft = sum(t.get("draft_n", 0) for t in timed)
     speed_by_depth = {}
     for i in result["suites"].get("speed", []):
@@ -339,6 +354,8 @@ def summarize(result):
         "mtp_accept": round(sum(t.get("draft_n_accepted", 0) for t in timed) / draft, 3) if draft else None,
         "ttft_8k_s": rounded(median((t.get("prompt_ms") or 0) / 1000 or None for t in speed_by_depth.get(8000, [])), 2),
         "prefill_tps_24k": rounded(median(t.get("prompt_per_second") for t in speed_by_depth.get(24000, [])), 0),
+        "decode_tps_100k": rounded(deep_t.get("predicted_per_second"), 1),
+        "prefill_tps_100k": rounded(deep_t.get("prompt_per_second"), 0),
         "min_free_gib": round(result["min_free_bytes"] / 2**30, 2) if result.get("min_free_bytes") else None,
         "status": result["status"],
     }
@@ -370,6 +387,8 @@ def main():
         # Warm-up after a restart (graph/kernels); not measured.
         client.chat([{"role": "user", "content": "Hi"}], seed=0, max_tokens=8, thinking=False)
         result["suites"]["speed"] = speed(client, args.smoke)
+        if not args.smoke:
+            result["suites"]["deep"] = deep(client)
         result["suites"]["tools"] = tools(client, tool_spec, completions)
         result["suites"]["longctx"] = longctx(client)[: 1 if args.smoke else None]
         result["suites"]["homelab"] = sandboxed(

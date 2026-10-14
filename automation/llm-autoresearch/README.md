@@ -21,7 +21,7 @@ This is a local, Claude Code–driven hill-climb over the B60 llama-server flags
 
 Because results are committed, a session can be started from any clone of the repo that meets the requirements below.
 
-Each experiment takes about 35 minutes: a 3–5 minute rollout plus about 30 minutes of evaluation. An 8-hour night gives roughly 12–14 experiments.
+Each experiment takes about 16–20 minutes: a 3-minute rollout plus 10–14 minutes of evaluation, including about 2.5 minutes for the 100K probe. An 8-hour night gives roughly 24 experiments.
 
 ## Requirements
 
@@ -34,7 +34,8 @@ Each experiment takes about 35 minutes: a 3–5 minute rollout plus about 30 min
 
 | Suite | Size | Graded by |
 | --- | --- | --- |
-| speed (diagnostic) | short / ~8K / ~24K prompt × 2 | llama.cpp `timings` passed through by LiteLLM |
+| speed (diagnostic) | short / "8K" / "24K" prompt × 2 (really about 13K / 40K tokens) | llama.cpp `timings` passed through by LiteLLM |
+| deep (speed) | 1 prompt of about 100K tokens | `decode_tps_100k` / `prefill_tps_100k`; part of the keep rule |
 | tools | 8 | correct function and arguments, or correctly no call |
 | longctx | 3 needles in ~16K tokens | exact match |
 | homelab | 8 manifest tasks | YAML assertions in the sandbox |

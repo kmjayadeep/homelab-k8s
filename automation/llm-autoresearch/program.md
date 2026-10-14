@@ -36,6 +36,8 @@ You may change **only** the `args` list of the `llama-server` container in `depl
   - sampling defaults: `--temp`, `--top-p`, `--top-k`, `--min-p`, `--presence-penalty`, `--repeat-penalty`
   - reasoning controls such as `--reasoning-budget`
 
+  At about 100K tokens, MTP acceptance was only 0.35–0.40. Worth testing first: speculative decoding off (`--spec-type none`) or a shorter draft. Judge these on `decode_tps_100k` as well as overall time.
+
   Check that a flag exists in this llama.cpp build before using it. A crash on an unknown flag wastes a restart. To list the supported flags, run `kubectl -n llm-serving exec deploy/intel-llama-tiel-coder-trial -c llama-server -- /app/llama-server --help`. Other options include `--cache-reuse`, `--poll`, and n-gram speculation (`--spec-type`, `--spec-ngram-*`).
 - **Memory is the binding risk.** A past 128K trial OOMed the host and took k3s down. The evaluator and `apply` abort when free memory on `titania-gpu` drops below 2 GiB, and `verdict` discards anything below 3 GiB of headroom. Be careful with f16 K/V or larger batches.
 
@@ -45,7 +47,8 @@ Make the model **better and/or faster** on the fixed eval, using these metrics f
 
 - **`passed`/`total`:** 49 graded tasks: 30 HumanEval+, 8 homelab manifests, 8 tool calls and 3 long-context needles.
 - **`quality_seconds`:** total wall time of those tasks. It reflects both speed and how long the model thinks.
-- **Diagnostics:** `decode_tps`, `ttft_8k_s`, `prefill_tps_24k`, `mtp_accept` and `min_free_gib`.
+- **`decode_tps_100k` / `prefill_tps_100k`:** one request of about 100K prompt tokens. Production must decode at least 30 tok/s at long context, and on 2026-10-14 this config managed only 21.8–22.7 tok/s at 105–111K (ADR 0004). This is the main gap to close.
+- **Diagnostics:** `decode_tps`, `ttft_8k_s`, `prefill_tps_24k`, `mtp_accept` and `min_free_gib`. The speed suite's depth labels undercount: "8K" and "24K" are really about 13K and 40K tokens. They are kept for comparability.
 
 Requests use fixed per-task seeds, but any change to the server alters the sampling path. In session `oct14`, flags that should not change answers (draft length, micro-batch size) still moved `passed` by about ±2 tasks between runs. A single run is therefore noisy, and the keep rule compares quality against a **reference**: the mean `passed` of the last 3 kept runs. "Kept time" is the `quality_seconds` of the last kept run. `experiment.py verdict` reads the changed flags from `HEAD~1..HEAD` and applies the rule:
 
@@ -53,6 +56,7 @@ Requests use fixed per-task seeds, but any change to the server alters the sampl
 - **Other flags** (sampling, reasoning, cache types):
   - **KEEP for quality:** at least 3 tasks above the reference, with time no more than 15% worse.
   - **KEEP for speed:** at least 5% faster, with quality no more than 1 task below both the reference and the baseline.
+- **Deep decode** (both rows have `decode_tps_100k`): a drop of more than 10% vetoes any keep. A gain of at least 8%, with `quality_seconds` no more than 10% worse, counts as "faster" in both rules above.
 - **DISCARD:** everything else, and any run with less than 3 GiB of memory headroom.
 
 Replaying `oct14` through this rule reproduces the config that was merged by hand: it keeps micro-batch 1024, draft length 3 and reasoning budget 2048, and rejects draft length 4, temperature 0.3 and reasoning budget 1024.
@@ -66,7 +70,7 @@ LOOP FOREVER:
 1. **Check the state:** `git status`, current branch and HEAD. HEAD must be the last kept config.
 2. **Edit** the manifest's llama-server `args` with one idea.
 3. **Commit:** `git commit -am "<short description of the idea>"`.
-4. **Run:** `python3 automation/llm-autoresearch/experiment.py run > automation/llm-autoresearch/run.log 2>&1`. This applies the manifest with Flux suspended, waits for the rollout (Recreate plus checksum, about 3–5 minutes), then evaluates (about 30 minutes). Do **not** let the output flood your context.
+4. **Run:** `python3 automation/llm-autoresearch/experiment.py run > automation/llm-autoresearch/run.log 2>&1`. This applies the manifest with Flux suspended, waits for the rollout (Recreate plus checksum, about 3–5 minutes), then evaluates (about 10–14 minutes). Do **not** let the output flood your context.
 5. **Read the result:** `tail -n 20 automation/llm-autoresearch/run.log`. Then run `python3 automation/llm-autoresearch/experiment.py verdict`.
 6. **Record:** `python3 automation/llm-autoresearch/experiment.py record <keep|discard|crash> "<description>"`. `results.tsv` stays untracked; do not commit it.
 7. **Act on the verdict:**
