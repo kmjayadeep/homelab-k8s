@@ -1,0 +1,45 @@
+{
+  "_comment": "Homelab-flavoured manifest tasks. 'check' runs in the network-less sandbox with DOCS (parsed YAML documents), find(kind, name) and get(doc, 'dotted.path') available; any exception is a failure.",
+  "tasks": [
+    {
+      "id": "deployment-probes",
+      "prompt": "Write a Kubernetes Deployment named `whoami` in namespace `tools` running image `traefik/whoami:v1.10` with 2 replicas. Expose container port 80 named `http`. Add HTTP readiness and liveness probes on path `/` using the named port. Set requests of cpu 50m and memory 64Mi and a memory limit of 128Mi. Use the label `app.kubernetes.io/name: whoami` on the pod template and as the selector.",
+      "check": "d = find('Deployment', 'whoami')\nassert get(d, 'metadata.namespace') == 'tools'\nassert get(d, 'spec.replicas') == 2\nassert get(d, 'spec.selector.matchLabels', {}).get('app.kubernetes.io/name') == 'whoami'\nassert get(d, 'spec.template.metadata.labels', {}).get('app.kubernetes.io/name') == 'whoami'\nc = get(d, 'spec.template.spec.containers.0')\nassert c['image'] == 'traefik/whoami:v1.10'\nassert any(p.get('containerPort') == 80 and p.get('name') == 'http' for p in c['ports'])\nfor probe in ('readinessProbe', 'livenessProbe'):\n    assert get(c, probe + '.httpGet.path') == '/'\n    assert get(c, probe + '.httpGet.port') in ('http', 80)\nassert str(get(c, 'resources.requests.cpu')) == '50m'\nassert get(c, 'resources.requests.memory') == '64Mi'\nassert get(c, 'resources.limits.memory') == '128Mi'"
+    },
+    {
+      "id": "service-ingress-tls",
+      "prompt": "Write a ClusterIP Service `whoami` in namespace `tools` selecting `app.kubernetes.io/name: whoami`, port 80 named `http` targeting the container port named `http`. Also write a networking.k8s.io/v1 Ingress `whoami` in the same namespace with ingressClassName `nginx`, host `whoami.cosmos.cboxlab.com`, path `/` with pathType `Prefix` routing to the Service's `http` port by name, and TLS for that host using secret `cosmos-cboxlab-cert`.",
+      "check": "s = find('Service', 'whoami')\nassert get(s, 'metadata.namespace') == 'tools'\nassert get(s, 'spec.type', 'ClusterIP') == 'ClusterIP'\nassert get(s, 'spec.selector', {}).get('app.kubernetes.io/name') == 'whoami'\np = get(s, 'spec.ports.0')\nassert p['port'] == 80 and p.get('name') == 'http' and p.get('targetPort') == 'http'\ni = find('Ingress', 'whoami')\nassert i['apiVersion'] == 'networking.k8s.io/v1'\nassert get(i, 'spec.ingressClassName') == 'nginx'\nr = get(i, 'spec.rules.0')\nassert r['host'] == 'whoami.cosmos.cboxlab.com'\npath = r['http']['paths'][0]\nassert path['path'] == '/' and path['pathType'] == 'Prefix'\nassert get(path, 'backend.service.name') == 'whoami'\nassert get(path, 'backend.service.port.name') == 'http'\nt = get(i, 'spec.tls.0')\nassert 'whoami.cosmos.cboxlab.com' in t['hosts'] and t['secretName'] == 'cosmos-cboxlab-cert'"
+    },
+    {
+      "id": "external-secret",
+      "prompt": "Write an External Secrets Operator `ExternalSecret` (API version external-secrets.io/v1) named `whoami-secrets` in namespace `tools`. It uses the namespaced SecretStore `vault`, refreshes every 1h, and creates the Kubernetes Secret `whoami-secrets`. Map Secret key `API_TOKEN` from Vault key `apps/whoami` property `api_token`, and `DB_PASSWORD` from the same Vault key, property `db_password`.",
+      "check": "e = find('ExternalSecret', 'whoami-secrets')\nassert e['apiVersion'] == 'external-secrets.io/v1'\nassert get(e, 'metadata.namespace') == 'tools'\nassert get(e, 'spec.secretStoreRef.name') == 'vault'\nassert get(e, 'spec.secretStoreRef.kind', 'SecretStore') == 'SecretStore'\nassert get(e, 'spec.refreshInterval') == '1h'\nassert get(e, 'spec.target.name') == 'whoami-secrets'\ndata = {d['secretKey']: d['remoteRef'] for d in get(e, 'spec.data', [])}\nassert data['API_TOKEN']['key'] == 'apps/whoami' and data['API_TOKEN']['property'] == 'api_token'\nassert data['DB_PASSWORD']['key'] == 'apps/whoami' and data['DB_PASSWORD']['property'] == 'db_password'"
+    },
+    {
+      "id": "kustomize-overlay",
+      "prompt": "Write a kustomize `kustomization.yaml` (apiVersion kustomize.config.k8s.io/v1beta1) that sets namespace `tools`, includes resources `deployment.yaml`, `service.yaml` and `ingress.yaml`, and overrides image `traefik/whoami` to tag `v1.11`.",
+      "check": "k = find('Kustomization')\nassert k['apiVersion'] == 'kustomize.config.k8s.io/v1beta1'\nassert k.get('namespace') == 'tools'\nassert set(k.get('resources', [])) == {'deployment.yaml', 'service.yaml', 'ingress.yaml'}\nimgs = [i for i in k.get('images', []) if i.get('name') == 'traefik/whoami']\nassert imgs and imgs[0].get('newTag') == 'v1.11'"
+    },
+    {
+      "id": "flux-kustomization",
+      "prompt": "Write a Flux `Kustomization` (API version kustomize.toolkit.fluxcd.io/v1) named `whoami` in namespace `tools`. It reconciles path `clusters/titania/apps/whoami` from the GitRepository `flux-system` in namespace `flux-system` every 15m, prunes, waits for resources, has a 5m timeout, and depends on the Kustomization `external-secrets` in namespace `external-secrets`.",
+      "check": "k = find('Kustomization', 'whoami')\nassert k['apiVersion'] == 'kustomize.toolkit.fluxcd.io/v1'\nassert get(k, 'metadata.namespace') == 'tools'\nassert get(k, 'spec.path').lstrip('./') == 'clusters/titania/apps/whoami'\nassert get(k, 'spec.interval') == '15m'\nassert get(k, 'spec.prune') is True and get(k, 'spec.wait') is True\nassert get(k, 'spec.timeout') == '5m'\nsrc = get(k, 'spec.sourceRef')\nassert src['kind'] == 'GitRepository' and src['name'] == 'flux-system' and src.get('namespace') == 'flux-system'\ndeps = get(k, 'spec.dependsOn', [])\nassert any(d['name'] == 'external-secrets' and d.get('namespace') == 'external-secrets' for d in deps)"
+    },
+    {
+      "id": "cronjob-timezone",
+      "prompt": "Write a batch/v1 CronJob `db-backup` in namespace `tools` that runs at 03:30 every day in the Europe/Berlin time zone, never runs two jobs concurrently, keeps one successful and three failed jobs, and runs image `busybox:1.37` with command `sh -c 'date'`. Pods should restart on failure.",
+      "check": "c = find('CronJob', 'db-backup')\nassert c['apiVersion'] == 'batch/v1'\nassert get(c, 'spec.schedule').split() == ['30', '3', '*', '*', '*']\nassert get(c, 'spec.timeZone') == 'Europe/Berlin'\nassert get(c, 'spec.concurrencyPolicy') == 'Forbid'\nassert get(c, 'spec.successfulJobsHistoryLimit') == 1 and get(c, 'spec.failedJobsHistoryLimit') == 3\npod = get(c, 'spec.jobTemplate.spec.template.spec')\nassert pod['restartPolicy'] == 'OnFailure'\nct = pod['containers'][0]\nassert ct['image'] == 'busybox:1.37'\ncmd = (ct.get('command') or []) + (ct.get('args') or [])\nassert cmd[:2] == ['sh', '-c'] and cmd[2].strip() == 'date'"
+    },
+    {
+      "id": "default-deny-netpol",
+      "prompt": "Write a NetworkPolicy `default-deny` for namespace `sandbox` that selects every pod and denies all ingress and all egress traffic.",
+      "check": "n = find('NetworkPolicy', 'default-deny')\nassert get(n, 'metadata.namespace') == 'sandbox'\nassert get(n, 'spec.podSelector') == {}\nassert set(get(n, 'spec.policyTypes', [])) == {'Ingress', 'Egress'}\nassert not get(n, 'spec.ingress') and not get(n, 'spec.egress')"
+    },
+    {
+      "id": "pvc-longhorn",
+      "prompt": "Write a PersistentVolumeClaim `data` in namespace `tools` using storage class `longhorn`, access mode ReadWriteOnce, requesting 5Gi.",
+      "check": "p = find('PersistentVolumeClaim', 'data')\nassert get(p, 'metadata.namespace') == 'tools'\nassert get(p, 'spec.storageClassName') == 'longhorn'\nassert get(p, 'spec.accessModes') == ['ReadWriteOnce']\nassert get(p, 'spec.resources.requests.storage') == '5Gi'"
+    }
+  ]
+}

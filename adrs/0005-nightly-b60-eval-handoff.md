@@ -1,6 +1,6 @@
 # ADR 0005: Lend the B60 to a nightly eval by suspending Flux, not by changing Git
 
-- Status: Accepted
+- Status: Superseded by [ADR 0006](0006-local-b60-autoresearch.md) (2026-10-14)
 - Date: 2026-10-14
 - Related plan: [0013: Nightly LLM parameter eval](../plans/0013-nightly-llm-parameter-eval.md)
 - Amends: [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (single B60 Deployment in Git)
@@ -48,5 +48,8 @@ The operator wants llama-server flags and sampling parameters evaluated every ni
 - `llm-serving` Kustomization health briefly shows "suspended" each night.
 
 ## Implementation status
+
+Superseded on 2026-10-14: the operator replaced the nightly pipeline with a local autoresearch loop (ADR 0006). The `llm-eval` cluster objects were removed from Git and the private repository's workflow was disabled. The text below describes the state before removal.
+
 
 The manifests are in `clusters/titania/apps/llm-eval/` and `clusters/titania/bootstrap/apps/llm-eval.yaml`. The harness is in the private `kmjayadeep/homelab-llm-evals` repository and starts in `sampling` mode. `full` mode requires the supervised handoff check in plan 0013 phase 1. This ADR does not prove live state; check `flux get ks -n llm-serving` and the workflow history.

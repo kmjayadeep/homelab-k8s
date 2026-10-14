@@ -18,6 +18,12 @@ Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `
 - When importing or rotating a value, use stdin or another non-logging file-to-file workflow, suppress command output, and never place values in command arguments, shell history, plans, or agent messages.
 - **Never perform destructive operations without explicit human approval.** This includes `rm`, `kubectl delete`, pruning/removing Flux resources, force operations, database/data deletion, and destructive rewrites. Explain the impact and wait for approval.
 - Do not apply or reconcile changes to the cluster unless explicitly requested.
+- **Exception: B60 autoresearch sessions** ([ADR 0006](adrs/0006-local-b60-autoresearch.md)). Once the operator has started a session per `automation/llm-autoresearch/program.md` and confirmed the baseline, the agent may do the following without asking each time:
+  - suspend and resume `llm-serving/llm-serving-intel-llama` through `experiment.py`
+  - apply that app's Kustomize build
+  - `git reset --hard` its own unpushed experiment commits on the `autoresearch/<tag>` branch
+
+  This covers only the llama-server `args` in `deployment-tiel-coder-trial.yaml`. It never covers other resources, other branches, `main`, or merging.
 
 ## Vault and External Secrets
 
