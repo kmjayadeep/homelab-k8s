@@ -106,7 +106,7 @@ spec:
             - "1024"
             - --reasoning-budget
             - "2048"
-            # Use runtime-default batch and microbatch sizes; preserve sampling.
+            # ubatch 1024 and reasoning budget 2048 from autoresearch oct14 (plan 0014); preserve sampling.
             - --temp
             - "0.6"
             - --top-p
@@ -122,7 +122,7 @@ spec:
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
-            - "4"
+            - "3"
           ports:
             - name: http
               containerPort: 8080

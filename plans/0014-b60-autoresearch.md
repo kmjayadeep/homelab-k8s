@@ -70,7 +70,7 @@ Record each session here: date, tag, number of experiments, kept changes and the
 - **Kept changes** (in the PR from `autoresearch/oct14`):
   - `--ubatch-size 1024`: prefill at 24K rose from 959 to 1165 tok/s, TTFT at 8K fell from 12.7 to 10.7 s, and `quality_seconds` dropped 22%. This is a clear win.
   - `--reasoning-budget 2048`: a further 11% less `quality_seconds` at equal quality (45/49). Budget 1024 was 4.9% faster still but lost 2 code tasks.
-  - `--spec-draft-n-max 4`: **probably noise.** It was kept on +2 homelab tasks while MTP acceptance fell from 0.675 to 0.58 and time rose 4.5%. Draft length 3 was later as fast or faster. The PR should probably drop it.
+  - `--spec-draft-n-max 4`: **probably noise.** It was kept on +2 homelab tasks while MTP acceptance fell from 0.675 to 0.58 and time rose 4.5%. Draft length 3 was later as fast or faster. Dropped before merge; production stays on draft length 3.
 - **Keep-rule finding:** settings that shouldn't change answers (draft length, micro-batch) moved quality by ±2 tasks between runs, which equals the +2 quality-keep threshold. That caused one likely false keep (draft length 4), and it inflated "best" to 45, which then rejected a 6%-faster draft length of 3. Proposed fix before overnight runs:
   - judge speed-only flags on time, with quality only as a guard against the baseline
   - require +3 for quality keeps, compared against the baseline rather than the best
