@@ -56,6 +56,15 @@ spec:
                 echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf.partial' | sha256sum -c -
                 mv /models/mmproj-bf16.gguf.partial /models/mmproj-bf16.gguf
               fi
+              # Plan 0015 trial: same Ornith-1.5 weights, ICE quant with Tiel's imatrix and MTPv2.
+              if test -f /models/model-19g-ice.gguf; then
+                echo 'ba2581cf09101760b3d45054c439626b8f6cb3de53dad7987929072bacbe2b1f  /models/model-19g-ice.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/model-19g-ice.gguf.partial \
+                  https://huggingface.co/gbuzhf/Ornith-1.5-35B-A3B-TIEL-Calibrated-MTPv2-ICE-GGUF/resolve/9991338360005ec7785aefe8c26e9847ced3f1cf/Ornith-1.5-35B-A3B-TIEL_Calibrated-MTPv2-19G-ICE.gguf
+                echo 'ba2581cf09101760b3d45054c439626b8f6cb3de53dad7987929072bacbe2b1f  /models/model-19g-ice.gguf.partial' | sha256sum -c -
+                mv /models/model-19g-ice.gguf.partial /models/model-19g-ice.gguf
+              fi
           resources:
             requests:
               cpu: 100m
@@ -78,7 +87,8 @@ spec:
           image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
           args:
             - --model
-            - /models/model.gguf
+            # Plan 0015 trial; Tiel's /models/model.gguf stays on the PVC for rollback.
+            - /models/model-19g-ice.gguf
             - --mmproj
             - /models/mmproj-bf16.gguf
             - --alias
