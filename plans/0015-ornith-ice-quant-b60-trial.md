@@ -1,6 +1,6 @@
 # Plan 0015: Trial higher-fidelity quants of the production B60 model
 
-- Status: Draft; nothing downloaded or deployed
+- Status: Paused 2026-10-14; production reverted to Tiel; 21G-ICE quality runs outstanding
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md)
 
@@ -104,4 +104,25 @@ Before running this plan:
 
 ## Outcome
 
-Not started.
+### 2026-10-14 (20:29–22:10 CEST, operator present), paused
+
+| | Tiel `UD-IQ4_XS` (reference) | 19G-ICE (PR #261) | 21G-ICE, CPU projector (PR #262) |
+| --- | --- | --- | --- |
+| Passed (two runs) | 44, 43 → **43.5** | 45, 42 → **43.5** | not measured (paused during run 1) |
+| Tools / needles | 8/8, 3/3 both runs | 8/8, 3/3 both runs | — |
+| Short decode | 61.6 tok/s | 62.0 tok/s | — |
+| `decode_tps_100k` | 26.2, 24.1 → 25.2 | 25.4, 23.5 → 24.5 (−2.8%) | — |
+| `prefill_tps_100k` | 998 | 1,011 | — |
+| 111K probe | 3/3, decode 22.5 tok/s | 3/3, decode 22.1 tok/s | — |
+| MTP acceptance | 0.70 | 0.70 | — |
+| Peak VRAM | 86.4% | 89.4% | 91.5% idle, 92.7% peak during the partial run |
+| Container anonymous memory | 4.5 GiB | 5.2 GiB after the evals | 1.6 GiB at idle |
+| Vision | BF16 on GPU | BF16 on GPU | CPU projector: red-square smoke "Red" in 2.0 s |
+
+- **19G-ICE** passed every gate but tied Tiel. Its quant gain does not show through the ±2-task eval noise.
+- **21G-ICE** loaded at 128K with `--no-mmproj-offload` within the VRAM gate. Its quality and speed were not measured.
+- **Deviation:** 21G went straight to `--no-mmproj-offload` without trying the defaults first, because the 19G figures projected about 96–97% VRAM.
+- **Downtime:** each first switch took about 13–23 minutes of `qwen-intel` downtime. Most of that was the download, and the Deployment's 10-minute progress deadline was exceeded with no rollback.
+- **Paused** at the operator's request. Both switches were reverted, and production is back on Tiel (manifest identical to `main` before the trial).
+- **Files left on the PVC:** `model-19g-ice.gguf` (18.8 GB) and `model-21g-ice.gguf` (20.8 GB). They are kept so 21G can resume without another download. Delete them only with explicit approval.
+- **To resume:** re-apply PR #262's change, run step 4's two evals and the 111K probe, then step 5. Expect about 5 minutes of downtime, because the checksum is re-verified and no download is needed.
