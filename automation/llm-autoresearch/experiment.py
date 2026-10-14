@@ -33,7 +33,8 @@ RESULTS = ROOT / "results.tsv"
 RUNS = ROOT / "runs"
 ARCHIVE = ROOT / "results"
 COLUMNS = ["commit", "passed", "total", "quality_seconds", "decode_tps", "ttft_8k_s",
-           "prefill_tps_24k", "mtp_accept", "min_free_gib", "status", "description"]
+           "prefill_tps_24k", "mtp_accept", "decode_tps_100k", "prefill_tps_100k", "min_free_gib",
+           "status", "description"]
 
 # Never changed by the loop: identity/routing, and anything that would shrink the
 # usable context production relies on (the eval only probes ~24K).
@@ -51,6 +52,8 @@ NOISE = 2           # tasks; observed run-to-run spread on answer-neutral change
 QUALITY_GAIN = 3    # tasks over the reference for a quality keep (> NOISE)
 REFERENCE_RUNS = 3  # reference quality = mean passed of the last N keeps, smoothing single-run noise
 SPEED_GAIN = 0.05   # fraction of quality_seconds saved for a speed keep
+DEEP_GAIN = 0.08    # decode_tps_100k gain for a deep-decode keep (a rate, so less noisy than wall time)
+DEEP_LOSS = 0.10    # decode_tps_100k loss that vetoes any keep
 
 
 def log(msg):
@@ -321,14 +324,20 @@ def decide(s, keeps, changed):
     if (s.get("min_free_gib") or 0) < 3:
         return "DISCARD", f"only {s.get('min_free_gib')} GiB free on titania-gpu (need >= 3 GiB headroom)"
     faster = qs <= (1 - SPEED_GAIN) * bqs
+    deep, bdeep = float(s.get("decode_tps_100k") or 0), float(keeps[-1].get("decode_tps_100k") or 0)
+    if deep and bdeep:
+        status += f", decode@100k {deep:.1f} vs {bdeep:.1f} tok/s"
+        if deep < (1 - DEEP_LOSS) * bdeep:
+            return "DISCARD", f"{status}; decode at 100K dropped more than {DEEP_LOSS:.0%}"
+    deep_faster = bool(deep and bdeep and deep >= (1 + DEEP_GAIN) * bdeep and qs <= 1.10 * bqs)
     if speed_only(changed):
-        if faster and p >= ref - NOISE and p >= basep - NOISE:
+        if (faster or deep_faster) and p >= ref - NOISE and p >= basep - NOISE:
             return "KEEP", f"speed-only ({', '.join(changed)}): {status}"
         return "DISCARD", (f"speed-only ({', '.join(changed)}): {status}; needs >={SPEED_GAIN:.0%} faster "
                            f"with quality >= reference-{NOISE} and baseline-{NOISE}")
     if p >= ref + QUALITY_GAIN and qs <= 1.15 * bqs:
         return "KEEP", f"better: {status}"
-    if faster and p >= ref - 1 and p >= basep - 1:
+    if (faster or deep_faster) and p >= ref - 1 and p >= basep - 1:
         return "KEEP", f"faster: {status}"
     return "DISCARD", (f"{status}; needs reference+{QUALITY_GAIN} within +15% time, "
                        f"or >={SPEED_GAIN:.0%} faster within -1 of reference and baseline")
