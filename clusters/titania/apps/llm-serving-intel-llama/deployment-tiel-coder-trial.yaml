@@ -102,6 +102,8 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
+            - --ubatch-size
+            - "1024"
             # Use runtime-default batch and microbatch sizes; preserve sampling.
             - --temp
             - "0.6"
