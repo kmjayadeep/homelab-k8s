@@ -1,0 +1,136 @@
+# Returns the B60 to production at the end of the 02:00-04:00 window even if
+# the nightly workflow crashed or was cancelled. Only resumes a Kustomization
+# that the eval suspended (marker annotation), never an operator suspension.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: llm-eval-watchdog
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-eval-watchdog
+    app.kubernetes.io/instance: llm-eval
+    app.kubernetes.io/part-of: llm-eval
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: llm-eval-watchdog
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-eval-watchdog
+    app.kubernetes.io/instance: llm-eval
+    app.kubernetes.io/part-of: llm-eval
+rules:
+  - apiGroups:
+      - kustomize.toolkit.fluxcd.io
+    resources:
+      - kustomizations
+    resourceNames:
+      - llm-serving-intel-llama
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - get
+      - list
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: llm-eval-watchdog
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-eval-watchdog
+    app.kubernetes.io/instance: llm-eval
+    app.kubernetes.io/part-of: llm-eval
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: llm-eval-watchdog
+subjects:
+  - kind: ServiceAccount
+    name: llm-eval-watchdog
+    namespace: llm-serving
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: llm-eval-watchdog
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-eval-watchdog
+    app.kubernetes.io/instance: llm-eval
+    app.kubernetes.io/part-of: llm-eval
+spec:
+  schedule: "50 3 * * *"
+  timeZone: Europe/Berlin
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 600
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: llm-eval-watchdog
+            app.kubernetes.io/instance: llm-eval
+            app.kubernetes.io/part-of: llm-eval
+        spec:
+          serviceAccountName: llm-eval-watchdog
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: watchdog
+              # alpine/k8s 1.33.0; registry.k8s.io/kubectl has no shell.
+              image: docker.io/alpine/k8s@sha256:60333a52c38e9a8df0a9b93a5a24a4870f0db2c7ea3266b185386bd0a500d7dc
+              command:
+                - sh
+                - -ec
+                - |
+                  ns=llm-serving
+                  ks=llm-serving-intel-llama
+                  kubectl -n "$ns" delete job -l app.kubernetes.io/name=llm-eval-server --ignore-not-found --wait=true
+                  marker=$(kubectl -n "$ns" get kustomization "$ks" -o jsonpath='{.metadata.annotations.llm-eval\.cboxlab\.com/suspended-by}')
+                  if [ -z "$marker" ]; then
+                    echo "no eval suspension marker; nothing to resume"
+                    exit 0
+                  fi
+                  echo "resuming $ks suspended by eval run $marker"
+                  kubectl -n "$ns" patch kustomization "$ks" --type=merge --field-manager=flux-client-side-apply \
+                    -p "{\"metadata\":{\"annotations\":{\"llm-eval.cboxlab.com/suspended-by\":null,\"reconcile.fluxcd.io/requestedAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}},\"spec\":{\"suspend\":false}}"
+              env:
+                - name: HOME
+                  value: /tmp
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir:
+                sizeLimit: 16Mi

@@ -4,6 +4,7 @@
 - Date: 2026-10-12
 - Related plans: [B60 evaluation](../plans/0005-intel-arc-b60-llm-serving-evaluation.md), [Tiel trial](../plans/0008-tiel-coder-b60-trial.md), [performance comparison](../plans/0007-local-llm-performance-comparison.md)
 - Supersedes: [ADR 0003](0003-intel-b60-llm-serving.md)
+- Amended by: [ADR 0005](0005-nightly-b60-eval-handoff.md) (nightly eval may borrow the B60 02:00–04:00)
 
 ## Context
 

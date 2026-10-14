@@ -1,0 +1,82 @@
+# Nightly GPU handoff (ADR 0005): suspend the serving Kustomization, scale the
+# production Deployment to zero, and run transient eval-server Jobs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: llm-eval-runner
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-eval-runner
+    app.kubernetes.io/instance: llm-eval
+    app.kubernetes.io/part-of: llm-eval
+rules:
+  - apiGroups:
+      - kustomize.toolkit.fluxcd.io
+    resources:
+      - kustomizations
+    resourceNames:
+      - llm-serving-intel-llama
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    resourceNames:
+      - intel-llama-tiel-coder-trial
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/scale
+    resourceNames:
+      - intel-llama-tiel-coder-trial
+    verbs:
+      - get
+      - patch
+      - update
+  # Job contents are constrained by the llm-eval-server-jobs admission policy.
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - get
+      - list
+      - watch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: llm-eval-runner
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-eval-runner
+    app.kubernetes.io/instance: llm-eval
+    app.kubernetes.io/part-of: llm-eval
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: llm-eval-runner
+subjects:
+  - kind: ServiceAccount
+    name: llm-eval-runner
+    namespace: actions-runner-system
