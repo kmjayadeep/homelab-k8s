@@ -49,7 +49,7 @@ Before each session:
    - run `experiment.py start`, which suspends Flux with the marker and checks Flux, the Deployment and node memory
    - record the baseline run as `keep`
 2. **Loop** (`program.md` → loop): edit one flag, commit, `run`, `verdict`, `record`, then keep, or reset and `apply --restore`. Stop only on infrastructure failure or when the human interrupts.
-3. **Session end:** summarize `results.tsv`, then open a PR with any kept changes and the results table. Run `experiment.py finish` to resume Flux.
+3. **Session end:** summarize `results.tsv`, run `experiment.py archive` and commit `results/<tag>/`, then open a PR with the results and any kept changes. Run `experiment.py finish` to resume Flux.
 4. **Adoption:** the operator reviews and merges the PR. Update ADR 0004 if the serving flags change materially.
 
 ## Validation and rollback
@@ -63,6 +63,8 @@ Before each session:
 Record each session here: date, tag, number of experiments, kept changes and the PR link.
 
 ### 2026-10-14 `oct14` (11:02–14:17 CEST, daytime, operator present)
+
+PR [#253](https://github.com/kmjayadeep/homelab-k8s/pull/253) (merged; draft length 4 dropped). Results: [`results/oct14/`](../automation/llm-autoresearch/results/oct14/).
 
 - **Run:** baseline plus 10 experiments, 3 kept and 7 discarded, with no crashes. Every rollout took 174–184 s.
 - **Memory:** `titania-gpu` never had less than 11.4 GiB of host memory free. B60 VRAM (`xpu-smi` over SSH) was 86.6% on the kept config and 90.3% with `--ubatch-size 2048`. Power peaked at 143 W of the 200 W limit.

@@ -1,4 +1,4 @@
-results.tsv
-run.log
-runs/
+/results.tsv
+/run.log
+/runs/
 __pycache__/

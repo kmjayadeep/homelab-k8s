@@ -15,8 +15,9 @@ Do these steps once per session, together with the human:
    - `automation/llm-autoresearch/experiment.py`: session tooling. **Read-only.**
    - `clusters/titania/apps/llm-serving-intel-llama/deployment-tiel-coder-trial.yaml`: **the file you edit, and only its llama-server `args`.**
    - `adrs/0006-local-b60-autoresearch.md`: what the operator has approved.
+   - `automation/llm-autoresearch/results/*/results.tsv`: every past session. Don't repeat an idea that was already discarded on the current config unless you have a reason to expect a different result.
 3. **Smoke check:** `python3 automation/llm-autoresearch/evaluate.py --smoke`. It sends one request per suite. If it fails, stop and tell the human.
-4. **Start:** `python3 automation/llm-autoresearch/experiment.py start`. This suspends Flux for `llm-serving-intel-llama` with a marker annotation and creates `results.tsv`.
+4. **Start:** `python3 automation/llm-autoresearch/experiment.py start`. This suspends Flux for `llm-serving-intel-llama` with a marker annotation and creates `results.tsv`. It refuses if `results.tsv` still holds a previous, unarchived session; archive that first (see "Ending the session").
 5. **Confirm with the human, then begin.** The first run is the baseline: the unchanged config.
 
 ## What you may change
@@ -98,7 +99,8 @@ The loop runs until the human interrupts you.
 When the human stops the loop:
 
 1. Print `results.tsv` and summarize the kept changes against the baseline.
-2. Push `autoresearch/<tag>` and, if anything was kept, open a PR against `main` summarizing the results. The PR body must include the `results.tsv` contents.
-3. Run `python3 automation/llm-autoresearch/experiment.py finish` to resume Flux. Production returns to `main`'s config until the PR is merged.
+2. Archive the session: `python3 automation/llm-autoresearch/experiment.py archive`. This moves `results.tsv` and the run summaries into `automation/llm-autoresearch/results/<tag>/`. Commit that directory, and add the session to the Outcome section of `plans/0014-b60-autoresearch.md`.
+3. Push `autoresearch/<tag>` and open a PR against `main`, even if nothing was kept, so the results reach `main`. The PR body must include the `results.tsv` contents.
+4. Run `python3 automation/llm-autoresearch/experiment.py finish` to resume Flux. Production returns to `main`'s config until the PR is merged.
 
 Never merge the PR yourself, and never push to `main`.
