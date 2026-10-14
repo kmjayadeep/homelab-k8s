@@ -22,10 +22,12 @@ The operator wants to find better llama-server settings for the single B60 model
   - resume Flux at the end
 
   [AGENTS.md](../AGENTS.md) carries this as a narrow exception.
-- **Evaluation and keep rule:** the fixed `evaluate.py` measures quality (49 graded tasks) and time through LiteLLM's `qwen-intel`, with the key read in-process from `pass`. `experiment.py verdict` applies a deterministic keep rule:
-  - +2 tasks with no more than 15% extra time, or
-  - at least 5% faster with at most −1 task against both the best and the baseline, and
-  - at least 3 GiB of headroom on `titania-gpu`.
+- **Evaluation and keep rule:** the fixed `evaluate.py` measures quality (49 graded tasks) and time through LiteLLM's `qwen-intel`, with the key read in-process from `pass`. `experiment.py verdict` applies a deterministic keep rule, revised after session `oct14` showed about ±2 tasks of run-to-run noise (details in `program.md`):
+  - quality is compared against the mean of the last 3 kept runs, not a single run
+  - speed-only flags (batching, threads, speculation) keep only for at least 5% less time, with quality as a guard
+  - other flags keep for +3 tasks within 15% extra time, or for at least 5% less time at no more than −1 task
+  - every keep needs at least 3 GiB of headroom on `titania-gpu`
+  - results are committed under `automation/llm-autoresearch/results/<tag>/` at session end
 
   Model-generated code runs in a local network-less Docker sandbox.
 - **Adoption:** kept configs reach `main` only through a PR that the human merges. Ending a session resumes Flux, so production returns to `main` until then.

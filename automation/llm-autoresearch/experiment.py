@@ -41,6 +41,17 @@ PROTECTED = {"--model", "--mmproj", "--alias", "--host", "--port", "--metrics", 
              "--ctx-size", "--parallel", "--n-gpu-layers"}
 MAX_CHANGED_FLAGS = 2  # one idea; allows coupled pairs such as cache-type-k/v
 
+# Flags that should change speed but not answers. Scores still move by about +-2 tasks
+# between runs of such configs (oct14), so these are judged on time, with quality
+# only as a guard against the session baseline.
+SPEED_ONLY = {"--batch-size", "--ubatch-size", "--threads", "--threads-batch", "--flash-attn",
+              "--poll", "--cache-reuse"}
+SPEED_ONLY_PREFIXES = ("--spec-",)
+NOISE = 2           # tasks; observed run-to-run spread on answer-neutral changes
+QUALITY_GAIN = 3    # tasks over the reference for a quality keep (> NOISE)
+REFERENCE_RUNS = 3  # reference quality = mean passed of the last N keeps, smoothing single-run noise
+SPEED_GAIN = 0.05   # fraction of quality_seconds saved for a speed keep
+
 
 def log(msg):
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
@@ -296,6 +307,33 @@ def record(status, description):
     log(f"recorded {commit} {status}")
 
 
+def speed_only(changed):
+    return bool(changed) and all(f in SPEED_ONLY or f.startswith(SPEED_ONLY_PREFIXES) for f in changed)
+
+
+def decide(s, keeps, changed):
+    """Keep rule (see program.md). keeps are the session's keep rows, baseline first."""
+    p, basep = s["passed"], int(keeps[0]["passed"])
+    recent = [int(r["passed"]) for r in keeps[-REFERENCE_RUNS:]]
+    ref = sum(recent) / len(recent)
+    qs, bqs = s["quality_seconds"], float(keeps[-1]["quality_seconds"])
+    status = f"quality {p} (reference {ref:.1f}, baseline {basep}), time {qs:.0f}s vs kept {bqs:.0f}s ({qs / bqs - 1:+.0%})"
+    if (s.get("min_free_gib") or 0) < 3:
+        return "DISCARD", f"only {s.get('min_free_gib')} GiB free on titania-gpu (need >= 3 GiB headroom)"
+    faster = qs <= (1 - SPEED_GAIN) * bqs
+    if speed_only(changed):
+        if faster and p >= ref - NOISE and p >= basep - NOISE:
+            return "KEEP", f"speed-only ({', '.join(changed)}): {status}"
+        return "DISCARD", (f"speed-only ({', '.join(changed)}): {status}; needs >={SPEED_GAIN:.0%} faster "
+                           f"with quality >= reference-{NOISE} and baseline-{NOISE}")
+    if p >= ref + QUALITY_GAIN and qs <= 1.15 * bqs:
+        return "KEEP", f"better: {status}"
+    if faster and p >= ref - 1 and p >= basep - 1:
+        return "KEEP", f"faster: {status}"
+    return "DISCARD", (f"{status}; needs reference+{QUALITY_GAIN} within +15% time, "
+                       f"or >={SPEED_GAIN:.0%} faster within -1 of reference and baseline")
+
+
 def verdict():
     latest = json.loads((ROOT / "runs" / "latest.json").read_text())
     s = latest.get("summary", {})
@@ -306,18 +344,11 @@ def verdict():
     if not rows:
         print("KEEP: first run is the baseline")
         return
-    base, best = rows[0], rows[-1]
-    p, bp, basep = s["passed"], int(best["passed"]), int(base["passed"])
-    qs, bqs = s["quality_seconds"], float(best["quality_seconds"])
-    if (s.get("min_free_gib") or 0) < 3:
-        print(f"DISCARD: only {s.get('min_free_gib')} GiB free on titania-gpu (need >= 3 GiB headroom)")
-    elif p >= bp + 2 and qs <= 1.15 * bqs:
-        print(f"KEEP: quality {p} vs best {bp} (+{p - bp}), time {qs:.0f}s vs {bqs:.0f}s")
-    elif p >= bp - 1 and p >= basep - 1 and qs <= 0.95 * bqs:
-        print(f"KEEP: faster {qs:.0f}s vs {bqs:.0f}s ({qs / bqs - 1:+.0%}) at quality {p} (best {bp}, baseline {basep})")
-    else:
-        print(f"DISCARD: quality {p} vs best {bp}, time {qs:.0f}s vs {bqs:.0f}s ({qs / bqs - 1:+.0%}); "
-              "needs +2 tasks within +15% time, or >=5% faster within -1 task")
+    # HEAD is the experiment commit; HEAD~1 is the last kept config.
+    kept, new = flags(manifest_args("HEAD~1")[1]), flags(manifest_args("HEAD")[1])
+    changed = sorted(k for k in set(kept) | set(new) if kept.get(k, "<absent>") != new.get(k, "<absent>"))
+    result, reason = decide(s, rows, changed)
+    print(f"{result}: {reason}")
 
 
 def main():

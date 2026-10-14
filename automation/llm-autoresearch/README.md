@@ -7,7 +7,7 @@ This is a local, Claude Code–driven hill-climb over the B60 llama-server flags
 | [`program.md`](program.md) | Agent instructions: setup, rules, loop, keep rule | human |
 | `clusters/titania/apps/llm-serving-intel-llama/deployment-tiel-coder-trial.yaml` | The experiment: llama-server `args` only | agent |
 | [`evaluate.py`](evaluate.py) | Fixed evaluator (ground truth) | nobody during a session |
-| [`experiment.py`](experiment.py) | `start`/`apply`/`run`/`verdict`/`record`/`finish` tooling | nobody during a session |
+| [`experiment.py`](experiment.py) | `start`/`apply`/`run`/`verdict`/`record`/`archive`/`finish` tooling | nobody during a session |
 | `tasks/`, `sandbox/` | Eval data and the network-less grading container | nobody during a session |
 | `results.tsv`, `run.log`, `runs/` | Working session output (git-ignored, because discards run `git reset --hard`) | tooling |
 | [`results/<tag>/`](results/) | Archived sessions: `results.tsv` plus per-run summaries, committed at session end | tooling (`experiment.py archive`) |
