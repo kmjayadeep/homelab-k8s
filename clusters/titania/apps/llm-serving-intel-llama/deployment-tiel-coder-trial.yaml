@@ -57,13 +57,13 @@ spec:
                 mv /models/mmproj-bf16.gguf.partial /models/mmproj-bf16.gguf
               fi
               # Plan 0015 trial: same Ornith-1.5 weights, ICE quant with Tiel's imatrix and MTPv2.
-              if test -f /models/model-19g-ice.gguf; then
-                echo 'ba2581cf09101760b3d45054c439626b8f6cb3de53dad7987929072bacbe2b1f  /models/model-19g-ice.gguf' | sha256sum -c -
+              if test -f /models/model-21g-ice.gguf; then
+                echo '42fb3674d92d4ae90928dac0b3a22190702874ec71d7f94c176eb68ca4ca3881  /models/model-21g-ice.gguf' | sha256sum -c -
               else
-                curl --fail --location --retry 5 --output /models/model-19g-ice.gguf.partial \
-                  https://huggingface.co/gbuzhf/Ornith-1.5-35B-A3B-TIEL-Calibrated-MTPv2-ICE-GGUF/resolve/9991338360005ec7785aefe8c26e9847ced3f1cf/Ornith-1.5-35B-A3B-TIEL_Calibrated-MTPv2-19G-ICE.gguf
-                echo 'ba2581cf09101760b3d45054c439626b8f6cb3de53dad7987929072bacbe2b1f  /models/model-19g-ice.gguf.partial' | sha256sum -c -
-                mv /models/model-19g-ice.gguf.partial /models/model-19g-ice.gguf
+                curl --fail --location --retry 5 --output /models/model-21g-ice.gguf.partial \
+                  https://huggingface.co/gbuzhf/Ornith-1.5-35B-A3B-TIEL-Calibrated-MTPv2-ICE-GGUF/resolve/9991338360005ec7785aefe8c26e9847ced3f1cf/Ornith-1.5-35B-A3B-TIEL_Calibrated-MTPv2-21G-ICE.gguf
+                echo '42fb3674d92d4ae90928dac0b3a22190702874ec71d7f94c176eb68ca4ca3881  /models/model-21g-ice.gguf.partial' | sha256sum -c -
+                mv /models/model-21g-ice.gguf.partial /models/model-21g-ice.gguf
               fi
           resources:
             requests:
@@ -88,9 +88,11 @@ spec:
           args:
             - --model
             # Plan 0015 trial; Tiel's /models/model.gguf stays on the PVC for rollback.
-            - /models/model-19g-ice.gguf
+            - /models/model-21g-ice.gguf
             - --mmproj
             - /models/mmproj-bf16.gguf
+            # Plan 0015: 21G-ICE leaves too little VRAM at 128K; keep the projector in host RAM.
+            - --no-mmproj-offload
             - --alias
             - tiel-coder-35b-a3b-intel
             - --host
