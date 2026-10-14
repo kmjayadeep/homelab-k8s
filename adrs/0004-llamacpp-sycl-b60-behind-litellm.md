@@ -34,7 +34,7 @@ Recorded observations:
 ## Consequences
 
 - One model is served at a time. Switching models interrupts `qwen-intel` and requires a download when the cache is gone.
-- Configured context is not validated capacity. Near-limit context, sustained load and the MTP speedup are untested for Tiel, and host-memory pressure remains the main risk.
+- Configured context is not validated capacity. On 2026-10-14 a single-request probe through LiteLLM retrieved 3/3 needles at 52K, 105K and 111K prompt tokens (LiteLLM caps input at 114,688). Prefill was 1,116 / 985 / 971 tok/s, but decode fell to 29.8 / 21.8 / 22.7 tok/s with MTP acceptance 0.35–0.40 on prose output, so decode is below 30 tok/s beyond about 50K. VRAM stayed at 86.4% (preallocated). Container anonymous memory was 4.5 GiB at idle and the working set peaked at 9.7 GiB including file cache; the host prompt cache is capped at 4 GiB (`--cache-ram 4096`, default 8 GiB). Sustained multi-request load remains untested, and host memory remains the main risk.
 - LiteLLM's `STORE_MODEL_IN_DB` can override the Git alias. Check effective routing after every switch (see `clusters/titania/apps/litellm/README.md`).
 - Follow-up: rewrite the `.agents/skills/manage-llm-models` skill, which still describes KServe/Envoy, and remove the `kserve-localmodel-huggingface` Vault role in the sibling `homelab-iac` repository.
 
