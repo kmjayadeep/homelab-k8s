@@ -8,5 +8,4 @@ An ADR captures the context, decision, alternatives, and consequences of a durab
 | [0002: Local Pi runner for reviewed repository changes](0002-autonomous-repository-agent.md) | Accepted design; verify implementation against the tree before claiming the runner is available |
 | [0003: Intel B60 LLM serving](0003-intel-b60-llm-serving.md) | Superseded by ADR 0004 |
 | [0004: llama.cpp SYCL on the B60 behind LiteLLM](0004-llamacpp-sycl-b60-behind-litellm.md) | Accepted; Tiel is the sole B60 workload; amended by ADR 0006 |
-| [0005: Nightly B60 eval handoff](0005-nightly-b60-eval-handoff.md) | Superseded by ADR 0006 |
 | [0006: Local B60 autoresearch](0006-local-b60-autoresearch.md) | Accepted; operator-started sessions may tune production llama-server args through LiteLLM |

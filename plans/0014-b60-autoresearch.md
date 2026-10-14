@@ -2,7 +2,7 @@
 
 - Status: Ready; no session run yet
 - Owner: Homelab operator
-- Related ADR: [ADR 0006](../adrs/0006-local-b60-autoresearch.md); supersedes [plan 0013](0013-nightly-llm-parameter-eval.md)
+- Related ADR: [ADR 0006](../adrs/0006-local-b60-autoresearch.md)
 
 ## Goal and scope
 
