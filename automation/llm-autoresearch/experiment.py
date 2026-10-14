@@ -221,14 +221,19 @@ def finish():
         "metadata": {"annotations": {MARKER: None, "reconcile.fluxcd.io/requestedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}},
         "spec": {"suspend": False},
     })
-    log("Flux resumed; production returns to the Git main config. Waiting for the Deployment...")
+    log("Flux resumed; waiting for the Deployment to roll back to the Git main config...")
+    _, main_args = manifest_args("main")
     for _ in range(120):
         d = kget("deployment", DEPLOY)
-        if d.get("status", {}).get("availableReplicas", 0) >= 1 and not d["status"].get("unavailableReplicas"):
-            log("production available")
+        st = d.get("status", {})
+        live_args = next(c for c in d["spec"]["template"]["spec"]["containers"] if c["name"] == CONTAINER).get("args", [])
+        # The old pod stays available until Flux reapplies, so also require main's args and a finished rollout.
+        if (live_args == main_args and st.get("observedGeneration", 0) >= d["metadata"]["generation"]
+                and st.get("updatedReplicas") == 1 and st.get("availableReplicas") == 1 and not st.get("unavailableReplicas")):
+            log("production available on the main config")
             return
         time.sleep(10)
-    raise SystemExit("production not available 20 minutes after resume; check `flux get ks -n llm-serving`")
+    raise SystemExit("production not back on the main config 20 minutes after resume; check `flux get ks -n llm-serving`")
 
 
 def read_rows():
