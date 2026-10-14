@@ -102,6 +102,10 @@ spec:
             - "1"
             - --n-gpu-layers
             - "99"
+            # Cap the host-RAM prompt cache (default 8192 MiB) so anonymous memory stays well inside
+            # the 16Gi limit; measured 4.5 GiB anon at idle, 9.7 GiB working set at a 111K prompt.
+            - --cache-ram
+            - "4096"
             - --ubatch-size
             - "1024"
             - --reasoning-budget
