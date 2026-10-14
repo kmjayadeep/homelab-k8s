@@ -16,4 +16,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0010: Swift two-slot vision baseline](0010-swift-qwen38-concurrency.md) | Abandoned for current serving; operator requested rollback to 96K/Q8/one-slot/MTP after prefill regression; incomplete evidence retained |
 | [0011: Empero Qwen3.8 distill 256K trial](0011-empero-qwen38-distill-b60-trial.md) | IQ3_M serving verified qwen-intel alias; near-256K synthetic text/vision passed at 87.33% peak sampled VRAM, structured tools failed |
 | [0012: Vault internal TLS](0012-vault-internal-tls.md) | Completed 2026-10-13 for TLS; restore and seal/unseal drills deferred |
-| [0013: Nightly LLM parameter eval](0013-nightly-llm-parameter-eval.md) | Implemented in Git (private `homelab-llm-evals` harness + `apps/llm-eval`); sampling-mode phase 0 pending, GPU handoff per [ADR 0005](../adrs/0005-nightly-b60-eval-handoff.md) |
+| [0013: Nightly LLM parameter eval](0013-nightly-llm-parameter-eval.md) | Deployed 2026-10-14; runner, RBAC, admission policy, watchdog and smoke run verified; sampling-mode phase 0 nightly, GPU handoff per [ADR 0005](../adrs/0005-nightly-b60-eval-handoff.md) |

@@ -1,6 +1,6 @@
 # Plan 0013: Nightly B60 LLM parameter evaluation
 
-- Status: Implemented in Git, phase 0 (sampling mode) pending first nights
+- Status: Deployed; phase 0 (sampling mode) running nightly, phase 1 handoff not yet tested
 - Owner: Homelab operator
 - Related ADR: [ADR 0005](../adrs/0005-nightly-b60-eval-handoff.md), [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md); related plans: [0007](0007-local-llm-performance-comparison.md), [0008](0008-tiel-coder-b60-trial.md)
 
@@ -110,4 +110,23 @@ Still to verify after merge:
 
 ## Outcome
 
-Implemented in Git on 2026-10-14. Nothing has been verified live yet; record each phase gate here as it passes.
+Implemented in Git on 2026-10-14.
+
+### 2026-10-14: deployment checks (phase 0 setup)
+
+- **Merged:** PR #246 (`4c775c86`). Flux Kustomization `llm-serving/llm-eval` is Ready, and `llm-serving-intel-llama` is still Ready.
+- **Runner:** `homelab-llm-evals` is online on GitHub with labels `self-hosted,Linux,X64,cosmos,llm-eval`. The existing ARC token does cover the new repository.
+- **`kubectl auth can-i` as `llm-eval-runner`:**
+  - yes: `create jobs` in `llm-serving`, patching the serving Kustomization, patching the Tiel Deployment's `scale` subresource
+  - no: Secrets in `llm-serving` or `actions-runner-system`, `create pods`, `pods/exec`, patching the Tiel Deployment itself, another Kustomization (`vault`), another Deployment's scale (`litellm`), nodes
+- **Admission policy** (server-side dry-run as the runner, nothing persisted): it admitted the eval Job built by the harness from the live Deployment with `--spec-draft-n-max 5`. It denied variants with a Secret volume, `automountServiceAccountToken: true`, and an unpinned image.
+- **Watchdog:** a manual run from the CronJob printed "no eval suspension marker; nothing to resume" and completed.
+- **Smoke workflow:** added a `smoke` dispatch option (one request per suite, nothing committed). Run `38519129207` passed every step on the in-cluster runner:
+  - pinned kubectl and unit tests
+  - preflight against Prometheus, Flux and production `/metrics`
+  - the suites: speed about 45 tok/s, tool call passed, needle passed, HumanEval/15 passed
+  - production restore check, Docker sandbox build and grading, job summary
+  - minimum free memory on `titania-gpu` during the run was 11.69 GiB
+  - the homelab Deployment task failed correctly: the model mis-indented `containerPort`
+
+Still open: the phase 0 gate (3 complete scheduled nights) and all of phase 1, which needs the supervised GPU handoff, the watchdog recovering a cancelled `full` run, and Flux reapplying replicas on resume.
