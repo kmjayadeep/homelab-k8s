@@ -3,16 +3,15 @@
 - Status: Accepted
 - Date: 2026-10-14
 - Related plan: [0014: B60 autoresearch](../plans/0014-b60-autoresearch.md)
-- Supersedes: [ADR 0005](0005-nightly-b60-eval-handoff.md)
 - Amends: [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (single B60 Deployment, changed only through Git)
 
 ## Context
 
-ADR 0005 introduced a scheduled GitHub Actions eval with a dedicated in-cluster runner, a GPU handoff to transient Jobs, an admission policy and a watchdog. After deploying it, the operator chose a simpler model, inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch). The operator starts a Claude Code session locally during low traffic, and the agent hill-climbs one llama-server parameter at a time on the **production** Deployment. Evaluation goes **through LiteLLM**, not around it. The operator accepts that `qwen-intel` serves experimental configs during a session and stops other consumers for its duration.
+The operator wants to find better llama-server settings for the single B60 model. They chose a simple loop inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch) over scheduled infrastructure. The operator starts a Claude Code session locally during low traffic, and the agent hill-climbs one llama-server parameter at a time on the **production** Deployment. Evaluation goes **through LiteLLM**, not around it. The operator accepts that `qwen-intel` serves experimental configs during a session and stops other consumers for its duration.
 
 ## Decision
 
-- **No in-cluster eval infrastructure.** The `llm-eval` runner, RBAC, admission policy, Service, watchdog and alerts are removed, and the private `homelab-llm-evals` workflow is disabled.
+- **No in-cluster eval infrastructure.** There is no scheduled pipeline, CI runner, eval Deployment or cluster-side watchdog.
 - **The experiment is the production manifest.** The agent edits only the llama-server `args` in `deployment-tiel-coder-trial.yaml`, on a local `autoresearch/<tag>` branch.
   - Identity, routing and context flags are protected: `--ctx-size 131072` and `--parallel 1` stay fixed.
   - `experiment.py` rejects edits outside `args`, changes to protected flags, and more than two changed flags.
@@ -33,7 +32,7 @@ ADR 0005 introduced a scheduled GitHub Actions eval with a dedicated in-cluster 
 
 ## Alternatives considered
 
-- **Keep ADR 0005's nightly pipeline.** It provided unattended scheduling and stronger isolation, but the operator found the machinery disproportionate. It also tested fixed variants rather than climbing from the best result.
+- **A scheduled nightly pipeline** (GitHub Actions on an in-cluster runner, a GPU handoff to transient Jobs, an admission policy and a watchdog). It would give unattended scheduling and stronger isolation, but the operator found the machinery disproportionate, and it tests fixed variants rather than climbing from the best result.
 - **A separate eval Deployment or alias.** It would avoid touching production, but the single GPU means only one server can run at a time anyway, and the operator explicitly wants evaluation through the real LiteLLM route.
 - **Committing each experiment to `main`.** This would keep Flux in charge, but it floods history, turns every rejected idea into a deploy and a revert, and requires push rights to `main`.
 
@@ -46,4 +45,4 @@ ADR 0005 introduced a scheduled GitHub Actions eval with a dedicated in-cluster 
 
 ## Implementation status
 
-The tooling is in `automation/llm-autoresearch/` (`program.md`, `evaluate.py`, `experiment.py`). The ADR 0005 cluster objects are removed from Git and pruned by Flux. The evaluator was smoke-tested on 2026-10-14 through LiteLLM. No experiment session has run yet.
+The tooling is in `automation/llm-autoresearch/` (`program.md`, `evaluate.py`, `experiment.py`). The evaluator was smoke-tested on 2026-10-14 through LiteLLM. No experiment session has run yet.
