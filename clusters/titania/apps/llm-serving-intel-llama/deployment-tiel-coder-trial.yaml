@@ -104,6 +104,8 @@ spec:
             - "99"
             - --ubatch-size
             - "1024"
+            - --reasoning-budget
+            - "2048"
             # Use runtime-default batch and microbatch sizes; preserve sampling.
             - --temp
             - "0.6"
