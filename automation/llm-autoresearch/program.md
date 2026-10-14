@@ -47,11 +47,15 @@ Make the model **better and/or faster** on the fixed eval, using these metrics f
 - **`quality_seconds`:** total wall time of those tasks. It reflects both speed and how long the model thinks.
 - **Diagnostics:** `decode_tps`, `ttft_8k_s`, `prefill_tps_24k`, `mtp_accept` and `min_free_gib`.
 
-Requests use fixed per-task seeds, so a repeated config gives near-identical results. Differences still partly reflect a changed sampling path, which is why the keep rule needs margins. `experiment.py verdict` applies the rule:
+Requests use fixed per-task seeds, but any change to the server alters the sampling path. In session `oct14`, flags that should not change answers (draft length, micro-batch size) still moved `passed` by about ±2 tasks between runs. A single run is therefore noisy, and the keep rule compares quality against a **reference**: the mean `passed` of the last 3 kept runs. "Kept time" is the `quality_seconds` of the last kept run. `experiment.py verdict` reads the changed flags from `HEAD~1..HEAD` and applies the rule:
 
-- **KEEP for quality:** at least 2 more tasks passed than the best kept config, with time no more than 15% worse.
-- **KEEP for speed:** at least 5% less `quality_seconds`, with at most 1 task fewer than best **and** at most 1 fewer than the baseline. The baseline check stops quality from ratcheting down over many keeps.
-- **DISCARD:** everything else.
+- **Speed-only flags** (`--batch-size`, `--ubatch-size`, `--threads`, `--threads-batch`, `--flash-attn`, `--poll`, `--cache-reuse` and every `--spec-*` flag) are judged on time. KEEP if at least 5% faster, with quality no more than 2 tasks below both the reference and the baseline. A higher score alone never keeps them.
+- **Other flags** (sampling, reasoning, cache types):
+  - **KEEP for quality:** at least 3 tasks above the reference, with time no more than 15% worse.
+  - **KEEP for speed:** at least 5% faster, with quality no more than 1 task below both the reference and the baseline.
+- **DISCARD:** everything else, and any run with less than 3 GiB of memory headroom.
+
+Replaying `oct14` through this rule reproduces the config that was merged by hand: it keeps micro-batch 1024, draft length 3 and reasoning budget 2048, and rejects draft length 4, temperature 0.3 and reasoning budget 1024.
 
 **Simplicity criterion:** with equal results, fewer flags is better. Removing a flag without losing anything is a win; you may keep it even when `verdict` says DISCARD on a tie, and say so in the description.
 
