@@ -117,8 +117,10 @@ spec:
             # the 16Gi limit; measured 4.5 GiB anon at idle, 9.7 GiB working set at a 111K prompt.
             - --cache-ram
             - "4096"
+            - --batch-size
+            - "4096"
             - --ubatch-size
-            - "1024"
+            - "2048"
             - --reasoning-budget
             - "2048"
             # ubatch 1024 and reasoning budget 2048 from autoresearch oct14 (plan 0014); preserve sampling.
