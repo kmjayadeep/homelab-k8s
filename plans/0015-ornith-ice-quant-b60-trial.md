@@ -1,6 +1,6 @@
 # Plan 0015: Trial higher-fidelity quants of the production B60 model
 
-- Status: Paused 2026-10-14; production reverted to Tiel; 21G-ICE quality runs outstanding
+- Status: Completed 2026-10-15; 21G-ICE adopted (PR #264); unused model files remain on the PVC pending approval
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md)
 
@@ -126,3 +126,27 @@ Before running this plan:
 - **Paused** at the operator's request. Both switches were reverted, and production is back on Tiel (manifest identical to `main` before the trial).
 - **Files left on the PVC:** `model-19g-ice.gguf` (18.8 GB) and `model-21g-ice.gguf` (20.8 GB). They are kept so 21G can resume without another download. Delete them only with explicit approval.
 - **To resume:** re-apply PR #262's change, run step 4's two evals and the 111K probe, then step 5. Expect about 5 minutes of downtime, because the checksum is re-verified and no download is needed.
+
+### 2026-10-15 (05:41–06:13 CEST), resumed and completed
+
+PR #264 re-applied 21G-ICE with `--no-mmproj-offload`. The file was already on the PVC, so downtime was about 5 minutes.
+
+| | Tiel (reference) | 19G-ICE | **21G-ICE** |
+| --- | --- | --- | --- |
+| Passed (two runs) | 43.5 | 43.5 | **45, 44 → 44.5** |
+| Tools / needles | 8/8, 3/3 | 8/8, 3/3 | 8/8, 3/3 both runs |
+| `quality_seconds` | 493 | 496 | 458 |
+| Short decode | 61.6 | 62.0 | **66.8 tok/s** |
+| MTP acceptance | 0.70 | 0.70 | 0.72 |
+| `decode_tps_100k` | 25.2 | 24.5 | **26.2** (25.6, 26.7) |
+| `prefill_tps_100k` | 998 | 1,011 | **1,045** |
+| 111K probe | 3/3, 22.5 tok/s | 3/3, 22.1 tok/s | 3/3, 23.6 tok/s, prefill 1,015 tok/s |
+| Peak VRAM | 86.4% | 89.4% | 92.7% |
+| Container anonymous memory | 4.5 GiB | 5.2 GiB | 6.0 GiB; node free never below 14.9 GiB |
+
+**Decision (step 5):** adopt 21G-ICE. It passes every gate and is the best on quality and on every token rate. The +1 task is within eval noise; the speed gains are on token rates, which are much less noisy than wall time. Vision works with the projector in host RAM (red-square smoke "Red" in 2.0 s).
+
+- **Names unchanged:** the Deployment, served alias and LiteLLM names keep "tiel-coder" for routing stability. ADR 0004 and the LiteLLM README record what is actually served.
+- **Still open:**
+  - Remove `model.gguf` (Tiel, 18.1 GB) and `model-19g-ice.gguf` (18.8 GB) from the PVC once approved. Tiel is the rollback path until then.
+  - Decode stays below 30 tok/s beyond about 50K tokens (26.2 at 100K, 23.6 at 111K). This is the next autoresearch target.
