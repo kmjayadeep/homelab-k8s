@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Sole B60 owner: Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 128K, BF16 projector on GPU, no MTP (oct15b).
+  # Sole B60 owner: Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 2 x 128K slots, BF16 projector on GPU, no MTP.
   # Names keep "tiel-coder" for routing stability; Tiel-Coder was a requant of the same weights.
   replicas: 1
   strategy:
@@ -101,8 +101,9 @@ spec:
             - --metrics
             - --jinja
             # 128K with vision is a target, not validated active-context capacity.
+            # Two 128K slots (no unified KV, so each client gets 131072).
             - --ctx-size
-            - "131072"
+            - "262144"
             - --cache-type-k
             - q8_0
             - --cache-type-v
@@ -110,7 +111,7 @@ spec:
             - --flash-attn
             - "on"
             - --parallel
-            - "1"
+            - "2"
             - --n-gpu-layers
             - "99"
             # Cap the host-RAM prompt cache (default 8192 MiB) so anonymous memory stays well inside
