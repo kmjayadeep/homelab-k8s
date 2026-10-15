@@ -112,3 +112,15 @@ Results: [`results/oct15/`](../automation/llm-autoresearch/results/oct15/). This
 - **Finding:** on 21G-ICE with b11515, MTP buys only about 3% at short context and costs decode and prefill at long context. It is a near-tie on one run. Confirm with two runs before removing it. Removing MTP may also free enough VRAM to put the vision projector back on the GPU.
 - **Draft-length sweep at 100K:** 2 → 25.3, 3 → 26.7, 4 → 18.6 tok/s. Draft length 3 is optimal with MTP on.
 - **Restore time:** each restore now takes about 305 s, because the init container verifies checksums for three model files (Tiel, 19G and 21G). Removing the unused files would shorten it (needs approval).
+
+### 2026-10-15 `oct15b` (08:02–09:44 CEST, operator present)
+
+Results: [`results/oct15b/`](../automation/llm-autoresearch/results/oct15b/). On 21G-ICE. The operator asked to test MTP off again.
+
+- **Baseline:** 46/49, 456 s, decode 64.8 tok/s, `decode_tps_100k` 27.5, `prefill_tps_100k` 1,044.
+- **Kept:**
+  1. **MTP off** (`--spec-type`/`--spec-draft-n-max` removed). This was a simplicity keep on a tie; `verdict` said DISCARD. Quality was 45 (within noise), decode 64.8 (unchanged), at 100K 27.8, and `prefill_tps_100k` 1,138 (+9%, the same as `oct15`'s single run).
+  2. **Vision projector back on the GPU** (`--no-mmproj-offload` removed), again a simplicity keep. Turning MTP off freed about 1.1 GiB of VRAM. Peak VRAM was 91.6%; vision took 0.41 s per new image vs 2.0 s on the CPU; container anonymous memory was 4.8 GiB vs 6.0. Text metrics were unchanged.
+  3. **`--batch-size 4096 --ubatch-size 2048`.** KEEP by the rule: `prefill_tps_100k` 1,179 (+4%), 1,366 at about 40K, `ttft_8k_s` 9.2, `quality_seconds` −10%, peak VRAM 93.6%.
+- **Discarded:** `--temp 1.0` (44/49, +10% time) and `--reasoning-budget 3072` (43/49, +13% time).
+- **Net vs MTP-on baseline:** same decode, prefill at 100K +13% (1,044 → 1,179), much faster vision, four fewer flags, peak VRAM 93.6%.

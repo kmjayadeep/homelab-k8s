@@ -1,0 +1,7 @@
+commit	passed	total	quality_seconds	decode_tps	ttft_8k_s	prefill_tps_24k	mtp_accept	decode_tps_100k	prefill_tps_100k	min_free_gib	status	description
+0ac99eb	46	49	455.8	64.8	9.87	1230.0	0.709	27.5	1044.0	15.28	keep	baseline (21G-ICE, main 0ac99eb)
+22cc490	45	49	450.2	64.8	9.55	1315.0	0	27.8	1138.0	15.74	keep	MTP off (simplicity keep on tie): 45/49, decode 64.8 (=), @100k 27.8, prefill@100k 1138 (+9%, also +9% in oct15); verdict said tie-discard
+a308cea	44	49	468.3	64.6	9.58	1314.0	0	27.7	1138.0	16.46	keep	projector on GPU (simplicity keep): text unchanged (44, noise), peak VRAM 91.6%, vision 0.41 s/new image vs 2.0 s CPU, anon 4.8 vs 6.0 GiB
+f5f5370	44	49	419.5	64.8	9.24	1366.0	0	27.8	1179.0	16.16	keep	batch 4096 / ubatch 2048: prefill@100k 1179 (+4%), @40k 1366, ttft8k 9.2 s, time -10%, peak VRAM 93.6%
+6d5c8d9	44	49	460.9	64.7	9.26	1364.0	0	27.8	1179.0	16.16	discard	temp 1.0: 44/49, time +10%, speeds unchanged
+9b8267a	43	49	473.9	64.8	9.25	1366.0	0	27.8	1180.0	16.15	discard	reasoning-budget 3072: 43/49, time +13%, speeds unchanged
