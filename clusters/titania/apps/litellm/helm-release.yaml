@@ -95,6 +95,8 @@ spec:
         nginx.ingress.kubernetes.io/app-root: /ui
         nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
         nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+        # Default 1m rejects long-context and base64 image requests with 413.
+        nginx.ingress.kubernetes.io/proxy-body-size: "64m"
       hosts:
         - host: litellm.cosmos.cboxlab.com
           paths:
