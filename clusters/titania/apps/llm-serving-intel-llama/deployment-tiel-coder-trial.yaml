@@ -109,10 +109,8 @@ spec:
             - q8_0
             - --flash-attn
             - "on"
-            # Two slots share one 128K KV pool (no extra VRAM; 2 x 128K caused host OOM, #269).
             - --parallel
-            - "2"
-            - --kv-unified
+            - "1"
             - --n-gpu-layers
             - "99"
             # Cap the host-RAM prompt cache (default 8192 MiB) so anonymous memory stays well inside
