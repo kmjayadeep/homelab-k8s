@@ -8,7 +8,8 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Sole B60 owner: 128K context with BF16 vision projector and MTP.
+  # Sole B60 owner: Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 128K, MTP, BF16 projector in host RAM.
+  # Names keep "tiel-coder" for routing stability; Tiel-Coder was a requant of the same weights.
   replicas: 1
   strategy:
     type: Recreate
@@ -87,11 +88,11 @@ spec:
           image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
           args:
             - --model
-            # Plan 0015 trial; Tiel's /models/model.gguf stays on the PVC for rollback.
+            # Tiel's /models/model.gguf stays on the PVC for rollback until its removal is approved.
             - /models/model-21g-ice.gguf
             - --mmproj
             - /models/mmproj-bf16.gguf
-            # Plan 0015: 21G-ICE leaves too little VRAM at 128K; keep the projector in host RAM.
+            # 21G-ICE leaves too little VRAM at 128K for the projector (92.7% peak with it in host RAM).
             - --no-mmproj-offload
             - --alias
             - tiel-coder-35b-a3b-intel
