@@ -92,8 +92,6 @@ spec:
             - /models/model-21g-ice.gguf
             - --mmproj
             - /models/mmproj-bf16.gguf
-            # 21G-ICE leaves too little VRAM at 128K for the projector (92.7% peak with it in host RAM).
-            - --no-mmproj-offload
             - --alias
             - tiel-coder-35b-a3b-intel
             - --host
