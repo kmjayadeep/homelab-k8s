@@ -41,14 +41,6 @@ spec:
           args:
             - -ec
             - |
-              if test -f /models/model.gguf; then
-                echo '96b4c5430b5a693447a0aafce58840466829e1788e46fc037b23dfbafab009bf  /models/model.gguf' | sha256sum -c -
-              else
-                curl --fail --location --retry 5 --output /models/model.gguf.partial \
-                  https://huggingface.co/peculiar-ragdoll/Tiel-Coder-35B-A3B-GGUF-MTP/resolve/bbe9e566f39e4fc9652ac66b71968289a03c520a/Tiel-Coder-35B-A3B-MTP-UD-IQ4_XS.gguf
-                echo '96b4c5430b5a693447a0aafce58840466829e1788e46fc037b23dfbafab009bf  /models/model.gguf.partial' | sha256sum -c -
-                mv /models/model.gguf.partial /models/model.gguf
-              fi
               if test -f /models/mmproj-bf16.gguf; then
                 echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf' | sha256sum -c -
               else
@@ -57,7 +49,7 @@ spec:
                 echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf.partial' | sha256sum -c -
                 mv /models/mmproj-bf16.gguf.partial /models/mmproj-bf16.gguf
               fi
-              # Plan 0015 trial: same Ornith-1.5 weights, ICE quant with Tiel's imatrix and MTPv2.
+              # Ornith-1.5 21G-ICE (plan 0015). The BF16 projector above is the same Ornith projector, from Tiel's repo.
               if test -f /models/model-21g-ice.gguf; then
                 echo '42fb3674d92d4ae90928dac0b3a22190702874ec71d7f94c176eb68ca4ca3881  /models/model-21g-ice.gguf' | sha256sum -c -
               else
@@ -88,7 +80,6 @@ spec:
           image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
           args:
             - --model
-            # Tiel's /models/model.gguf stays on the PVC for rollback until its removal is approved.
             - /models/model-21g-ice.gguf
             - --mmproj
             - /models/mmproj-bf16.gguf

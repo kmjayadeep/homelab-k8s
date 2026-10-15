@@ -1,6 +1,6 @@
 # Plan 0015: Trial higher-fidelity quants of the production B60 model
 
-- Status: Completed 2026-10-15; 21G-ICE adopted (PR #264); unused model files remain on the PVC pending approval
+- Status: Completed 2026-10-15; 21G-ICE adopted (PR #264); unused model files removed
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md)
 
@@ -147,6 +147,6 @@ PR #264 re-applied 21G-ICE with `--no-mmproj-offload`. The file was already on t
 **Decision (step 5):** adopt 21G-ICE. It passes every gate and is the best on quality and on every token rate. The +1 task is within eval noise; the speed gains are on token rates, which are much less noisy than wall time. Vision works with the projector in host RAM (red-square smoke "Red" in 2.0 s).
 
 - **Names unchanged:** the Deployment, served alias and LiteLLM names keep "tiel-coder" for routing stability. ADR 0004 and the LiteLLM README record what is actually served.
+- **Cleanup (2026-10-15, operator-approved):** Tiel's download was removed from the init container, and `model.gguf` (Tiel, 18.1 GB) and `model-19g-ice.gguf` (18.8 GB) were deleted from the PVC. Rolling back to Tiel now means re-adding its init block from Git history and downloading it again.
 - **Still open:**
-  - Remove `model.gguf` (Tiel, 18.1 GB) and `model-19g-ice.gguf` (18.8 GB) from the PVC once approved. Tiel is the rollback path until then.
   - Decode stays below 30 tok/s beyond about 50K tokens (26.2 at 100K, 23.6 at 111K). This is the next autoresearch target.
