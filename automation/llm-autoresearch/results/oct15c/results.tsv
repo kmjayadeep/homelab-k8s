@@ -1,0 +1,6 @@
+commit	passed	total	quality_seconds	decode_tps	ttft_8k_s	prefill_tps_24k	mtp_accept	decode_tps_100k	prefill_tps_100k	min_free_gib	status	description
+fc3e71e	46	49	458.0	64.8	8.85	1375.0	0	27.8	1179.0	16.22	keep	baseline (oct15b config, main)
+d02458a	44	49	418.0	67.9	9.25	1372.0	0.567	27.2	1177.0	16.09	keep	ngram-mod: decode 67.9 (+5%), time -9%, accept 0.57, @100k 27.2 (-2%), 44/49
+22ee850	42	49	482.1	64.2	9.22	1375.0	0.277	27.7	1179.0	16.08	discard	ngram-mod n-match 12: accept 0.28, decode 64.2, time +15%, 42/49
+edecfb8	41	49	423.3	68.0	9.24	1366.0	0.662	27.7	1180.0	16.09	discard	ngram-mod n-match 32: accept 0.66, decode 68.0, time +1%, 41/49 (guard)
+8a7ccb7	45	49	462.6	68.2	9.24	1374.0	0.737	27.7	1178.0	16.18	discard	ngram-mod n-min/max 16/32: accept 0.74, decode 68.2, time +11%, 45/49

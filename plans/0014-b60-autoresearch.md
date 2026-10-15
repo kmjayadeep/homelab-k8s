@@ -124,3 +124,15 @@ Results: [`results/oct15b/`](../automation/llm-autoresearch/results/oct15b/). On
   3. **`--batch-size 4096 --ubatch-size 2048`.** KEEP by the rule: `prefill_tps_100k` 1,179 (+4%), 1,366 at about 40K, `ttft_8k_s` 9.2, `quality_seconds` −10%, peak VRAM 93.6%.
 - **Discarded:** `--temp 1.0` (44/49, +10% time) and `--reasoning-budget 3072` (43/49, +13% time).
 - **Net vs MTP-on baseline:** same decode, prefill at 100K +13% (1,044 → 1,179), much faster vision, four fewer flags, peak VRAM 93.6%.
+
+### 2026-10-15 `oct15c` (10:46–12:14 CEST, operator present)
+
+Results: [`results/oct15c/`](../automation/llm-autoresearch/results/oct15c/). Ran after the 256K/parallel trials (ADR 0004).
+
+- **Baseline** (`oct15b` config): 46/49, 458 s, decode 64.8 tok/s, `decode_tps_100k` 27.8, `prefill_tps_100k` 1,179.
+- **Kept:** `--spec-type ngram-mod` with default settings. This is n-gram speculation from the context, with no VRAM cost. Decode was 67.9 tok/s (+5%), `quality_seconds` 418 (−9%), acceptance 0.57, `decode_tps_100k` 27.2 (−2%, inside the veto), and 44/49.
+- **Discarded:**
+  - `--spec-ngram-mod-n-match 12`: acceptance 0.28, +15% time.
+  - `--spec-ngram-mod-n-match 32`: acceptance 0.66, decode 68.0, 41/49 tripped the quality guard (likely noise).
+  - `--spec-ngram-mod-n-min/max 16/32`: acceptance 0.74, decode 68.2, but +11% time.
+- **Note:** raising acceptance did not cut total time. The defaults (n-match 24, draft 48–64) remain best.
