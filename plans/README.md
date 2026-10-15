@@ -17,4 +17,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0011: Empero Qwen3.8 distill 256K trial](0011-empero-qwen38-distill-b60-trial.md) | IQ3_M serving verified qwen-intel alias; near-256K synthetic text/vision passed at 87.33% peak sampled VRAM, structured tools failed |
 | [0012: Vault internal TLS](0012-vault-internal-tls.md) | Completed 2026-10-13 for TLS; restore and seal/unseal drills deferred |
 | [0014: B60 autoresearch](0014-b60-autoresearch.md) | Active: local one-parameter hill-climb through LiteLLM per [ADR 0006](../adrs/0006-local-b60-autoresearch.md); session `oct14` merged (ubatch 1024, reasoning budget 2048) |
-| [0015: Ornith ICE quant trial](0015-ornith-ice-quant-b60-trial.md) | Completed 2026-10-15: 21G-ICE adopted (44.5 vs Tiel 43.5; decode 66.8 vs 61.6 tok/s; 92.7% VRAM, CPU projector); old files on PVC pending approval |
+| [0015: Ornith ICE quant trial](0015-ornith-ice-quant-b60-trial.md) | Completed 2026-10-15: 21G-ICE adopted (44.5 vs Tiel 43.5; decode 66.8 vs 61.6 tok/s; later tuned in plan 0014); old model files removed |
