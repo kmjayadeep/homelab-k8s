@@ -1,0 +1,6 @@
+commit	passed	total	quality_seconds	decode_tps	ttft_8k_s	prefill_tps_24k	mtp_accept	decode_tps_100k	prefill_tps_100k	min_free_gib	status	description
+0d08a31	45	49	464.4	66.8	10.11	1230.0	0.716	25.6	1044.0	15.22	keep	baseline run 1 (21G-ICE, reused from plan 0015 05:47-06:11, same spec)
+0d08a31	44	49	451.5	66.8	9.87	1231.0	0.718	26.7	1045.0	15.16	keep	baseline run 2 (21G-ICE, reused from plan 0015 05:47-06:11, same spec)
+7cb6612	43	49	473.4	61.8	10.09	1232.0	0.813	25.3	1045.0	15.26	discard	spec-draft-n-max 2: 43/49, decode 61.8 (-7%), @100k 25.3 (-5%), accept 0.81
+ecfab95	43	49	458.7	65.7	10.1	1231.0	0.619	18.6	1045.0	15.27	discard	spec-draft-n-max 4: 43/49, decode 65.7, @100k 18.6 (-30%), accept 0.62; vetoed
+b6478c3	43	49	479.3	64.8	9.56	1314.0	0	27.8	1137.0	15.73	discard	MTP off: 43/49, decode 64.8 (-3%), @100k 27.8 (+4%), prefill@100k 1137 (+9%), time +6%; near-tie, confirm with 2 runs

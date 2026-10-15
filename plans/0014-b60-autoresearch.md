@@ -99,3 +99,16 @@ Results: [`results/oct14b/`](../automation/llm-autoresearch/results/oct14b/). Th
   - judge speed-only flags on the per-token rates (`decode_tps`, `prefill_tps_24k`, `ttft_8k_s`), not on `quality_seconds`
   - start the baseline from a fresh restart, or send a warm-up request after every rollout, so every run starts from the same cache state
   - consider two evaluation passes per config, or a larger task set, before tightening quality margins
+
+### 2026-10-15 `oct15` (06:15–07:24 CEST, operator present)
+
+Results: [`results/oct15/`](../automation/llm-autoresearch/results/oct15/). This was the first session on Ornith 21G-ICE (adopted in [plan 0015](0015-ornith-ice-quant-b60-trial.md)) and the first with `decode_tps_100k` in the keep rule.
+
+- **Baseline:** reused the two plan 0015 evaluation runs of the identical spec from 05:47–06:11, instead of a third run (deviation; it saved about 13 minutes). Passed 45 and 44; decode 66.8 tok/s; `decode_tps_100k` 25.6 and 26.7.
+- **Discarded:**
+  - `--spec-draft-n-max 2`: 43/49; decode 61.8, at 100K 25.3; acceptance 0.81. Higher acceptance did not pay for the shorter drafts.
+  - `--spec-draft-n-max 4`: 43/49; decode 65.7; at 100K **18.6** (−30%), acceptance 0.62. Vetoed by the deep-decode rule.
+  - **MTP off** (`--spec-type`/`--spec-draft-n-max` removed): 43/49; decode 64.8 (−3%); at 100K **27.8 (+4%)**; `prefill_tps_100k` **1,137 (+9%)**; `quality_seconds` +6%. The rule discarded it.
+- **Finding:** on 21G-ICE with b11515, MTP buys only about 3% at short context and costs decode and prefill at long context. It is a near-tie on one run. Confirm with two runs before removing it. Removing MTP may also free enough VRAM to put the vision projector back on the GPU.
+- **Draft-length sweep at 100K:** 2 → 25.3, 3 → 26.7, 4 → 18.6 tok/s. Draft length 3 is optimal with MTP on.
+- **Restore time:** each restore now takes about 305 s, because the init container verifies checksums for three model files (Tiel, 19G and 21G). Removing the unused files would shorten it (needs approval).
