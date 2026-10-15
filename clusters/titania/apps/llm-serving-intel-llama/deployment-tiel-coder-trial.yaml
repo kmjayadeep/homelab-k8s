@@ -136,10 +136,6 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            - --spec-type
-            - draft-mtp
-            - --spec-draft-n-max
-            - "3"
           ports:
             - name: http
               containerPort: 8080
