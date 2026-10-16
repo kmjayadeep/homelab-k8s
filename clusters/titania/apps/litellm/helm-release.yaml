@@ -74,7 +74,8 @@ spec:
             output_cost_per_token: 0.000001
             # 128K configured; one benign image check passed, near-limit safety untested.
             supports_vision: true
-            supports_function_calling: false
+            # Tool calls verified end to end through LiteLLM on 2026-10-17.
+            supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
       router_settings:
