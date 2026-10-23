@@ -42,6 +42,10 @@ spec:
     # pods on other nodes stalls. Other nodes auto-detect 1500/1450 correctly.
     MTU: 1500
 
+    # Restart agents when cilium-config changes; otherwise values such as MTU
+    # only take effect on the next unrelated agent restart.
+    rollOutCiliumPods: true
+
     k8sServiceHost: 192.168.1.70
     k8sServicePort: 6443
 
