@@ -18,6 +18,12 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    # Stirling-PDF 2.x ships with the "security" profile and login enabled by
+    # default; 1.x ran without login. Keep the previous behaviour (the app is
+    # LAN-only behind the ingress).
+    envs:
+      - name: SECURITY_ENABLELOGIN
+        value: "false"
     # Stirling-PDF 2.x (Spring Boot + LibreOffice unoserver) takes 60-90s to
     # open :8080 on this hardware. The chart's default liveness probe starts
     # after 5s and fails after 3x10s, so the container was killed in a loop
