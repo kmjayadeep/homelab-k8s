@@ -39,7 +39,12 @@ spec:
       # to mount and unmount volumes for workloads on the dedicated AI node.
       taintToleration: workload=ai:NoSchedule
       defaultReplicaCount: 1
-      replicaAutoBalance: true
+      # Valid values: disabled | least-effort | best-effort. "true" is invalid
+      # and made longhorn-manager reject the WHOLE default-setting ConfigMap
+      # ("Customized settings are invalid, will give up using them"), so none
+      # of these defaults were applied (live default-replica-count stayed 3,
+      # engine auto-upgrade stayed 0).
+      replicaAutoBalance: least-effort
       # Let Longhorn live-upgrade volume engines to the new default engine
       # after each manager upgrade (3 per node, the upstream recommendation).
       # Engines lagging a minor behind block the next minor upgrade; see
