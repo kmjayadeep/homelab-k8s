@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: bitnami
         namespace: monitoring
-      version: "15.14.1"
+      version: "16.0.7"
   interval: 1h0m0s
   install:
     crds: Create
