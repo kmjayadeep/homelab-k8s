@@ -18,11 +18,24 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    global:
+      security:
+        # Chart >= 15.9 refuses to render with a non-default image repository
+        # unless this is set. We deliberately run bitnamilegacy/thanos because
+        # the free bitnami/ catalog stopped publishing tags in Aug 2025.
+        allowInsecureImages: true
     image:
       repository: bitnamilegacy/thanos
     existingObjstoreSecret: thanos-s3-vault
     query:
       enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi
       stores:
       - dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
       ingress:
@@ -38,6 +51,13 @@ spec:
       enabled: false
     compactor:
       enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi
       ingress:
         enabled: true
         hostname: thanos-compact.cosmos.cboxlab.com
@@ -50,5 +70,12 @@ spec:
         enabled: false
     storegateway:
       enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi
       persistence:
         enabled: false
