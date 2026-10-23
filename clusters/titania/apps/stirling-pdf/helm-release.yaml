@@ -18,6 +18,32 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    # Stirling-PDF 2.x (Spring Boot + LibreOffice unoserver) takes 60-90s to
+    # open :8080 on this hardware. The chart's default liveness probe starts
+    # after 5s and fails after 3x10s, so the container was killed in a loop
+    # and the chart 3.1.0 upgrade never became ready.
+    probes:
+      liveness:
+        enabled: true
+        initialDelaySeconds: 180
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 6
+      readiness:
+        enabled: true
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
+    resources:
+      requests:
+        cpu: 250m
+        memory: 768Mi
+      limits:
+        cpu: "2"
+        memory: 2Gi
     ingress:
       enabled: true
       annotations:
