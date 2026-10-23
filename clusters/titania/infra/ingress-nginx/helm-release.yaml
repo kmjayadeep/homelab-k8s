@@ -30,7 +30,12 @@ spec:
           maxSurge: 1
       service:
         loadBalancerIP:  # Set in env specific patches
-        externalTrafficPolicy: Local
+        # Cluster, not Local: with k3s kube-proxy in IPVS mode on the master and
+        # Cilium delivering overlay replies straight to pods, eTP=Local breaks
+        # pod -> LoadBalancer IP (hairpin) traffic from nodes without a local
+        # ingress endpoint. Cluster masquerades that traffic so the reply path
+        # is symmetric. Costs client source IPs in ingress logs.
+        externalTrafficPolicy: Cluster
         ipFamilyPolicy: PreferDualStack
         ipFamilies:
         - IPv4
