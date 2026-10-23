@@ -19,3 +19,4 @@ Plans are temporary coordination artifacts: steps, gates, rollback instructions,
 | [0014: B60 autoresearch](0014-b60-autoresearch.md) | Active: local one-parameter hill-climb through LiteLLM per [ADR 0006](../adrs/0006-local-b60-autoresearch.md); session `oct14` merged (ubatch 1024, reasoning budget 2048) |
 | [0015: Ornith ICE quant trial](0015-ornith-ice-quant-b60-trial.md) | Completed 2026-10-15: 21G-ICE adopted (44.5 vs Tiel 43.5; decode 66.8 vs 61.6 tok/s; later tuned in plan 0014); old model files removed |
 | [0016: Longhorn 1.9 → 1.13 upgrade](0016-longhorn-1.9-to-1.13-upgrade.md) | Active: one minor per Renovate PR with automatic engine upgrade enabled; progress table inside the plan |
+| [0017: Vault 1.18 → 2.0 upgrade](0017-vault-1.18-to-2.0-upgrade.md) | Draft: image pinned and chart at 0.34.1; per-minor pod rollout waits for operator approval of pod deletions |
