@@ -47,3 +47,4 @@ Record each step's date, chart version, engine image and any anomaly here.
 | Date | Step | Result |
 | --- | --- | --- |
 | 2026-10-23 | 0: prerequisites | verified as listed above |
+| 2026-10-23 | 1: enable auto engine upgrade (#323) | ConfigMap rendered `3` but the live setting stayed `0`: longhorn-manager rejected the whole `longhorn-default-setting` ConfigMap because `replica-auto-balance: true` is not a valid value (`Customized settings are invalid, will give up using them`). Live `default-replica-count` was still 3 and `priority-class` empty for the same reason. Fixed by setting `replicaAutoBalance: least-effort`. |
