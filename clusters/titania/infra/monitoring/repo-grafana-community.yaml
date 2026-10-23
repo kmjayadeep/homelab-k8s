@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana-community
+  namespace: monitoring
+spec:
+  interval: 1h0m0s
+  # OSS Loki chart. grafana/loki chart >= 7.0.0 is Grafana Enterprise Logs
+  # only; the OSS chart was forked here at 6.55.0 (March 2026).
+  url: https://grafana-community.github.io/helm-charts

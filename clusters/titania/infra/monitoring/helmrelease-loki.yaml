@@ -9,9 +9,9 @@ spec:
       chart: loki
       sourceRef:
         kind: HelmRepository
-        name: grafana
+        name: grafana-community
         namespace: monitoring
-      version: "6.55.0"
+      version: "19.1.1"
   interval: 1h0m0s
   values:
     loki:
@@ -50,7 +50,9 @@ spec:
       # for testing
       enabled: false
 
-    deploymentMode: SingleBinary
+    # Renamed from SingleBinary in chart 12.0.0; the old name is still accepted
+    # but the chart defaults to Monolithic now, so be explicit.
+    deploymentMode: Monolithic
 
     singleBinary:
       replicas: 1
@@ -95,8 +97,6 @@ spec:
     compactor:
       replicas: 0
     indexGateway:
-      replicas: 0
-    bloomCompactor:
       replicas: 0
     bloomGateway:
       replicas: 0
