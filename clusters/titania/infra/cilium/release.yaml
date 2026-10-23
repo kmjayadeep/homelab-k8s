@@ -34,6 +34,14 @@ spec:
 
     enableIPv6Masquerade: true
 
+    # Pin the underlay MTU to eth0 (1500 on every node). Auto-detection on
+    # titania-master picked up tailscale0 (MTU 1280), which set cilium_host,
+    # cilium_vxlan and pod veths to 1280 and the overlay routes to 1230. That
+    # is below the IPv6 minimum MTU (1280), so IPv6 clients cannot honour the
+    # resulting "packet too big" and traffic forwarded through the master to
+    # pods on other nodes stalls. Other nodes auto-detect 1500/1450 correctly.
+    MTU: 1500
+
     k8sServiceHost: 192.168.1.70
     k8sServicePort: 6443
 
