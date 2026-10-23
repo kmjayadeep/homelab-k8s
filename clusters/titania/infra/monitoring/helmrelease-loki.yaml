@@ -71,6 +71,13 @@ spec:
         - secretRef:
             name: loki-minio-creds-vault
 
+    # The memcached results cache defaults to 1 GiB and 500m CPU requested while
+    # using ~13Mi/2m here; that request alone kept titania-worker1 at 96% CPU
+    # requested and blocked scheduling of new Longhorn instance managers.
+    resultsCache:
+      allocatedMemory: 128
+      allocatedCPU: 50m
+
     chunksCache:
       enabled: false
       # default is 500MB, with limited memory keep this smaller
