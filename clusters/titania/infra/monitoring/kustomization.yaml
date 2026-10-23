@@ -12,6 +12,7 @@ resources:
 
 # loki
 - ./repo-grafana.yaml
+- ./repo-grafana-community.yaml
 - ./helmrelease-loki.yaml
 - ./helmrelease-promtail.yaml
 
