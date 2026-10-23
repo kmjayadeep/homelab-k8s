@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: prometheus-community
         namespace: monitoring
-      version: "84.5.0"
+      version: "85.4.0"
   interval: 1h0m0s
   install:
     crds: Create
