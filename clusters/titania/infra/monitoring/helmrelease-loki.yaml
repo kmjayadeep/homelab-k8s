@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: monitoring
-      version: "6.55.0"
+      version: "7.3.0"
   interval: 1h0m0s
   values:
     loki:
