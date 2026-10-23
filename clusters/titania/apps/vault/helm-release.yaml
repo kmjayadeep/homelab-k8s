@@ -49,6 +49,14 @@ spec:
               description: "Vault is sealed and unable to serve requests."
 
     server:
+      # Pin the Vault server image. Without this every chart bump silently
+      # changes the default tag (0.30.x -> 1.20, 0.33.x -> 2.0) and, because
+      # the StatefulSet uses updateStrategy OnDelete, the new version would
+      # land on whichever pod restarts next. Vault upgrades are a deliberate,
+      # standby-first operation; bump this tag in its own PR.
+      image:
+        repository: hashicorp/vault
+        tag: "1.18.1"
       # Mounted by the chart at /vault/userconfig/vault-tls-cert.
       extraVolumes:
         - type: secret
