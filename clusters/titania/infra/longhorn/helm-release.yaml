@@ -40,6 +40,11 @@ spec:
       taintToleration: workload=ai:NoSchedule
       defaultReplicaCount: 1
       replicaAutoBalance: true
+      # Let Longhorn live-upgrade volume engines to the new default engine
+      # after each manager upgrade (3 per node, the upstream recommendation).
+      # Engines lagging a minor behind block the next minor upgrade; see
+      # plans/0016-longhorn-1.9-to-1.13-upgrade.md.
+      concurrentAutomaticEngineUpgradePerNodeLimit: 3
     defaultBackupStore:
       backupTarget: nfs://truenas.cosmos.cboxlab.com:/mnt/main/k8s/longhorn-backup
     persistence:
