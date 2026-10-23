@@ -65,7 +65,7 @@ spec:
               type: RuntimeDefault
           initContainers:
             - name: vault-agent-auth
-              image: hashicorp/vault:2.1.2
+              image: hashicorp/vault:2.2.1
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/vault
@@ -101,7 +101,7 @@ spec:
                 - name: vault-auth
                   mountPath: /vault-auth
             - name: raft-snapshot
-              image: hashicorp/vault:2.1.2
+              image: hashicorp/vault:2.2.1
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
