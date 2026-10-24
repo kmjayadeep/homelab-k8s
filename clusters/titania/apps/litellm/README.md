@@ -29,13 +29,15 @@ The B60 has room for one inference Deployment at a time (`gpu.intel.com/xe: 1`; 
 
 ## Alias drift (`STORE_MODEL_IN_DB=True`)
 
-LiteLLM persists Router Settings in its database. A persisted `model_group_alias` can override the HelmRelease value after a Helm upgrade, and this has happened before. After any alias change:
+LiteLLM persists Router Settings in its database. A persisted `model_group_alias` overrides the HelmRelease value after a Helm upgrade; this happened on every alias change so far, most recently on 2026-10-25 (plan 0018 promotion: the alias kept pointing at the stopped Ornith backend and `qwen-intel` returned HTTP 500 until corrected). After any alias change:
 
 - check `GET /router/settings` (`current_values.model_group_alias`) and `/model/info`
 - if the alias is stale, send the **complete** alias map with an authenticated `POST /config/update`
 - send a benign request through `qwen-intel`
 
 Prefer the Git-managed alias over editing Model Group Alias Settings in the Admin UI. Never print keys or config values while checking.
+
+The evals key gets HTTP 403 on `/router/settings` and `/config/update`. The least-exposure way to run the fix is from inside the LiteLLM pod, where `PROXY_MASTER_KEY` is already in the environment: `kubectl -n litellm exec -i <pod> -- python3 -` with a script that reads `os.environ["PROXY_MASTER_KEY"]`, calls `http://127.0.0.1:4000` and prints only status codes and the alias map. The key never leaves the pod or enters shell history.
 
 ## History
 
