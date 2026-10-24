@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/part-of: llm-serving
 spec:
   # Plan 0018 trial: Swift Qwen3.8-27B Q4_K_S (dense, embedded MTP) with the F16 projector at 128K.
-  # Held at zero replicas until step 3 hands over the B60; the download Job fills the PVC first.
-  replicas: 0
+  # Sole B60 owner since plan 0018 step 3; the PVC was filled by the step 2 download Job.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
