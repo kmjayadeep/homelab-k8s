@@ -1,0 +1,177 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intel-llama-swift-qwen38-trial
+  labels:
+    app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # Plan 0018 trial: Swift Qwen3.8-27B Q4_K_S (dense, embedded MTP) with the F16 projector at 128K.
+  # Held at zero replicas until step 3 hands over the B60; the download Job fills the PVC first.
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+      app.kubernetes.io/instance: llm-serving
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+        app.kubernetes.io/instance: llm-serving
+        app.kubernetes.io/component: inference
+        app.kubernetes.io/part-of: llm-serving
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:ed154ad601683a2a85f8634398a6fbefd64d624df7b8432bbad512f8b8bfbf93
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              # Swift Qwen3.8-27B Q4_K_S + F16 projector, plan 0018. Hashes are the HF LFS object hashes
+              # (x-linked-etag), which plan 0009 verified; the repo's SHA256SUMS disagrees for the projector.
+              if test -f /models/model-q4ks.gguf; then
+                echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model-q4ks.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/model-q4ks.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q4_K_S.gguf
+                echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model-q4ks.gguf.partial' | sha256sum -c -
+                mv /models/model-q4ks.gguf.partial /models/model-q4ks.gguf
+              fi
+              if test -f /models/mmproj-f16.gguf; then
+                echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj-f16.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/mmproj-f16.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/mmproj-Swift-Qwen3.8-27B-F16.gguf
+                echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj-f16.gguf.partial' | sha256sum -c -
+                mv /models/mmproj-f16.gguf.partial /models/mmproj-f16.gguf
+              fi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      containers:
+        - name: llama-server
+          # Official server-intel b11515, oneAPI 2026.1.1 / FP16; pin the published image index.
+          image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
+          args:
+            - --model
+            - /models/model-q4ks.gguf
+            - --mmproj
+            - /models/mmproj-f16.gguf
+            - --alias
+            - swift-qwen3.8-27b-q4ks-intel
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --metrics
+            - --jinja
+            # 128K single slot with the projector on the GPU; plan 0009 idled at 88.5% (128K, no projector)
+            # and 89.0% (96K with it). Verify VRAM below 95% at step 3 and again after the 100K probe.
+            - --ctx-size
+            - "131072"
+            - --cache-type-k
+            - q8_0
+            - --cache-type-v
+            - q8_0
+            - --flash-attn
+            - "on"
+            - --parallel
+            - "1"
+            - --n-gpu-layers
+            - "99"
+            - --cache-ram
+            - "4096"
+            # Publisher sampling defaults; explicit request parameters override them.
+            - --temp
+            - "1.0"
+            - --top-p
+            - "0.95"
+            - --top-k
+            - "20"
+            - --min-p
+            - "0"
+            - --presence-penalty
+            - "0"
+            - --repeat-penalty
+            - "1.0"
+            # Embedded MTP head, publisher-recommended draft length. Batch/ubatch and reasoning-budget
+            # changes are step 6 experiments, not part of the first measurement.
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "3"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 4
+              memory: 8Gi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 6
+              memory: 16Gi
+              gpu.intel.com/xe: 1
+          # The GPU device plugin injects the allocated DRM nodes; no privileged access needed.
+          securityContext:
+            allowPrivilegeEscalation: false
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 90
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: intel-llama-swift-qwen38-model-cache
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
