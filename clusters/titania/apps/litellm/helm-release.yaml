@@ -60,6 +60,7 @@ spec:
 
     proxy_config:
       model_list:
+        # Ornith-1.5 35B-A3B 21G-ICE, the rollback since 2026-10-25; backend at zero replicas.
         - model_name: tiel-coder-35b-a3b-intel
           litellm_params:
             model: openai/tiel-coder-35b-a3b-intel
@@ -78,11 +79,11 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
-        # Plan 0018 step 1: versioned route for the Swift Qwen3.8-27B dense trial. The backend
-        # Deployment does not exist yet; qwen-intel stays on Tiel until the trial passes its gates.
-        - model_name: swift-qwen3.8-27b-q4ks-intel
+        # Served model since 2026-10-25 (plan 0018): Swift Qwen3.8-27B Q3_K_M, dense, embedded MTP, F16 projector.
+        # The alias name must match the llama-server --alias in deployment-swift-qwen38-trial.yaml.
+        - model_name: swift-qwen3.8-27b-q3km-intel
           litellm_params:
-            model: openai/swift-qwen3.8-27b-q4ks-intel
+            model: openai/swift-qwen3.8-27b-q3km-intel
             api_base: http://intel-llama-swift-qwen38-trial.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
           model_info:
@@ -92,14 +93,14 @@ spec:
             input_cost_per_token: 0.0000001
             cache_read_input_token_cost: 0.00000001
             output_cost_per_token: 0.000001
-            # 128K configured with the F16 projector; vision and tools verified on this file in plan 0009 at 96K.
+            # 128K configured with the F16 projector; vision, tools (8/8) and needles (3/3) verified on 2026-10-25 (plan 0018).
             supports_vision: true
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
       router_settings:
         model_group_alias:
-          qwen-intel: tiel-coder-35b-a3b-intel
+          qwen-intel: swift-qwen3.8-27b-q3km-intel
       litellm_settings:
         json_logs: true
         request_timeout: 600
