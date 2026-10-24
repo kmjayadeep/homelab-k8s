@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-swift-qwen38-model-cache
+  labels:
+    app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 16.6 GB Q4_K_S + 0.9 GB projector, plus room for the Q4_0 experiment (16.0 GB) in plan 0018 step 6.
+      storage: 40Gi
+  storageClassName: local-path
