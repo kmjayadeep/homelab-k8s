@@ -241,3 +241,14 @@ Not retried: IQ3/IQ4 quants (SYCL penalty, plan 0005), Q4_K_M/Q5 (more bytes tha
 | Rollout | Files / changed flags | short decode | decode 13K / 40K | `decode_tps_100k` | `prefill_tps_24k` / `100k` | accept | idle / peak VRAM | passed | `quality_seconds` |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | run 1 (phase 1) | Q4_K_S, MTP n-max 3 | 35.3 | 25.0 / 19.5 | 12.7 | 511 / 441 | 0.60 | 93.2% / 94.9% | 43/49 | 1,029 |
+| probe, [#370](https://github.com/kmjayadeep/homelab-k8s/pull/370) | Q4_0, MTP n-max 3 | 32–36 | 31–33 / 22–24 | **14.2** | 352–368 / 318 | 0.51 | 90.9% / 92.5% | — | — |
+| probe, [#371](https://github.com/kmjayadeep/homelab-k8s/pull/371) | Q4_0, `--spec-type none` | 21.1 | — / 10.9 | 6.3 | 364 / 331 | — | 84.8% / 85.6% | — | — |
+| probe, [#372](https://github.com/kmjayadeep/homelab-k8s/pull/372) | Q4_0, MTP n-max 5 | 28.1 | — / 21.4 | 11.0 | 349 / 317 | 0.30 | — / 93.7% | — | — |
+
+Probe rows use the evaluator's `speed()` depths (the "24K" depth is 39.7K prompt tokens through LiteLLM) and its 100K `deep()` request; "prefill" is the 40K / 100K value.
+
+What the first three rollouts showed (2026-10-24, 22:40–23:15 CEST):
+
+- **Q4_0 vs Q4_K_S:** decode +12% at 100K (14.2 vs 12.7) and +15% at 40K, short unchanged, idle VRAM 2.3 points lower; but prefill fell 28% (318 vs 441 at 100K). llama.cpp fixed a "prompt-processing regression after Q4_0/Q8_0 weight reorder" (#30374, 2026-10-17) **after** build b11515, which matches this.
+- **MTP is what makes a dense 27B usable here.** Without it decode is 21 short and 6.3 at 100K, so one single-token step at 100K costs about 160 ms against 47 ms short: attention over the 100K cache on the SYCL flash-attention path dominates, and the 4-token MTP verification batch amortises it. Draft length 5 loses (acceptance drops to 0.30 and the bigger batch costs more than it returns), so 3 stays.
+- **Where the gap is:** the Ornith MoE pays about 2.2 ms per full-attention layer per step at 100K, Swift about 8 ms (32 query heads against 16, and 16 layers against 10). Weight quantisation cannot change that; a faster attention kernel or a newer build might. Build b11854 (2026-10-24) also adds SYCL graph record/replay (#28725), removes host waits in `fattn-mkl` (#30684) and speeds q8 dequant (#30775), so the next rollout is the image, trial Deployment only.

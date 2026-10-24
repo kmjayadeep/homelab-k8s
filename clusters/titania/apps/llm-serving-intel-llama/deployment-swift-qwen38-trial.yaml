@@ -78,8 +78,11 @@ spec:
               mountPath: /models
       containers:
         - name: llama-server
-          # Official server-intel b11515, oneAPI 2026.1.1 / FP16; pin the published image index.
-          image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
+          # Official server-intel b11854 (2026-10-24) for the plan 0018 phase 2 trial only; Ornith stays on
+          # b11515. Since b11515 the SYCL backend gained a fix for the Q4_0/Q8_0 reorder prefill regression
+          # (#30374), graph record/replay (#28725), fattn-mkl without host waits (#30684) and q8 fast dequant
+          # (#30775). Pinned by the published image index digest.
+          image: ghcr.io/ggml-org/llama.cpp@sha256:2ecfe61c6aa395589ca3b437999ae97f07ca909a88fe2fe426e150ea88a06117
           args:
             - --model
             - /models/model-q40.gguf
@@ -122,13 +125,12 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            # Phase 2 idea 2: longer MTP draft. Speculation off probed 21 short / 6.3 at 100K against
-            # 34 / 14.2 with n-max 3, so attention over the cache dominates each step and a longer
-            # draft amortises it; the verification batch itself is cheap at long context.
+            # Embedded MTP head, draft length 3. Phase 2 probes on Q4_0: speculation off 21 short / 6.3 at
+            # 100K, draft 3 gives 34 / 14.2, draft 5 drops to 28 / 11.0 (acceptance 0.30). 3 is the optimum.
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
-            - "5"
+            - "3"
           ports:
             - name: http
               containerPort: 8080
