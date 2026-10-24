@@ -8,10 +8,10 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Plan 0018 trial: Swift Qwen3.8-27B Q4_K_S (dense, embedded MTP) with the F16 projector at 128K.
-  # Stopped 2026-10-24: run 1 decoded 12.7 tok/s at 100K (gate 27) and prefilled 441 tok/s (gate 500); see plan 0018.
-  # Kept at zero replicas with its PVC until the operator approves removal.
-  replicas: 0
+  # Plan 0018 phase 2: Swift Qwen3.8-27B (dense, embedded MTP) with the F16 projector at 128K, now on the
+  # Q4_0 file (SYCL reorder fast path). Phase 1 on Q4_K_S decoded 12.7 tok/s at 100K; the phase 2 gate is 18.
+  # Q4_K_S stays on the PVC for a direct comparison. Alias name unchanged so the LiteLLM entry is untouched.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -42,15 +42,15 @@ spec:
           args:
             - -ec
             - |
-              # Swift Qwen3.8-27B Q4_K_S + F16 projector, plan 0018. Hashes are the HF LFS object hashes
+              # Swift Qwen3.8-27B Q4_0 + F16 projector, plan 0018 phase 2. Hashes are the HF LFS object hashes
               # (x-linked-etag), which plan 0009 verified; the repo's SHA256SUMS disagrees for the projector.
-              if test -f /models/model-q4ks.gguf; then
-                echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model-q4ks.gguf' | sha256sum -c -
+              if test -f /models/model-q40.gguf; then
+                echo '2f6c6709ff863e942e9796827f44fe75e0c8431a7b7e09859930762dde9da8e2  /models/model-q40.gguf' | sha256sum -c -
               else
-                curl --fail --location --retry 5 --output /models/model-q4ks.gguf.partial \
-                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q4_K_S.gguf
-                echo '974812e92df1ce82d91aa7aafa466ef1b707c91fdd3074dfb29438aa59d279d3  /models/model-q4ks.gguf.partial' | sha256sum -c -
-                mv /models/model-q4ks.gguf.partial /models/model-q4ks.gguf
+                curl --fail --location --retry 5 --output /models/model-q40.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q4_0.gguf
+                echo '2f6c6709ff863e942e9796827f44fe75e0c8431a7b7e09859930762dde9da8e2  /models/model-q40.gguf.partial' | sha256sum -c -
+                mv /models/model-q40.gguf.partial /models/model-q40.gguf
               fi
               if test -f /models/mmproj-f16.gguf; then
                 echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj-f16.gguf' | sha256sum -c -
@@ -82,7 +82,7 @@ spec:
           image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
           args:
             - --model
-            - /models/model-q4ks.gguf
+            - /models/model-q40.gguf
             - --mmproj
             - /models/mmproj-f16.gguf
             - --alias
@@ -122,8 +122,8 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            # Embedded MTP head, publisher-recommended draft length. Batch/ubatch and reasoning-budget
-            # changes are step 6 experiments, not part of the first measurement.
+            # Embedded MTP head, publisher-recommended draft length. Draft length and batch/ubatch are the
+            # next phase 2 ideas; keep them unchanged for the Q4_0 vs Q4_K_S comparison.
             - --spec-type
             - draft-mtp
             - --spec-draft-n-max
