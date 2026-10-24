@@ -1,6 +1,6 @@
 # Plan 0018: Trial Swift Qwen3.8-27B (dense) against Ornith-1.5 21G-ICE on the B60
 
-- Status: Planned 2026-10-24. Baseline recorded; candidate chosen (Swift Q4_K_S + MTP); no cluster change made yet
+- Status: Completed 2026-10-24. Swift Q4_K_S + MTP trialled and **rejected** on long-context speed; Ornith restored. Swift Deployment and PVC retained at zero replicas pending approval to remove
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md) (one B60 Deployment behind LiteLLM), [ADR 0006](../adrs/0006-local-b60-autoresearch.md) (flag tuning)
 - Related plans: [0009](0009-swift-qwen38-b60-trial.md) (first Swift trial, 2026-10-06), [0010](0010-swift-qwen38-concurrency.md) (abandoned two-slot experiment on Swift), [0015](0015-ornith-ice-quant-b60-trial.md) (how 21G-ICE was adopted), [0014](0014-b60-autoresearch.md) (how its flags were tuned)
@@ -184,4 +184,28 @@ Each step is one pull request unless noted. Every manifest step runs `kustomize 
 
 ## Outcome
 
-Not started. Record each evaluator run (model name, passed/49, quality_seconds, decode_tps, decode_tps_100k, prefill_tps_100k, VRAM idle and post-probe, min_free_gib) against the Ornith rows above, then the promote or roll-back decision.
+### 2026-10-24 Swift Qwen3.8-27B Q4_K_S + MTP (15:07–17:50 CEST, operator present)
+
+PRs [#364](https://github.com/kmjayadeep/homelab-k8s/pull/364) (route), [#365](https://github.com/kmjayadeep/homelab-k8s/pull/365) (pre-download), [#366](https://github.com/kmjayadeep/homelab-k8s/pull/366) (handover), and the rollback PR linked below. Steps 1–5 ran as planned; step 6 tuning was skipped because the gap is not a tuning gap.
+
+- **Pre-download:** the Job fetched 17.5 GB in about 6 minutes and both checksums verified. Handover downtime for the GPU was 2 minutes to Ready (checksum re-verify only).
+- **Load gate:** build b11515, alias and `n_ctx` 131072 confirmed, projector loaded, MTP draft context created, 0 restarts. Idle VRAM **22,828 MiB (93.2%)**; pod working set 10.6 GiB (Ornith: 6.6); host available 20.9 GB.
+- **Function gate:** chat, 32×32 red-square image ("Red") and a structured `get_weather` tool call all passed through the versioned route; smoke 4/4, decode 37.4 tok/s, acceptance 0.68. VRAM after the smoke **23,230 MiB (94.9%)**, and it stayed at that value through the full run (53 samples at 20 s).
+- **Run 1** (`evaluate.py --model swift-qwen3.8-27b-q4ks-intel`, 27 minutes):
+
+| Metric | Swift run 1 | Ornith reference (oct15c) |
+| --- | --- | --- |
+| passed / 49 | **43** (code 25/30, homelab 7/8, tools 8/8, needles 3/3) | 44–46 |
+| `quality_seconds` | **1,029** | 418–458 |
+| short decode | 35.3 (speed suite 28.8) | 67.9 |
+| decode at ≈13K / ≈40K | 25.0 / 19.5 | — |
+| `ttft_8k_s` | 23.9 | 9.25 |
+| `prefill_tps_24k` | 511 | 1,372 |
+| MTP acceptance | 0.60 | n-gram 0.57 |
+| `decode_tps_100k` | **12.7** | 27.2 |
+| `prefill_tps_100k` | **441** | 1,177 |
+| `min_free_gib` | 15.8 | 16.1 |
+
+- **Verdict:** DISCARD. Both hard long-context gates failed (decode 12.7 vs the 27 parity gate and the 30 target; prefill 441 vs the 500 minimum), quality did not beat Ornith (43 vs 44–46, inside noise), and total eval time was 2.5× longer. The dense 27B loses about 65% of its decode between short and 100K context on this card, against about 60% for the MoE, from a far lower starting point. Batch/ubatch tuning would help prefill, not a 2× decode gap, so step 6 was skipped and the second run was not taken. A failed code task list is in the run JSON (`runs/20261024T172220.json`, git-ignored).
+- **Rollback:** step 3 reversed in one PR (Swift 0, Tiel 1, health check back). Ornith's files were still on their PVC. The Swift Deployment, Service, PVC (17.5 GB on `titania-gpu`) and LiteLLM entry are **retained at zero replicas**; removing them needs operator approval and is a separate PR.
+- **What this settles:** on the B60 with llama.cpp SYCL, a dense 27B cannot meet the 128K-context decode requirement even with an embedded MTP head, so the dense path below 27B (Gemma 4 12B, Ministral 3 14B) is the only dense option left, at a quality cost. Any future Qwen3.8-27B attempt would need a different runtime or a Q4_0 build and should be judged on `decode_tps_100k` first.

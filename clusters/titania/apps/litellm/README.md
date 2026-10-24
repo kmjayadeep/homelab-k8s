@@ -7,7 +7,7 @@ LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, 
 | LiteLLM name | Backend Service | Model | Limits |
 |---|---|---|---|
 | `qwen-intel` (alias) → `tiel-coder-35b-a3b-intel` | `intel-llama-tiel-coder-trial.llm-serving:8080` | Ornith-1.5 35B-A3B 21G-ICE since 2026-10-15 (plan 0015; name kept for routing). Formerly Tiel-Coder 35B-A3B IQ4_XS + BF16 mmproj, llama.cpp SYCL, MTP | 114,688 input + 16,384 output (131,072 configured) |
-| `swift-qwen3.8-27b-q4ks-intel` (versioned, trial) | `intel-llama-swift-qwen38-trial.llm-serving:8080` | Swift Qwen3.8-27B Q4_K_S + MTP, dense, F16 projector ([plan 0018](../../../../plans/0018-b60-model-switch-baseline.md)); backend not yet deployed | 114,688 input + 16,384 output |
+| `swift-qwen3.8-27b-q4ks-intel` (versioned, trial) | `intel-llama-swift-qwen38-trial.llm-serving:8080` | Swift Qwen3.8-27B Q4_K_S + MTP, dense, F16 projector ([plan 0018](../../../../plans/0018-b60-model-switch-baseline.md)); backend stopped after failing the 100K gates on 2026-10-24 | 114,688 input + 16,384 output |
 
 - Capabilities: chat, reasoning, vision, function calling. A `tools` request through `qwen-intel` returned a valid `tool_calls` response on 2026-10-17; the autoresearch tool suite passes 8/8.
 - Known limits: one benign image request passed. Near-limit context, sustained load and the MTP speedup are untested, and the first 128K pod was evicted for host-memory pressure. See [plan 0008](../../../../plans/0008-tiel-coder-b60-trial.md#128k-vision-follow-up).
