@@ -13,3 +13,4 @@ resources:
   - pvc-swift-qwen38.yaml
   - deployment-swift-qwen38-trial.yaml
   - service-swift-qwen38-trial.yaml
+  - job-swift-qwen38-download-q40.yaml
