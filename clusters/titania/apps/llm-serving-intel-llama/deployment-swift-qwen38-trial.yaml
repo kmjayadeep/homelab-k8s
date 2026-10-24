@@ -122,12 +122,10 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            # Embedded MTP head, publisher-recommended draft length. Draft length and batch/ubatch are the
-            # next phase 2 ideas; keep them unchanged for the Q4_0 vs Q4_K_S comparison.
+            # Phase 2 idea 2: speculation off to measure what the 4-token MTP verification batch costs at
+            # 100K (Q4_0 + MTP n-max 3 probed 34 short / 14.2 at 100K). The MTP head stays in the file.
             - --spec-type
-            - draft-mtp
-            - --spec-draft-n-max
-            - "3"
+            - none
           ports:
             - name: http
               containerPort: 8080
