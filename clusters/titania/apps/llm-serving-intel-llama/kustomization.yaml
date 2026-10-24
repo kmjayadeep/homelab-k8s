@@ -11,5 +11,7 @@ resources:
   - servicemonitor.yaml
   # Plan 0018: Swift Qwen3.8-27B dense trial (sole B60 owner since step 3)
   - pvc-swift-qwen38.yaml
+  - pvc-swift-qwen38-q3.yaml
+  - job-swift-qwen38-download-q3km.yaml
   - deployment-swift-qwen38-trial.yaml
   - service-swift-qwen38-trial.yaml
