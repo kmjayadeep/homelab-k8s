@@ -8,10 +8,10 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Plan 0018 trial: Swift Qwen3.8-27B (dense, embedded MTP) with the F16 projector at 128K. Best config
-  # (Q4_0, b11854, MTP draft 3) scored 43/49 and 12.7 tok/s at 100K against the phase 2 gates of 44 and 18;
-  # stopped 2026-10-24 23:55. Kept at zero replicas with its PVC (Q4_K_S + Q4_0) until removal is approved.
-  replicas: 0
+  # Plan 0018 phase 3 (2026-10-25): Swift Qwen3.8-27B Q3_K_M at the operator's request, otherwise the phase 2
+  # best config (b11854, F16 projector, 128K Q8 KV, MTP draft 3). Mounts the separate Q3 PVC; the 40Gi PVC
+  # with Q4_K_S and Q4_0 is untouched.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -42,15 +42,15 @@ spec:
           args:
             - -ec
             - |
-              # Swift Qwen3.8-27B Q4_0 + F16 projector, plan 0018 phase 2. Hashes are the HF LFS object hashes
+              # Swift Qwen3.8-27B Q3_K_M + F16 projector, plan 0018 phase 3. Hashes are the HF LFS object hashes
               # (x-linked-etag), which plan 0009 verified; the repo's SHA256SUMS disagrees for the projector.
-              if test -f /models/model-q40.gguf; then
-                echo '2f6c6709ff863e942e9796827f44fe75e0c8431a7b7e09859930762dde9da8e2  /models/model-q40.gguf' | sha256sum -c -
+              if test -f /models/model-q3km.gguf; then
+                echo '5ae067582f921ff9a1847ce4aab0b41ecad4c38c386e76fd4714f9a8b98e586e  /models/model-q3km.gguf' | sha256sum -c -
               else
-                curl --fail --location --retry 5 --output /models/model-q40.gguf.partial \
-                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q4_0.gguf
-                echo '2f6c6709ff863e942e9796827f44fe75e0c8431a7b7e09859930762dde9da8e2  /models/model-q40.gguf.partial' | sha256sum -c -
-                mv /models/model-q40.gguf.partial /models/model-q40.gguf
+                curl --fail --location --retry 5 --output /models/model-q3km.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q3_K_M.gguf
+                echo '5ae067582f921ff9a1847ce4aab0b41ecad4c38c386e76fd4714f9a8b98e586e  /models/model-q3km.gguf.partial' | sha256sum -c -
+                mv /models/model-q3km.gguf.partial /models/model-q3km.gguf
               fi
               if test -f /models/mmproj-f16.gguf; then
                 echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj-f16.gguf' | sha256sum -c -
@@ -85,7 +85,7 @@ spec:
           image: ghcr.io/ggml-org/llama.cpp@sha256:2ecfe61c6aa395589ca3b437999ae97f07ca909a88fe2fe426e150ea88a06117
           args:
             - --model
-            - /models/model-q40.gguf
+            - /models/model-q3km.gguf
             - --mmproj
             - /models/mmproj-f16.gguf
             - --alias
@@ -174,7 +174,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-swift-qwen38-model-cache
+            claimName: intel-llama-swift-qwen38-q3-model-cache
         - name: dshm
           emptyDir:
             medium: Memory
