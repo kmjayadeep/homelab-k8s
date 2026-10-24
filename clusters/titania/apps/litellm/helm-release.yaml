@@ -78,6 +78,25 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
+        # Plan 0018 step 1: versioned route for the Swift Qwen3.8-27B dense trial. The backend
+        # Deployment does not exist yet; qwen-intel stays on Tiel until the trial passes its gates.
+        - model_name: swift-qwen3.8-27b-q4ks-intel
+          litellm_params:
+            model: openai/swift-qwen3.8-27b-q4ks-intel
+            api_base: http://intel-llama-swift-qwen38-trial.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            # Same internal accounting rates as the other local entries.
+            input_cost_per_token: 0.0000001
+            cache_read_input_token_cost: 0.00000001
+            output_cost_per_token: 0.000001
+            # 128K configured with the F16 projector; vision and tools verified on this file in plan 0009 at 96K.
+            supports_vision: true
+            supports_function_calling: true
+            max_input_tokens: 114688
+            max_output_tokens: 16384
       router_settings:
         model_group_alias:
           qwen-intel: tiel-coder-35b-a3b-intel
