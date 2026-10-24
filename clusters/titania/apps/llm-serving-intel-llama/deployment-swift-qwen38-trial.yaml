@@ -8,10 +8,10 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Plan 0018 phase 2: Swift Qwen3.8-27B (dense, embedded MTP) with the F16 projector at 128K, now on the
-  # Q4_0 file (SYCL reorder fast path). Phase 1 on Q4_K_S decoded 12.7 tok/s at 100K; the phase 2 gate is 18.
-  # Q4_K_S stays on the PVC for a direct comparison. Alias name unchanged so the LiteLLM entry is untouched.
-  replicas: 1
+  # Plan 0018 trial: Swift Qwen3.8-27B (dense, embedded MTP) with the F16 projector at 128K. Best config
+  # (Q4_0, b11854, MTP draft 3) scored 43/49 and 12.7 tok/s at 100K against the phase 2 gates of 44 and 18;
+  # stopped 2026-10-24 23:55. Kept at zero replicas with its PVC (Q4_K_S + Q4_0) until removal is approved.
+  replicas: 0
   strategy:
     type: Recreate
   selector:

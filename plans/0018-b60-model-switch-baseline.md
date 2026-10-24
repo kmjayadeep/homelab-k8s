@@ -1,6 +1,6 @@
 # Plan 0018: Trial Swift Qwen3.8-27B (dense) against Ornith-1.5 21G-ICE on the B60
 
-- Status: In progress. Phase 1 (2026-10-24 afternoon): Swift Q4_K_S + MTP **rejected** against MoE-level speed gates; Ornith restored. **Phase 2 reopened the same evening** with dense-realistic gates: Q4_0 weights, MTP draft length, batch size, then a lower quant
+- Status: Completed 2026-10-24. Phase 1: Swift Q4_K_S + MTP rejected against MoE-level speed gates. Phase 2 (same evening, dense-realistic gates): Q4_0, MTP draft length and build b11854 tried; best config 43/49 and 12.7 tok/s at 100K against gates of 44 and 18. **Swift rejected, Ornith restored.** Swift Deployment, PVC (Q4_K_S + Q4_0) and LiteLLM entry retained at zero replicas pending approval to remove; a Q3_K_M run is the only idea left and needs an operator decision (see phase 2 outcome)
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md) (one B60 Deployment behind LiteLLM), [ADR 0006](../adrs/0006-local-b60-autoresearch.md) (flag tuning)
 - Related plans: [0009](0009-swift-qwen38-b60-trial.md) (first Swift trial, 2026-10-06), [0010](0010-swift-qwen38-concurrency.md) (abandoned two-slot experiment on Swift), [0015](0015-ornith-ice-quant-b60-trial.md) (how 21G-ICE was adopted), [0014](0014-b60-autoresearch.md) (how its flags were tuned)
@@ -244,6 +244,8 @@ Not retried: IQ3/IQ4 quants (SYCL penalty, plan 0005), Q4_K_M/Q5 (more bytes tha
 | probe, [#370](https://github.com/kmjayadeep/homelab-k8s/pull/370) | Q4_0, MTP n-max 3 | 32–36 | 31–33 / 22–24 | **14.2** | 352–368 / 318 | 0.51 | 90.9% / 92.5% | — | — |
 | probe, [#371](https://github.com/kmjayadeep/homelab-k8s/pull/371) | Q4_0, `--spec-type none` | 21.1 | — / 10.9 | 6.3 | 364 / 331 | — | 84.8% / 85.6% | — | — |
 | probe, [#372](https://github.com/kmjayadeep/homelab-k8s/pull/372) | Q4_0, MTP n-max 5 | 28.1 | — / 21.4 | 11.0 | 349 / 317 | 0.30 | — / 93.7% | — | — |
+| probe, [#373](https://github.com/kmjayadeep/homelab-k8s/pull/373) | Q4_0, MTP n-max 3, **build b11854** | 37–38 | 31–34 / 22–23 | 13.5 | 483–485 / **420** | 0.46 | 90.9% / 92.5% | — | — |
+| **run 2** (full, same config) | Q4_0, MTP n-max 3, b11854 | 45.0 (median over graded tasks; speed suite 37) | 26.8 / 23.1 | **12.7** | 485 / 420 | 0.565 | 90.9% / 92.5% | **43/49** (code 26/30, homelab 6/8, tools 8/8, needles 3/3) | 1,043 |
 
 Probe rows use the evaluator's `speed()` depths (the "24K" depth is 39.7K prompt tokens through LiteLLM) and its 100K `deep()` request; "prefill" is the 40K / 100K value.
 
@@ -252,3 +254,20 @@ What the first three rollouts showed (2026-10-24, 22:40–23:15 CEST):
 - **Q4_0 vs Q4_K_S:** decode +12% at 100K (14.2 vs 12.7) and +15% at 40K, short unchanged, idle VRAM 2.3 points lower; but prefill fell 28% (318 vs 441 at 100K). llama.cpp fixed a "prompt-processing regression after Q4_0/Q8_0 weight reorder" (#30374, 2026-10-17) **after** build b11515, which matches this.
 - **MTP is what makes a dense 27B usable here.** Without it decode is 21 short and 6.3 at 100K, so one single-token step at 100K costs about 160 ms against 47 ms short: attention over the 100K cache on the SYCL flash-attention path dominates, and the 4-token MTP verification batch amortises it. Draft length 5 loses (acceptance drops to 0.30 and the bigger batch costs more than it returns), so 3 stays.
 - **Where the gap is:** the Ornith MoE pays about 2.2 ms per full-attention layer per step at 100K, Swift about 8 ms (32 query heads against 16, and 16 layers against 10). Weight quantisation cannot change that; a faster attention kernel or a newer build might. Build b11854 (2026-10-24) also adds SYCL graph record/replay (#28725), removes host waits in `fattn-mkl` (#30684) and speeds q8 dequant (#30775), so the next rollout is the image, trial Deployment only.
+- **Build b11854** (probe row above): prefill recovered and beat Q4_K_S on b11515 (505 at 13K, 485 at 40K, 420 at 100K), short decode rose to 37–38, 40K stayed at 22–23 and **100K stayed at 13.5–14.2**. Idle VRAM unchanged at 90.9%.
+- **Why 100K decode will not move with flags** (read from the b11854 SYCL sources, `ggml/src/ggml-sycl/fattn.cpp` and `fattn-onednn.cpp`): the XMX-accelerated oneDNN and oneMKL attention paths are prefill-only (`Q->ne[1] >= 32`), whatever the cache type. A decode step with MTP carries 4 query tokens, which skips even the vector kernel (quantized KV, `Q->ne[1] <= 2`) and lands on the generic tile kernel for both Q8 and F16 caches, so an F16 cache would only save the in-kernel dequant and does not fit at 128K anyway (8.6 GiB). The tile kernel walks 100K keys for 32 query heads on 16 layers per step, which is the 110–130 ms the probes show. A lower weight quant does not touch it.
+
+**Phase 2 verdict (2026-10-24 23:55 CEST): DISCARD, Ornith restored.** Run 2 is `runs/20261024T232811.json` (git-ignored; failed code tasks HumanEval 91, 116, 132, 141; failed homelab `external-secret`, `cronjob-timezone`; run 1 failed 5 code tasks and 1 homelab task, so the two runs agree at 43). Against the revised gates:
+
+| Gate | Phase 2 target | Best Swift (Q4_0, b11854, MTP 3) | Ornith |
+| --- | ---: | ---: | ---: |
+| `passed` | at least 44 | 43, 43 | 44–46 |
+| short decode | at least 35 | 37–45 | 68 |
+| `decode_tps_100k` | at least 18 | 12.7–14.2 | 27.2 |
+| `prefill_tps_100k` | at least 500 | 420 | 1,177 |
+| `quality_seconds` | — | 1,029–1,043 | 418–458 |
+| VRAM idle / peak | below 95% | 90.9% / 92.5% | 92.9% / 97% (uptime growth) |
+
+What phase 2 added to phase 1: the newer build and Q4_0 are both worth keeping for any future dense attempt (prefill +32%, short decode +15% over phase 1), MTP draft 3 is the optimum, and the 100K ceiling is the SYCL tile attention kernel, not the weights. **Not done, by design:** `--batch-size`/`--ubatch-size` (prefill only; the binding gates are quality and 100K decode), and **Q3_K_M** (13.6 GB). Q3_K_M cannot raise quality above 43 and would lift 100K decode by a few percent at most, so it only makes sense if the operator also lowers the quality gate; it also needs either approval to delete `model-q4ks.gguf` (the 40Gi PVC holds 33.5 GB) or a second PVC. Rollback PR linked in the commit history (Swift 0, Tiel 1, health check back). The Swift PVC now holds both Q4_K_S and Q4_0 (33.5 GB on `titania-gpu`); removing the Swift Deployment, Service, PVC and LiteLLM entry needs explicit approval.
+
+Build b11854 for **Ornith** is a separate, low-risk follow-up: the prefill fix and graph replay could help the MoE too, and it should go through the plan 0014 autoresearch loop rather than this plan.
