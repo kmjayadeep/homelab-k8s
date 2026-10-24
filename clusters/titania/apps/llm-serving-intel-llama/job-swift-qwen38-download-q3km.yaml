@@ -1,0 +1,74 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: intel-llama-swift-qwen38-download-q3km
+  labels:
+    app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-download
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # Plan 0018 phase 3: fill the Q3 PVC while Ornith keeps serving. Remove in the handover PR.
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-llama-swift-qwen38-trial
+        app.kubernetes.io/instance: llm-serving
+        app.kubernetes.io/component: model-download
+    spec:
+      restartPolicy: OnFailure
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      containers:
+        - name: model-download
+          image: curlimages/curl@sha256:ed154ad601683a2a85f8634398a6fbefd64d624df7b8432bbad512f8b8bfbf93
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              # Swift Qwen3.8-27B Q3_K_M + F16 projector, same pinned revision; hashes are the HF LFS object hashes.
+              if test -f /models/model-q3km.gguf; then
+                echo '5ae067582f921ff9a1847ce4aab0b41ecad4c38c386e76fd4714f9a8b98e586e  /models/model-q3km.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/model-q3km.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q3_K_M.gguf
+                echo '5ae067582f921ff9a1847ce4aab0b41ecad4c38c386e76fd4714f9a8b98e586e  /models/model-q3km.gguf.partial' | sha256sum -c -
+                mv /models/model-q3km.gguf.partial /models/model-q3km.gguf
+              fi
+              if test -f /models/mmproj-f16.gguf; then
+                echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj-f16.gguf' | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output /models/mmproj-f16.gguf.partial \
+                  https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/mmproj-Swift-Qwen3.8-27B-F16.gguf
+                echo '9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b  /models/mmproj-f16.gguf.partial' | sha256sum -c -
+                mv /models/mmproj-f16.gguf.partial /models/mmproj-f16.gguf
+              fi
+              ls -l /models
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: intel-llama-swift-qwen38-q3-model-cache
