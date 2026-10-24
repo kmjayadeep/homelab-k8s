@@ -122,10 +122,13 @@ spec:
             - "0"
             - --repeat-penalty
             - "1.0"
-            # Phase 2 idea 2: speculation off to measure what the 4-token MTP verification batch costs at
-            # 100K (Q4_0 + MTP n-max 3 probed 34 short / 14.2 at 100K). The MTP head stays in the file.
+            # Phase 2 idea 2: longer MTP draft. Speculation off probed 21 short / 6.3 at 100K against
+            # 34 / 14.2 with n-max 3, so attention over the cache dominates each step and a longer
+            # draft amortises it; the verification batch itself is cheap at long context.
             - --spec-type
-            - none
+            - draft-mtp
+            - --spec-draft-n-max
+            - "5"
           ports:
             - name: http
               containerPort: 8080
