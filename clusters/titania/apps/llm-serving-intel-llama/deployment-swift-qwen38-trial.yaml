@@ -9,8 +9,9 @@ metadata:
     app.kubernetes.io/part-of: llm-serving
 spec:
   # Plan 0018 trial: Swift Qwen3.8-27B Q4_K_S (dense, embedded MTP) with the F16 projector at 128K.
-  # Sole B60 owner since plan 0018 step 3; the PVC was filled by the step 2 download Job.
-  replicas: 1
+  # Stopped 2026-10-24: run 1 decoded 12.7 tok/s at 100K (gate 27) and prefilled 441 tok/s (gate 500); see plan 0018.
+  # Kept at zero replicas with its PVC until the operator approves removal.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
