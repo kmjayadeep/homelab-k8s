@@ -10,8 +10,8 @@ metadata:
 spec:
   # Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 128K, BF16 projector on GPU, ngram-mod speculation.
   # Names keep "tiel-coder" for routing stability; Tiel-Coder was a requant of the same weights.
-  # Scaled to zero for plan 0018 phase 3 (Swift Q3_K_M, 2026-10-25); PVC and files stay for rollback.
-  replicas: 0
+  # Restored after plan 0018 (Swift Qwen3.8-27B, three phases) missed its quality and 100K decode gates (2026-10-25).
+  replicas: 1
   strategy:
     type: Recreate
   selector:

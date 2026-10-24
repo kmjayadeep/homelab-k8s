@@ -8,10 +8,10 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Plan 0018 phase 3 (2026-10-25): Swift Qwen3.8-27B Q3_K_M at the operator's request, otherwise the phase 2
-  # best config (b11854, F16 projector, 128K Q8 KV, MTP draft 3). Mounts the separate Q3 PVC; the 40Gi PVC
-  # with Q4_K_S and Q4_0 is untouched.
-  replicas: 1
+  # Plan 0018 trial, final state (2026-10-25): Swift Qwen3.8-27B Q3_K_M on b11854 with the F16 projector, 128K
+  # Q8 KV and MTP draft 3. Every Swift run scored 43/49 (Ornith 44-46); this config decoded 14.6 tok/s at 100K
+  # (gate 18). Kept at zero replicas, ready to serve, until the operator promotes or approves removal.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
