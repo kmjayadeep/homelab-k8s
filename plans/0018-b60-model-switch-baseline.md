@@ -1,6 +1,6 @@
 # Plan 0018: Trial Swift Qwen3.8-27B (dense) against Ornith-1.5 21G-ICE on the B60
 
-- Status: In progress again (phase 3, 2026-10-25): the operator asked for the Q3_K_M run after reading the phase 2 verdict. Phase 1: Swift Q4_K_S + MTP rejected against MoE-level speed gates. Phase 2 (same evening, dense-realistic gates): Q4_0, MTP draft length and build b11854 tried; best config 43/49 and 12.7 tok/s at 100K against gates of 44 and 18. **Swift rejected, Ornith restored.** Swift Deployment, PVC (Q4_K_S + Q4_0) and LiteLLM entry retained at zero replicas pending approval to remove; a Q3_K_M run is the only idea left and needs an operator decision (see phase 2 outcome)
+- Status: Completed 2026-10-25. Three phases; Swift Qwen3.8-27B scored 43/49 in every run (Q4_K_S, Q4_0, Q3_K_M) against Ornith's 44–46, and its best 100K decode was 14.8 tok/s against 27. **Ornith restored.** The Q3_K_M Deployment is kept at zero replicas, ready to serve, pending the operator's decision to promote (at the measured speed) or remove. Phase 1: Swift Q4_K_S + MTP rejected against MoE-level speed gates. Phase 2 (same evening, dense-realistic gates): Q4_0, MTP draft length and build b11854 tried; best config 43/49 and 12.7 tok/s at 100K against gates of 44 and 18. **Swift rejected, Ornith restored.** Swift Deployment, PVC (Q4_K_S + Q4_0) and LiteLLM entry retained at zero replicas pending approval to remove; a Q3_K_M run is the only idea left and needs an operator decision (see phase 2 outcome)
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md) (one B60 Deployment behind LiteLLM), [ADR 0006](../adrs/0006-local-b60-autoresearch.md) (flag tuning)
 - Related plans: [0009](0009-swift-qwen38-b60-trial.md) (first Swift trial, 2026-10-06), [0010](0010-swift-qwen38-concurrency.md) (abandoned two-slot experiment on Swift), [0015](0015-ornith-ice-quant-b60-trial.md) (how 21G-ICE was adopted), [0014](0014-b60-autoresearch.md) (how its flags were tuned)
@@ -278,3 +278,19 @@ After the phase 2 verdict the operator asked to try Q3_K_M anyway. Expectation s
 
 | Rollout | Files / changed flags | short decode | decode 13K / 40K | `decode_tps_100k` | `prefill_tps_24k` / `100k` | accept | idle / peak VRAM | passed | `quality_seconds` |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| probe, [#377](https://github.com/kmjayadeep/homelab-k8s/pull/377) | Q3_K_M, MTP n-max 3, b11854 | 43–44 | 34–35 / 24.5–25.7 | **14.8** | 464–466 / 407 | 0.50–0.54 | **81.7% / 83.3%** | — | — |
+| **run 3** (full) | Q3_K_M, MTP n-max 3, b11854 | 50.0 (median over graded tasks) | 34–35 / 24.5–25.7 | **14.6** | 466 / 407 | 0.588 | 81.7% / 83.3% | **43/49** (code 25/30, homelab 7/8, tools 8/8, needles 3/3) | **934** |
+
+**Phase 3 verdict (2026-10-25 01:05 CEST): gates still missed; Ornith restored, Q3_K_M kept ready.** Run 3 is `runs/20261025T003244.json` (git-ignored; failed code HumanEval 91, 116, 132, 141, 142; failed homelab `cronjob-timezone`). The same four code tasks failed on Q4_0 and Q3_K_M, so the quant did not change what the model gets wrong. Q3_K_M is the best Swift config measured: short decode 43–50, 100K decode 14.6–14.8, 100K prefill 407, idle VRAM 81.7% (11 points under Ornith), quality time 934 s against 1,029–1,043 for the Q4 variants and 418–458 for Ornith.
+
+| Gate | Target | Swift Q3_K_M | Ornith |
+| --- | ---: | ---: | ---: |
+| `passed` | at least 44 | 43 (43, 43, 43 across all Swift runs) | 44–46 |
+| short decode | at least 35 | 43–50 | 68 |
+| `decode_tps_100k` | at least 18 | 14.6 | 27.2 |
+| `prefill_tps_100k` | at least 500 | 407 | 1,177 |
+| VRAM idle / peak | below 95% | 81.7% / 83.3% | 92.9% / 97% |
+
+**Decision left to the operator.** Quality is one task under Ornith's range and inside the ±2 run-to-run noise, so the honest reading is parity on this evaluator, not a loss; the agent's gates were not met, so nothing was promoted. Promoting Swift Q3_K_M means accepting about half of Ornith's decode at every depth (14.6 vs 27 at 100K, 45 vs 68 short) and 2.1× longer graded-task time in exchange for a dense 27B with 11 points more VRAM headroom. Promotion is step 7 as written (alias move, persisted-alias check, ADR 0004 amendment) and needs one handover PR plus one LiteLLM PR. Removal of the Swift Deployment, Service, two PVCs (33.5 GB + 14.5 GB on `titania-gpu`) and LiteLLM entry needs explicit approval.
+
+Rollback PR linked in the commit history (Swift 0, Tiel 1, health check back).
