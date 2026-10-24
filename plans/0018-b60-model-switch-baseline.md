@@ -1,6 +1,6 @@
 # Plan 0018: Trial Swift Qwen3.8-27B (dense) against Ornith-1.5 21G-ICE on the B60
 
-- Status: Completed 2026-10-24. Swift Q4_K_S + MTP trialled and **rejected** on long-context speed; Ornith restored. Swift Deployment and PVC retained at zero replicas pending approval to remove
+- Status: In progress. Phase 1 (2026-10-24 afternoon): Swift Q4_K_S + MTP **rejected** against MoE-level speed gates; Ornith restored. **Phase 2 reopened the same evening** with dense-realistic gates: Q4_0 weights, MTP draft length, batch size, then a lower quant
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md) (one B60 Deployment behind LiteLLM), [ADR 0006](../adrs/0006-local-b60-autoresearch.md) (flag tuning)
 - Related plans: [0009](0009-swift-qwen38-b60-trial.md) (first Swift trial, 2026-10-06), [0010](0010-swift-qwen38-concurrency.md) (abandoned two-slot experiment on Swift), [0015](0015-ornith-ice-quant-b60-trial.md) (how 21G-ICE was adopted), [0014](0014-b60-autoresearch.md) (how its flags were tuned)
@@ -209,3 +209,35 @@ PRs [#364](https://github.com/kmjayadeep/homelab-k8s/pull/364) (route), [#365](h
 - **Verdict:** DISCARD. Both hard long-context gates failed (decode 12.7 vs the 27 parity gate and the 30 target; prefill 441 vs the 500 minimum), quality did not beat Ornith (43 vs 44–46, inside noise), and total eval time was 2.5× longer. The dense 27B loses about 65% of its decode between short and 100K context on this card, against about 60% for the MoE, from a far lower starting point. Batch/ubatch tuning would help prefill, not a 2× decode gap, so step 6 was skipped and the second run was not taken. A failed code task list is in the run JSON (`runs/20261024T172220.json`, git-ignored).
 - **Rollback:** step 3 reversed in one PR (Swift 0, Tiel 1, health check back). Ornith's files were still on their PVC. The Swift Deployment, Service, PVC (17.5 GB on `titania-gpu`) and LiteLLM entry are **retained at zero replicas**; removing them needs operator approval and is a separate PR.
 - **What this settles:** on the B60 with llama.cpp SYCL, a dense 27B cannot meet the 128K-context decode requirement even with an embedded MTP head, so the dense path below 27B (Gemma 4 12B, Ministral 3 14B) is the only dense option left, at a quality cost. Any future Qwen3.8-27B attempt would need a different runtime or a Q4_0 build and should be judged on `decode_tps_100k` first.
+
+### Phase 2 (reopened 2026-10-24 evening): dense-realistic gates
+
+The operator reduced the speed expectation: a dense 27B reads about 16 GB of weights per token where the MoE reads about 3 GB, so parity with Ornith's decode is not a fair gate. Swift is kept as the candidate because of its quality, and the question becomes whether a Q4_0 or a lower quant plus MTP tuning gets it to a usable 128K speed.
+
+**Revised gates** (replace the step 5 speed gates; everything else stands):
+
+| Gate | Phase 1 | Phase 2 | Why |
+| --- | --- | --- | --- |
+| `passed` (mean of 2 runs, final candidate) | 44–46 | at least 44; any single run below 42 discards that config | a dense model only earns its slot on quality parity or better; lower quants must not give that away |
+| short decode | 40 goal | at least 35 | Q4_K_S already does 35; the quants below should not be slower |
+| `decode_tps_100k` | at least 27 | **at least 18** | about two thirds of Ornith; 128K sessions stay interactive |
+| `prefill_tps_100k` | at least 500 | at least 500 (TTFT about 200 s at 100K) | unchanged; prefill is compute bound and dense should manage it |
+| VRAM idle and after the probe | below 95% | below 95% | unchanged (ADR 0004) |
+| `min_free_gib` | at least 3 | at least 3 | unchanged |
+
+**Method.** One idea per rollout, PR-merged like phase 1 (the autoresearch exception covers only the Tiel Deployment). Each rollout gets a 6-minute speed-only probe first (`speed()` and `deep()` from the fixed evaluator, run from a scratch script, no graded tasks) and a full `evaluate.py --model …` run only when the probe meets the speed gates. Rows below record both. Stop after two consecutive ideas without a gain.
+
+**Ordered ideas.**
+
+1. **Q4_0 weights** (`Swift-Qwen3.8-27B-Q4_0.gguf`, 15,972,755,552 bytes, LFS sha `2f6c6709…`), args otherwise identical to run 1, served under the same LiteLLM route name with alias `swift-qwen3.8-27b-q4ks-intel` kept for now so the LiteLLM entry is untouched; the plan row says which file was loaded. SYCL has a reorder fast path for Q4_0 mat-vec; community tables show about +28% decode over K-quants for a 27B on Arc. Pre-downloaded by `job-swift-qwen38-download-q40.yaml` while Ornith serves (PVC 33.5 GB of 40Gi afterwards).
+2. **MTP draft length**: `--spec-draft-n-max 2` and `5`, and one probe with `--spec-type none`, to see how much of the 100K decode loss is MTP verification cost rather than attention. Probe only; the better setting goes into the full run.
+3. **`--batch-size 4096 --ubatch-size 2048`** for prefill, only if idle VRAM leaves at least 1 GiB under 95%.
+4. **Q3_K_M** (`Swift-Qwen3.8-27B-Q3_K_M.gguf`, 13.62 GB, LFS sha `5ae067582f921ff9a1847ce4aab0b41ecad4c38c386e76fd4714f9a8b98e586e`): about 18% fewer weight bytes than Q4_K_S and roughly 3 GiB of VRAM headroom for idea 3. Needs either approval to delete `model-q4ks.gguf` from the 40Gi PVC or a larger PVC. Quality is the risk, so this one always gets two full runs.
+
+Not retried: IQ3/IQ4 quants (SYCL penalty, plan 0005), Q4_K_M/Q5 (more bytes than Q4_K_S), f16 KV cache (about 8.6 GiB at 128K, does not fit).
+
+**Rows.**
+
+| Rollout | Files / changed flags | short decode | decode 13K / 40K | `decode_tps_100k` | `prefill_tps_24k` / `100k` | accept | idle / peak VRAM | passed | `quality_seconds` |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| run 1 (phase 1) | Q4_K_S, MTP n-max 3 | 35.3 | 25.0 / 19.5 | 12.7 | 511 / 441 | 0.60 | 93.2% / 94.9% | 43/49 | 1,029 |
