@@ -6,10 +6,10 @@ LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, 
 
 | LiteLLM name | Backend Service | Model | Limits |
 |---|---|---|---|
-| `qwen-intel` (alias) → `tiel-coder-35b-a3b-intel` | `intel-llama-tiel-coder-trial.llm-serving:8080` | Ornith-1.5 35B-A3B 21G-ICE since 2026-10-15 (plan 0015; name kept for routing). Formerly Tiel-Coder 35B-A3B IQ4_XS + BF16 mmproj, llama.cpp SYCL, MTP | 114,688 input + 16,384 output (131,072 configured) |
-| `swift-qwen3.8-27b-q4ks-intel` (versioned, trial) | `intel-llama-swift-qwen38-trial.llm-serving:8080` | Swift Qwen3.8-27B Q4_K_S + MTP, dense, F16 projector ([plan 0018](../../../../plans/0018-b60-model-switch-baseline.md)); backend at zero replicas since 2026-10-25 (now Q3_K_M on b11854, ready to serve) after three trial phases missed the quality and 100K decode gates; PVCs hold Q4_K_S + Q4_0 and Q3_K_M | 114,688 input + 16,384 output |
+| `qwen-intel` (alias) → `swift-qwen3.8-27b-q3km-intel` | `intel-llama-swift-qwen38-trial.llm-serving:8080` | Swift Qwen3.8-27B Q3_K_M (dense, embedded MTP draft 3, F16 projector, llama.cpp SYCL b11854) since 2026-10-25 ([plan 0018](../../../../plans/0018-b60-model-switch-baseline.md)). Measured: 43/49 on the autoresearch evaluator, 43–50 tok/s short decode, 14.6 at 100K, prefill 407–490, idle VRAM 82% | 114,688 input + 16,384 output (131,072 configured) |
+| `tiel-coder-35b-a3b-intel` (versioned, rollback) | `intel-llama-tiel-coder-trial.llm-serving:8080` | Ornith-1.5 35B-A3B 21G-ICE + BF16 mmproj, n-gram speculation (plan 0015, tuned in plan 0014); served 2026-10-15 to 2026-10-25, now at zero replicas with its PVC. 44–46/49, 68 tok/s short, 27 at 100K | 114,688 input + 16,384 output |
 
-- Capabilities: chat, reasoning, vision, function calling. A `tools` request through `qwen-intel` returned a valid `tool_calls` response on 2026-10-17; the autoresearch tool suite passes 8/8.
+- Capabilities: chat, reasoning, vision, function calling. On Swift, a `tools` request, a 32×32 image and the 8/8 tool suite passed through LiteLLM on 2026-10-24/25.
 - Known limits: one benign image request passed. Near-limit context, sustained load and the MTP speedup are untested, and the first 128K pod was evicted for host-memory pressure. See [plan 0008](../../../../plans/0008-tiel-coder-b60-trial.md#128k-vision-follow-up).
 - Clients should use `qwen-intel`, not the versioned name, so the model can be changed without reconfiguring clients.
 
