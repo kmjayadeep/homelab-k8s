@@ -40,6 +40,13 @@
       "prBodyNotes": [
         "⚠️ Critical infrastructure chart. Merge one minor step at a time, read the upstream upgrade notes first, and confirm cluster health (`flux get all -A`, all pods Ready, ingress serving) before approving the next step. A Cilium upgrade can orphan existing pod endpoints; plan to restart pods afterwards."
       ]
+    },
+    {
+      "description": "Grading sandbox: numpy 2.2.6 / PyYAML 6.0.2 ship no cp314/cp315 wheels, so python major and minor bumps are a deliberate change together with those pins",
+      "matchFileNames": ["automation/llm-autoresearch/sandbox/Dockerfile"],
+      "matchPackageNames": ["python"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
     }
   ]
 }
