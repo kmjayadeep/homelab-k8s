@@ -19,7 +19,7 @@
 | `k8s-agent` | Chart default, generic Kubernetes assistant | all `k8s_*` tools (writes fail: tool RBAC is read-only) |
 | `homelab-sre` | Investigate and explain titania, propose Git changes | read-only `k8s_*`, Grafana Prometheus/Loki/alerting/dashboards |
 
-Ask `homelab-sre` through the UI or A2A: `POST https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/` with a JSON-RPC `message/send`.
+Ask `homelab-sre` through the UI or A2A. The canonical A2A endpoint is the controller Service, `http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/`; the UI Ingress proxies the same path (`https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/`, a JSON-RPC `message/send` through it was verified on 2026-10-26 in plan 0019).
 
 ## Rotate the Grafana token
 

@@ -50,6 +50,7 @@ spec:
       # Loki is not provisioned by the sidecar; declare it so Grafana (and the kagent Grafana MCP) can query logs.
       additionalDataSources:
         - name: Loki
+          uid: loki
           type: loki
           access: proxy
           url: http://loki-gateway.monitoring.svc.cluster.local

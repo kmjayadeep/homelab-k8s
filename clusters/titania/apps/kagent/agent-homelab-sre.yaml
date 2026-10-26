@@ -17,6 +17,7 @@ spec:
           cpu: 50m
           memory: 128Mi
         limits:
+          cpu: "1"
           memory: 512Mi
     tools:
       - type: McpServer
@@ -38,20 +39,27 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: grafana-mcp
+          # Names verified against grafana/mcp-grafana 2.1.1 tools/list with --enabled-tools=datasource,prometheus,loki,alerting,dashboard,search --disable-write.
           toolNames:
             - list_datasources
+            - get_datasource
+            - check_datasources_health
             - query_prometheus
+            - query_prometheus_histogram
             - list_prometheus_metric_names
             - list_prometheus_metric_metadata
             - list_prometheus_label_names
             - list_prometheus_label_values
             - query_loki_logs
             - query_loki_stats
+            - query_loki_patterns
+            - analyze_loki_labels
             - list_loki_label_names
             - list_loki_label_values
-            - list_alert_rules
-            - get_alert_rule_by_uid
+            - alerting_rules_read
+            - alerting_silences_read
             - search_dashboards
+            - get_dashboard_summary
             - get_dashboard_panel_queries
     a2aConfig:
       skills:
@@ -94,8 +102,9 @@ spec:
       - LLM stack: llama.cpp on the B60 in llm-serving, fronted by LiteLLM (litellm namespace), used by Open WebUI,
         kagent and other clients. Only one inference Deployment fits on the GPU at a time.
       - Observability: kube-prometheus-stack in monitoring (Prometheus with Thanos, Alertmanager, Grafana) and
-        Loki. The Grafana datasources are "Prometheus" (default, long retention through Thanos) and "Loki".
-        Grafana dashboards and alert rules are available through the Grafana tools.
+        Loki. Grafana datasource UIDs: "prometheus" (default, long retention through Thanos) and "loki".
+        Use these UIDs directly with query_prometheus and query_loki_logs; call list_datasources only if one of
+        them fails. Grafana dashboards and alert rules are available through the Grafana tools.
       - Known pitfalls: the master node runs kube-proxy in IPVS mode alongside Cilium; node IPv6 addresses are
         link-local, so cilium-health may show 2/3; the GPU node has large memory requests reserved for inference.
 
