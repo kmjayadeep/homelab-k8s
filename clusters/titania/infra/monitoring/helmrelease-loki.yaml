@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: grafana-community
         namespace: monitoring
-      version: "19.4.0"
+      version: "20.0.1"
   interval: 1h0m0s
   values:
     loki:
@@ -46,9 +46,6 @@ spec:
           endpoint: minio.cosmos.cboxlab.com
           s3ForcePathStyle: true
 
-    minio:
-      # for testing
-      enabled: false
 
     # Renamed from SingleBinary in chart 12.0.0; the old name is still accepted
     # but the chart defaults to Monolithic now, so be explicit.
