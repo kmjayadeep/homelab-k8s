@@ -83,4 +83,7 @@ Risks:
 
 ## Outcome
 
-Pending. Record per phase: dates, PR numbers, verified gates, decisions taken (embedding model, chat channel, write access).
+- 2026-10-26, phases 1–2 merged in PR #427 (reviewed: six findings; the Host allowlist blocker, the `--enabled-tools` form, a NetworkPolicy on the MCP endpoint, the CPU limit and datasource UIDs were fixed before merge; all flags verified against the pinned image with `docker run`). Post-merge: `grafana-mcp` Ready, `RemoteMCPServer` Accepted after a startup race, Loki datasource present in Grafana (`uid: loki`), `homelab-sre` Accepted and Ready. `list_datasources` works with the Viewer token, so no extra Grafana role was needed.
+- PR #428: the first agent run got Forbidden on Flux objects and nodes because the chart's read-only rule set covers core workloads only; `rbac.additionalRules` added read access to nodes, cluster storage and the cluster's CRDs (Secrets still excluded). After it, the agent listed Kustomization and HelmRelease status and queried Loki through the UI proxy A2A endpoint (completed task in 26s).
+- Finding: Grafana MCP `query_prometheus` is an MCP App (`_meta.ui.resourceUri: ui://grafana/metrics.html`); kagent's runtime logs "Wiring MCP App model result callback" and gives the rendered result to the UI, so the model never sees the numbers. Numeric PromQL therefore uses the kagent tool server's `prometheus_query_tool`/`prometheus_query_range_tool` against Thanos Query (`kagent-tools.tools.prometheus.url`); the Grafana tools stay for Loki, metric discovery, alert rules and dashboards.
+- Pending: phase 3 (Helios rebuild and the embedding model decision), phase 4 (chat channel), phase 5 (write access).
