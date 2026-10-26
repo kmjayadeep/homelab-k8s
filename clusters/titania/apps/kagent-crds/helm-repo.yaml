@@ -1,0 +1,11 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kagent
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  type: oci
+  interval: 1h
+  url: oci://ghcr.io/kagent-dev/kagent/helm

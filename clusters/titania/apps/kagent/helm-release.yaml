@@ -1,0 +1,95 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kagent
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  interval: 1h
+  # The controller restarts a few times while the bundled PostgreSQL comes up on first install.
+  timeout: 10m
+  dependsOn:
+    - name: kagent-crds
+  chart:
+    spec:
+      chart: kagent
+      version: "0.10.4"
+      sourceRef:
+        kind: HelmRepository
+        name: kagent
+      interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      strategy: rollback
+  values:
+    # The ModelConfig and its Secret are managed in Git (model-config.yaml, external-secret.yaml).
+    providers: null
+
+    rbac:
+      # Controller gets a Role in this namespace only and watches only this namespace.
+      namespaces:
+        - kagent
+
+    controller:
+      auth:
+        # No UI authentication yet; the Ingress is LAN/VPN-only (plan 0019 risks).
+        mode: unsecure
+
+    database:
+      postgres:
+        # Bundled instance is evaluation-grade; external PostgreSQL on Helios is a follow-up.
+        bundled:
+          enabled: true
+          storageClassName: longhorn
+          storage: 2Gi
+
+    ui:
+      externalUrl: https://kagent.cosmos.cboxlab.com
+      route:
+        enabled: false
+
+    kmcp:
+      enabled: true
+
+    kagent-tools:
+      enabled: true
+      rbac:
+        # Read-only cluster access, no Secrets. Widening is a separate approved change.
+        readOnly: true
+        allowSecrets: false
+      tools:
+        loglevel: info
+
+    # Only the generic Kubernetes agent. The others target components not installed here
+    # or need extra credentials (Grafana, Prometheus); see plan 0019 follow-ups.
+    k8s-agent:
+      enabled: true
+    kgateway-agent:
+      enabled: false
+    istio-agent:
+      enabled: false
+    promql-agent:
+      enabled: false
+    observability-agent:
+      enabled: false
+    argo-rollouts-agent:
+      enabled: false
+    helm-agent:
+      enabled: false
+    cilium-policy-agent:
+      enabled: false
+    cilium-manager-agent:
+      enabled: false
+    cilium-debug-agent:
+      enabled: false
+    grafana-mcp:
+      enabled: false
+    oauth2-proxy:
+      enabled: false
+    substrate:
+      enabled: false
