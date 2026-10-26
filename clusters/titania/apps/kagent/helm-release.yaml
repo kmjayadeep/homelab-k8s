@@ -59,9 +59,42 @@ spec:
     kagent-tools:
       enabled: true
       rbac:
-        # Read-only cluster access, no Secrets. Widening is a separate approved change.
+        # Read-only cluster access, no Secrets. Widening to writes is a separate approved change.
         readOnly: true
         allowSecrets: false
+        # The chart's read-only set covers core workloads only. Add read access to what an SRE needs on
+        # titania: nodes and cluster-scoped storage, Flux, Longhorn, Cilium, ESO (specs hold paths, not
+        # values), cert-manager, monitoring, MetalLB, kagent, metrics (kubectl top) and RBAC objects.
+        additionalRules:
+          - apiGroups: [""]
+            resources: [nodes, persistentvolumes, resourcequotas, limitranges]
+            verbs: [get, list, watch]
+          - apiGroups: [storage.k8s.io, policy, scheduling.k8s.io, node.k8s.io, coordination.k8s.io, discovery.k8s.io, rbac.authorization.k8s.io]
+            resources: ["*"]
+            verbs: [get, list, watch]
+          - apiGroups: [apiextensions.k8s.io]
+            resources: [customresourcedefinitions]
+            verbs: [get, list, watch]
+          - apiGroups: [metrics.k8s.io]
+            resources: [pods, nodes]
+            verbs: [get, list]
+          - apiGroups:
+              - kustomize.toolkit.fluxcd.io
+              - helm.toolkit.fluxcd.io
+              - source.toolkit.fluxcd.io
+              - notification.toolkit.fluxcd.io
+              - image.toolkit.fluxcd.io
+              - longhorn.io
+              - cilium.io
+              - external-secrets.io
+              - cert-manager.io
+              - trust.cert-manager.io
+              - monitoring.coreos.com
+              - metallb.io
+              - externaldns.k8s.io
+              - kagent.dev
+            resources: ["*"]
+            verbs: [get, list, watch]
       tools:
         loglevel: info
 
