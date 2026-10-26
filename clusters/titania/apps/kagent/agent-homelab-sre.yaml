@@ -34,6 +34,10 @@ spec:
             - k8s_check_service_connectivity
             - k8s_get_available_api_resources
             - datetime_get_current_time
+            # PromQL against Thanos Query (kagent-tools.tools.prometheus.url); plain JSON results.
+            - prometheus_query_tool
+            - prometheus_query_range_tool
+            - prometheus_label_names_tool
       - type: McpServer
         mcpServer:
           apiGroup: kagent.dev
@@ -44,8 +48,7 @@ spec:
             - list_datasources
             - get_datasource
             - check_datasources_health
-            - query_prometheus
-            - query_prometheus_histogram
+            # query_prometheus is deliberately absent: it is an MCP App whose result goes to the UI, not the model.
             - list_prometheus_metric_names
             - list_prometheus_metric_metadata
             - list_prometheus_label_names
@@ -103,8 +106,7 @@ spec:
         kagent and other clients. Only one inference Deployment fits on the GPU at a time.
       - Observability: kube-prometheus-stack in monitoring (Prometheus with Thanos, Alertmanager, Grafana) and
         Loki. Grafana datasource UIDs: "prometheus" (default, long retention through Thanos) and "loki".
-        Use these UIDs directly with query_prometheus and query_loki_logs; call list_datasources only if one of
-        them fails. Grafana dashboards and alert rules are available through the Grafana tools.
+        Use the "loki" UID with query_loki_logs; call list_datasources only if it fails. Grafana dashboards and alert rules are available through the Grafana tools.
       - Known pitfalls: the master node runs kube-proxy in IPVS mode alongside Cilium; node IPv6 addresses are
         link-local, so cilium-health may show 2/3; the GPU node has large memory requests reserved for inference.
 
@@ -122,9 +124,10 @@ spec:
          as the manifest path and field to edit in Git, plus how to verify after Flux reconciles.
 
       # Tool notes
-      - query_prometheus requires datasourceUid="prometheus" and endTime (use "now"; add startTime and
-        stepSeconds for a range). The result is JSON: data[].metric holds labels and data[].value[1] (instant)
-        or data[].values (range) holds the numbers. Read the numbers from that JSON; there is no rendered panel.
+      - For numbers, use prometheus_query_tool (instant; argument "query") or prometheus_query_range_tool
+        (arguments query, start, end, step). They query Thanos (long retention) and return Prometheus JSON:
+        data.result[].metric holds labels, data.result[].value[1] or values holds the numbers. The Grafana
+        list_prometheus_* tools are for discovering metric names, labels and metadata.
       - node_exporter series carry instance="<ip>:9100", not node names. Join through node_uname_info
         (nodename label) with "* on(instance) group_left(nodename)", or use kube_node_* metrics by node label.
       - query_loki_logs takes datasourceUid="loki" and a LogQL selector such as {namespace="litellm"}; keep

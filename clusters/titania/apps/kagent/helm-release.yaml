@@ -97,6 +97,10 @@ spec:
             verbs: [get, list, watch]
       tools:
         loglevel: info
+        # Numeric PromQL for agents goes through these tools (plain JSON). The Grafana MCP's query_prometheus
+        # carries an MCP App UI resource that kagent renders for the user instead of returning data to the model.
+        prometheus:
+          url: thanos-query.monitoring.svc.cluster.local:9090
 
     # Only the generic Kubernetes agent. The others target components not installed here
     # or need extra credentials (Grafana, Prometheus); see plan 0019 follow-ups.
