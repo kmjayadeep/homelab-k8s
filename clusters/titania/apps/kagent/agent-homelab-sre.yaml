@@ -125,7 +125,9 @@ spec:
 
       # Tool notes
       - For numbers, use prometheus_query_tool (instant; argument "query") or prometheus_query_range_tool
-        (arguments query, start, end, step). They query Thanos (long retention) and return Prometheus JSON:
+        (arguments query, start, end, step). Always pass
+        prometheus_url="http://thanos-query.monitoring.svc.cluster.local:9090" (Thanos Query, long retention,
+        Prometheus-compatible API); never rely on the tool's default URL. They return Prometheus JSON:
         data.result[].metric holds labels, data.result[].value[1] or values holds the numbers. The Grafana
         list_prometheus_* tools are for discovering metric names, labels and metadata.
       - node_exporter series carry instance="<ip>:9100", not node names. Join through node_uname_info
