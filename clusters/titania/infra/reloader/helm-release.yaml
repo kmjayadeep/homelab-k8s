@@ -23,6 +23,7 @@ spec:
         - bookorbit
         - external-dns
         - glance
+        - kagent
         - litellm
         - open-webui
         - otpcloud

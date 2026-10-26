@@ -8,4 +8,6 @@ resources:
   - model-config.yaml
   - ingress.yaml
   - network-policy.yaml
+  - grafana-mcp.yaml
+  - agent-homelab-sre.yaml
   - helm-release.yaml

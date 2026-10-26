@@ -9,6 +9,21 @@
 - `model-config.yaml`: the single `ModelConfig` every default agent uses. `model` is a LiteLLM model name.
 - `external-secret.yaml`: LiteLLM virtual key (alias `kagent`) from Vault `apps/litellm/kagent`.
 - `network-policy.yaml`: only the controller may reach the bundled PostgreSQL, which uses the chart's fixed credentials.
+- `grafana-mcp.yaml`: Grafana MCP server (`grafana/mcp-grafana`, read-only flags) with a Viewer service-account token from Vault `services/grafana/kagent`, plus its `RemoteMCPServer`. Gives agents Prometheus, Loki, alert-rule and dashboard tools ([plan 0020](../../../../plans/0020-kagent-sre-agent.md)).
+- `agent-homelab-sre.yaml`: the read-only `homelab-sre` agent: cluster-specific prompt, Kubernetes read tools and the Grafana tools, A2A skills `investigate` and `health-report`.
+
+## Agents
+
+| Agent | Purpose | Tools |
+| --- | --- | --- |
+| `k8s-agent` | Chart default, generic Kubernetes assistant | all `k8s_*` tools (writes fail: tool RBAC is read-only) |
+| `homelab-sre` | Investigate and explain titania, propose Git changes | read-only `k8s_*`, Grafana Prometheus/Loki/alerting/dashboards |
+
+Ask `homelab-sre` through the UI or A2A: `POST https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/` with a JSON-RPC `message/send`.
+
+## Rotate the Grafana token
+
+Create a new token for the Grafana service account `kagent-mcp` (Viewer), import it with `../homelab-iac/vault-config/import-grafana-kagent-token.sh`, wait for the `ExternalSecret` refresh (or force-sync), and Reloader restarts `grafana-mcp`. Delete the old token in Grafana.
 
 ## Change the model
 
