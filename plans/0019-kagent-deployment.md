@@ -1,6 +1,6 @@
 # Plan 0019: Deploy kagent behind LiteLLM
 
-- Status: Active (step 1 done 2026-10-26)
+- Status: Active (step 1 done 2026-10-26; steps 2–4 delivered in PR #416)
 - Owner: Jayadeep KM
 - Related ADR: none yet; [ADR 0001](../adrs/0001-vault-external-secrets.md) (secrets) and [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md) (LiteLLM as the only model entry point) apply
 
@@ -70,7 +70,7 @@ Done: `external_secrets_roles.kagent` (namespace `kagent`, ServiceAccount `exter
 
 A `services/deepseek/litellm` path was added and then removed the same day once it was confirmed that LiteLLM already holds the DeepSeek credential in its database. The `litellm` policy is back to its previous two paths.
 
-### Step 2: LiteLLM — no manifest change
+### Step 2: LiteLLM — no manifest change (README done in PR #416)
 
 LiteLLM needs no Git change: `deepseek-v4-flash` already exists and the kagent key already exists. Remaining items:
 
@@ -79,7 +79,7 @@ LiteLLM needs no Git change: `deepseek-v4-flash` already exists and the kagent k
 
 Gate: one benign chat request to `deepseek-v4-flash` through `https://litellm.cosmos.cboxlab.com` with the kagent key succeeds (check the response status and LiteLLM spend log, do not print the key).
 
-### Step 3: kagent manifests (this repo, one PR)
+### Step 3: kagent manifests (this repo, PR #416)
 
 New files:
 
@@ -87,15 +87,18 @@ New files:
 
 - `Namespace` `kagent` with standard labels.
 - Flux `Kustomization` `kagent-crds` (namespace `kagent`): path `clusters/titania/apps/kagent-crds`, `prune: true`, `wait: true`, `timeout: 5m`, health check on `HelmRelease` `kagent-crds`.
-- Flux `Kustomization` `kagent` (namespace `kagent`): path `clusters/titania/apps/kagent`, `dependsOn` `kagent-crds` (ns `kagent`), `external-secrets` (ns `external-secrets`), `litellm` (ns `flux-system`); `prune: true`, `wait: true`, `timeout: 10m` (the controller restarts a few times while bundled Postgres starts), health check on `HelmRelease` `kagent`.
+- Flux `Kustomization` `kagent` (namespace `kagent`): path `clusters/titania/apps/kagent`, `dependsOn` `kagent-crds` (ns `kagent`), `external-secrets` (ns `external-secrets`), `litellm` (ns `flux-system`); `prune: true`, `wait: true`, `timeout: 15m` (above the HelmRelease's own 10m; the controller restarts a few times while bundled Postgres starts), health check on `HelmRelease` `kagent`.
+- The `Namespace` carries `kustomize.toolkit.fluxcd.io/prune: disabled` like `vault`: a namespace deletion would uninstall `kagent-crds` through the HelmRelease finalizer and remove every Agent, so protecting only the HelmRelease is not enough.
 
 `clusters/titania/apps/kagent-crds/`
 
-- `kustomization.yaml` (namespace `kagent`), `helm-repo.yaml` (`HelmRepository` `kagent`, `type: oci`, `url: oci://ghcr.io/kagent-dev/kagent/helm`), `helm-release.yaml` (`HelmRelease` `kagent-crds`, chart `kagent-crds` `0.10.4`, values `kmcp.enabled: true`, `substrate.enabled: false`). Annotate the HelmRelease `kustomize.toolkit.fluxcd.io/prune: disabled`, matching the stateful anchors in the repository map: pruning the CRDs would delete every `Agent`, `ModelConfig` and `RemoteMCPServer` instantly.
+- `kustomization.yaml` (namespace `kagent`), `helm-repo.yaml` (`HelmRepository` `kagent`, `type: oci`, `url: oci://ghcr.io/kagent-dev/kagent/helm`, prune disabled because both HelmReleases depend on it), `helm-release.yaml` (`HelmRelease` `kagent-crds`, chart `kagent-crds` `0.10.4`, values `kmcp.enabled: true`, `substrate.enabled: false`). Annotate the HelmRelease `kustomize.toolkit.fluxcd.io/prune: disabled`, matching the stateful anchors in the repository map: pruning the CRDs would delete every `Agent`, `ModelConfig` and `RemoteMCPServer` instantly.
 
 `clusters/titania/apps/kagent/`
 
 - `kustomization.yaml` (namespace `kagent`) listing the files below.
+- `network-policy.yaml`: ingress to the bundled PostgreSQL pod only from the controller pod on 5432. The chart renders a fixed `kagent` password, so without this any pod in the cluster could read the session store.
+- `README.md`: layout, model switch, key rotation and restart procedure, risks.
 - `external-secret.yaml`: `ServiceAccount` `external-secrets-vault`, `SecretStore` `vault` (role `kagent`, same server/CA/mount as the other apps), `ExternalSecret` `kagent-litellm` → Secret `kagent-litellm` with key `LITELLM_API_KEY` from `apps/litellm/kagent` / `api_key`; `deletionPolicy: Retain`.
 - `model-config.yaml`: `ModelConfig` `default-model-config` (`kagent.dev/v1alpha2`) with `provider: OpenAI`, `model: deepseek-v4-flash`, `apiKeySecret: kagent-litellm`, `apiKeySecretKey: LITELLM_API_KEY`, `openAI.baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1`. The name must stay `default-model-config` because the default agents reference it implicitly. A comment records that `qwen-intel` is the local alternative.
 - `ingress.yaml`: `Ingress` `kagent`, class `nginx`, host `kagent.cosmos.cboxlab.com`, TLS secret `cosmos-cboxlab-cert`, backend Service `kagent-ui` port `8080`, annotations `proxy-read-timeout`/`proxy-send-timeout: "1800"` and `proxy-buffering: "off"` for SSE.
@@ -158,7 +161,7 @@ The second command fails on the `ModelConfig` until the `kagent.dev` CRDs exist 
 
 Gate: after merge and Flux reconciliation (only when the operator asks to reconcile), `flux get kustomizations -n kagent` shows both Ready; all pods in `kagent` Running (controller, ui, kmcp, tools, postgres, k8s-agent); `kubectl get modelconfig,agent -n kagent` shows Accepted/Ready conditions; the Ingress resolves and serves the UI; a chat with `k8s-agent` ("list pods in litellm") returns a tool-backed answer through LiteLLM (check LiteLLM spend logs for the `kagent` key, not the model response text).
 
-### Step 4: Documentation
+### Step 4: Documentation (PR #416)
 
 - `plans/README.md`: keep this plan's status current.
 - `docs/README.md`: add a row "Run or extend kagent" pointing at this plan and `clusters/titania/apps/kagent/`.
@@ -177,7 +180,7 @@ Gate: after merge and Flux reconciliation (only when the operator asks to reconc
 
 Reproducible checks are listed per step above. Rollback, each with explicit approval:
 
-- **kagent**: revert the manifests PR. Flux prunes the namespace contents except the `kagent-crds` HelmRelease (prune disabled); removing CRDs is then a manual, approved step. Bundled Postgres data is lost with the PVC; that is acceptable for evaluation.
+- **kagent**: revert the manifests PR. Flux prunes the app Kustomization's contents (HelmRelease `kagent`, ModelConfig, Ingress, ExternalSecret, NetworkPolicy) but leaves the `kagent` Namespace, the `HelmRepository` and the `kagent-crds` HelmRelease (all prune disabled); removing those and the CRDs is a manual, approved step. Bundled Postgres data is lost with the PVC; that is acceptable for evaluation.
 - **LiteLLM**: revoke the `kagent` virtual key in the Admin UI.
 - **Vault**: remove the `kagent` role in `homelab-iac`; delete `apps/litellm/kagent` only after the consumer is gone.
 
@@ -185,9 +188,9 @@ Risks to carry in the PR description:
 
 - The kagent UI has no authentication and gives anyone on the LAN/VPN an agent with cluster-wide read access (pods, logs, configmaps, events). Logs and ConfigMaps can contain sensitive data even though Secrets are excluded.
 - DeepSeek receives cluster metadata returned by the tools (resource names, log excerpts) until the `ModelConfig` is pointed at `qwen-intel`.
-- The bundled PostgreSQL is a single pod on Longhorn with no backups; sessions are disposable.
+- The bundled PostgreSQL is a single pod on Longhorn with no backups and the chart's fixed credentials; sessions are disposable and a NetworkPolicy limits access to the controller.
 - Chart `0.x`: breaking changes between minors are common (SQLite removal, `rbac.clusterScoped` removal in `0.9`). Read release notes on each Renovate PR before merging.
 
 ## Outcome
 
-- 2026-10-26: step 1 complete (`homelab-iac` commits `d6727c4` and the follow-up revert). Steps 2–4 pending.
+- 2026-10-26: step 1 complete (`homelab-iac` commits `d6727c4`, `ed6a0bb`). Steps 2–4 in PR #416; reviewed with nine findings, of which the Namespace/HelmRepository prune protection, the Postgres NetworkPolicy, the Kustomization timeout, the stale Vault key metadata and the rotation README were fixed before merge. UI authentication stays an accepted follow-up. Post-merge validation recorded below once done.

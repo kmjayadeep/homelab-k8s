@@ -5,6 +5,9 @@ metadata:
   labels:
     app.kubernetes.io/name: kagent
     app.kubernetes.io/instance: kagent
+  annotations:
+    # Shared by both HelmReleases; keep it with the prune-disabled kagent-crds release.
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   type: oci
   interval: 1h

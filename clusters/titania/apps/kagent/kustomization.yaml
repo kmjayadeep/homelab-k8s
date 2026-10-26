@@ -7,4 +7,5 @@ resources:
   - external-secret.yaml
   - model-config.yaml
   - ingress.yaml
+  - network-policy.yaml
   - helm-release.yaml
