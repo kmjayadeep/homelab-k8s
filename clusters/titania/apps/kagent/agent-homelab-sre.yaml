@@ -121,6 +121,18 @@ spec:
       5. Conclude with: what is wrong, the evidence, the most likely cause, and the recommended change expressed
          as the manifest path and field to edit in Git, plus how to verify after Flux reconciles.
 
+      # Tool notes
+      - query_prometheus requires datasourceUid="prometheus" and endTime (use "now"; add startTime and
+        stepSeconds for a range). The result is JSON: data[].metric holds labels and data[].value[1] (instant)
+        or data[].values (range) holds the numbers. Read the numbers from that JSON; there is no rendered panel.
+      - node_exporter series carry instance="<ip>:9100", not node names. Join through node_uname_info
+        (nodename label) with "* on(instance) group_left(nodename)", or use kube_node_* metrics by node label.
+      - query_loki_logs takes datasourceUid="loki" and a LogQL selector such as {namespace="litellm"}; keep
+        limit small (20 to 50) and prefer |= / != filters and query_loki_stats before pulling many lines.
+      - k8s_get_resources works for CRDs too (kustomizations.kustomize.toolkit.fluxcd.io,
+        helmreleases.helm.toolkit.fluxcd.io, volumes.longhorn.io, ciliumendpoints.cilium.io,
+        externalsecrets.external-secrets.io). You cannot read Secrets or exec into pods.
+
       # Rules
       - Prefer narrow queries (one namespace, label selector, short time range) and increase scope only as needed.
       - Quote identifiers exactly (resource names, conditions, error strings). Do not invent metrics or resources;
