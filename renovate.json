@@ -47,6 +47,17 @@
       "matchPackageNames": ["python"],
       "matchUpdateTypes": ["major", "minor"],
       "enabled": false
+    },
+    {
+      "description": "litellm-helm is an OCI chart on docker.litellm.ai, which publishes no release timestamps; with the Renovate 42 default (timestamp-required) every update stays in 'Pending Status Checks' forever. Treat missing timestamps as stable for this chart only, still one minor per PR",
+      "matchPackageNames": ["litellm-helm"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
+      "description": "llama.cpp trial images are pinned by digest only (plan 0018); there is no tag for Renovate to follow, so skip them instead of warning on every run",
+      "matchFileNames": ["clusters/titania/apps/llm-serving-intel-llama/**"],
+      "matchPackageNames": ["ghcr.io/ggml-org/llama.cpp"],
+      "enabled": false
     }
   ]
 }
