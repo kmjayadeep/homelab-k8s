@@ -1,0 +1,17 @@
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  # The chart's default agents reference this exact name when modelConfigRef is empty.
+  name: default-model-config
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  provider: OpenAI
+  # A LiteLLM model name. `deepseek-v4-flash` is database-managed in LiteLLM; switch to the
+  # local llama.cpp backend by setting `qwen-intel` here (plan 0019). Agents do not change.
+  model: deepseek-v4-flash
+  apiKeySecret: kagent-litellm
+  apiKeySecretKey: LITELLM_API_KEY
+  openAI:
+    baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1

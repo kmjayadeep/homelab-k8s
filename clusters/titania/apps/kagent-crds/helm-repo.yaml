@@ -1,0 +1,14 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kagent
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+  annotations:
+    # Shared by both HelmReleases; keep it with the prune-disabled kagent-crds release.
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  type: oci
+  interval: 1h
+  url: oci://ghcr.io/kagent-dev/kagent/helm

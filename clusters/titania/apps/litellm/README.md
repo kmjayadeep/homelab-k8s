@@ -1,6 +1,6 @@
 # LiteLLM
 
-LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, Pi) use `https://litellm.cosmos.cboxlab.com` with LiteLLM keys. The inference servers in `llm-serving` have no authentication and no Ingress. No NetworkPolicy restricts them, so any in-cluster pod can still reach them directly.
+LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, Pi, kagent) use `https://litellm.cosmos.cboxlab.com` or the in-cluster Service with LiteLLM keys. The inference servers in `llm-serving` have no authentication and no Ingress. No NetworkPolicy restricts them, so any in-cluster pod can still reach them directly.
 
 ## Current model
 
@@ -26,6 +26,10 @@ The B60 has room for one inference Deployment at a time (`gpu.intel.com/xe: 1`; 
 3. Send a benign request to the versioned LiteLLM name.
 4. Point `router_settings.model_group_alias.qwen-intel` at the new entry.
 5. Remove the old backend and its `model_list` entry, or keep them stopped if you need a rollback.
+
+## kagent
+
+kagent ([plan 0019](../../../../plans/0019-kagent-deployment.md)) reaches LiteLLM in-cluster with its own virtual key (alias `kagent`, Vault path `apps/litellm/kagent`). Its model is the `model` field of `clusters/titania/apps/kagent/model-config.yaml`, currently the database-managed `deepseek-v4-flash`; set it to `qwen-intel` to move kagent onto the local backend. External providers such as DeepSeek and Anthropic are configured in the LiteLLM Admin UI and stored in its database, not in this repository.
 
 ## Alias drift (`STORE_MODEL_IN_DB=True`)
 

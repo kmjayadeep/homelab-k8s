@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kagent
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+  annotations:
+    # Deleting the namespace would uninstall kagent-crds and remove every Agent and
+    # ModelConfig with it, so the prune-disabled HelmRelease alone is not enough.
+    kustomize.toolkit.fluxcd.io/prune: disabled
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kagent-crds
+  namespace: kagent
+spec:
+  path: clusters/titania/apps/kagent-crds
+  interval: 15m
+  prune: true
+  wait: true
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kagent-crds
+      namespace: kagent
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kagent
+  namespace: kagent
+spec:
+  path: clusters/titania/apps/kagent
+  dependsOn:
+    - name: kagent-crds
+      namespace: kagent
+    - name: external-secrets
+      namespace: external-secrets
+    - name: litellm
+      namespace: flux-system
+  interval: 15m
+  prune: true
+  wait: true
+  # Above the HelmRelease's own 10m timeout so a slow first install does not flap the status.
+  timeout: 15m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kagent
+      namespace: kagent
