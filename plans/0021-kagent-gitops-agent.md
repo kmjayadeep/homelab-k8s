@@ -1,6 +1,6 @@
 # Plan 0021: GitOps agent that opens pull requests
 
-- Status: Active (PR open 2026-10-27; waits for the GitHub token)
+- Status: Completed 2026-10-27 (follow-ups: `main` ruleset, kagent embedded-resource report)
 - Owner: Jayadeep KM
 - Related: [plan 0019](0019-kagent-deployment.md), [plan 0020](0020-kagent-sre-agent.md), [ADR 0001](../adrs/0001-vault-external-secrets.md), [ADR 0002](../adrs/0002-autonomous-repository-agent.md)
 
@@ -68,4 +68,4 @@ Create the GitHub App (Settings → Developer settings → GitHub Apps → New: 
 - `homelab-sre` delegation to `homelab-gitops` added (this PR), with the SRE opening rule reworded.
 - 2026-10-27: `homelab-gitops` produced two more PRs on request: #444 (lower the restic threshold for the alert drill; merged by the operator) and #445 (revert). Both were one-line diffs with correct Conventional Commits messages, App-authored commits, complete PR bodies and green validation runs. `homelab-sre` delegation merged in PR #443.
 - 2026-10-27: PR #442 closed and #445 merged by the operator. `homelab-sre` now delegates automatically for concrete in-repo recommendations (plan 0020); the first autonomous PR is #449, opened from an alert investigation with an "## Origin" section.
-- Pending: operator review of PR #449, the `main` ruleset (require PR; bypass admin role and deploy keys), and reporting the embedded-resource handling to kagent.
+- 2026-10-27: PR #449 merged by the operator; `for: 30m` is live in the `restic-rules` PrometheusRule. Plan complete. Open follow-ups, not blocking: the `main` ruleset (require PR; bypass admin role and deploy keys) to make the App's inability to push to `main` a hard guarantee, and reporting kagent's dropping of MCP embedded resources upstream.
