@@ -1,6 +1,6 @@
 # Plan 0021: GitOps agent that opens pull requests
 
-- Status: Completed 2026-10-27 (follow-ups: `main` ruleset, kagent embedded-resource report)
+- Status: Completed 2026-10-27 (follow-up: kagent embedded-resource report)
 - Owner: Jayadeep KM
 - Related: [plan 0019](0019-kagent-deployment.md), [plan 0020](0020-kagent-sre-agent.md), [ADR 0001](../adrs/0001-vault-external-secrets.md), [ADR 0002](../adrs/0002-autonomous-repository-agent.md)
 
@@ -55,7 +55,7 @@ Create the GitHub App (Settings → Developer settings → GitHub Apps → New: 
 
 - Rollback: revert the PR; Flux prunes the MCPServer, Agent and ExternalSecret; `homelab-sre` loses the delegate. Revoke the GitHub token and delete `services/github/kagent-gitops` after the consumer is gone. Open `kagent/*` branches and PRs are closed by hand.
 - Risks:
-  - Until a ruleset exists on `main`, only the excluded merge tool and the prompt keep the App from writing to `main`, and Flux deploys `main` within minutes. Add the ruleset (require PR; bypass admin role and deploy keys) soon after.
+  - Three layers keep the App off `main`: the GitHub ruleset (hard guarantee, verified), the excluded merge tool at the server, and the prompt. Flux deploys `main` within minutes of a merge, so the human merge remains the real gate.
   - The agent writes whole files; a truncated file silently removes content. The PR diff and the validation workflow are the guards; the prompt requires reading before writing.
   - PR bodies and commits are visible publicly if the repository is public; the agent is told never to include secret values, and ESO paths are the only secret references in Git anyway.
   - Provider: file contents of the repository go to DeepSeek until the ModelConfig points at `qwen-intel`.
@@ -68,4 +68,5 @@ Create the GitHub App (Settings → Developer settings → GitHub Apps → New: 
 - `homelab-sre` delegation to `homelab-gitops` added (this PR), with the SRE opening rule reworded.
 - 2026-10-27: `homelab-gitops` produced two more PRs on request: #444 (lower the restic threshold for the alert drill; merged by the operator) and #445 (revert). Both were one-line diffs with correct Conventional Commits messages, App-authored commits, complete PR bodies and green validation runs. `homelab-sre` delegation merged in PR #443.
 - 2026-10-27: PR #442 closed and #445 merged by the operator. `homelab-sre` now delegates automatically for concrete in-repo recommendations (plan 0020); the first autonomous PR is #449, opened from an alert investigation with an "## Origin" section.
-- 2026-10-27: PR #449 merged by the operator; `for: 30m` is live in the `restic-rules` PrometheusRule. Plan complete. Open follow-ups, not blocking: the `main` ruleset (require PR; bypass admin role and deploy keys) to make the App's inability to push to `main` a hard guarantee, and reporting kagent's dropping of MCP embedded resources upstream.
+- 2026-10-27: PR #449 merged by the operator; `for: 30m` is live in the `restic-rules` PrometheusRule.
+- 2026-10-27: GitHub ruleset `main: pull requests only` (id 25934843, active) on the default branch: require a pull request (0 approvals), block force pushes and deletion; bypass "always" for the Repository admin role (the operator's direct pushes) and deploy keys (Flux image automation). The GitHub App has no bypass. Verified by calling `create_or_update_file` on `main` through the MCP server with the App credentials: GitHub answered `409 Repository rule violations found: Changes must be made through a pull request` and `main` was untouched. Rulesets are free for public repositories, which this one is. Plan complete; remaining follow-up is reporting kagent's dropping of MCP embedded resources upstream.
