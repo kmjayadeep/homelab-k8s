@@ -19,3 +19,17 @@ spec:
       clients:
         - url: http://loki-gateway/loki/api/v1/push
           tenant_id: 1
+    # Helm replaces list values instead of merging them, so the two
+    # control-plane tolerations the chart would otherwise add are restated
+    # here; the third one admits promtail to the tainted GPU node.
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: workload
+        operator: Equal
+        value: ai
+        effect: NoSchedule
