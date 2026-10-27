@@ -41,9 +41,8 @@ spec:
   # kmcp runs the stdio server behind its HTTP transport proxy.
   transportType: stdio
   deployment:
-    labels:
-      app.kubernetes.io/name: github-mcp
-      app.kubernetes.io/instance: kagent
+    # Do not set deployment.labels: kmcp replaces (not merges) the pod template labels and its selector
+    # then no longer matches. kmcp labels the pods app.kubernetes.io/managed-by=kmcp itself.
     image: ghcr.io/github/github-mcp-server:v2.0.3
     port: 3000
     cmd: /server/github-mcp-server
@@ -77,22 +76,18 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: github-mcp
+  name: kmcp-servers
   labels:
-    app.kubernetes.io/name: github-mcp
+    app.kubernetes.io/name: kmcp-servers
     app.kubernetes.io/instance: kagent
 spec:
-  # The MCP endpoint has no caller authentication and fronts a write-capable GitHub credential;
-  # only pods in this namespace (controller, agents) may use it.
+  # kmcp-managed MCP servers have no caller authentication; github-mcp fronts a write-capable GitHub
+  # credential. Only pods in this namespace (controller, agents) may reach any of them.
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: github-mcp
-      app.kubernetes.io/instance: kagent
+      app.kubernetes.io/managed-by: kmcp
   policyTypes:
     - Ingress
   ingress:
     - from:
         - podSelector: {}
-      ports:
-        - protocol: TCP
-          port: 3000
