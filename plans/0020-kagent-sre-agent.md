@@ -58,13 +58,15 @@ Gate: `Agent` Accepted and Ready; in the UI, "Is anything in the cluster not Rea
 
 Gate: controller Ready against Helios; the UI Memory page no longer returns 500; a memory survives a controller restart.
 
-### Phase 4: Alert-driven triage (operator decides the channel, then PR)
+### Phase 4: Telegram chat and alert-driven triage (PR in progress 2026-10-26)
 
-- Alertmanager receiver → webhook → adapter → `POST /api/a2a/kagent/homelab-sre/` (`message/send` with the alert labels and annotations) → the completed task text posted to the chat channel (Telegram, Slack or ntfy; choose one) and optionally back as an Alertmanager annotation.
-- The adapter is a small HTTP service; preferred home is the `docker-images` repository with a pinned image, deployed in `kagent` with its chat credential from Vault (`services/<channel>/kagent-triage`). Rate-limit to one investigation per alert group per hour so a flapping alert cannot run up provider spend.
-- Alertmanager configuration lives at Vault `platform/monitoring/alertmanager`; adding the receiver is a value change there, not in Git.
+Channel decision: **Telegram** (operator, 2026-10-26). Token at Vault `services/telegram/kagent-bot` (`token`) with the operator chat id as `chat_id` on the same path; both granted to the `kagent` role (homelab-iac `f61480d`, `cd8d0d0`).
 
-Gate: a test alert produces one agent investigation and one chat message.
+- Service `kagent-telegram-bot` (source `docker-images/kagent-telegram-bot`, image `ghcr.io/kmjayadeep/kagent-telegram-bot:<timestamp>`, aiohttp only, non-root): Telegram long polling for the allow-listed chat with one A2A session per chat and `/new`; `POST /alertmanager` posts every firing/resolved alert to the chat and runs one `homelab-sre` investigation per Alertmanager group key per hour (`ALERT_DEDUP_SECONDS`), at most two concurrently, result posted to the chat. Unauthorized chats get only their chat id back.
+- Manifests in `clusters/titania/apps/kagent/telegram-bot.yaml`: ExternalSecret (token, chat id), Deployment (Recreate strategy so two pollers never overlap, Reloader annotation, probes on `/healthz`, 20m/64Mi–500m/256Mi), Service `kagent-telegram-bot:8080`, NetworkPolicy admitting only Alertmanager pods from `monitoring`.
+- Operator step: add to the Vault-held Alertmanager config (`platform/monitoring/alertmanager`) a receiver `kagent-sre` with `webhook_configs: [{url: "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/alertmanager", send_resolved: true}]` and a route to it (for example `severity=~"warning|critical"`, `group_wait: 30s`, `repeat_interval: 4h`). The existing receivers keep working; this one adds the investigation.
+
+Gate: bot pod Ready; `/start` in the operator chat answered; a synthetic Alertmanager payload POSTed to the webhook yields the one-line alert and an investigation message in the chat; after the Alertmanager change, a real or test alert (`amtool alert add`) does the same end to end.
 
 ### Phase 5: Scoped write access (explicit approval per agent)
 

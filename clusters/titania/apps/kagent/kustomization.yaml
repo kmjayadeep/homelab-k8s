@@ -10,4 +10,5 @@ resources:
   - network-policy.yaml
   - grafana-mcp.yaml
   - agent-homelab-sre.yaml
+  - telegram-bot.yaml
   - helm-release.yaml
