@@ -15,11 +15,20 @@ spec:
     creationPolicy: Owner
     deletionPolicy: Retain
   data:
-    # GitHub token scoped to kmjayadeep/homelab-k8s (contents and pull requests). Plan 0021.
-    - secretKey: GITHUB_PERSONAL_ACCESS_TOKEN
+    # GitHub App installed only on kmjayadeep/homelab-k8s (Contents and Pull requests read/write, Metadata read).
+    # The server mints short-lived installation tokens from the private key. Plan 0021.
+    - secretKey: GITHUB_APP_ID
       remoteRef:
         key: services/github/kagent-gitops
-        property: token
+        property: app_id
+    - secretKey: GITHUB_APP_INSTALLATION_ID
+      remoteRef:
+        key: services/github/kagent-gitops
+        property: installation_id
+    - secretKey: GITHUB_APP_PRIVATE_KEY
+      remoteRef:
+        key: services/github/kagent-gitops
+        property: private_key
 ---
 apiVersion: kagent.dev/v1alpha1
 kind: MCPServer

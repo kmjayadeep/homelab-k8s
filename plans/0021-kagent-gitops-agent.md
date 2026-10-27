@@ -21,12 +21,11 @@ Verified 2026-10-27:
 - kmcp is installed with kagent (`MCPServer` CRD `kagent.dev/v1alpha1`); it runs stdio MCP servers behind its HTTP proxy with `deployment.image/cmd/args/secretRefs`.
 - GitHub MCP server `ghcr.io/github/github-mcp-server:v2.0.3` (2026-10-21) runs as `stdio`, supports `--toolsets`, `--tools`, `--exclude-tools`, `--read-only`, and takes `GITHUB_PERSONAL_ACCESS_TOKEN`. With `--toolsets=repos,pull_requests` it registers 29 tools; the write tools are `create_branch`, `create_or_update_file`, `push_files`, `create_pull_request`, `update_pull_request`, `update_pull_request_branch`, `merge_pull_request`, `pull_request_review_write`, `add_comment_to_pending_review`, `add_reply_to_pull_request_comment`, `delete_file`, `create_repository`, `fork_repository`. The image runs as root by default; it is a static binary and runs as 65532.
 - kagent supports an agent as a tool (`type: Agent`) and per-tool filtering (`toolNames`).
-- Vault: `services/github/kagent-gitops` (`token`) is granted to the `kagent` role (homelab-iac `da3e445`, applied). The value is **not yet imported**; `import-github-kagent-gitops-token.sh` is ready.
+- Vault: `services/github/kagent-gitops` is granted to the `kagent` role (homelab-iac `da3e445`, applied). The App values are **not yet imported**.
 
-Token choice (operator decision, see risks):
+Authentication (decided 2026-10-27): a **GitHub App** owned by the operator, installed only on `homelab-k8s` with Contents read/write, Pull requests read/write and Metadata read. The MCP server mints short-lived installation tokens from the App's private key (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY`), so no long-lived token exists, PRs are authored by the App's bot user, and the App is not an admin: a ruleset requiring pull requests on `main` (bypass: repository admin role and deploy keys) blocks it from `main` while the operator and Flux keep pushing. Vault path `services/github/kagent-gitops` holds `app_id`, `installation_id` and `private_key`; `import-github-kagent-gitops-app.sh` imports all three (PEM over stdin).
 
-- **A. Dedicated GitHub machine account** invited as a collaborator with Write, with a fine-grained token for `homelab-k8s` (Contents: read/write, Pull requests: read/write, Metadata: read). PRs show a distinct author, and a later ruleset "require a pull request before merging" with bypass for the admin role and deploy keys would hard-block the token from `main` while the operator and Flux keep pushing.
-- **B. The owner's own fine-grained token** with the same permissions. Quickest, but the token acts as the admin, so a ruleset cannot stop it; the only guards against pushing to `main` are the server-side tool exclusions and the agent prompt.
+Rejected alternatives: a fine-grained token on the owner's account (acts as admin, cannot be blocked by rulesets) and a machine account (works, but a long-lived token and a second account to maintain).
 
 Approvals: merging the PR (creates the MCPServer with a Secret-backed token and a write-capable agent); any later ruleset or token change.
 
@@ -43,20 +42,20 @@ Gate (before merge): client and server dry-runs pass; the workflow runs green on
 
 ### Step 2: Token (operator)
 
-Create the token per option A or B, put it in `pass`, then `pass show <entry> | ./import-github-kagent-gitops-token.sh` in `homelab-iac/vault-config`. Merge the PR afterwards, or the MCPServer pod has no token and the Kustomization waits.
+Create the GitHub App (Settings → Developer settings → GitHub Apps → New: no webhook, permissions Contents read/write, Pull requests read/write, Metadata read; install on `homelab-k8s` only), generate a private key, then in `homelab-iac/vault-config`: `./import-github-kagent-gitops-app.sh <app_id> <installation_id> < app.pem` and delete the PEM file. Optionally add the ruleset on `main`. Merge the PR afterwards, or the MCPServer pod has no credentials and the Kustomization waits.
 
 ### Step 3: Validate (after merge)
 
 - `MCPServer` `github-mcp` Ready, `Agent` `homelab-gitops` Accepted and Ready, `homelab-sre` re-rendered with the delegate tool.
 - Ask `homelab-gitops` in the UI for a trivial, reversible change (for example a comment or README line in `clusters/titania/apps/kagent/`); confirm a `kagent/...` branch and a PR appear, the validation workflow runs on it, and the PR body has the required sections. Close or merge the PR by hand.
 - From Telegram: ask `homelab-sre` to investigate something, then "open a PR for that"; confirm delegation produces one PR.
-- Confirm that a direct push to `main` is not possible for the agent: the merge tool is absent (`tools/list` on the MCPServer) and, under option A with a ruleset, a push to `main` with the token is rejected.
+- Confirm that a direct push to `main` is not possible for the agent: the merge tool is absent (`tools/list` on the MCPServer) and, once the ruleset exists, a push to `main` by the App is rejected.
 
 ## Validation and rollback
 
 - Rollback: revert the PR; Flux prunes the MCPServer, Agent and ExternalSecret; `homelab-sre` loses the delegate. Revoke the GitHub token and delete `services/github/kagent-gitops` after the consumer is gone. Open `kagent/*` branches and PRs are closed by hand.
 - Risks:
-  - Under option B nothing but tool filtering stops the token from writing to `main`, and Flux deploys `main` within minutes. Prefer option A plus a ruleset.
+  - Until a ruleset exists on `main`, only the excluded merge tool and the prompt keep the App from writing to `main`, and Flux deploys `main` within minutes. Add the ruleset (require PR; bypass admin role and deploy keys) soon after.
   - The agent writes whole files; a truncated file silently removes content. The PR diff and the validation workflow are the guards; the prompt requires reading before writing.
   - PR bodies and commits are visible publicly if the repository is public; the agent is told never to include secret values, and ESO paths are the only secret references in Git anyway.
   - Provider: file contents of the repository go to DeepSeek until the ModelConfig points at `qwen-intel`.
