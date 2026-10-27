@@ -11,13 +11,15 @@
 - `network-policy.yaml`: only the controller may reach the bundled PostgreSQL, which uses the chart's fixed credentials.
 - `grafana-mcp.yaml`: Grafana MCP server (`grafana/mcp-grafana`, read-only flags) with a Viewer service-account token from Vault `services/grafana/kagent`, plus its `RemoteMCPServer`. Gives agents Prometheus, Loki, alert-rule and dashboard tools ([plan 0020](../../../../plans/0020-kagent-sre-agent.md)).
 - `agent-homelab-sre.yaml`: the read-only `homelab-sre` agent: cluster-specific prompt, Kubernetes read tools and the Grafana tools, A2A skills `investigate` and `health-report`.
+- `github-mcp.yaml` and `agent-homelab-gitops.yaml`: the GitHub MCP server (kmcp `MCPServer`, stdio, token from Vault `services/github/kagent-gitops`, merge/delete/fork/review tools excluded at the server) and the `homelab-gitops` agent that opens pull requests. Every PR it opens runs the repository's validation workflow; a human merges.
 
 ## Agents
 
 | Agent | Purpose | Tools |
 | --- | --- | --- |
 | `k8s-agent` | Chart default, generic Kubernetes assistant | all `k8s_*` tools (writes fail: tool RBAC is read-only) |
-| `homelab-sre` | Investigate and explain titania, propose Git changes | read-only `k8s_*`, Grafana Prometheus/Loki/alerting/dashboards |
+| `homelab-sre` | Investigate and explain titania, propose Git changes | read-only `k8s_*`, Thanos PromQL, Grafana Loki/alerting/dashboards; can delegate to `homelab-gitops` on explicit request |
+| `homelab-gitops` | Turn a requested change into a pull request on `kmjayadeep/homelab-k8s` | GitHub MCP (`github-mcp.yaml`): read repo, create `kagent/*` branch, push files, open PR; no merge, no delete; read-only `k8s_*` for live names ([plan 0021](../../../../plans/0021-kagent-gitops-agent.md)) |
 
 Ask `homelab-sre` through the UI or A2A. The canonical A2A endpoint is the controller Service, `http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/`; the UI Ingress proxies the same path (`https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/`, a JSON-RPC `message/send` through it was verified on 2026-10-26 in plan 0019).
 

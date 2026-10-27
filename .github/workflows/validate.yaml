@@ -1,0 +1,47 @@
+name: Validate manifests
+
+on:
+  pull_request:
+    paths:
+      - "clusters/**"
+      - ".github/workflows/validate.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  kustomize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install kustomize and kubeconform
+        env:
+          KUSTOMIZE_VERSION: v5.8.3
+          KUBECONFORM_VERSION: v0.7.0
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin kustomize
+          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar -xz -C /usr/local/bin kubeconform
+          kustomize version && kubeconform -v
+
+      - name: Build every Kustomize entry point and validate known schemas
+        run: |
+          set -euo pipefail
+          status=0
+          for kz in $(find clusters/titania/apps clusters/titania/infra -name kustomization.yaml | sort); do
+            dir=$(dirname "$kz")
+            echo "::group::$dir"
+            if ! kustomize build "$dir" > /tmp/build.yaml; then
+              echo "::error file=$kz::kustomize build failed"; status=1
+            elif ! kubeconform -strict -ignore-missing-schemas -summary /tmp/build.yaml; then
+              echo "::error file=$kz::kubeconform failed"; status=1
+            fi
+            echo "::endgroup::"
+          done
+          echo "::group::bootstrap"
+          for f in clusters/titania/bootstrap/apps/*.yaml clusters/titania/bootstrap/infra/*.yaml; do
+            kubeconform -strict -ignore-missing-schemas "$f" || { echo "::error file=$f::kubeconform failed"; status=1; }
+          done
+          echo "::endgroup::"
+          exit $status
