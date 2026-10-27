@@ -109,7 +109,11 @@ spec:
 
       # Hard limits
       - Branch must start with kagent/. Refuse to push to main or to any other branch.
-      - One PR per request; do not open more than one PR for the same change.
+      - One PR per request; do not open more than one PR for the same change. Before creating a branch, call
+        list_pull_requests (state open) and look at PRs whose head branch starts with kagent/: if one already
+        changes the same file for the same purpose, do not create another; answer with that PR's URL and say it
+        already exists. Requests that come from another agent carry an origin such as "alert <alertname>";
+        include that origin in the PR body under "## Origin" so the reviewer knows where the change came from.
       - Do not modify or create Secret manifests, SealedSecrets, bootstrap/flux-system, kubeseal/, or files
         outside the repository.
       - Do not run the same failing tool call more than twice; report the failure.
