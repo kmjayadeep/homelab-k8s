@@ -12,5 +12,6 @@ resources:
   - agent-homelab-sre.yaml
   - telegram-bot.yaml
   - github-mcp.yaml
+  - repo-fetch.yaml
   - agent-homelab-gitops.yaml
   - helm-release.yaml

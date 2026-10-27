@@ -62,4 +62,6 @@ Create the GitHub App (Settings → Developer settings → GitHub Apps → New: 
 
 ## Outcome
 
-Pending.
+- 2026-10-27: PR #439 merged (manifests, agent, validation workflow) and #440 (kmcp label fix: `deployment.labels` replaces kmcp's template labels and breaks its selector; the NetworkPolicy now selects `app.kubernetes.io/managed-by: kmcp`). The GitHub App (`jayadeep-s-ai-orchestrator`, App 3314004, installation 122333875 on `homelab-k8s`) authenticates: `tools/list` on the kmcp endpoint shows 21 tools and no merge, delete, fork or new-repo tool.
+- First smoke test stopped correctly at `input-required`: the agent found that `get_file_contents` gave it only `successfully downloaded text file (SHA: …)`. Verified by calling the server directly: the body is returned as an MCP embedded resource (`repo://…`, `text/plain`) next to that text line, and kagent's Go ADK forwards only text parts to the model. Upstream github/github-mcp-server (issue 3189) explicitly keeps the body out of the text part; the gap is on the kagent client side. Workaround: a pinned `mcp-server-fetch` image (docker-images) as kmcp `MCPServer` `repo-fetch`; the agent reads files from `raw.githubusercontent.com` with `raw=true` and uses `get_file_contents` only for listings. Follow-up: report the embedded-resource handling to kagent.
+- Pending: smoke-test PR, `homelab-sre` delegation follow-up, `main` ruleset.

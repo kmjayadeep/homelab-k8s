@@ -1,0 +1,37 @@
+apiVersion: kagent.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: repo-fetch
+  labels:
+    app.kubernetes.io/name: repo-fetch
+    app.kubernetes.io/instance: kagent
+spec:
+  # Plain-text reads of public repository files (raw.githubusercontent.com). The GitHub MCP server returns
+  # file bodies only as MCP embedded resources, which kagent's runtime does not pass to the model (plan 0021).
+  transportType: stdio
+  deployment:
+    image: ghcr.io/kmjayadeep/mcp-server-fetch:20261027035003
+    port: 3000
+    cmd: mcp-server-fetch
+    args:
+      - --ignore-robots-txt
+      - --user-agent=kagent-homelab-gitops (+https://github.com/kmjayadeep/homelab-k8s)
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      runAsGroup: 65532
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
