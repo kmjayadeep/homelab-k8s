@@ -41,6 +41,9 @@ spec:
   # kmcp runs the stdio server behind its HTTP transport proxy.
   transportType: stdio
   deployment:
+    labels:
+      app.kubernetes.io/name: github-mcp
+      app.kubernetes.io/instance: kagent
     image: ghcr.io/github/github-mcp-server:v2.0.3
     port: 3000
     cmd: /server/github-mcp-server
@@ -70,3 +73,26 @@ spec:
       capabilities:
         drop:
           - ALL
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: github-mcp
+  labels:
+    app.kubernetes.io/name: github-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  # The MCP endpoint has no caller authentication and fronts a write-capable GitHub credential;
+  # only pods in this namespace (controller, agents) may use it.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: github-mcp
+      app.kubernetes.io/instance: kagent
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 3000

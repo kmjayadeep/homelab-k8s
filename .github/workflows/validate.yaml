@@ -13,35 +13,47 @@ jobs:
   kustomize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Install kustomize and kubeconform
+      - name: Install kustomize and kubeconform (pinned, checksum-verified)
         env:
           KUSTOMIZE_VERSION: v5.8.3
+          KUSTOMIZE_SHA256: cb9e31198d3f63b44848bd0afc4c8efc56e6cfef9c93a4a39a211940e6decd61
           KUBECONFORM_VERSION: v0.7.0
+          KUBECONFORM_SHA256: c31518ddd122663b3f3aa874cfe8178cb0988de944f29c74a0b9260920d115d3
         run: |
           set -euo pipefail
-          curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin kustomize
-          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar -xz -C /usr/local/bin kubeconform
+          curl -fsSL -o kustomize.tgz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          echo "${KUSTOMIZE_SHA256}  kustomize.tgz" | sha256sum -c -
+          curl -fsSL -o kubeconform.tgz "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz"
+          echo "${KUBECONFORM_SHA256}  kubeconform.tgz" | sha256sum -c -
+          sudo tar -xzf kustomize.tgz -C /usr/local/bin kustomize
+          sudo tar -xzf kubeconform.tgz -C /usr/local/bin kubeconform
           kustomize version && kubeconform -v
 
-      - name: Build every Kustomize entry point and validate known schemas
+      - name: Build every Kustomize entry point and validate against core and CRD schemas
+        env:
+          # Flux, ESO, cert-manager, monitoring, Longhorn, kagent and other CRDs come from the community CRD catalog.
+          CRD_CATALOG: "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
         run: |
           set -euo pipefail
-          status=0
+          rc=0
+          validate() {
+            kubeconform -strict -ignore-missing-schemas -schema-location default -schema-location "$CRD_CATALOG" -summary "$@"
+          }
           for kz in $(find clusters/titania/apps clusters/titania/infra -name kustomization.yaml | sort); do
             dir=$(dirname "$kz")
             echo "::group::$dir"
             if ! kustomize build "$dir" > /tmp/build.yaml; then
-              echo "::error file=$kz::kustomize build failed"; status=1
-            elif ! kubeconform -strict -ignore-missing-schemas -summary /tmp/build.yaml; then
-              echo "::error file=$kz::kubeconform failed"; status=1
+              echo "::error file=$kz::kustomize build failed"; rc=1
+            elif ! validate /tmp/build.yaml; then
+              echo "::error file=$kz::kubeconform failed"; rc=1
             fi
             echo "::endgroup::"
           done
           echo "::group::bootstrap"
           for f in clusters/titania/bootstrap/apps/*.yaml clusters/titania/bootstrap/infra/*.yaml; do
-            kubeconform -strict -ignore-missing-schemas "$f" || { echo "::error file=$f::kubeconform failed"; status=1; }
+            validate "$f" || { echo "::error file=$f::kubeconform failed"; rc=1; }
           done
           echo "::endgroup::"
-          exit $status
+          exit $rc

@@ -64,10 +64,6 @@ spec:
             - search_dashboards
             - get_dashboard_summary
             - get_dashboard_panel_queries
-      # Delegate: opens pull requests in homelab-k8s. Used only when the user explicitly asks for a PR.
-      - type: Agent
-        agent:
-          name: homelab-gitops
     a2aConfig:
       skills:
         - id: investigate
@@ -141,12 +137,6 @@ spec:
       - k8s_get_resources works for CRDs too (kustomizations.kustomize.toolkit.fluxcd.io,
         helmreleases.helm.toolkit.fluxcd.io, volumes.longhorn.io, ciliumendpoints.cilium.io,
         externalsecrets.external-secrets.io). You cannot read Secrets or exec into pods.
-
-      # Pull requests
-      - You can hand a change to the homelab-gitops agent, which opens a pull request in homelab-k8s. Do this
-        only when the user explicitly asks for a PR (for example "open a PR for that"), never on your own
-        initiative and never during an alert investigation. Pass it a precise description: file path, field, old
-        value, new value and the reason. Report the PR URL it returns.
 
       # Rules
       - Prefer narrow queries (one namespace, label selector, short time range) and increase scope only as needed.
