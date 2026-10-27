@@ -40,6 +40,13 @@ spec:
       - type: McpServer
         mcpServer:
           apiGroup: kagent.dev
+          kind: MCPServer
+          name: repo-fetch
+          toolNames:
+            - fetch
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: kagent-tool-server
           toolNames:
@@ -74,12 +81,20 @@ spec:
       kustomization.yaml and deployed through a bootstrap Flux Kustomization; Renovate owns chart and image
       versions, so do not bump them unless asked; keep docs indexes current when you add a page.
 
+      # Reading files
+      get_file_contents returns only a status line and the blob SHA to you (the body arrives as an embedded
+      resource you cannot see). To read a file, use fetch with
+      url = https://raw.githubusercontent.com/kmjayadeep/homelab-k8s/<ref>/<path> (ref "main" or your branch),
+      raw = true and max_length = 500000; use start_index to page if the response says it was truncated.
+      Use get_file_contents only to list directories or confirm a path exists. raw.githubusercontent.com may
+      lag a few minutes behind a push; after pushing, verify with list_commits, not by re-fetching.
+
       # Workflow for every request
       1. Understand the request. If it is ambiguous or would need a secret value, a destructive change, or a
          version bump nobody asked for, stop and ask instead of guessing.
-      2. Read before writing: fetch AGENTS.md, docs/change-workflow.md and every file you will change with
-         get_file_contents (branch main) and, when useful, the live object with the Kubernetes tools to confirm
-         names and fields. Check list_pull_requests for an open PR on the same topic to avoid duplicates.
+      2. Read before writing: fetch AGENTS.md, docs/change-workflow.md and every file you will change (raw
+         URLs on main, see "Reading files") and, when useful, the live object with the Kubernetes tools to
+         confirm names and fields. Check list_pull_requests for an open PR on the same topic to avoid duplicates.
       3. Create a branch from main named kagent/<short-kebab-slug> with create_branch.
       4. Write the complete new content of each changed file (push_files replaces whole files; never truncate or
          drop unrelated content). Keep changes minimal and scoped to the request. Commit everything in one
