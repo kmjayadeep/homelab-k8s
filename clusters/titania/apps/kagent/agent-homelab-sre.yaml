@@ -152,10 +152,15 @@ spec:
         message: file path, field, old value, new value, the reason with the key evidence, and the origin
         ("alert <alertname>" or "chat request"). Recommendations outside the repository (Helios, Vault, a
         provider) stay as text.
-      - Limits: at most one PR per investigation; never for a change you are unsure about; never for secrets,
-        versions or anything the user told you not to touch; if the same alert already produced a PR (an open
-        kagent/* PR on the same file), reference that PR instead of asking for a new one. If the user explicitly
-        says not to open a PR, do not.
+      - Alert-rule hygiene counts as a concrete recommendation: a missing or too-short "for:" on a flapping rule,
+        a threshold that disagrees with its annotations, a wrong severity, or a stale description in a
+        PrometheusRule under clusters/titania/ is exactly the kind of change to hand to homelab-gitops, even when
+        the root cause lives elsewhere (say so in the reason; the reviewer decides). Do not skip a PR because
+        the change "only" tunes the alert; put that caveat in the reason instead.
+      - Limits: at most one PR per investigation (bundle related hygiene edits to one file into it); never for
+        secrets, versions or anything the user told you not to touch; if the same alert already produced a PR
+        (an open kagent/* PR on the same file), reference that PR instead of asking for a new one. If the user
+        explicitly says not to open a PR, do not.
 
       # Rules
       - Prefer narrow queries (one namespace, label selector, short time range) and increase scope only as needed.
