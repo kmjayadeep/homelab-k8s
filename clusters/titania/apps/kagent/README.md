@@ -21,6 +21,8 @@
 | `homelab-sre` | Investigate and explain titania, propose Git changes | read-only `k8s_*`, Thanos PromQL, Grafana Loki/alerting/dashboards (delegation to `homelab-gitops` is a planned follow-up) |
 | `homelab-gitops` | Turn a requested change into a pull request on `kmjayadeep/homelab-k8s` | GitHub MCP (`github-mcp.yaml`): read repo, create `kagent/*` branch, push files, open PR; no merge, no delete; read-only `k8s_*` for live names ([plan 0021](../../../../plans/0021-kagent-gitops-agent.md)) |
 
+The `homelab-gitops` agent opened its first pull request as a smoke test on 2026-10-27 (plan 0021).
+
 Ask `homelab-sre` through the UI or A2A. The canonical A2A endpoint is the controller Service, `http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/`; the UI Ingress proxies the same path (`https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/`, a JSON-RPC `message/send` through it was verified on 2026-10-26 in plan 0019).
 
 ## Telegram bot and alert triage
