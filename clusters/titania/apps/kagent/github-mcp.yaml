@@ -1,0 +1,98 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kagent-github
+  labels:
+    app.kubernetes.io/name: github-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: kagent-github
+    creationPolicy: Owner
+    deletionPolicy: Retain
+  data:
+    # GitHub App installed only on kmjayadeep/homelab-k8s (Contents and Pull requests read/write, Metadata read).
+    # The server mints short-lived installation tokens from the private key. Plan 0021.
+    - secretKey: GITHUB_APP_ID
+      remoteRef:
+        key: services/github/kagent-gitops
+        property: app_id
+    - secretKey: GITHUB_APP_INSTALLATION_ID
+      remoteRef:
+        key: services/github/kagent-gitops
+        property: installation_id
+    - secretKey: GITHUB_APP_PRIVATE_KEY
+      remoteRef:
+        key: services/github/kagent-gitops
+        property: private_key
+---
+apiVersion: kagent.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: github-mcp
+  labels:
+    app.kubernetes.io/name: github-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  # kmcp runs the stdio server behind its HTTP transport proxy.
+  transportType: stdio
+  deployment:
+    labels:
+      app.kubernetes.io/name: github-mcp
+      app.kubernetes.io/instance: kagent
+    image: ghcr.io/github/github-mcp-server:v2.0.3
+    port: 3000
+    cmd: /server/github-mcp-server
+    args:
+      - stdio
+      - --toolsets=repos,pull_requests
+      # Pull requests are the only write path: no merging, deleting, forking, reviewing or new repositories.
+      - --exclude-tools=merge_pull_request,delete_file,create_repository,fork_repository,pull_request_review_write,add_comment_to_pending_review,add_reply_to_pull_request_comment,update_pull_request_branch
+    secretRefs:
+      - name: kagent-github
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      runAsGroup: 65532
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: github-mcp
+  labels:
+    app.kubernetes.io/name: github-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  # The MCP endpoint has no caller authentication and fronts a write-capable GitHub credential;
+  # only pods in this namespace (controller, agents) may use it.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: github-mcp
+      app.kubernetes.io/instance: kagent
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 3000

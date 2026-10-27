@@ -11,4 +11,6 @@ resources:
   - grafana-mcp.yaml
   - agent-homelab-sre.yaml
   - telegram-bot.yaml
+  - github-mcp.yaml
+  - agent-homelab-gitops.yaml
   - helm-release.yaml
