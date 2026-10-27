@@ -21,6 +21,10 @@
 
 Ask `homelab-sre` through the UI or A2A. The canonical A2A endpoint is the controller Service, `http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/`; the UI Ingress proxies the same path (`https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/`, a JSON-RPC `message/send` through it was verified on 2026-10-26 in plan 0019).
 
+## Telegram bot and alert triage
+
+`telegram-bot.yaml` runs `ghcr.io/kmjayadeep/kagent-telegram-bot` (source in the `docker-images` repository). It long-polls Telegram and forwards messages from the operator chat to `homelab-sre` over A2A (one session per chat, `/new` resets), and serves `POST /alertmanager` for Alertmanager: every firing or resolved alert is posted to the chat, and a firing group triggers one agent investigation per hour whose result is posted too. Token and chat id come from Vault `services/telegram/kagent-bot`; a NetworkPolicy admits only Alertmanager pods to the webhook. Alertmanager's receiver (`webhook_configs` → `http://kagent-telegram-bot.kagent.svc.cluster.local:8080/alertmanager`, `send_resolved: true`) is configured in the Vault-held Alertmanager config, not in Git.
+
 ## Rotate the Grafana token
 
 Create a new token for the Grafana service account `kagent-mcp` (Viewer), import it with `../homelab-iac/vault-config/import-grafana-kagent-token.sh`, wait for the `ExternalSecret` refresh (or force-sync), and Reloader restarts `grafana-mcp`. Delete the old token in Grafana.

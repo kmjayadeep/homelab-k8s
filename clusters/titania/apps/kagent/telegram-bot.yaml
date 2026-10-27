@@ -1,0 +1,143 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kagent-telegram
+  labels:
+    app.kubernetes.io/name: kagent-telegram-bot
+    app.kubernetes.io/instance: kagent
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: kagent-telegram
+    creationPolicy: Owner
+    deletionPolicy: Retain
+  data:
+    - secretKey: TELEGRAM_BOT_TOKEN
+      remoteRef:
+        key: services/telegram/kagent-bot
+        property: token
+    # The operator's chat: the only chat allowed to talk to the agent, and where alerts are posted.
+    - secretKey: TELEGRAM_CHAT_ID
+      remoteRef:
+        key: services/telegram/kagent-bot
+        property: chat_id
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kagent-telegram-bot
+  labels:
+    app.kubernetes.io/name: kagent-telegram-bot
+    app.kubernetes.io/instance: kagent
+  annotations:
+    secret.reloader.stakater.com/reload: kagent-telegram
+spec:
+  replicas: 1
+  # Long polling must not run twice against the same bot token.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kagent-telegram-bot
+      app.kubernetes.io/instance: kagent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kagent-telegram-bot
+        app.kubernetes.io/instance: kagent
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bot
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261026195419
+          env:
+            - name: KAGENT_A2A_URL
+              value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
+            - name: AGENT_DISPLAY_NAME
+              value: homelab-sre
+            - name: ALERT_DEDUP_SECONDS
+              value: "3600"
+            - name: A2A_TIMEOUT_SECONDS
+              value: "600"
+          envFrom:
+            - secretRef:
+                name: kagent-telegram
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kagent-telegram-bot
+  labels:
+    app.kubernetes.io/name: kagent-telegram-bot
+    app.kubernetes.io/instance: kagent
+spec:
+  selector:
+    app.kubernetes.io/name: kagent-telegram-bot
+    app.kubernetes.io/instance: kagent
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kagent-telegram-bot
+  labels:
+    app.kubernetes.io/name: kagent-telegram-bot
+    app.kubernetes.io/instance: kagent
+spec:
+  # The webhook has no authentication; only Alertmanager (monitoring namespace) may reach it.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: kagent-telegram-bot
+      app.kubernetes.io/instance: kagent
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: alertmanager
+      ports:
+        - protocol: TCP
+          port: 8080
