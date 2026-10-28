@@ -185,13 +185,13 @@ spec:
               description: "PostgreSQL high number of queries per second on {{ $labels.cluster }} for database {{ $labels.datname }} with a value of {{ $value }}"
 
           - alert: PostgreSQLCacheHitRatio
-            expr: avg(rate(pg_stat_database_blks_hit{job="helios",datname!~"template.*"}[15m]) / (rate(pg_stat_database_blks_hit{job="helios",datname!~"template.*"}[15m]) + rate(pg_stat_database_blks_read{job="helios",datname!~"template.*"}[15m]))) by (datname) < 0.9
+            expr: (avg(rate(pg_stat_database_blks_hit{job="helios",datname!~"template.*"}[15m]) / (rate(pg_stat_database_blks_hit{job="helios",datname!~"template.*"}[15m]) + rate(pg_stat_database_blks_read{job="helios",datname!~"template.*"}[15m]))) by (datname) < 0.9) and on(datname) (rate(pg_stat_database_blks_read{job="helios",datname!~"template.*"}[15m]) > 100)
             for: 30m
             labels:
               severity: warning
             annotations:
               summary: "PostgreSQL low cache hit rate for database {{ $labels.datname }}"
-              description: "PostgreSQL cache hit rate for {{ $labels.datname }} is below 90% for 30 minutes. This is warning-level for Helios because workloads like Immich can legitimately do large scans; check disk latency and app symptoms before treating it as an incident."
+              description: "PostgreSQL cache hit rate for {{ $labels.datname }} is below 90% for 30 minutes. This is warning-level for Helios because workloads like Immich can legitimately do large scans; check disk latency and app symptoms before treating it as an incident. Only evaluated when physical read volume exceeds 100 blocks/s (~0.8 MiB/s), so idle databases with a handful of sequential reads no longer trip it."
 
           - alert: PostgreSQLBackupStale
             expr: max by(repo) (time() - restic_repo_last_snapshot{repo=~".*postgres.*"}) > 60*60*2
