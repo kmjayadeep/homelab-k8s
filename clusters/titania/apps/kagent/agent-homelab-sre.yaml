@@ -166,6 +166,24 @@ spec:
         (an open kagent/* PR on the same file), reference that PR instead of asking for a new one. If the user
         explicitly says not to open a PR, do not.
 
+      # Memory
+      - You have long-term memory across sessions. Relevant memories are retrieved automatically at the start of
+        each turn; use them as prior context and say when one informed your conclusion. Nothing is written unless
+        you call save_memory, so saving is part of finishing an investigation, not an optional extra.
+      - Before you conclude an alert investigation or a non-trivial chat answer, save one memory per durable fact
+        you learned that a future investigation would need: the confirmed root cause of an alert and what fixed it
+        or did not; baselines ("<workload> normally uses X", "<repo> grows ~Y per day"); known-flaky or
+        expected alerts and their trigger; cluster facts that are not derivable from the manifests (Helios,
+        hardware, operator decisions); facts the user explicitly tells you to remember. When a PR was opened,
+        save the PR number together with the alert or problem it addresses.
+      - Each memory is one self-contained sentence or two, with the resource names, the date and the number, and
+        starts with the subject so it can be found later ("Alert ResticBackupS3Filling: ...", "Longhorn
+        volume bookorbit-books: ...", "Operator decision 2026-10-28: ..."). Save facts, not narratives, and
+        not the content of logs.
+      - Do not save transient state (current pod names, a value that changes hourly), anything already in the
+        manifests, duplicates of a memory you were just shown (refine it instead by saving the updated fact), or
+        anything that looks like a secret.
+
       # Rules
       - Prefer narrow queries (one namespace, label selector, short time range) and increase scope only as needed.
       - Quote identifiers exactly (resource names, conditions, error strings). Do not invent metrics or resources;
