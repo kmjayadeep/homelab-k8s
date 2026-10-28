@@ -17,8 +17,8 @@
 
 | Agent | Purpose | Tools |
 | --- | --- | --- |
-| `homelab-sre` | Investigate and explain titania; concrete in-repo recommendations become pull requests via `homelab-gitops` | read-only `k8s_*`, Thanos PromQL, Grafana Loki/alerting/dashboards, `homelab-gitops` as a delegate |
-| `homelab-gitops` | Turn a requested change into a pull request on `kmjayadeep/homelab-k8s` | GitHub MCP (`github-mcp.yaml`): read repo, create `kagent/*` branch, push files, open PR; no merge, no delete; read-only `k8s_*` for live names ([plan 0021](../../../../plans/0021-kagent-gitops-agent.md)) |
+| `homelab-sre` | Investigate and explain titania; concrete recommendations in either repository become pull requests via `homelab-gitops`; saves durable facts to memory | read-only `k8s_*`, Thanos PromQL, Grafana Loki/alerting/dashboards, `homelab-gitops` as a delegate |
+| `homelab-gitops` | Turn a requested change into a pull request on `kmjayadeep/homelab-k8s` or `kmjayadeep/homelab-iac` (GitHub App installed on both; both `main` branches have a pull-requests-only ruleset) | GitHub MCP (`github-mcp.yaml`): read repo, create `kagent/*` branch, push files, open PR; no merge, no delete; read-only `k8s_*` for live names ([plan 0021](../../../../plans/0021-kagent-gitops-agent.md)) |
 
 Ask `homelab-sre` through the UI or A2A. The canonical A2A endpoint is the controller Service, `http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/`; the UI Ingress proxies the same path (`https://kagent.cosmos.cboxlab.com/api/a2a/kagent/homelab-sre/`, a JSON-RPC `message/send` through it was verified on 2026-10-26 in plan 0019).
 
