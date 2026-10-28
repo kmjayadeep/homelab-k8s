@@ -13,6 +13,10 @@ LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, 
 - Known limits: one benign image request passed. Near-limit context, sustained load and the MTP speedup are untested, and the first 128K pod was evicted for host-memory pressure. See [plan 0008](../../../../plans/0008-tiel-coder-b60-trial.md#128k-vision-follow-up).
 - Clients should use `qwen-intel`, not the versioned name, so the model can be changed without reconfiguring clients.
 
+## Embeddings
+
+`gemini-embedding-2` (Google Gemini API free tier, key at Vault `services/gemini/litellm`, Git-managed entry) serves `/v1/embeddings` at 768 dimensions for kagent agent memory. The entry caps itself below the free tier's reported 100 RPM / 30K TPM. Text sent for embedding leaves the cluster to Google.
+
 ## Pricing
 
 Every local entry uses the same **internal accounting rates**. They are not actual cost: $0.10/1M uncached input, $0.01/1M cache-read input, and $1.00/1M output, set in `model_info`. Cache reads are discounted only if the backend reports `prompt_tokens_details.cached_tokens`.
