@@ -1,6 +1,6 @@
 # kagent
 
-[kagent](https://kagent.dev/) runs Kubernetes-aware AI agents. Deployed per [plan 0019](../../../../plans/0019-kagent-deployment.md). UI: `https://kagent.cosmos.cboxlab.com` (LAN/VPN only, no authentication yet).
+[kagent](https://kagent.dev/) runs Kubernetes-aware AI agents. Deployed per [plan 0019](../../../../plans/0019-kagent-deployment.md). UI: `https://kagent.cosmos.cboxlab.com` (LAN/VPN only, HTTP basic auth since 2026-10-28).
 
 ## Layout
 
@@ -26,6 +26,20 @@ Ask `homelab-sre` through the UI or A2A. The canonical A2A endpoint is the contr
 ## Telegram bot and alert triage
 
 `telegram-bot.yaml` runs `ghcr.io/kmjayadeep/kagent-telegram-bot` (source in the `docker-images` repository). It long-polls Telegram and forwards messages from the operator chat to `homelab-sre` over A2A (one session per chat, `/new` resets), and serves `POST /alertmanager` for Alertmanager: every firing or resolved alert is posted to the chat, and a firing group triggers one agent investigation per hour whose result is posted too. Token and chat id come from Vault `services/telegram/kagent-bot`; a NetworkPolicy admits only Alertmanager pods to the webhook. Alertmanager's receiver `kagent-sre` (`webhook_configs` → `http://kagent-telegram-bot.kagent.svc.cluster.local:8080/alertmanager`, `send_resolved: true`) and its `severity =~ "warning|critical"` route with `continue: true` live in the Vault-held Alertmanager config (`platform/monitoring/alertmanager`), not in Git; edit that document file-to-file and validate with `amtool check-config` before writing it back.
+
+## UI credentials
+
+The Ingress requires HTTP basic auth (`ui-basic-auth.yaml`). Username and password live in Vault at `apps/kagent/ui-basic-auth`; External Secrets renders the bcrypt htpasswd line into Secret `kagent-ui-basic-auth`. Read them (never paste the password into chat or commits):
+
+```bash
+cd ~/workspace/homelab/homelab-iac/vault-config
+direnv exec . vault kv get -field=username -mount=homelab/kv apps/kagent/ui-basic-auth
+direnv exec . vault kv get -field=password -mount=homelab/kv apps/kagent/ui-basic-auth
+```
+
+Rotate: `printf '%s\n' "<new password>" | direnv exec . ./import-kagent-ui-basic-auth.sh <username>` (or pipe from `pass`), then wait for the ExternalSecret refresh or force-sync it; ingress-nginx picks the Secret up without a restart. Browsers may need the credentials re-entered. A2A calls through the Ingress need `-u` as well; the Telegram bot and the agents use the controller Service in-cluster and are not affected.
+
+- Risk removed: the UI is no longer open to anyone on the LAN/VPN.
 
 ## Rotate the GitHub App key
 
@@ -54,6 +68,5 @@ Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `dee
 
 ## Risks
 
-- No UI authentication; anyone on the LAN/VPN gets read access to pods, logs, ConfigMaps and events through the agent.
 - Tool output is sent to the configured model provider (DeepSeek until the model is switched to `qwen-intel`).
 - Sessions and memory live in the `kagent` database on Helios, which is in the hourly Restic backup set.

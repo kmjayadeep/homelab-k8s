@@ -10,6 +10,13 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    # HTTP basic auth for the whole host (UI and its /api proxy, including A2A through the Ingress).
+    # Credentials: Vault apps/kagent/ui-basic-auth, rendered by the kagent-ui-basic-auth ExternalSecret.
+    # In-cluster callers (Telegram bot, agents) use the controller Service directly and are unaffected.
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: kagent-ui-basic-auth
+    nginx.ingress.kubernetes.io/auth-secret-type: auth-file
+    nginx.ingress.kubernetes.io/auth-realm: kagent
 spec:
   ingressClassName: nginx
   tls:
