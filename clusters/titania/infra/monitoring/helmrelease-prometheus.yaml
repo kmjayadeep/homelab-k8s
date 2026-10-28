@@ -116,7 +116,7 @@ spec:
               severity: warning
             annotations:
               summary: '{{ $labels.kind }} {{ $labels.exported_namespace }}/{{ $labels.name }} reconciliation has been failing for more than ten minutes.'
-
+      
       postgresql:
         groups:
         - name: PostgreSQL
