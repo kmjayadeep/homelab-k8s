@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261026195419
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261028102935
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
