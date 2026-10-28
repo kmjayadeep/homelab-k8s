@@ -62,3 +62,19 @@ spec:
         summary: Restic backup is storing more than 10k objects in the bucket
       labels:
         severity: warning
+    - alert: ResticBackupS3FillingCritical
+      expr: max by (repo) (restic_s3_size_total / restic_s3_size_limit) > 0.9
+      annotations:
+        summary: Restic backup above 90% of the bucket size limit
+        description: Restic backup for repo {{$labels.repo}} is above 90% of its bucket size limit; backups fail once the limit is reached.
+      for: 10m
+      labels:
+        severity: critical
+    - alert: ResticBackupS3FillingPredicted
+      expr: max by (repo) (predict_linear(restic_s3_size_total[6h], 86400) / restic_s3_size_limit > 1) and max by (repo) (restic_s3_size_total / restic_s3_size_limit) > 0.5
+      annotations:
+        summary: Restic repo projected to hit its bucket size limit within 24h
+        description: At the growth rate of the last 6h, repo {{$labels.repo}} is projected to exceed its bucket size limit within 24 hours.
+      for: 1h
+      labels:
+        severity: warning
