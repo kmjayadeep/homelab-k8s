@@ -20,8 +20,15 @@ spec:
   values:
     kubeApiServer:
       enabled: false
+    # kubelet and cAdvisor metrics (container CPU/memory/network, pod probes). Costs roughly
+    # +25-35k series and +150-200Mi of Prometheus memory; the limit below accounts for it.
     kubelet:
-      enabled: false
+      enabled: true
+      serviceMonitor:
+        interval: 30s
+        cAdvisorInterval: 30s
+        probes: true
+        resource: false
     kubeControllerManager:
       enabled: false
     kubeEtcd:
@@ -69,7 +76,7 @@ spec:
         kubeApiserverHistogram: true
         kubeApiserverSlos: true
         kubeControllerManager: false
-        kubelet: false
+        kubelet: true
         kubeProxy: false
         kubePrometheusGeneral: true
         kubePrometheusNodeRecording: true
@@ -209,10 +216,10 @@ spec:
         retention: 3h
         resources:
           limits:
-            memory: 700Mi
+            memory: 1Gi
             cpu: 1
           requests:
-            memory: 400Mi
+            memory: 512Mi
             cpu: 1m
         storageSpec:
           volumeClaimTemplate:
