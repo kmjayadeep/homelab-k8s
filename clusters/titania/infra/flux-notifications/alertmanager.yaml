@@ -171,5 +171,6 @@ spec:
     - "^Reconciliation finished in"
     - "^Health check passed"
     - "^Dependency .* is not ready"
+    - "^Dependencies do not meet ready condition"
     - "^Helm (install|upgrade|rollback|test) has started"
     - "^Helm (install|upgrade) succeeded for release .* with chart .*$"
