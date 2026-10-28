@@ -1,6 +1,6 @@
 # Plan 0022: Flux change verification and scheduled kagent tasks
 
-- Status: In progress 2026-10-28
+- Status: Completed 2026-10-28
 - Owner: Jayadeep KM
 - Related: [plan 0020](0020-kagent-sre-agent.md), [plan 0021](0021-kagent-gitops-agent.md), [ADR 0002](../adrs/0002-autonomous-repository-agent.md)
 
@@ -38,4 +38,12 @@ Out of scope (operator decision 2026-10-28): GPU metrics export, homelab-iac tem
 
 ## Outcome
 
-Pending.
+2026-10-28, all four paths verified after PR #481 merged (bot image `20261028125041`):
+
+- Alertmanager config version 3 in Vault; `amtool config routes test` sends `FluxKustomizationProgressing` to `kagent-flux` only and a warning alert still to `kagent-sre` and `homelab-telegram`. The ExternalSecret needed a `force-sync` annotation to pick the new document up before its refresh interval.
+- Flux path: the real `Progressing` events of the merge itself were discarded ("no alerts found for the involved object") because the Alert was created in the same reconcile; a synthetic event POSTed to notification-controller from a pod in `flux-system` was dispatched, became `FluxKustomizationProgressing` in Alertmanager, reached the bot's `/flux` 2 minutes later (group wait) and produced a 475-character `OK` verdict from `homelab-sre` after the 120 s delay.
+- Daily summary (manual job): 406 characters, five lines, verdict first.
+- Renovate review: the first run reported "no tool to post PR comments" although the Agent spec listed `add_issue_comment`; the agent runtime loads its tool list from the MCP server at pod start, and `homelab-gitops` had started before the re-configured `github-mcp` pod was serving. After `rollout restart deploy/homelab-gitops` the second run commented on PR #482 (wallabag 2.6.15, verdict merge, with the CVE context and the custom-entrypoint check) and PR #483 (curl 8.23.0, verdict merge), both carrying the `<!-- kagent-renovate-review -->` marker.
+- Repository review: PR #484 (`kagent/review-vault-tls-readme`) fixes the stale "Vault internal TLS is still follow-up work" sentence in the root README.
+
+Lessons: restart agents after changing an MCPServer's toolsets; add new namespaces to Alert `flux-changes`; the Alert is not evaluated for events emitted while it is being created.
