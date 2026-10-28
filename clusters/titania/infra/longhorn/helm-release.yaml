@@ -53,6 +53,15 @@ spec:
       # Engines lagging a minor behind block the next minor upgrade; see
       # plans/0016-longhorn-1.9-to-1.13-upgrade.md.
       concurrentAutomaticEngineUpgradePerNodeLimit: 3
+      # Semicolon-separated list of orphan types Longhorn may delete on its own
+      # (empty = disabled). Leftover replica directories from node/longhorn-manager
+      # restarts were never reclaimed: 65 orphans.longhorn.io replica objects on
+      # titania-worker1 (DataCleanable=True) while only ~5 GiB of live replica data
+      # existed there, and /var/lib/longhorn on the root filesystem ratcheted up
+      # ~17 GiB, ~25 GiB and ~10 GiB across the restarts of 2026-10-23, 10-26 and
+      # 10-28. Narrow to "replica-data" if deleting stale instance managers proves
+      # too aggressive.
+      orphanResourceAutoDeletion: "replica-data;instance"
     defaultBackupStore:
       backupTarget: nfs://truenas.cosmos.cboxlab.com:/mnt/main/k8s/longhorn-backup
     persistence:
