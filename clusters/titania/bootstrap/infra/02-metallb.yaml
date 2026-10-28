@@ -2,8 +2,9 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: metallb-system
-  # Step 1 of handing this Namespace to a single owner: carry the labels the upstream MetalLB
-  # base sets, so both Kustomizations render the same labels while the base still ships one.
+  # Sole owner of this Namespace: the copy the upstream MetalLB base ships is deleted in
+  # infra/metallb/kustomization.yaml. Two Kustomizations applying it flipped the owner label
+  # every reconcile and emitted a "configured" Flux event each time.
   labels:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/enforce: privileged
@@ -17,11 +18,7 @@ metadata:
 spec:
   path: clusters/titania/infra/metallb
   interval: 15m
-  # Step 1: pruning is off while Namespace/metallb-system leaves this Kustomization's inventory
-  # (step 2 deletes it from the upstream base). Both Kustomizations have been applying the
-  # Namespace with the same field manager, so the owner label flips and a prune could remove the
-  # live Namespace. Re-enable (step 3) once the inventory no longer lists the Namespace.
-  prune: false
+  prune: true
   wait: true
   timeout: 2m
   sourceRef:
