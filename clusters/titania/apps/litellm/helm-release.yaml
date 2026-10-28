@@ -43,6 +43,11 @@ spec:
           secretKeyRef:
             name: litellm-secrets-vault
             key: LITELLM_SALT_KEY
+      - name: GEMINI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: litellm-secrets-vault
+            key: GEMINI_API_KEY
       - name: STORE_MODEL_IN_DB
         value: "True"
       - name: NUM_WORKERS
@@ -98,6 +103,22 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
+        # Google Gemini Embedding 2 on the Gemini API free tier (key from Vault services/gemini/litellm).
+        # Used for kagent agent memory; 768 dimensions matches kagent's vector store. rpm/tpm stay under the
+        # free tier's reported limits (100 RPM, 30K TPM) so LiteLLM queues instead of getting 429s.
+        - model_name: gemini-embedding-2
+          litellm_params:
+            model: gemini/gemini-embedding-2
+            api_key: os.environ/GEMINI_API_KEY
+            dimensions: 768
+            rpm: 90
+            tpm: 28000
+          model_info:
+            mode: embedding
+            output_vector_size: 768
+            # Free tier: no charge; keep accounting at zero.
+            input_cost_per_token: 0
+            output_cost_per_token: 0
       router_settings:
         model_group_alias:
           qwen-intel: swift-qwen3.8-27b-q3km-intel
