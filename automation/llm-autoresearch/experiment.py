@@ -24,10 +24,10 @@ import evaluate  # noqa: E402
 
 NS = "llm-serving"
 KS = "llm-serving-intel-llama"
-DEPLOY = "intel-llama-tiel-coder-trial"
+DEPLOY = "intel-llama-ornith"
 CONTAINER = "llama-server"
 APP_DIR = REPO / "clusters/titania/apps/llm-serving-intel-llama"
-MANIFEST = "clusters/titania/apps/llm-serving-intel-llama/deployment-tiel-coder-trial.yaml"
+MANIFEST = "clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml"
 MARKER = "llm-autoresearch.cboxlab.com/suspended-by"
 RESULTS = ROOT / "results.tsv"
 RUNS = ROOT / "runs"

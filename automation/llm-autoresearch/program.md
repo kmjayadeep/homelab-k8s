@@ -13,7 +13,7 @@ Do these steps once per session, together with the human:
    - `automation/llm-autoresearch/README.md`: context.
    - `automation/llm-autoresearch/evaluate.py`: the fixed evaluator. **Read-only.**
    - `automation/llm-autoresearch/experiment.py`: session tooling. **Read-only.**
-   - `clusters/titania/apps/llm-serving-intel-llama/deployment-tiel-coder-trial.yaml`: **the file you edit, and only its llama-server `args`.**
+   - `clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml`: **the file you edit, and only its llama-server `args`.**
    - `adrs/0006-local-b60-autoresearch.md`: what the operator has approved.
    - `automation/llm-autoresearch/results/*/results.tsv`: every past session. Don't repeat an idea that was already discarded on the current config unless you have a reason to expect a different result.
 3. **Smoke check:** `python3 automation/llm-autoresearch/evaluate.py --smoke`. It sends one request per suite. If it fails, stop and tell the human.
@@ -22,7 +22,7 @@ Do these steps once per session, together with the human:
 
 ## What you may change
 
-You may change **only** the `args` list of the `llama-server` container in `deployment-tiel-coder-trial.yaml`. Rules:
+You may change **only** the `args` list of the `llama-server` container in `deployment-ornith.yaml`. Rules:
 
 - **Protected flags.** These may not be touched: `--model`, `--mmproj`, `--alias`, `--host`, `--port`, `--metrics`, `--jinja`, `--ctx-size` (stays 131072), `--parallel` (stays 1) and `--n-gpu-layers`. Production needs the full single-slot 128K context, which the eval cannot see, so nothing may trade it away.
 - **One idea per experiment.** That means one flag, or a coupled pair such as `--cache-type-k` with `--cache-type-v`, or `--batch-size` with `--ubatch-size`. `experiment.py` rejects more than two changed flags.
@@ -38,7 +38,7 @@ You may change **only** the `args` list of the `llama-server` container in `depl
 
   At about 100K tokens, MTP acceptance was only 0.35–0.40. Worth testing first: speculative decoding off (`--spec-type none`) or a shorter draft. Judge these on `decode_tps_100k` as well as overall time.
 
-  Check that a flag exists in this llama.cpp build before using it. A crash on an unknown flag wastes a restart. To list the supported flags, run `kubectl -n llm-serving exec deploy/intel-llama-tiel-coder-trial -c llama-server -- /app/llama-server --help`. Other options include `--cache-reuse`, `--poll`, and n-gram speculation (`--spec-type`, `--spec-ngram-*`).
+  Check that a flag exists in this llama.cpp build before using it. A crash on an unknown flag wastes a restart. To list the supported flags, run `kubectl -n llm-serving exec deploy/intel-llama-ornith -c llama-server -- /app/llama-server --help`. Other options include `--cache-reuse`, `--poll`, and n-gram speculation (`--spec-type`, `--spec-ngram-*`).
 - **Memory is the binding risk.** A past 128K trial OOMed the host and took k3s down. The evaluator and `apply` abort when free memory on `titania-gpu` drops below 2 GiB, and `verdict` discards anything below 3 GiB of headroom. Be careful with f16 K/V or larger batches.
 
 ## The goal
