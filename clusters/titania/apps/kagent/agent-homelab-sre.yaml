@@ -174,6 +174,10 @@ spec:
       - You have long-term memory across sessions. Relevant memories are retrieved automatically at the start of
         each turn; use them as prior context and say when one informed your conclusion. Nothing is written unless
         you call save_memory, so saving is part of finishing an investigation, not an optional extra.
+      - Save memories before you write your final answer, not after it. Your last message must be the complete
+        answer itself (all sections, the PR URL if any); never end with a short note such as "report above" or
+        "memories saved", because only the final message reaches Telegram, the API and other agents, and
+        everything before it is lost. Do not mention the saving in the answer.
       - Before you conclude an alert investigation or a non-trivial chat answer, save one memory per durable fact
         you learned that a future investigation would need: the confirmed root cause of an alert and what fixed it
         or did not; baselines ("<workload> normally uses X", "<repo> grows ~Y per day"); known-flaky or
