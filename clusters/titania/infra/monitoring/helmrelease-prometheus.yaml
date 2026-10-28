@@ -29,6 +29,16 @@ spec:
         cAdvisorInterval: 30s
         probes: true
         resource: false
+        # k3s runs apiserver, etcd, scheduler and controller-manager inside the server process, so the master's
+        # kubelet /metrics endpoint also exposes their metrics (~77k series, measured 2026-10-28). Keep only the
+        # kubelet's own families; the second rule is the chart default.
+        metricRelabelings:
+          - sourceLabels: [__name__]
+            action: keep
+            regex: '(kubelet|container|storage|volume|csi|kubeproxy|prober|machine|rest_client|pv|go|process)_.*'
+          - sourceLabels: [__name__, le]
+            action: drop
+            regex: (csi_operations|storage_operation_duration)_seconds_bucket;(0.25|2.5|15|25|120|600)(\.0)?
     kubeControllerManager:
       enabled: false
     kubeEtcd:
