@@ -12,6 +12,7 @@ resources:
   - grafana-mcp.yaml
   - agent-homelab-sre.yaml
   - telegram-bot.yaml
+  - scheduled-tasks.yaml
   - github-mcp.yaml
   - repo-fetch.yaml
   - agent-homelab-gitops.yaml

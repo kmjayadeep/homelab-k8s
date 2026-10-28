@@ -48,9 +48,10 @@ spec:
     cmd: /server/github-mcp-server
     args:
       - stdio
-      - --toolsets=repos,pull_requests
+      # issues is needed only for PR conversation comments (add_issue_comment); issue creation stays excluded.
+      - --toolsets=repos,pull_requests,issues
       # Pull requests are the only write path: no merging, deleting, forking, reviewing or new repositories.
-      - --exclude-tools=merge_pull_request,delete_file,create_repository,fork_repository,pull_request_review_write,add_comment_to_pending_review,add_reply_to_pull_request_comment,update_pull_request_branch
+      - --exclude-tools=merge_pull_request,delete_file,create_repository,fork_repository,pull_request_review_write,add_comment_to_pending_review,add_reply_to_pull_request_comment,update_pull_request_branch,issue_write,sub_issue_write
     secretRefs:
       - name: kagent-github
     resources:

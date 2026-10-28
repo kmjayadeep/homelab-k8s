@@ -1,0 +1,207 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kagent-scheduled-prompts
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+data:
+  # Each file is the JSON body for the bot's POST /task endpoint: {"agent", "prompt", "title"}.
+  daily-report.json: |
+    {
+      "agent": "homelab-sre",
+      "title": "Daily summary",
+      "prompt": "Daily cluster summary for the operator. Check Flux objects, pods, Longhorn volumes, firing alerts (ignore Watchdog and InfoInhibitor), node memory and disk, and your memory for open issues from previous days. Answer in at most 600 characters of plain text, no headers, no sections: line 1 is the overall verdict in a few words, then at most four short lines, one per thing that needs attention, each naming the object and the number that matters. If nothing needs attention, say so in one line and stop. Save a memory only for a new durable fact. Do not open a pull request."
+    }
+  repo-review.json: |
+    {
+      "agent": "homelab-gitops",
+      "title": "Daily repository review",
+      "prompt": "Scheduled repository review (origin: schedule). First call list_pull_requests (state open) on kmjayadeep/homelab-k8s: if any open PR has a head branch starting with kagent/review-, reply with its URL and the words 'review PR still open' and stop; one review PR per day is the hard limit. Otherwise pick exactly one concrete, low-risk improvement in homelab-k8s that is visible in the repository or by comparing it with the live cluster: a manifest without resource requests or limits or probes, a stale sentence in a README or plan that contradicts the manifests, a file no kustomization.yaml references, a missing label, an alert rule whose annotation disagrees with its expression. Never version bumps, secrets, bootstrap/flux-system or deletions. Open one PR on a branch named kagent/review-<slug> following your workflow, and reply with the PR URL and one sentence on what it fixes. If you find nothing worth a PR, say so in one line."
+    }
+  renovate-review.json: |
+    {
+      "agent": "homelab-gitops",
+      "title": "Renovate review",
+      "prompt": "Renovate pre-review (origin: schedule). List open pull requests in kmjayadeep/homelab-k8s authored by Renovate (author login app/renovate, head branch starting with renovate/). For each one that does not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), do the review described in your Renovate review section and post one comment. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words. If every open Renovate PR is already reviewed, reply 'nothing new' only."
+    }
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-daily-report
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: daily-report
+spec:
+  schedule: "30 7 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.17.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/daily-report.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-repo-review
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: repo-review
+spec:
+  schedule: "0 7 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.17.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/repo-review.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-renovate-review
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: renovate-review
+spec:
+  schedule: "15 */6 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.17.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/renovate-review.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
