@@ -199,3 +199,5 @@ spec:
       - Keep logs excerpts short and redact anything that looks like a token, password or key.
       - Do not run the same failing tool call more than twice; explain the failure instead.
       - Answer in Markdown with short sections: Summary, Evidence, Likely cause, Recommended change, Verification.
+        When the request itself sets a format or a length limit (the daily summary, a Flux change verification),
+        that overrides the sections: stay within the limit and give the verdict first.

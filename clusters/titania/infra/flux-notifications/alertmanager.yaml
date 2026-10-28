@@ -1,0 +1,175 @@
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Provider
+metadata:
+  name: alertmanager
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: flux-notifications
+    app.kubernetes.io/instance: flux-notifications
+spec:
+  type: alertmanager
+  # Events become firing alerts named Flux<Kind><Reason> with labels kind, name, namespace, reason, severity
+  # and the event message as the annotation. Alertmanager routes alertname =~ "^Flux" to the kagent bot's
+  # /flux webhook (config held in Vault, platform/monitoring/alertmanager), which asks homelab-sre for a
+  # short verification of the changed namespace. Alerts self-resolve after Alertmanager's resolve_timeout.
+  address: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093/api/v2/alerts
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: flux-changes
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: flux-notifications
+    app.kubernetes.io/instance: flux-notifications
+spec:
+  providerRef:
+    name: alertmanager
+  eventSeverity: info
+  # Flux Alerts take wildcards for names but not for namespaces, so every namespace that holds Flux
+  # Kustomizations or HelmReleases is listed. Add a namespace here when a new app is bootstrapped;
+  # a missing namespace only means its changes are not verified automatically.
+  eventSources:
+    - kind: Kustomization
+      name: "*"
+      namespace: actions-runner-system
+    - kind: Kustomization
+      name: "*"
+      namespace: baskit
+    - kind: Kustomization
+      name: "*"
+      namespace: beancount
+    - kind: Kustomization
+      name: "*"
+      namespace: bookorbit
+    - kind: Kustomization
+      name: "*"
+      namespace: cert-manager
+    - kind: Kustomization
+      name: "*"
+      namespace: external-dns
+    - kind: Kustomization
+      name: "*"
+      namespace: external-secrets
+    - kind: Kustomization
+      name: "*"
+      namespace: flux-system
+    - kind: Kustomization
+      name: "*"
+      namespace: glance
+    - kind: Kustomization
+      name: "*"
+      namespace: homer
+    - kind: Kustomization
+      name: "*"
+      namespace: ingress-nginx
+    - kind: Kustomization
+      name: "*"
+      namespace: intel-gpu
+    - kind: Kustomization
+      name: "*"
+      namespace: kagent
+    - kind: Kustomization
+      name: "*"
+      namespace: kube-system
+    - kind: Kustomization
+      name: "*"
+      namespace: llm-serving
+    - kind: Kustomization
+      name: "*"
+      namespace: longhorn-system
+    - kind: Kustomization
+      name: "*"
+      namespace: metallb-system
+    - kind: Kustomization
+      name: "*"
+      namespace: monitoring
+    - kind: Kustomization
+      name: "*"
+      namespace: open-webui
+    - kind: Kustomization
+      name: "*"
+      namespace: otpcloud
+    - kind: Kustomization
+      name: "*"
+      namespace: reflector
+    - kind: Kustomization
+      name: "*"
+      namespace: reloader
+    - kind: Kustomization
+      name: "*"
+      namespace: stirling-pdf
+    - kind: Kustomization
+      name: "*"
+      namespace: taskplanner
+    - kind: Kustomization
+      name: "*"
+      namespace: tools
+    - kind: Kustomization
+      name: "*"
+      namespace: torrents
+    - kind: Kustomization
+      name: "*"
+      namespace: uptime
+    - kind: Kustomization
+      name: "*"
+      namespace: vault
+    - kind: Kustomization
+      name: "*"
+      namespace: vaultwarden
+    - kind: Kustomization
+      name: "*"
+      namespace: wallabag
+    - kind: HelmRelease
+      name: "*"
+      namespace: actions-runner-system
+    - kind: HelmRelease
+      name: "*"
+      namespace: cert-manager
+    - kind: HelmRelease
+      name: "*"
+      namespace: external-secrets
+    - kind: HelmRelease
+      name: "*"
+      namespace: flux-system
+    - kind: HelmRelease
+      name: "*"
+      namespace: ingress-nginx
+    - kind: HelmRelease
+      name: "*"
+      namespace: kagent
+    - kind: HelmRelease
+      name: "*"
+      namespace: kube-system
+    - kind: HelmRelease
+      name: "*"
+      namespace: litellm
+    - kind: HelmRelease
+      name: "*"
+      namespace: longhorn-system
+    - kind: HelmRelease
+      name: "*"
+      namespace: monitoring
+    - kind: HelmRelease
+      name: "*"
+      namespace: open-webui
+    - kind: HelmRelease
+      name: "*"
+      namespace: reflector
+    - kind: HelmRelease
+      name: "*"
+      namespace: reloader
+    - kind: HelmRelease
+      name: "*"
+      namespace: stirling-pdf
+    - kind: HelmRelease
+      name: "*"
+      namespace: vault
+  # Keep only events that mean "something changed or failed": the periodic success and dependency
+  # chatter is excluded by message.
+  exclusionList:
+    - "^Reconciliation finished in"
+    - "^Health check passed"
+    - "^Dependency .* is not ready"
+    - "^Helm (install|upgrade|rollback|test) has started"
+    - "^Helm (install|upgrade) succeeded for release .* with chart .*$"
