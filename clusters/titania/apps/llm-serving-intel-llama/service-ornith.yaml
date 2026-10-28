@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: intel-llama-tiel-coder-trial
+  name: intel-llama-ornith
   labels:
-    app.kubernetes.io/name: intel-llama-tiel-coder-trial
+    app.kubernetes.io/name: intel-llama-ornith
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
   selector:
-    app.kubernetes.io/name: intel-llama-tiel-coder-trial
+    app.kubernetes.io/name: intel-llama-ornith
     app.kubernetes.io/instance: llm-serving
   ports:
     - name: http

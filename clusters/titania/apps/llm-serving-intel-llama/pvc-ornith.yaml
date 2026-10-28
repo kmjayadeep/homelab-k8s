@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: intel-llama-tiel-coder-model-cache
+  name: intel-llama-ornith-models
   labels:
-    app.kubernetes.io/name: intel-llama-tiel-coder-trial
+    app.kubernetes.io/name: intel-llama-ornith
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: model-cache
     app.kubernetes.io/part-of: llm-serving

@@ -1,29 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: intel-llama-tiel-coder-trial
+  name: intel-llama-ornith
   labels:
-    app.kubernetes.io/name: intel-llama-tiel-coder-trial
+    app.kubernetes.io/name: intel-llama-ornith
     app.kubernetes.io/instance: llm-serving
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
   # Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 128K, BF16 projector on GPU, ngram-mod speculation.
-  # Names keep "tiel-coder" for routing stability; Tiel-Coder was a requant of the same weights.
-  # At zero replicas since 2026-10-25: the operator adopted Swift Qwen3.8-27B Q3_K_M (plan 0018). Kept as the
-  # standing rollback with its PVC while Swift is in use (ADR 0004 amendment); re-enable by swapping replicas
-  # with the Swift Deployment, the Flux health check and the LiteLLM alias.
-  replicas: 0
+  # The only B60 Deployment (ADR 0004). Served 2026-10-15 to 2026-10-25 and again since 2026-10-28, when the
+  # operator rolled back from Swift Qwen3.8-27B (plan 0018) and removed the Swift manifests. Renamed from
+  # intel-llama-tiel-coder-trial on 2026-10-28; Tiel-Coder was a requant of the same weights.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: intel-llama-tiel-coder-trial
+      app.kubernetes.io/name: intel-llama-ornith
       app.kubernetes.io/instance: llm-serving
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: intel-llama-tiel-coder-trial
+        app.kubernetes.io/name: intel-llama-ornith
         app.kubernetes.io/instance: llm-serving
         app.kubernetes.io/component: inference
         app.kubernetes.io/part-of: llm-serving
@@ -87,7 +86,7 @@ spec:
             - --mmproj
             - /models/mmproj-bf16.gguf
             - --alias
-            - tiel-coder-35b-a3b-intel
+            - ornith-1.5-35b-a3b-intel
             - --host
             - 0.0.0.0
             - --port
@@ -176,7 +175,7 @@ spec:
       volumes:
         - name: model-cache
           persistentVolumeClaim:
-            claimName: intel-llama-tiel-coder-model-cache
+            claimName: intel-llama-ornith-models
         - name: dshm
           emptyDir:
             medium: Memory

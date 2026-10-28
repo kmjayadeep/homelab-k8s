@@ -12,7 +12,7 @@ The operator wants to find better llama-server settings for the single B60 model
 ## Decision
 
 - **No in-cluster eval infrastructure.** There is no scheduled pipeline, CI runner, eval Deployment or cluster-side watchdog.
-- **The experiment is the production manifest.** The agent edits only the llama-server `args` in `deployment-tiel-coder-trial.yaml`, on a local `autoresearch/<tag>` branch.
+- **The experiment is the production manifest.** The agent edits only the llama-server `args` in `deployment-ornith.yaml`, on a local `autoresearch/<tag>` branch.
   - Identity, routing and context flags are protected: `--ctx-size 131072` and `--parallel 1` stay fixed.
   - `experiment.py` rejects edits outside `args`, changes to protected flags, and more than two changed flags.
 - **Session control:** during an operator-started session, the agent uses the operator's kubeconfig to:
