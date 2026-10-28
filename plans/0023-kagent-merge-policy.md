@@ -1,6 +1,6 @@
 # Plan 0023: Trusted auto-merge and Telegram merge approval
 
-- Status: In progress 2026-10-28
+- Status: In progress 2026-10-28 (live test of the Telegram path pending)
 - Owner: Jayadeep KM
 - Related: [ADR 0007](../adrs/0007-policy-gated-merges.md), [plan 0022](0022-kagent-scheduled-tasks.md)
 
@@ -29,4 +29,5 @@ Close the loop after the Renovate pre-review from plan 0022: the bot merges Reno
 
 ## Outcome
 
-Pending.
+- 2026-10-28, PR #486 merged: bot image `20261028135638` live with `merge policy=True`. The first pass found no open PR because the operator had merged #482, #483 and #484 by hand minutes earlier, so the automatic path is verified by the container test only until the next Renovate patch PR appears.
+- Gap found while preparing the live test: docs-only PRs have no check runs (the validation workflow runs on `clusters/**` only), and the first image required green checks before offering an agent PR, so a PR like #484 would never have been asked. Image `20261028140315` offers `kagent/*` PRs whose checks are green or absent and keeps "at least one green check" mandatory for automatic merges. This PR, opened on a `kagent/` branch on purpose, is the live test of the Telegram offer and the Merge button.
