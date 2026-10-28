@@ -69,3 +69,7 @@ Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `dee
 
 - Tool output is sent to the configured model provider (DeepSeek until the model is switched to `qwen-intel`).
 - Sessions and memory live in the `kagent` database on Helios, which is in the hourly Restic backup set.
+
+## Calling an agent from inside the cluster
+
+The A2A endpoint in-cluster is `http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/<agent>/` (JSON-RPC 2.0, `message/send`, with the query as a text part in `params.message.parts`); it needs no basic auth, whereas the same path through the Ingress requires the UI credentials. Only the agent's final message is returned as the task artifact, and the earlier messages are available in the session history.
