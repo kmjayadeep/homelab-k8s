@@ -24,7 +24,7 @@ FluxCD GitOps manifests for the active `titania` homelab cluster. Flux watches `
 
 ## Secrets
 
-Vault is the source of truth for application and infrastructure secret values. External Secrets Operator uses namespaced stores and Kubernetes ServiceAccounts to create Kubernetes Secrets. Git stores only non-secret references and configuration. No SealedSecret manifests remain; the controller is temporarily retained. See [ADR 0001](adrs/0001-vault-external-secrets.md), [the migration plan](plans/0001-sealed-secrets-to-vault.md), and [AGENTS.md](AGENTS.md) before touching secrets. Vault internal TLS is still follow-up work.
+Vault is the source of truth for application and infrastructure secret values. External Secrets Operator uses namespaced stores and Kubernetes ServiceAccounts to create Kubernetes Secrets. Git stores only non-secret references and configuration. No SealedSecret manifests remain; the controller is temporarily retained. Vault serves its API over internal TLS, rolled out and verified on 2026-10-13 per [plan 0012](plans/0012-vault-internal-tls.md): every `SecretStore` uses `https://vault.vault.svc.cluster.local:8200` with the trust-manager `vault-ca-cert` bundle, and plain HTTP is no longer accepted. Recovery restore and unseal drills remain outstanding. See [ADR 0001](adrs/0001-vault-external-secrets.md), [the migration plan](plans/0001-sealed-secrets-to-vault.md), and [AGENTS.md](AGENTS.md) before touching secrets.
 
 ## Repository automation
 
