@@ -5,7 +5,7 @@
 ## Layout
 
 - `../kagent-crds/`: CRD chart (`kagent-crds`), prune disabled together with the shared `HelmRepository`. The Namespace in `bootstrap/apps/kagent.yaml` is prune disabled too; removing kagent is a deliberate manual action.
-- `helm-release.yaml`: chart values. Only `k8s-agent` is enabled; the tool server has read-only cluster RBAC without Secrets; the controller is scoped to this namespace.
+- `helm-release.yaml`: chart values. All chart-default agents are disabled (`homelab-sre` replaces `k8s-agent`); the tool server has read-only cluster RBAC without Secrets; the controller is scoped to this namespace.
 - `model-config.yaml`: the single `ModelConfig` every default agent uses. `model` is a LiteLLM model name.
 - `external-secret.yaml`: LiteLLM virtual key (alias `kagent`) from Vault `apps/litellm/kagent`.
 - `postgres.yaml`: kagent's database is `kagent` on Helios PostgreSQL (`postgres.cosmos.cboxlab.com`, pgvector enabled). The ExternalSecret builds `DATABASE_URL` from the Vault password (`services/postgresql/kagent`) and the controller reads it from a mounted file; the bundled PostgreSQL is disabled. `ModelConfig` `embeddings` points at LiteLLM's `gemini-embedding-2` for agent memory.
@@ -17,7 +17,6 @@
 
 | Agent | Purpose | Tools |
 | --- | --- | --- |
-| `k8s-agent` | Chart default, generic Kubernetes assistant | all `k8s_*` tools (writes fail: tool RBAC is read-only) |
 | `homelab-sre` | Investigate and explain titania; concrete in-repo recommendations become pull requests via `homelab-gitops` | read-only `k8s_*`, Thanos PromQL, Grafana Loki/alerting/dashboards, `homelab-gitops` as a delegate |
 | `homelab-gitops` | Turn a requested change into a pull request on `kmjayadeep/homelab-k8s` | GitHub MCP (`github-mcp.yaml`): read repo, create `kagent/*` branch, push files, open PR; no merge, no delete; read-only `k8s_*` for live names ([plan 0021](../../../../plans/0021-kagent-gitops-agent.md)) |
 
