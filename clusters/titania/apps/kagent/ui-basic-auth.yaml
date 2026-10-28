@@ -18,7 +18,7 @@ spec:
       engineVersion: v2
       data:
         # ingress-nginx basic auth expects an htpasswd file under the key "auth"; the bcrypt hash is rendered here.
-        auth: "{{ htpasswd .username .password }}"
+        auth: "{{ htpasswd .username .password \"bcrypt\" }}"
   data:
     - secretKey: username
       remoteRef:
