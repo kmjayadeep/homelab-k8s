@@ -65,7 +65,7 @@ spec:
 
     proxy_config:
       model_list:
-        # Ornith-1.5 35B-A3B 21G-ICE, the rollback since 2026-10-25; backend at zero replicas.
+        # Ornith-1.5 35B-A3B 21G-ICE, the served model again since 2026-10-28 (rolled back from Swift).
         - model_name: tiel-coder-35b-a3b-intel
           litellm_params:
             model: openai/tiel-coder-35b-a3b-intel
@@ -84,7 +84,8 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
-        # Served model since 2026-10-25 (plan 0018): Swift Qwen3.8-27B Q3_K_M, dense, embedded MTP, F16 projector.
+        # Swift Qwen3.8-27B Q3_K_M (dense, embedded MTP, F16 projector), served 2026-10-25 to 2026-10-28 (plan 0018);
+        # backend at zero replicas since the rollback to Ornith.
         # The alias name must match the llama-server --alias in deployment-swift-qwen38-trial.yaml.
         - model_name: swift-qwen3.8-27b-q3km-intel
           litellm_params:
@@ -121,7 +122,7 @@ spec:
             output_cost_per_token: 0
       router_settings:
         model_group_alias:
-          qwen-intel: swift-qwen3.8-27b-q3km-intel
+          qwen-intel: tiel-coder-35b-a3b-intel
       litellm_settings:
         json_logs: true
         request_timeout: 600

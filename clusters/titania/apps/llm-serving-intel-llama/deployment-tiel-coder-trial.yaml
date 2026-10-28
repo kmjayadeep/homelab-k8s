@@ -10,10 +10,9 @@ metadata:
 spec:
   # Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 128K, BF16 projector on GPU, ngram-mod speculation.
   # Names keep "tiel-coder" for routing stability; Tiel-Coder was a requant of the same weights.
-  # At zero replicas since 2026-10-25: the operator adopted Swift Qwen3.8-27B Q3_K_M (plan 0018). Kept as the
-  # standing rollback with its PVC while Swift is in use (ADR 0004 amendment); re-enable by swapping replicas
-  # with the Swift Deployment, the Flux health check and the LiteLLM alias.
-  replicas: 0
+  # Active B60 owner again since 2026-10-28: the operator rolled back from Swift Qwen3.8-27B Q3_K_M (served
+  # 2026-10-25 to 2026-10-28, plan 0018) to this known-good config. Swift stays at zero replicas with its PVCs.
+  replicas: 1
   strategy:
     type: Recreate
   selector:

@@ -8,11 +8,11 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # Served B60 model since 2026-10-25 (plan 0018, ADR 0004): Swift Qwen3.8-27B Q3_K_M (dense) on llama.cpp
-  # b11854 with the F16 projector, 128K Q8 KV and MTP draft 3. The operator chose it at parity quality
-  # (43/49 vs Ornith 44-46) accepting about half of Ornith's decode (14.6 vs 27 tok/s at 100K). The name
-  # keeps "trial" for Service and health-check stability. Ornith stays at zero replicas as the rollback.
-  replicas: 1
+  # Swift Qwen3.8-27B Q3_K_M (dense) on llama.cpp b11854 with the F16 projector, 128K Q8 KV and MTP draft 3.
+  # Served 2026-10-25 to 2026-10-28 (plan 0018, ADR 0004) at parity quality (43/49 vs Ornith 44-46) and about
+  # half of Ornith's decode; the operator then rolled back to Ornith. Kept at zero replicas with its PVCs,
+  # ready to serve; removal needs explicit approval (ADR 0004).
+  replicas: 0
   strategy:
     type: Recreate
   selector:
