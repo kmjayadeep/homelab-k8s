@@ -38,7 +38,10 @@ spec:
       # System-managed components, including the CSI node plugin, must be able
       # to mount and unmount volumes for workloads on the dedicated AI node.
       taintToleration: workload=ai:NoSchedule
-      defaultReplicaCount: 1
+      # Two replicas (one per Longhorn node) since 2026-10-28: the master reboot during the k3s upgrade
+      # faulted the two volumes that were down to a single replica, and single-replica volumes cannot
+      # survive any node outage. Existing volumes keep their own numberOfReplicas; see the Longhorn notes.
+      defaultReplicaCount: 2
       # Valid values: disabled | least-effort | best-effort. "true" is invalid
       # and made longhorn-manager reject the WHOLE default-setting ConfigMap
       # ("Customized settings are invalid, will give up using them"), so none
@@ -55,7 +58,7 @@ spec:
     persistence:
       defaultFsType: "xfs"
       defaultClass: false
-      defaultClassReplicaCount: 1
+      defaultClassReplicaCount: 2
       recurringJobSelector:
         enable: true
         jobList: '[{"name":"daily", "isGroup":true}]'
