@@ -61,7 +61,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: task
-              image: curlimages/curl:8.17.0
+              image: curlimages/curl:8.23.0
               command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
                         "-H", "content-type: application/json", "-d", "@/prompts/daily-report.json",
                         "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
@@ -121,7 +121,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: task
-              image: curlimages/curl:8.17.0
+              image: curlimages/curl:8.23.0
               command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
                         "-H", "content-type: application/json", "-d", "@/prompts/repo-review.json",
                         "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
@@ -181,7 +181,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: task
-              image: curlimages/curl:8.17.0
+              image: curlimages/curl:8.23.0
               command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
                         "-H", "content-type: application/json", "-d", "@/prompts/renovate-review.json",
                         "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
