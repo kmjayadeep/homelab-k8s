@@ -9,3 +9,4 @@ An ADR captures the context, decision, alternatives, and consequences of a durab
 | [0003: Intel B60 LLM serving](0003-intel-b60-llm-serving.md) | Superseded by ADR 0004 |
 | [0004: llama.cpp SYCL on the B60 behind LiteLLM](0004-llamacpp-sycl-b60-behind-litellm.md) | Accepted; Tiel is the sole B60 workload; amended by ADR 0006 |
 | [0006: Local B60 autoresearch](0006-local-b60-autoresearch.md) | Accepted; operator-started sessions may tune production llama-server args through LiteLLM |
+| [0007: Policy-gated merges and Telegram approval](0007-policy-gated-merges.md) | Accepted 2026-10-28; the bot merges Renovate patch/digest/pin PRs with a green review and asks the operator for everything else; models never merge |

@@ -33,7 +33,7 @@ metadata:
     app.kubernetes.io/name: kagent-telegram-bot
     app.kubernetes.io/instance: kagent
   annotations:
-    secret.reloader.stakater.com/reload: kagent-telegram
+    secret.reloader.stakater.com/reload: kagent-telegram,kagent-github
 spec:
   replicas: 1
   # Long polling must not run twice against the same bot token.
@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261028125041
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261028135638
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
@@ -73,9 +73,21 @@ spec:
               value: "120"
             - name: FLUX_DEDUP_SECONDS
               value: "600"
+            # Merge policy (ADR 0007): deterministic, no model involved. Credentials come from the same
+            # Secret the GitHub MCP server uses (kagent-github, Vault services/github/kagent-gitops).
+            - name: GITHUB_REPOS
+              value: kmjayadeep/homelab-k8s
+            - name: AUTOMERGE_UPDATE_TYPES
+              value: patch,digest,pin,pinDigest
+            - name: AUTOMERGE_BLOCK_LABELS
+              value: critical-infra
+            - name: MERGE_POLICY_INTERVAL_SECONDS
+              value: "1800"
           envFrom:
             - secretRef:
                 name: kagent-telegram
+            - secretRef:
+                name: kagent-github
           ports:
             - name: http
               containerPort: 8080

@@ -33,6 +33,10 @@ Flux notification-controller sends events to the existing Alertmanager through t
 
 Scheduled tasks are CronJobs in `scheduled-tasks.yaml` that POST a JSON body `{agent, prompt, title}` to the bot's `/task` endpoint; the bot calls that agent over A2A and posts the answer to the alert chat with the title. Run one by hand with `kubectl -n kagent create job --from=cronjob/kagent-daily-report manual-report`. The NetworkPolicy admits only Alertmanager pods and the CronJob pods (label `app.kubernetes.io/component: scheduled-task`) to the bot's port.
 
+## Merge policy (ADR 0007)
+
+The bot, not an agent, decides merges, authenticated as the same GitHub App. Renovate PRs whose body table lists only `patch`, `digest`, `pin` or `pinDigest` updates, with no `critical-infra` label, green check runs, a clean mergeable state and a `Verdict: merge` review comment from the App are merged automatically and announced in Telegram. Every other reviewed Renovate PR and every `kagent/*` PR with green checks is posted once per head SHA with Merge and Skip buttons; the bot re-reads the PR before merging on the button press. Decisions leave marker comments on the PR. `/prs` in the chat runs a pass immediately; otherwise a pass runs every 30 minutes and after each gitops scheduled task. Widening the policy means editing the `AUTOMERGE_*` or `GITHUB_REPOS` environment in `telegram-bot.yaml` and amending the ADR.
+
 ## UI credentials
 
 The Ingress requires HTTP basic auth (`ui-basic-auth.yaml`). Username and password live in Vault at `apps/kagent/ui-basic-auth`; External Secrets renders the bcrypt htpasswd line into Secret `kagent-ui-basic-auth`. Read them (never paste the password into chat or commits):
