@@ -111,10 +111,11 @@ spec:
         prometheus:
           url: http://thanos-query.monitoring.svc.cluster.local:9090
 
-    # Only the generic Kubernetes agent. The others target components not installed here
-    # or need extra credentials (Grafana, Prometheus); see plan 0019 follow-ups.
+    # No chart-default agents. The generic k8s-agent is replaced by homelab-sre (agent-homelab-sre.yaml);
+    # the operator deleted it on 2026-10-27 and the next Helm upgrade recreated it, so it is now off in code.
+    # The others target components not installed here or need extra credentials (Grafana, Prometheus).
     k8s-agent:
-      enabled: true
+      enabled: false
     kgateway-agent:
       enabled: false
     istio-agent:
