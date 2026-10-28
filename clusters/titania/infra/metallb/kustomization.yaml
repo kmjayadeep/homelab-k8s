@@ -7,3 +7,16 @@ resources:
 - github.com/metallb/metallb/config/native?ref=v0.16.1
 - l2advertisement.yaml
 - public-pool.yaml
+
+# Step 2: the Namespace is owned by the bootstrap Kustomization (bootstrap/infra/02-metallb.yaml);
+# drop the copy the upstream base ships so only one Flux Kustomization applies it.
+patches:
+- target:
+    kind: Namespace
+    name: metallb-system
+  patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: metallb-system
