@@ -39,14 +39,23 @@ spec:
       auth:
         # No UI authentication yet; the Ingress is LAN/VPN-only (plan 0019 risks).
         mode: unsecure
+      volumes:
+        - name: db-secret
+          secret:
+            secretName: kagent-postgres
+      volumeMounts:
+        - name: db-secret
+          mountPath: /var/secrets/db
+          readOnly: true
 
     database:
       postgres:
-        # Bundled instance is evaluation-grade; external PostgreSQL on Helios is a follow-up.
+        # Helios PostgreSQL (postgres.cosmos.cboxlab.com, database kagent, pgvector enabled). The URL is built
+        # by the kagent-postgres ExternalSecret from the Vault password and mounted as a file.
+        urlFile: /var/secrets/db/DATABASE_URL
+        vectorEnabled: true
         bundled:
-          enabled: true
-          storageClassName: longhorn
-          storage: 2Gi
+          enabled: false
 
     ui:
       externalUrl: https://kagent.cosmos.cboxlab.com
