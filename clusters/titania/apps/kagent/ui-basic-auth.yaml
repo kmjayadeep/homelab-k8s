@@ -1,0 +1,30 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kagent-ui-basic-auth
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: kagent-ui-basic-auth
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    template:
+      engineVersion: v2
+      data:
+        # ingress-nginx basic auth expects an htpasswd file under the key "auth"; the bcrypt hash is rendered here.
+        auth: "{{ htpasswd .username .password }}"
+  data:
+    - secretKey: username
+      remoteRef:
+        key: apps/kagent/ui-basic-auth
+        property: username
+    - secretKey: password
+      remoteRef:
+        key: apps/kagent/ui-basic-auth
+        property: password

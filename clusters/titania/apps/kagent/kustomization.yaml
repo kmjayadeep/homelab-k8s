@@ -8,6 +8,7 @@ resources:
   - model-config.yaml
   - postgres.yaml
   - ingress.yaml
+  - ui-basic-auth.yaml
   - grafana-mcp.yaml
   - agent-homelab-sre.yaml
   - telegram-bot.yaml
