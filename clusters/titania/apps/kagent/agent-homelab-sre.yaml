@@ -11,6 +11,10 @@ spec:
   declarative:
     modelConfig: default-model-config
     stream: true
+    # Long-term memory across sessions (pgvector on Helios, embeddings via LiteLLM gemini-embedding-2).
+    memory:
+      modelConfig: embeddings
+      ttlDays: 60
     deployment:
       resources:
         requests:

@@ -8,7 +8,7 @@
 - `helm-release.yaml`: chart values. Only `k8s-agent` is enabled; the tool server has read-only cluster RBAC without Secrets; the controller is scoped to this namespace.
 - `model-config.yaml`: the single `ModelConfig` every default agent uses. `model` is a LiteLLM model name.
 - `external-secret.yaml`: LiteLLM virtual key (alias `kagent`) from Vault `apps/litellm/kagent`.
-- `network-policy.yaml`: only the controller may reach the bundled PostgreSQL, which uses the chart's fixed credentials.
+- `postgres.yaml`: kagent's database is `kagent` on Helios PostgreSQL (`postgres.cosmos.cboxlab.com`, pgvector enabled). The ExternalSecret builds `DATABASE_URL` from the Vault password (`services/postgresql/kagent`) and the controller reads it from a mounted file; the bundled PostgreSQL is disabled. `ModelConfig` `embeddings` points at LiteLLM's `gemini-embedding-2` for agent memory.
 - `grafana-mcp.yaml`: Grafana MCP server (`grafana/mcp-grafana`, read-only flags) with a Viewer service-account token from Vault `services/grafana/kagent`, plus its `RemoteMCPServer`. Gives agents Prometheus, Loki, alert-rule and dashboard tools ([plan 0020](../../../../plans/0020-kagent-sre-agent.md)).
 - `agent-homelab-sre.yaml`: the read-only `homelab-sre` agent: cluster-specific prompt, Kubernetes read tools and the Grafana tools, A2A skills `investigate` and `health-report`.
 - `github-mcp.yaml` and `agent-homelab-gitops.yaml`: the GitHub MCP server (kmcp `MCPServer`, stdio, authenticated as a GitHub App whose id, installation id and private key come from Vault `services/github/kagent-gitops`; merge/delete/fork/review tools excluded at the server; NetworkPolicy limits callers to this namespace) and the `homelab-gitops` agent that opens pull requests. Every PR it opens runs the repository's validation workflow; a human merges. A GitHub ruleset on `main` (pull requests only; bypass for repository admins and deploy keys) means the App cannot push to `main` even if asked. kmcp renders the Deployment without readiness or liveness probes (the CRD has no probe fields); a hung server shows up as agent tool timeouts, not restarts.
@@ -56,4 +56,4 @@ Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `dee
 
 - No UI authentication; anyone on the LAN/VPN gets read access to pods, logs, ConfigMaps and events through the agent.
 - Tool output is sent to the configured model provider (DeepSeek until the model is switched to `qwen-intel`).
-- The bundled PostgreSQL is evaluation-grade, single pod, no backups.
+- Sessions and memory live in the `kagent` database on Helios, which is in the hourly Restic backup set.

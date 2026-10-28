@@ -1,0 +1,42 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kagent-postgres
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: kagent-postgres
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    template:
+      engineVersion: v2
+      data:
+        # Helios PostgreSQL (plan 0020 phase 3). Only the password is secret; the rest is configuration.
+        DATABASE_URL: "postgres://kagent:{{ .password | urlquery }}@postgres.cosmos.cboxlab.com:5432/kagent?sslmode=prefer"
+  data:
+    - secretKey: password
+      remoteRef:
+        key: services/postgresql/kagent
+        property: password
+---
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: embeddings
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  # Embedding provider for agent memory: LiteLLM's gemini-embedding-2 entry (768 dimensions).
+  provider: OpenAI
+  model: gemini-embedding-2
+  apiKeySecret: kagent-litellm
+  apiKeySecretKey: LITELLM_API_KEY
+  openAI:
+    baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1

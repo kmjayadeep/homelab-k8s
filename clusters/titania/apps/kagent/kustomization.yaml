@@ -6,8 +6,8 @@ namespace: kagent
 resources:
   - external-secret.yaml
   - model-config.yaml
+  - postgres.yaml
   - ingress.yaml
-  - network-policy.yaml
   - grafana-mcp.yaml
   - agent-homelab-sre.yaml
   - telegram-bot.yaml
