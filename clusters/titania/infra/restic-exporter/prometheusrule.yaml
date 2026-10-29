@@ -48,9 +48,9 @@ spec:
   - name: restic-s3-rules
     rules:
     - alert: ResticBackupS3Filling
-      expr: max by(repo) (restic_s3_size_total/restic_s3_size_limit) > 0.8
+      expr: max by(repo) (avg_over_time(restic_s3_size_total[3h]) / restic_s3_size_limit) > 0.8
       annotations:
-        description: Restic backup for repo {{$labels.repo}} is taking more than 80% of space limit in the bucket
+        description: Restic backup for repo {{$labels.repo}} is taking more than 80% of space limit in the bucket (3h average)
         summary: Restic backup crossed 80% of the size limit
       for: 30m
       labels:
