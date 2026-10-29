@@ -23,6 +23,10 @@ spec:
           volumeMounts:
             - name: prowlarr-config
               mountPath: /config
+          ports:
+            - containerPort: 9696
+              name: http
+              protocol: TCP
           resources:
             requests:
               memory: "128Mi"
@@ -30,3 +34,19 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
