@@ -33,6 +33,10 @@ spec:
           mountPath: /config
         - mountPath: /data
           name: nfs-downloads
+        ports:
+        - containerPort: 6969
+          name: http
+          protocol: TCP
         resources:
           requests:
             memory: "128Mi"
@@ -40,3 +44,19 @@ spec:
           limits:
             memory: "500Mi"
             cpu: "250m"
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 3
