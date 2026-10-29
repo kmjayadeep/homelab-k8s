@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261028140315
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261029050033
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
@@ -68,7 +68,8 @@ spec:
               value: "3600"
             - name: A2A_TIMEOUT_SECONDS
               value: "600"
-            # Flux change verification (POST /flux from Alertmanager): wait for rollouts to settle first.
+            # Flux failure investigation (POST /flux from Alertmanager, error events only): wait so transient
+            # errors can heal; answers starting with OK are logged, not posted.
             - name: FLUX_VERIFY_DELAY_SECONDS
               value: "120"
             - name: FLUX_DEDUP_SECONDS
