@@ -25,10 +25,14 @@ metadata:
 spec:
   providerRef:
     name: alertmanager
-  eventSeverity: info
+  # Error events only: failed reconciliations, failed health checks, failed Helm installs/upgrades.
+  # Successful changes are not sent anywhere; broken workloads after a change surface through the
+  # regular Prometheus alerts, which already reach the agent. (Was "info" for the first day: 60 agent
+  # calls for healthy changes, see plan 0022.)
+  eventSeverity: error
   # Flux Alerts take wildcards for names but not for namespaces, so every namespace that holds Flux
   # Kustomizations or HelmReleases is listed. Add a namespace here when a new app is bootstrapped;
-  # a missing namespace only means its changes are not verified automatically.
+  # a missing namespace only means its failures are not investigated automatically.
   eventSources:
     - kind: Kustomization
       name: "*"
@@ -167,10 +171,8 @@ spec:
       namespace: vault
   # Keep only events that mean "something changed or failed": the periodic success and dependency
   # chatter is excluded by message.
+  # Dependency waits are reported while an upstream Kustomization is still reconciling; they are not
+  # failures of this object.
   exclusionList:
-    - "^Reconciliation finished in"
-    - "^Health check passed"
     - "^Dependency .* is not ready"
     - "^Dependencies do not meet ready condition"
-    - "^Helm (install|upgrade|rollback|test) has started"
-    - "^Helm (install|upgrade) succeeded for release .* with chart .*$"
