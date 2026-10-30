@@ -23,6 +23,26 @@ spec:
           - name: http-metrics
             containerPort: 18090
             protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: http-metrics
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+        livenessProbe:
+          tcpSocket:
+            port: http-metrics
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
         volumeMounts:
         - name: config
           mountPath: /app/config.yaml
