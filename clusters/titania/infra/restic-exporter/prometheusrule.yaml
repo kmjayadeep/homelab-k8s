@@ -71,10 +71,10 @@ spec:
       labels:
         severity: critical
     - alert: ResticBackupS3FillingPredicted
-      expr: max by (repo) (predict_linear(restic_s3_size_total[6h], 86400) / restic_s3_size_limit > 1) and max by (repo) (restic_s3_size_total / restic_s3_size_limit) > 0.5
+      expr: max by (repo) (predict_linear(restic_s3_size_total[24h], 259200) / restic_s3_size_limit > 1) and max by (repo) (avg_over_time(restic_s3_size_total[6h]) / restic_s3_size_limit > 0.7)
       annotations:
-        summary: Restic repo projected to hit its bucket size limit within 24h
-        description: At the growth rate of the last 6h, repo {{$labels.repo}} is projected to exceed its bucket size limit within 24 hours.
-      for: 1h
+        summary: Restic repo projected to hit its bucket size limit within 3 days
+        description: At the growth rate of the last 24h, repo {{$labels.repo}} is projected to exceed its bucket size limit within 3 days.
+      for: 3h
       labels:
         severity: warning
