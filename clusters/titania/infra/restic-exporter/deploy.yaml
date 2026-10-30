@@ -42,7 +42,7 @@ spec:
             memory: 64Mi
           limits:
             cpu: 200m
-            memory: 128Mi
+            memory: 512Mi
         volumeMounts:
         - name: config
           mountPath: /app/config.yaml
