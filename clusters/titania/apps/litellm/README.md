@@ -19,8 +19,10 @@ Plain model names that encode a policy. Clients (kagent `ModelConfig`s, Open Web
 | Router | Backends | How |
 |---|---|---|
 | `local-first` | local llama-server, then `deepseek-v4-flash` | Own `model_list` entry for the local server with `max_parallel_requests: 1` (the server runs one slot) and `stream_timeout: 120`; `router_settings.fallbacks` sends the call to the database-managed `deepseek-v4-flash` when the slot is busy, the first streamed token takes longer than 120 s or the backend is unreachable. Timeouts are not retried locally (`retry_policy.TimeoutErrorRetries: 0`); other errors get two quick retries first |
-| `sensitive` | local llama-server only | Own `model_list` entry without limits or fallback; requests queue at llama-server and fail if it is down. Nothing leaves the cluster |
+| `sensitive` | local llama-server only | `router_settings.model_group_alias` to the versioned entry, like `qwen-intel`; no limits, no fallback, requests queue at llama-server and fail if it is down. Nothing leaves the cluster. Subject to alias drift (below) |
 | `frontier` | `deepseek-v4-flash` only | `router_settings.model_group_alias`; the DeepSeek key stays in LiteLLM's database. Subject to alias drift (below) |
+
+`local-first` is the only router with its own `model_list` entry, because `max_parallel_requests` and `stream_timeout` are per-deployment settings: on an alias they would also throttle `qwen-intel` and `sensitive`, which have no fallback. Its `model_info` is a YAML anchor of the versioned entry's block, so limits and rates are written once.
 
 Busy detection for `local-first` counts only requests LiteLLM routes through that group, so a slot held by `qwen-intel` or `sensitive` traffic is noticed only through `stream_timeout` (streamed calls) or `request_timeout` (600 s). A 100K-token cold prompt needs about 85 s of prefill, so raise `stream_timeout` before lowering it. The spend log shows which backend answered each call. Removing or renaming the `deepseek-v4-flash` database entry breaks both `local-first`'s fallback and `frontier`.
 
@@ -39,7 +41,7 @@ The B60 has room for one inference Deployment at a time (`gpu.intel.com/xe: 1`; 
 1. Add the new backend (Deployment, Service, PVC) in `clusters/titania/apps/llm-serving-intel-llama/` at zero replicas, and add a versioned `model_list` entry with the exact served alias, limits and pricing.
 2. Scale the current backend to zero and confirm its pod has exited. Then scale the new one to one and wait for Ready. Use separate commits.
 3. Send a benign request to the versioned LiteLLM name.
-4. Point `router_settings.model_group_alias.qwen-intel` at the new entry, and update the `local-first` and `sensitive` entries' `model`, `api_base` and `model_info` (and `local-first`'s `max_parallel_requests`, which matches the server's `--parallel`) in the same commit.
+4. Point `router_settings.model_group_alias.qwen-intel` and `sensitive` at the new entry, move the `&local-model-info` anchor to it, and update the `local-first` entry's `model` and `api_base` (and `max_parallel_requests`, which matches the server's `--parallel`) in the same commit.
 5. Remove the old backend and its `model_list` entry, or keep them stopped if you need a rollback.
 
 ## kagent

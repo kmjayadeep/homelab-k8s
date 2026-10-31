@@ -72,7 +72,8 @@ spec:
             model: openai/ornith-1.5-35b-a3b-intel
             api_base: http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
-          model_info:
+          # Shared by the `local-first` router entry below (YAML anchor; Kustomize expands it).
+          model_info: &local-model-info
             mode: chat
             supports_reasoning: true
             # Existing local internal accounting rates, not measured operating cost.
@@ -85,14 +86,12 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
-        # Routers (plain model names clients pick by policy; see README "Routers"):
-        #   local-first  local backend, DeepSeek when the local slot is busy, the first token is late or the
-        #                backend is down (router_settings.fallbacks)
-        #   sensitive    local backend only, never leaves the cluster, queues at the server
-        #   frontier     DeepSeek only (model_group_alias below; the DeepSeek key lives in LiteLLM's database)
-        # The local entries point at the same llama-server as the versioned entry above; keep model, api_base
-        # and model_info in step when switching models. `local-first` is capped at the server's single slot
-        # (`--parallel 1` in deployment-ornith.yaml) with a 120 s time-to-first-token budget on streamed calls.
+        # `local-first` router (README "Routers"): the same llama-server as the entry above, but as its own
+        # deployment so that the busy signal applies only to this name: capped at the server's single slot
+        # (`--parallel 1` in deployment-ornith.yaml) with a 120 s time-to-first-token budget on streamed
+        # calls. On busy, late first token or backend down, router_settings.fallbacks sends the call to
+        # DeepSeek. It cannot be a model_group_alias: per-deployment limits would then hit `qwen-intel` and
+        # `sensitive` too, with no fallback. Keep model and api_base in step when switching models.
         - model_name: local-first
           litellm_params:
             model: openai/ornith-1.5-35b-a3b-intel
@@ -100,31 +99,7 @@ spec:
             api_key: not-used
             max_parallel_requests: 1
             stream_timeout: 120
-          model_info:
-            mode: chat
-            supports_reasoning: true
-            input_cost_per_token: 0.0000001
-            cache_read_input_token_cost: 0.00000001
-            output_cost_per_token: 0.000001
-            supports_vision: true
-            supports_function_calling: true
-            max_input_tokens: 114688
-            max_output_tokens: 16384
-        - model_name: sensitive
-          litellm_params:
-            model: openai/ornith-1.5-35b-a3b-intel
-            api_base: http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/v1
-            api_key: not-used
-          model_info:
-            mode: chat
-            supports_reasoning: true
-            input_cost_per_token: 0.0000001
-            cache_read_input_token_cost: 0.00000001
-            output_cost_per_token: 0.000001
-            supports_vision: true
-            supports_function_calling: true
-            max_input_tokens: 114688
-            max_output_tokens: 16384
+          model_info: *local-model-info
         # Google Gemini Embedding 2 on the Gemini API free tier (key from Vault services/gemini/litellm).
         # Used for kagent agent memory; 768 dimensions matches kagent's vector store. rpm/tpm stay under the
         # free tier's reported limits (100 RPM, 30K TPM) so LiteLLM queues instead of getting 429s.
@@ -144,8 +119,10 @@ spec:
       router_settings:
         model_group_alias:
           qwen-intel: ornith-1.5-35b-a3b-intel
-          # `frontier` router: the database-managed DeepSeek entry. The database also stores this alias map
-          # (alias drift, README), so check /router/settings after merging an alias change.
+          # Routers without their own limits are aliases. `sensitive`: local only, never leaves the cluster,
+          # queues at the server. `frontier`: the database-managed DeepSeek entry. The database also stores
+          # this alias map (alias drift, README), so check /router/settings after merging an alias change.
+          sensitive: ornith-1.5-35b-a3b-intel
           frontier: deepseek-v4-flash
         # `local-first` router: DeepSeek when the local slot is busy, the first token is late or the backend
         # is unreachable. Fallback targets are model group names, so the database-managed DeepSeek entry works
