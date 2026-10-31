@@ -4,6 +4,10 @@ metadata:
   name: taskplanner
   annotations:
     secret.reloader.stakater.com/reload: taskplanner-config-vault
+  labels:
+    app: taskplanner
+    app.kubernetes.io/name: taskplanner
+    app.kubernetes.io/instance: taskplanner
 spec:
   selector:
     matchLabels:
@@ -12,6 +16,8 @@ spec:
     metadata:
       labels:
         app: taskplanner
+        app.kubernetes.io/name: taskplanner
+        app.kubernetes.io/instance: taskplanner
     spec:
       containers:
         - name: taskplanner
