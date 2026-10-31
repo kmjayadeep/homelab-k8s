@@ -82,7 +82,7 @@ Get explicit approval for the interruption, then use separate commits so Flux ap
 2. Scale the old Deployment to 0 and confirm its pod has exited and released the GPU.
 3. Scale the new Deployment to 1 and point `healthChecks` in `bootstrap/apps/llm-serving-intel-llama.yaml` at it. Wait for the checksum init to exit 0 and the pod to be Ready with zero restarts.
 4. Send a benign request to the **versioned** LiteLLM name.
-5. Change `router_settings.model_group_alias.qwen-intel` and `sensitive` to the new entry, move the `&local-model-info` anchor to it, and update the `local-first` router entry's `model`, `api_base` and `max_parallel_requests` (equal to the server's `--parallel`).
+5. Change `router_settings.model_group_alias.qwen-intel` and `sensitive` to the new entry and move the `&local-backend` and `&local-model-info` anchors to it; the `local-first` router entry follows them (check only its `max_parallel_requests`, equal to the server's `--parallel`).
 6. Because `STORE_MODEL_IN_DB=True`, a persisted alias can override Helm values. Check `GET /router/settings`. If the alias is stale, send the **complete** alias map with an authenticated `POST /config/update`, then send a benign `qwen-intel` request.
 7. Remove the old Deployment, Service, PVC and LiteLLM entry, with approval. Rollback means restoring them from git history.
 

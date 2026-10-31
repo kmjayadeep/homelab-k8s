@@ -67,12 +67,13 @@ spec:
       model_list:
         # Ornith-1.5 35B-A3B 21G-ICE, the only local B60 model (ADR 0004). The model_name must match the
         # llama-server --alias in deployment-ornith.yaml.
+        # The local backend is declared once here; the `local-first` router entry below merges these two
+        # blocks through YAML anchors, which Kustomize expands before Flux sees the HelmRelease.
         - model_name: ornith-1.5-35b-a3b-intel
-          litellm_params:
+          litellm_params: &local-backend
             model: openai/ornith-1.5-35b-a3b-intel
             api_base: http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/v1
             api_key: not-used
-          # Shared by the `local-first` router entry below (YAML anchor; Kustomize expands it).
           model_info: &local-model-info
             mode: chat
             supports_reasoning: true
@@ -86,17 +87,15 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
-        # `local-first` router (README "Routers"): the same llama-server as the entry above, but as its own
-        # deployment so that the busy signal applies only to this name: capped at the server's single slot
-        # (`--parallel 1` in deployment-ornith.yaml) with a 120 s time-to-first-token budget on streamed
-        # calls. On busy, late first token or backend down, router_settings.fallbacks sends the call to
-        # DeepSeek. It cannot be a model_group_alias: per-deployment limits would then hit `qwen-intel` and
-        # `sensitive` too, with no fallback. Keep model and api_base in step when switching models.
+        # `local-first` router (README "Routers"): the local backend above as its own deployment, so that
+        # the busy signal applies only to this name: capped at the server's single slot (`--parallel 1` in
+        # deployment-ornith.yaml) with a 120 s time-to-first-token budget on streamed calls. On busy, late
+        # first token or backend down, router_settings.fallbacks sends the call to DeepSeek. It cannot be a
+        # model_group_alias: per-deployment limits would then hit `qwen-intel` and `sensitive` too, with no
+        # fallback. Nothing here needs editing when the local model changes.
         - model_name: local-first
           litellm_params:
-            model: openai/ornith-1.5-35b-a3b-intel
-            api_base: http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/v1
-            api_key: not-used
+            <<: *local-backend
             max_parallel_requests: 1
             stream_timeout: 120
           model_info: *local-model-info
