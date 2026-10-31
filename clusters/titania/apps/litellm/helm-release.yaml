@@ -48,6 +48,11 @@ spec:
           secretKeyRef:
             name: litellm-secrets-vault
             key: GEMINI_API_KEY
+      - name: DEEPSEEK_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: litellm-secrets-vault
+            key: DEEPSEEK_API_KEY
       - name: STORE_MODEL_IN_DB
         value: "True"
       - name: NUM_WORKERS
@@ -101,6 +106,17 @@ spec:
             # Free tier: no charge; keep accounting at zero.
             input_cost_per_token: 0
             output_cost_per_token: 0
+        # DeepSeek (key from Vault services/deepseek/litellm, mapped to DEEPSEEK_API_KEY). Pricing, limits
+        # and capabilities come from LiteLLM's cost map for the `deepseek/` provider. Moved here from the
+        # Admin UI database on 2026-10-31 so routers and fallbacks can reference Git-managed entries.
+        - model_name: deepseek-v4-flash
+          litellm_params:
+            model: deepseek/deepseek-v4-flash
+            api_key: os.environ/DEEPSEEK_API_KEY
+        - model_name: deepseek-v4-pro
+          litellm_params:
+            model: deepseek/deepseek-v4-pro
+            api_key: os.environ/DEEPSEEK_API_KEY
       router_settings:
         model_group_alias:
           qwen-intel: ornith-1.5-35b-a3b-intel

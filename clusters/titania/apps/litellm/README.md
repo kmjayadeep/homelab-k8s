@@ -12,6 +12,16 @@ LiteLLM is the only entry point to local models. Clients (Open WebUI, OpenClaw, 
 - Known limits: one benign image request passed. Near-limit context, sustained load and the MTP speedup are untested, and the first 128K pod was evicted for host-memory pressure. See [plan 0008](../../../../plans/0008-tiel-coder-b60-trial.md#128k-vision-follow-up).
 - Clients should use `qwen-intel`, not the versioned name, so the model can be changed without reconfiguring clients.
 
+## Remote providers
+
+| LiteLLM name | Provider entry | Key |
+|---|---|---|
+| `deepseek-v4-flash` | `deepseek/deepseek-v4-flash` | Vault `services/deepseek/litellm` → `DEEPSEEK_API_KEY` (import with `../homelab-iac/vault-config/import-deepseek-litellm-key.sh`, stdin only) |
+| `deepseek-v4-pro` | `deepseek/deepseek-v4-pro` | same key |
+| `gemini-embedding-2` | `gemini/gemini-embedding-2` | Vault `services/gemini/litellm` → `GEMINI_API_KEY` |
+
+Pricing and limits for these come from LiteLLM's built-in cost map; nothing is overridden. The DeepSeek entries were database-managed (Admin UI) until 2026-10-31. A database model with the same `model_name` as a Git entry is served as an extra deployment of the same group, so delete the Admin UI copies after the Git entries answer requests. The Anthropic and OpenRouter entries remain database-managed.
+
 ## Embeddings
 
 `gemini-embedding-2` (Google Gemini API free tier, key at Vault `services/gemini/litellm`, Git-managed entry) serves `/v1/embeddings` at 768 dimensions for kagent agent memory. The entry caps itself below the free tier's reported 100 RPM / 30K TPM. Text sent for embedding leaves the cluster to Google.
@@ -32,7 +42,7 @@ The B60 has room for one inference Deployment at a time (`gpu.intel.com/xe: 1`; 
 
 ## kagent
 
-kagent ([plan 0019](../../../../plans/0019-kagent-deployment.md)) reaches LiteLLM in-cluster with its own virtual key (alias `kagent`, Vault path `apps/litellm/kagent`). Its model is the `model` field of `clusters/titania/apps/kagent/model-config.yaml`, currently the database-managed `deepseek-v4-flash`; set it to `qwen-intel` to move kagent onto the local backend. External providers such as DeepSeek and Anthropic are configured in the LiteLLM Admin UI and stored in its database, not in this repository.
+kagent ([plan 0019](../../../../plans/0019-kagent-deployment.md)) reaches LiteLLM in-cluster with its own virtual key (alias `kagent`, Vault path `apps/litellm/kagent`). Its model is the `model` field of `clusters/titania/apps/kagent/model-config.yaml`, currently the database-managed `deepseek-v4-flash`; set it to `qwen-intel` to move kagent onto the local backend. DeepSeek is Git-managed (see Remote providers); Anthropic and OpenRouter entries are configured in the LiteLLM Admin UI and stored in its database, not in this repository.
 
 ## Alias drift (`STORE_MODEL_IN_DB=True`)
 
