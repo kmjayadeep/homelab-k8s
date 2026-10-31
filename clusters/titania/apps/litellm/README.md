@@ -18,7 +18,7 @@ Plain model names that encode a policy. Clients (kagent `ModelConfig`s, Open Web
 
 | Router | Backends | How |
 |---|---|---|
-| `local-first` | local llama-server, then `deepseek-v4-flash` | Own `model_list` entry for the local server with `max_parallel_requests: 1` (the server runs one slot) and `stream_timeout: 120`; `router_settings.fallbacks` sends the call to the database-managed `deepseek-v4-flash` when the slot is busy, the first streamed token takes longer than 120 s or the backend is unreachable. Timeouts are not retried locally (`retry_policy.TimeoutErrorRetries: 0`); other errors get two quick retries first |
+| `local-first` | local llama-server, then `deepseek-v4-flash` | Own `model_list` entry for the local server with `max_parallel_requests: 1` (the server runs one slot) and `stream_timeout: 120`; `router_settings.fallbacks` sends the call to `deepseek-v4-flash` when the slot is busy, the first streamed token takes longer than 120 s or the backend is unreachable. Timeouts are not retried locally (`retry_policy.TimeoutErrorRetries: 0`); other errors get two quick retries first |
 | `sensitive` | local llama-server only | `router_settings.model_group_alias` to the versioned entry, like `qwen-intel`; no limits, no fallback, requests queue at llama-server and fail if it is down. Nothing leaves the cluster. Subject to alias drift (below) |
 | `frontier` | `deepseek-v4-flash` only | `router_settings.model_group_alias` to the Git-managed DeepSeek entry. Subject to alias drift (below) |
 
