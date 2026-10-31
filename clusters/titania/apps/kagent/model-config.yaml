@@ -9,7 +9,7 @@ metadata:
 spec:
   provider: OpenAI
   # A LiteLLM router name (clusters/titania/apps/litellm/helm-release.yaml). `local-first`: the local
-  # llama.cpp backend with a LiteLLM fallback to the database-managed `deepseek-v4-flash` when the local slot
+  # llama.cpp backend with a LiteLLM fallback to `deepseek-v4-flash` when the local slot
   # is busy, the first token is late or the backend is down. Both agents use this ModelConfig today; set an
   # Agent's `modelConfig` to `sensitive` or `frontier` below to change one agent's policy.
   model: local-first
