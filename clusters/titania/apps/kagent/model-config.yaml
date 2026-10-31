@@ -8,9 +8,43 @@ metadata:
     app.kubernetes.io/instance: kagent
 spec:
   provider: OpenAI
-  # A LiteLLM model name. `deepseek-v4-flash` is database-managed in LiteLLM; switch to the
-  # local llama.cpp backend by setting `qwen-intel` here (plan 0019). Agents do not change.
-  model: deepseek-v4-flash
+  # A LiteLLM router name (clusters/titania/apps/litellm/helm-release.yaml). `local-first`: the local
+  # llama.cpp backend with a LiteLLM fallback to the database-managed `deepseek-v4-flash` when the local slot
+  # is busy, the first token is late or the backend is down. Both agents use this ModelConfig today; set an
+  # Agent's `modelConfig` to `sensitive` or `frontier` below to change one agent's policy.
+  model: local-first
+  apiKeySecret: kagent-litellm
+  apiKeySecretKey: LITELLM_API_KEY
+  openAI:
+    baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1
+---
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  # Local backend only: tool output and prompts never leave the cluster. Calls queue at llama-server.
+  name: sensitive
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  provider: OpenAI
+  model: sensitive
+  apiKeySecret: kagent-litellm
+  apiKeySecretKey: LITELLM_API_KEY
+  openAI:
+    baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1
+---
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  # DeepSeek only (LiteLLM alias `frontier` -> `deepseek-v4-flash`).
+  name: frontier
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  provider: OpenAI
+  model: frontier
   apiKeySecret: kagent-litellm
   apiKeySecretKey: LITELLM_API_KEY
   openAI:

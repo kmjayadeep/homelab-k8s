@@ -6,7 +6,7 @@
 
 - `../kagent-crds/`: CRD chart (`kagent-crds`), prune disabled together with the shared `HelmRepository`. The Namespace in `bootstrap/apps/kagent.yaml` is prune disabled too; removing kagent is a deliberate manual action.
 - `helm-release.yaml`: chart values. All chart-default agents are disabled (`homelab-sre` replaces `k8s-agent`); the tool server has read-only cluster RBAC without Secrets; the controller is scoped to this namespace.
-- `model-config.yaml`: the single `ModelConfig` every default agent uses. `model` is a LiteLLM model name.
+- `model-config.yaml`: one `ModelConfig` per LiteLLM router ([LiteLLM README](../litellm/README.md#routers)): `default-model-config` → `local-first` (local llama.cpp, DeepSeek when the single local slot is busy, the first streamed token takes over 120 s or the backend is down), `sensitive` → local only, `frontier` → DeepSeek only. Both agents use the default.
 - `external-secret.yaml`: LiteLLM virtual key (alias `kagent`) from Vault `apps/litellm/kagent`.
 - `postgres.yaml`: kagent's database is `kagent` on Helios PostgreSQL (`postgres.cosmos.cboxlab.com`, pgvector enabled). The ExternalSecret builds `DATABASE_URL` from the Vault password (`services/postgresql/kagent`) and the controller reads it from a mounted file; the bundled PostgreSQL is disabled. `ModelConfig` `embeddings` points at LiteLLM's `gemini-embedding-2` for agent memory.
 - `grafana-mcp.yaml`: Grafana MCP server (`grafana/mcp-grafana`, read-only flags) with a Viewer service-account token from Vault `services/grafana/kagent`, plus its `RemoteMCPServer`. Gives agents Prometheus, Loki, alert-rule and dashboard tools ([plan 0020](../../../../plans/0020-kagent-sre-agent.md)).
@@ -61,7 +61,7 @@ Create a new token for the Grafana service account `kagent-mcp` (Viewer), import
 
 ## Change the model
 
-Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `deepseek-v4-pro` are database-managed in LiteLLM; `qwen-intel` is the local llama.cpp alias. Agents reference the `ModelConfig`, so nothing else changes. Confirm with a chat in the UI and the LiteLLM spend log for the `kagent` key.
+To change one agent's policy, set its `spec.modelConfig` (in `agent-*.yaml`) to `sensitive` or `frontier`; the default is `local-first`. To change what a router means for everyone, edit the LiteLLM HelmRelease (`local-first`/`sensitive` entries, `router_settings.fallbacks`, `frontier` alias), see [the LiteLLM README](../litellm/README.md#routers). Pinning a raw LiteLLM name such as `qwen-intel` or `deepseek-v4-pro` in a `ModelConfig` also works. Confirm with a chat in the UI and the LiteLLM spend log for the `kagent` key, which also shows whether a call was answered locally or by the fallback.
 
 ## Rotate the LiteLLM key
 
@@ -78,7 +78,7 @@ Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `dee
 
 ## Risks
 
-- Tool output is sent to the configured model provider (DeepSeek until the model is switched to `qwen-intel`).
+- Tool output is sent to the configured model provider. With `local-first` that is the local backend most of the time, but any call can fall back to DeepSeek (busy slot, late first token, backend down), so treat every tool result as leaving the cluster. Use the `sensitive` ModelConfig to keep an agent local.
 - Sessions and memory live in the `kagent` database on Helios, which is in the hourly Restic backup set.
 
 ## Calling an agent from inside the cluster
