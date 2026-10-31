@@ -16,7 +16,7 @@ A new app typically needs a namespace and Flux Kustomization in `bootstrap/apps/
 - `adrs/`: accepted and superseded long-term decisions; [index](../adrs/README.md).
 - `plans/`: rollout steps, experiments, and historical evidence; [index](../plans/README.md).
 - `docs/`: current explanatory material, including this map and [change workflow](change-workflow.md).
-- `automation/`: repository automation; do not assume a proposed runner exists just because it is described in a plan or ADR.
+- `automation/`: repository automation; do not assume a proposed runner exists just because it is described in a plan or ADR. `automation/kagent-skills/` holds skill directories loaded into kagent agents at pod start.
 - `kubeseal/`: legacy public keys retained while the Sealed Secrets controller is decommissioned; do not create new SealedSecret resources.
 - `../homelab-iac/vault-config/PATHS.md`: canonical Vault path taxonomy in a **sibling repository**; check that it exists before work that depends on it.
 

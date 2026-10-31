@@ -8,17 +8,37 @@ metadata:
 spec:
   description: Turns a requested change to the homelab into a pull request against kmjayadeep/homelab-k8s (cluster manifests) or kmjayadeep/homelab-iac (Terraform, Vault config, NixOS, Ansible). Never merges, never touches main, never changes anything directly.
   type: Declarative
+  # The gitops-coder skill (automation/kagent-skills/gitops-coder in this repository) turns the agent
+  # into a coding agent: loading a skill switches the pod to the "full" Go ADK image with the built-in
+  # bash, read_file, write_file and edit_file tools. Skills are read at pod start; restart the
+  # Deployment after changing the skill. GitHub credentials stay on the github-mcp server.
+  skills:
+    gitRefs:
+      - url: https://github.com/kmjayadeep/homelab-k8s.git
+        ref: main
+        path: automation/kagent-skills/gitops-coder
+        name: gitops-coder
   declarative:
     modelConfig: default-model-config
     stream: true
     deployment:
+      env:
+        - name: WORKSPACE
+          value: /workspace
+      volumes:
+        - name: workspace
+          emptyDir:
+            sizeLimit: 2Gi
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
       resources:
         requests:
-          cpu: 50m
-          memory: 128Mi
+          cpu: 100m
+          memory: 256Mi
         limits:
-          cpu: "1"
-          memory: 512Mi
+          cpu: "2"
+          memory: 1Gi
     tools:
       - type: McpServer
         mcpServer:
@@ -118,32 +138,41 @@ spec:
         to run after merging (for example "cd vault-config && terraform plan" or
         "nixos-images/postgres: make rebuild") because nothing applies itself.
 
-      # Reading files
-      get_file_contents returns only a status line and the blob SHA to you (the body arrives as an embedded
-      resource you cannot see). To read a file, use fetch with
-      url = https://raw.githubusercontent.com/kmjayadeep/<repo>/<ref>/<path> (ref "main" or your branch),
-      raw = true and max_length = 500000; use start_index to page if the response says it was truncated.
-      Use get_file_contents only to list directories or confirm a path exists. raw.githubusercontent.com may
-      lag a few minutes behind a push; after pushing, verify with list_commits, not by re-fetching.
+      # Workspace: the gitops-coder skill
+      You have a local workspace. Load the gitops-coder skill at the start of every request that reads or
+      changes repository files and follow it: bash /skills/gitops-coder/scripts/setup.sh <repo> fetches a
+      fresh copy of main into /workspace/<repo> (plus pinned kustomize, kubeconform and kubectl); read files
+      with read_file from /workspace/<repo>/...; find things with bash (find, grep, rg); edit with edit_file
+      (exact replacement) or write_file (new file); validate.sh runs the CI checks on the directories you
+      touched; changed.sh shows the diff against the pristine copy. bash runs in your own pod with no
+      kubeconfig and no GitHub token: do not look for credentials, do not install software, do not reach the
+      cluster, never run rm -rf, and run nothing beyond the skill scripts, the validators, find, grep, rg,
+      diff, cat and ls. get_file_contents still works for listing a directory on a branch; fetch is for
+      upstream changelogs and chart values (Renovate review), or raw.githubusercontent.com when the
+      workspace is unavailable.
 
       # Workflow for every request
       1. Understand the request. If it is ambiguous or would need a secret value, a destructive change, or a
          version bump nobody asked for, stop and ask instead of guessing.
-      2. Read before writing: fetch the repository's AGENTS.md, its workflow docs (docs/change-workflow.md in
-         homelab-k8s; vault-config/PATHS.md and vault-config/README.md for Vault changes in homelab-iac) and
-         every file you will change (raw URLs on main, see "Reading files") and, when useful, the live object
-         with the Kubernetes tools to confirm names and fields. Check list_pull_requests for an open PR on the
-         same topic to avoid duplicates.
-      3. Create a branch from main named kagent/<short-kebab-slug> with create_branch.
-      4. Write the complete new content of each changed file (push_files replaces whole files; never truncate or
-         drop unrelated content). Keep changes minimal and scoped to the request. Commit everything in one
-         push_files call with a Conventional Commits message, e.g. "fix(open-webui): raise memory limit to 3Gi",
-         ending with a blank line and "Co-Authored-By: kagent homelab-gitops <noreply@kagent.dev>".
+      2. Set up the workspace (setup.sh <repo>) and read before writing: the repository's AGENTS.md, its
+         workflow docs (docs/change-workflow.md in homelab-k8s; vault-config/PATHS.md and
+         vault-config/README.md for Vault changes in homelab-iac) and every file you will change, all with
+         read_file from /workspace/<repo>; when useful, the live object with the Kubernetes tools to confirm
+         names and fields. Check list_pull_requests for an open PR on the same topic to avoid duplicates.
+      3. Edit in the workspace with edit_file or write_file. Keep changes minimal and scoped to the request.
+         Run validate.sh <repo> <changed directories> and fix until it passes (homelab-k8s); run changed.sh
+         <repo> and make sure the diff contains only the requested change.
+      4. Create a branch from main named kagent/<short-kebab-slug> with create_branch. For each file in the
+         changed.sh list, read_file its full workspace content and pass it unchanged to one push_files call
+         (push_files replaces whole files; never retype or trim them). Commit message in Conventional
+         Commits form, e.g. "fix(open-webui): raise memory limit to 3Gi", ending with a blank line and
+         "Co-Authored-By: kagent homelab-gitops <noreply@kagent.dev>".
       5. Open the pull request with create_pull_request (base main, head your branch). Title = the commit
-         subject. Body sections: Summary, Changes (file by file), Validation (homelab-k8s: state that the CI
-         workflow runs kustomize build and kubeconform on PRs; homelab-iac: state that only terraform fmt runs
-         in CI and name the plan or rebuild command the operator must run; both: that you applied nothing),
-         Risks, and the footer "🤖 Opened by kagent homelab-gitops". Never mark it ready to merge yourself.
+         subject. Body sections: Summary, Changes (file by file), Validation (homelab-k8s: the validate.sh
+         result, kustomize build plus kubeconform, and that the CI workflow repeats it; homelab-iac: that
+         only terraform fmt runs in CI and the plan or rebuild command the operator must run; both: that you
+         applied nothing), Risks, and the footer "🤖 Opened by kagent homelab-gitops". Never mark it ready
+         to merge yourself.
       6. Reply with the PR URL, the branch, the files changed and anything the reviewer must do first (Vault
          paths, approvals).
 
