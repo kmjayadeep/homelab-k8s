@@ -61,7 +61,7 @@ Create a new token for the Grafana service account `kagent-mcp` (Viewer), import
 
 ## Change the model
 
-Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `deepseek-v4-pro` are database-managed in LiteLLM; `qwen-intel` is the local llama.cpp alias. Agents reference the `ModelConfig`, so nothing else changes. Confirm with a chat in the UI and the LiteLLM spend log for the `kagent` key.
+Edit `spec.model` in `model-config.yaml` and merge. `deepseek-v4-flash` and `deepseek-v4-pro` are Git-managed entries in the LiteLLM HelmRelease (key from Vault); `qwen-intel` is the local llama.cpp alias. Agents reference the `ModelConfig`, so nothing else changes. Confirm with a chat in the UI and the LiteLLM spend log for the `kagent` key.
 
 ## Rotate the LiteLLM key
 
