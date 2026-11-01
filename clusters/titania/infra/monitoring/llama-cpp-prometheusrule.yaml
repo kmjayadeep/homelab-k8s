@@ -27,3 +27,20 @@ spec:
           annotations:
             summary: "llama.cpp requests are deferred"
             description: "The llama.cpp predictor for {{ $labels.service }} has deferred requests for at least 10 minutes."
+        # A slot can wedge mid-generation while /health keeps returning 200: the HTTP listener is alive, the
+        # task never releases, and with --parallel 1 every later request queues behind it (seen in the field
+        # on the same llama.cpp SYCL stack; the liveness probe only checks /health). Completion counters
+        # (tokens_predicted_total, prompt_tokens_total) are updated at slot release, so a healthy long
+        # generation also freezes them; n_decode_total counts every llama_decode() call and moves on each
+        # token step and each prompt batch, so "a request in flight and no decode step for 5 minutes" is a
+        # wedge, not a long answer. A 100K prefill takes about 100 s here, well inside the window.
+        - alert: LlamaCppSlotWedged
+          expr: |
+            max_over_time(llamacpp:requests_processing{job="llama-cpp"}[5m]) > 0
+            and increase(llamacpp:n_decode_total{job="llama-cpp"}[5m]) == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "llama.cpp slot appears wedged"
+            description: "{{ $labels.service }} in {{ $labels.namespace }} has had a request in flight with no llama_decode() progress for 10 minutes while /health still answers. Restart the pod (kubectl rollout restart deployment -n llm-serving) and check the slot that was processing in the server log."
