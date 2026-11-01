@@ -12,7 +12,8 @@ spec:
   # The only B60 Deployment (ADR 0004). Served 2026-10-15 to 2026-10-25 and again since 2026-10-28, when the
   # operator rolled back from Swift Qwen3.8-27B (plan 0018) and removed the Swift manifests. Renamed from
   # intel-llama-tiel-coder-trial on 2026-10-28; Tiel-Coder was a requant of the same weights.
-  replicas: 1
+  # 0 replicas during the Nemotron 3.5 Lightning trial (plan 0024); set back to 1 to roll back.
+  replicas: 0
   strategy:
     type: Recreate
   selector:

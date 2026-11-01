@@ -27,5 +27,5 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: intel-llama-ornith
+      name: intel-llama-nemotron
       namespace: llm-serving

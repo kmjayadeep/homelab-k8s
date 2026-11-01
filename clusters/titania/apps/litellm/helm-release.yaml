@@ -92,6 +92,23 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
+        # Nemotron 3.5 Lightning 30B-A3B trial (plan 0024), versioned route only; `qwen-intel` is not moved
+        # until the trial is judged. Text only: the model has no vision projector.
+        - model_name: nemotron-3.5-lightning-30b-a3b-intel
+          litellm_params:
+            model: openai/nemotron-3.5-lightning-30b-a3b-intel
+            api_base: http://intel-llama-nemotron.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            input_cost_per_token: 0.0000001
+            cache_read_input_token_cost: 0.00000001
+            output_cost_per_token: 0.000001
+            supports_vision: false
+            supports_function_calling: true
+            max_input_tokens: 114688
+            max_output_tokens: 16384
         # `local-first` router (README "Routers"): the local backend above as its own deployment, so that
         # the busy signal applies only to this name: capped at the server's single slot (`--parallel 1` in
         # deployment-ornith.yaml) with a 120 s time-to-first-token budget on streamed calls. On busy, late

@@ -1,0 +1,198 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intel-llama-nemotron
+  labels:
+    app.kubernetes.io/name: intel-llama-nemotron
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # NVIDIA Nemotron 3.5 Lightning 30B-A3B trial (plan 0024): bartowski Q4_0 + first-party MTP draft head,
+  # 128K, text only (no vision projector exists). Holds the B60 while intel-llama-ornith is at 0 replicas;
+  # ADR 0004's one-Deployment rule is restored when the trial ends with either removal or promotion.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-llama-nemotron
+      app.kubernetes.io/instance: llm-serving
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-llama-nemotron
+        app.kubernetes.io/instance: llm-serving
+        app.kubernetes.io/component: inference
+        app.kubernetes.io/part-of: llm-serving
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:3b8fde20978e330b401837f24b871ebe2c8d14ff7f07b87990bcd832588a1a75
+          # Pin these once known (plan 0024 step 2): the first run prints the computed sha256 of each file
+          # and the download is kept; an empty value skips verification and logs a warning.
+          env:
+            - name: MODEL_SHA256
+              value: ""
+            - name: MTP_SHA256
+              value: ""
+            - name: HF_REPO
+              value: https://huggingface.co/bartowski/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF/resolve/main
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              fetch() { # fetch <url> <dest> <sha256-or-empty>
+                if ! test -f "$2"; then
+                  curl --fail --location --retry 5 --output "$2.partial" "$1"
+                  mv "$2.partial" "$2"
+                fi
+                if test -n "$3"; then
+                  echo "$3  $2" | sha256sum -c -
+                else
+                  echo "WARNING: no pinned checksum for $2; pin this value in deployment-nemotron.yaml:"
+                  sha256sum "$2"
+                fi
+              }
+              fetch "$HF_REPO/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-Q4_0.gguf" /models/model-q4_0.gguf "$MODEL_SHA256"
+              fetch "$HF_REPO/mtp-NVIDIA-Nemotron-3.5-Lightning-30B-A3B-Q8_0.gguf" /models/mtp-q8_0.gguf "$MTP_SHA256"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      containers:
+        - name: llama-server
+          # Same image as deployment-ornith.yaml: server-intel b11515, oneAPI 2026.1.1 / FP16.
+          image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
+          env:
+            # Persist compiled SYCL kernels across restarts (shorter startup; from the field config).
+            - name: NEO_CACHE_PERSISTENT
+              value: "1"
+          args:
+            - --model
+            - /models/model-q4_0.gguf
+            - --alias
+            - nemotron-3.5-lightning-30b-a3b-intel
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --metrics
+            - --jinja
+            # 128K, not the native 262K: at 262K the field config peaked at 23.88 of 24 GiB and decode fell
+            # to about 20 tok/s; 131072 peaked at 22.26 GiB with 1.7 GiB headroom.
+            - --ctx-size
+            - "131072"
+            - --cache-type-k
+            - q8_0
+            - --cache-type-v
+            - q8_0
+            - --flash-attn
+            - "on"
+            - --parallel
+            - "1"
+            - --n-gpu-layers
+            - "99"
+            - --cache-ram
+            - "4096"
+            # 2048/2048 as in the field config; 4096/2048 (Ornith) is a later autoresearch idea, watch VRAM.
+            - --batch-size
+            - "2048"
+            - --ubatch-size
+            - "2048"
+            - --reasoning-budget
+            - "2048"
+            # Sampling kept equal to Ornith's so evaluate.py runs compare like for like.
+            - --temp
+            - "0.6"
+            - --top-p
+            - "0.95"
+            - --top-k
+            - "20"
+            - --min-p
+            - "0"
+            - --presence-penalty
+            - "0"
+            - --repeat-penalty
+            - "1.0"
+            # First-party MTP head as a separate draft file, fully offloaded. n-max 7 (never 8+: a +71% verify
+            # step cost appears at batch 9 on this card) and p-min 0.6 (+26% decode on real code generation
+            # over the 0.0 default) per the field measurements; both are autoresearch candidates to re-sweep.
+            - --model-draft
+            - /models/mtp-q8_0.gguf
+            - --n-gpu-layers-draft
+            - "99"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "7"
+            - --spec-draft-p-min
+            - "0.6"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 4
+              memory: 8Gi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 6
+              memory: 16Gi
+              gpu.intel.com/xe: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 90
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: intel-llama-nemotron-models
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
