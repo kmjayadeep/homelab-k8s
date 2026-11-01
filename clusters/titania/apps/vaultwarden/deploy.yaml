@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: vaultwarden
   labels:
-    app.kubernetes.io/name: vaultwarden
+    app: vaultwarden
 spec:
   selector:
     matchLabels:
@@ -12,7 +12,6 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: vaultwarden
-      annotations:
     spec:
       containers:
         - name: vaultwarden
@@ -33,14 +32,6 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
           volumeMounts:
           - name: data
             mountPath: /data
