@@ -43,4 +43,4 @@ spec:
             severity: critical
           annotations:
             summary: "llama.cpp slot appears wedged"
-            description: "{{ $labels.service }} in {{ $labels.namespace }} has had a request in flight with no llama_decode() progress for 10 minutes while /health still answers. Restart the pod (kubectl rollout restart deployment -n llm-serving) and check the slot that was processing in the server log."
+            description: "{{ $labels.service }} in {{ $labels.namespace }} has had a request in flight with no llama_decode() progress for 5 minutes while /health still answers. Restart the pod (kubectl rollout restart deployment -n llm-serving) and check the slot that was processing in the server log."
