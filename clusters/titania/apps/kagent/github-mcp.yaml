@@ -43,7 +43,7 @@ spec:
   deployment:
     # Do not set deployment.labels: kmcp replaces (not merges) the pod template labels and its selector
     # then no longer matches. kmcp labels the pods app.kubernetes.io/managed-by=kmcp itself.
-    image: ghcr.io/github/github-mcp-server:v2.0.3
+    image: ghcr.io/github/github-mcp-server:v2.1.0
     port: 3000
     cmd: /server/github-mcp-server
     args:
