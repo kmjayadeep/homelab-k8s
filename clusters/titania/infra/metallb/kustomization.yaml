@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: metallb-system
 
 resources:
-- github.com/metallb/metallb/config/native?ref=v0.16.1
+- github.com/metallb/metallb/config/native?ref=v0.16.2
 - l2advertisement.yaml
 - public-pool.yaml
 
