@@ -2,7 +2,16 @@
 
 This is an experiment loop, inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch), for tuning the production llama.cpp server on the Intel Arc Pro B60. The human edits this file. You (the agent) edit only the llama-server `args` in the Deployment manifest. The loop changes one idea at a time, evaluates it through LiteLLM, keeps the change if it helps and discards it if it doesn't.
 
-The operator runs this from Claude Code during a low-traffic window and has stopped other `qwen-intel` consumers. Production **is** the experiment: every change replaces what `qwen-intel` serves until the session ends.
+The operator runs this from Claude Code during a low-traffic window and has stopped other consumers of the target's route. Production **is** the experiment: every change replaces what that route serves until the session ends.
+
+**Targets.** A session tunes one Deployment, chosen at `start` and stored in the git-ignored `session.json`:
+
+| Target | Manifest | LiteLLM route |
+| --- | --- | --- |
+| `ornith` (default) | `deployment-ornith.yaml` | `qwen-intel` |
+| `nemotron` ([plan 0025](../../plans/0025-nemotron-lightning-b60-trial.md) trial) | `deployment-nemotron.yaml` | `nemotron-3.5-lightning-30b-a3b-intel` |
+
+Only the Deployment that currently holds the B60 can be a target. Below, "the manifest" means the target's manifest.
 
 ## Setup
 
@@ -13,18 +22,18 @@ Do these steps once per session, together with the human:
    - `automation/llm-autoresearch/README.md`: context.
    - `automation/llm-autoresearch/evaluate.py`: the fixed evaluator. **Read-only.**
    - `automation/llm-autoresearch/experiment.py`: session tooling. **Read-only.**
-   - `clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml`: **the file you edit, and only its llama-server `args`.**
+   - the target's manifest in `clusters/titania/apps/llm-serving-intel-llama/`: **the file you edit, and only its llama-server `args`.**
    - `adrs/0006-local-b60-autoresearch.md`: what the operator has approved.
    - `automation/llm-autoresearch/results/*/results.tsv`: every past session. Don't repeat an idea that was already discarded on the current config unless you have a reason to expect a different result.
-3. **Smoke check:** `python3 automation/llm-autoresearch/evaluate.py --smoke`. It sends one request per suite. If it fails, stop and tell the human.
-4. **Start:** `python3 automation/llm-autoresearch/experiment.py start`. This suspends Flux for `llm-serving-intel-llama` with a marker annotation and creates `results.tsv`. It refuses if `results.tsv` still holds a previous, unarchived session; archive that first (see "Ending the session").
+3. **Smoke check:** `python3 automation/llm-autoresearch/evaluate.py --smoke --model <target route>`. It sends one request per suite. If it fails, stop and tell the human.
+4. **Start:** `python3 automation/llm-autoresearch/experiment.py start --target <target>`. This records the target, suspends Flux for `llm-serving-intel-llama` with a marker annotation and creates `results.tsv`. It refuses if `results.tsv` still holds a previous, unarchived session; archive that first (see "Ending the session").
 5. **Confirm with the human, then begin.** The first run is the baseline: the unchanged config.
 
 ## What you may change
 
-You may change **only** the `args` list of the `llama-server` container in `deployment-ornith.yaml`. Rules:
+You may change **only** the `args` list of the `llama-server` container in the target's manifest. Rules:
 
-- **Protected flags.** These may not be touched: `--model`, `--mmproj`, `--alias`, `--host`, `--port`, `--metrics`, `--jinja`, `--ctx-size` (stays 131072), `--parallel` (stays 1) and `--n-gpu-layers`. Production needs the full single-slot 128K context, which the eval cannot see, so nothing may trade it away.
+- **Protected flags.** These may not be touched: `--model`, `--mmproj`, `--model-draft`, `--alias`, `--host`, `--port`, `--metrics`, `--jinja`, `--ctx-size` (stays 131072), `--parallel` (stays 1) and `--n-gpu-layers`. Production needs the full single-slot 128K context, which the eval cannot see, so nothing may trade it away.
 - **One idea per experiment.** That means one flag, or a coupled pair such as `--cache-type-k` with `--cache-type-v`, or `--batch-size` with `--ubatch-size`. `experiment.py` rejects more than two changed flags.
 - **Everything else is off-limits:** the image, init container, resources, probes, volumes and all other files.
 - **Candidate areas:**
@@ -38,7 +47,7 @@ You may change **only** the `args` list of the `llama-server` container in `depl
 
   At about 100K tokens, MTP acceptance was only 0.35–0.40. Worth testing first: speculative decoding off (`--spec-type none`) or a shorter draft. Judge these on `decode_tps_100k` as well as overall time.
 
-  Check that a flag exists in this llama.cpp build before using it. A crash on an unknown flag wastes a restart. To list the supported flags, run `kubectl -n llm-serving exec deploy/intel-llama-ornith -c llama-server -- /app/llama-server --help`. Other options include `--cache-reuse`, `--poll`, and n-gram speculation (`--spec-type`, `--spec-ngram-*`).
+  Check that a flag exists in this llama.cpp build before using it. A crash on an unknown flag wastes a restart. To list the supported flags, run `kubectl -n llm-serving exec deploy/<target Deployment> -c llama-server -- /app/llama-server --help`. Other options include `--cache-reuse`, `--poll`, and n-gram speculation (`--spec-type`, `--spec-ngram-*`).
 - **Memory is the binding risk.** A past 128K trial OOMed the host and took k3s down. The evaluator and `apply` abort when free memory on `titania-gpu` drops below 2 GiB, and `verdict` discards anything below 3 GiB of headroom. Be careful with f16 K/V or larger batches.
 
 ## The goal

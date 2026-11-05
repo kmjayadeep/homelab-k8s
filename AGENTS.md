@@ -23,7 +23,7 @@ Kubernetes homelab managed through FluxCD GitOps. Cluster manifests live under `
   - apply that app's Kustomize build
   - `git reset --hard` its own unpushed experiment commits on the `autoresearch/<tag>` branch
 
-  This covers only the llama-server `args` in `deployment-ornith.yaml`. It never covers other resources, other branches, `main`, or merging.
+  This covers only the llama-server `args` in the session target's manifest: `deployment-ornith.yaml`, or `deployment-nemotron.yaml` while the [plan 0025](plans/0025-nemotron-lightning-b60-trial.md) trial runs (`experiment.py start --target`). It never covers other resources, other branches, `main`, or merging.
 
 ## Vault and External Secrets
 

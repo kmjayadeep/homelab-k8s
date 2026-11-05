@@ -2,3 +2,4 @@
 /run.log
 /runs/
 __pycache__/
+/session.json

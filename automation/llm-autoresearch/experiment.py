@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Session tooling for the B60 autoresearch loop (see program.md).
 
-  start    preflight, suspend Flux for llm-serving-intel-llama (with marker)
+  start    preflight, record the session target, suspend Flux for llm-serving-intel-llama (with marker)
   apply    validate the manifest edit, apply it, wait for rollout + LiteLLM
   run      apply, then evaluate.py (redirect to run.log)
   record   append the latest run to results.tsv
@@ -24,12 +24,29 @@ import evaluate  # noqa: E402
 
 NS = "llm-serving"
 KS = "llm-serving-intel-llama"
-DEPLOY = "intel-llama-ornith"
 CONTAINER = "llama-server"
 APP_DIR = REPO / "clusters/titania/apps/llm-serving-intel-llama"
-MANIFEST = "clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml"
 MARKER = "llm-autoresearch.cboxlab.com/suspended-by"
 RESULTS = ROOT / "results.tsv"
+# The session target, chosen once by `start --target` and stored in the git-ignored SESSION file so
+# every later command (including after `git reset --hard`) acts on the same Deployment and route.
+# Only targets listed here may be tuned; see AGENTS.md and ADR 0006.
+TARGETS = {
+    "ornith": {"deploy": "intel-llama-ornith",
+               "manifest": "clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml",
+               "model": evaluate.MODEL},
+    # Plan 0025 trial: evaluated on its versioned LiteLLM route, since `qwen-intel` still names Ornith.
+    "nemotron": {"deploy": "intel-llama-nemotron",
+                 "manifest": "clusters/titania/apps/llm-serving-intel-llama/deployment-nemotron.yaml",
+                 "model": "nemotron-3.5-lightning-30b-a3b-intel"},
+}
+DEFAULT_TARGET = "ornith"
+SESSION = ROOT / "session.json"
+
+
+def target():
+    name = json.loads(SESSION.read_text())["target"] if SESSION.exists() else DEFAULT_TARGET
+    return TARGETS[name]
 RUNS = ROOT / "runs"
 ARCHIVE = ROOT / "results"
 COLUMNS = ["commit", "passed", "total", "quality_seconds", "decode_tps", "ttft_8k_s",
@@ -38,7 +55,7 @@ COLUMNS = ["commit", "passed", "total", "quality_seconds", "decode_tps", "ttft_8
 
 # Never changed by the loop: identity/routing, and anything that would shrink the
 # usable context production relies on (the eval only probes ~24K).
-PROTECTED = {"--model", "--mmproj", "--alias", "--host", "--port", "--metrics", "--jinja",
+PROTECTED = {"--model", "--mmproj", "--model-draft", "--alias", "--host", "--port", "--metrics", "--jinja",
              "--ctx-size", "--parallel", "--n-gpu-layers"}
 MAX_CHANGED_FLAGS = 2  # one idea; allows coupled pairs such as cache-type-k/v
 
@@ -82,7 +99,8 @@ def patch_kustomization(patch):
 
 def manifest_args(revision):
     """Return llama-server args of the Deployment at a git revision ('WORKTREE' for the file on disk)."""
-    text = (REPO / MANIFEST).read_text() if revision == "WORKTREE" else sh("git", "-C", str(REPO), "show", f"{revision}:{MANIFEST}")
+    manifest = target()["manifest"]
+    text = (REPO / manifest).read_text() if revision == "WORKTREE" else sh("git", "-C", str(REPO), "show", f"{revision}:{manifest}")
     doc = json.loads(sh("kubectl", "create", "--dry-run=client", "-o", "json", "-f", "-", stdin=text))
     container = next(c for c in doc["spec"]["template"]["spec"]["containers"] if c["name"] == CONTAINER)
     return doc, container.get("args", [])
@@ -112,7 +130,7 @@ def validate():
     for flag in PROTECTED:
         if base.get(flag, "<absent>") != new.get(flag, "<absent>"):
             raise SystemExit(f"REJECTED: {flag} is protected")
-    if sh("git", "-C", str(REPO), "status", "--porcelain", "--", MANIFEST).strip():
+    if sh("git", "-C", str(REPO), "status", "--porcelain", "--", APP_DIR.relative_to(REPO)).strip():
         raise SystemExit("REJECTED: commit the experiment before running it")
     # HEAD is the experiment commit; its parent is the last kept config (or main).
     _, kept_args = manifest_args("HEAD~1") if _has_parent_experiment() else (None, head_args)
@@ -161,7 +179,7 @@ def apply(skip_validate=False):
     since = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 5))
     rendered = sh("kustomize", "build", str(APP_DIR))
     sh("kubectl", "apply", "--server-side", "--field-manager=llm-autoresearch", "--force-conflicts", "-f", "-", stdin=rendered)
-    deploy = kget("deployment", DEPLOY)
+    deploy = kget("deployment", target()["deploy"])
     selector = ",".join(f"{k}={v}" for k, v in sorted(deploy["spec"]["selector"]["matchLabels"].items()))
     log("applied; waiting for rollout (Recreate + checksum init takes a few minutes)")
     started, min_free = time.monotonic(), None
@@ -179,13 +197,13 @@ def apply(skip_validate=False):
         problem = pod_problem(selector, since)
         if problem:
             return fail(problem)
-        d = kget("deployment", DEPLOY)
+        d = kget("deployment", target()["deploy"])
         st = d.get("status", {})
         if (st.get("observedGeneration", 0) >= d["metadata"]["generation"] and st.get("updatedReplicas") == 1
                 and st.get("availableReplicas") == 1 and not st.get("unavailableReplicas")):
             break
         time.sleep(10)
-    client = evaluate.Client(evaluate.bench.load_key("litellm/evals"), evaluate.MODEL, evaluate.Guard())
+    client = evaluate.Client(evaluate.bench.load_key("litellm/evals"), target()["model"], evaluate.Guard())
     for _ in range(30):
         try:
             message, rec = client.chat([{"role": "user", "content": "Reply with OK."}], seed=0, max_tokens=8, thinking=False)
@@ -209,14 +227,17 @@ def fail(reason):
     return 2
 
 
-def start():
+def start(name):
     _has_parent_experiment()  # enforces the autoresearch/<tag> branch
+    if SESSION.exists() and read_rows():
+        raise SystemExit("REJECTED: session.json belongs to an unarchived session; archive it first")
+    SESSION.write_text(json.dumps({"target": name}) + "\n")
     if sh("git", "-C", str(REPO), "status", "--porcelain", "--untracked-files=no").strip():
         raise SystemExit("REJECTED: working tree has uncommitted tracked changes")
     ks = kustomization()
     if ks["spec"].get("suspend") and MARKER not in ks["metadata"].get("annotations", {}):
         raise SystemExit("REJECTED: Flux is suspended by someone else; not taking over")
-    deploy = kget("deployment", DEPLOY)
+    deploy = kget("deployment", target()["deploy"])
     if deploy.get("status", {}).get("availableReplicas", 0) < 1:
         raise SystemExit("REJECTED: production Deployment is not available")
     if read_rows():
@@ -228,7 +249,8 @@ def start():
     patch_kustomization({"metadata": {"annotations": {MARKER: branch}}, "spec": {"suspend": True}})
     if not RESULTS.exists():
         RESULTS.write_text("\t".join(COLUMNS) + "\n")
-    log(f"Flux suspended for {KS} by {branch}; results in {RESULTS.relative_to(REPO)}")
+    log(f"Flux suspended for {KS} by {branch}; target {target()['deploy']} via {target()['model']}; "
+        f"results in {RESULTS.relative_to(REPO)}")
 
 
 def archive(tag=None):
@@ -252,6 +274,8 @@ def archive(tag=None):
     (dest / "runs").mkdir(parents=True)
     local.mkdir(parents=True, exist_ok=True)
     RESULTS.rename(dest / "results.tsv")
+    if SESSION.exists():
+        SESSION.rename(dest / "session.json")
     kept = 0
     for f in sorted(RUNS.glob("*.json*")):
         if f.name == "latest.json":
@@ -277,7 +301,7 @@ def finish():
     log("Flux resumed; waiting for the Deployment to roll back to the Git main config...")
     _, main_args = manifest_args("main")
     for _ in range(120):
-        d = kget("deployment", DEPLOY)
+        d = kget("deployment", target()["deploy"])
         st = d.get("status", {})
         live_args = next(c for c in d["spec"]["template"]["spec"]["containers"] if c["name"] == CONTAINER).get("args", [])
         # The old pod stays available until Flux reapplies, so also require main's args and a finished rollout.
@@ -363,7 +387,9 @@ def verdict():
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("start")
+    st = sub.add_parser("start")
+    st.add_argument("--target", choices=sorted(TARGETS), default=DEFAULT_TARGET,
+                    help="Deployment to tune for the whole session (default: %(default)s)")
     a = sub.add_parser("apply")
     a.add_argument("--restore", action="store_true", help="Re-apply the kept config after a reset (skips edit checks)")
     sub.add_parser("run")
@@ -376,14 +402,14 @@ def main():
     sub.add_parser("finish")
     args = parser.parse_args()
     if args.cmd == "start":
-        start()
+        start(args.target)
     elif args.cmd == "apply":
         return apply(skip_validate=args.restore)
     elif args.cmd == "run":
         code = apply()
         if code:
             return code
-        return subprocess.run([sys.executable, str(ROOT / "evaluate.py")]).returncode
+        return subprocess.run([sys.executable, str(ROOT / "evaluate.py"), "--model", target()["model"]]).returncode
     elif args.cmd == "record":
         record(args.status, args.description)
     elif args.cmd == "verdict":
