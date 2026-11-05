@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
-  # NVIDIA Nemotron 3.5 Lightning 30B-A3B trial (plan 0024): bartowski Q4_0 + first-party MTP draft head,
+  # NVIDIA Nemotron 3.5 Lightning 30B-A3B trial (plan 0025): bartowski Q4_0 + first-party MTP draft head,
   # 128K, text only (no vision projector exists). Holds the B60 while intel-llama-ornith is at 0 replicas;
   # ADR 0004's one-Deployment rule is restored when the trial ends with either removal or promotion.
   replicas: 1
@@ -37,15 +37,14 @@ spec:
       initContainers:
         - name: model-download
           image: curlimages/curl@sha256:3b8fde20978e330b401837f24b871ebe2c8d14ff7f07b87990bcd832588a1a75
-          # Pin these once known (plan 0024 step 2): the first run prints the computed sha256 of each file
-          # and the download is kept; an empty value skips verification and logs a warning.
+          # Hugging Face LFS hashes at the pinned repo revision.
           env:
             - name: MODEL_SHA256
-              value: ""
+              value: cf548e9348b829334e8fc8512224a284e1df2b1e6e7203f20ee9826800ab5525
             - name: MTP_SHA256
-              value: ""
+              value: a8be9bdeafd1503e73bf2d335b3ee1e2577822af7b4761b14322fc7c7546c886
             - name: HF_REPO
-              value: https://huggingface.co/bartowski/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF/resolve/main
+              value: https://huggingface.co/bartowski/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF/resolve/f0eec2267ae843d9eb21ea3926ab0046da0a8628
           command:
             - sh
           args:
@@ -59,7 +58,7 @@ spec:
                 if test -n "$3"; then
                   echo "$3  $2" | sha256sum -c -
                 else
-                  echo "WARNING: no pinned checksum for $2; pin this value in deployment-nemotron.yaml:"
+                  echo "WARNING: no pinned checksum for $2"
                   sha256sum "$2"
                 fi
               }

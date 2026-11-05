@@ -92,7 +92,7 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
-        # Nemotron 3.5 Lightning 30B-A3B trial (plan 0024), versioned route only; `qwen-intel` is not moved
+        # Nemotron 3.5 Lightning 30B-A3B trial (plan 0025), versioned route only; `qwen-intel` is not moved
         # until the trial is judged. Text only: the model has no vision projector.
         - model_name: nemotron-3.5-lightning-30b-a3b-intel
           litellm_params:

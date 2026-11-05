@@ -1,4 +1,4 @@
-# Plan 0024: Trial NVIDIA Nemotron 3.5 Lightning 30B-A3B on the B60
+# Plan 0025: Trial NVIDIA Nemotron 3.5 Lightning 30B-A3B on the B60
 
 - Status: Draft (manifests in PR; operator evaluates)
 - Owner: Homelab operator
@@ -32,7 +32,7 @@ Two findings there shape the config: `--spec-draft-n-max` must stay at or below 
 
 Prerequisites and open items for the operator:
 
-- **Checksums are not pinned.** The Hugging Face file hashes could not be read from the agent's environment. The init container downloads from `resolve/main`, prints the sha256 of each file and continues. After the first start, copy both values into `MODEL_SHA256` / `MTP_SHA256` in `deployment-nemotron.yaml` and, if possible, replace `main` in `HF_REPO` with the repo revision.
+- **Checksums are pinned** to the Hugging Face LFS hashes at repo revision `f0eec2267ae843d9eb21ea3926ab0046da0a8628`, read on 2026-11-05 before merge.
 - `qwen-intel` and `sensitive` keep pointing at `ornith-1.5-35b-a3b-intel`, which is at 0 replicas during the trial, so **Open WebUI and kagent's local model are down for the trial**. `local-first` falls back to DeepSeek as designed. Flip the alias only if the trial is promoted (step 7 of plan 0018, including the alias-drift check).
 - Other `qwen-intel` consumers stopped for the download: about 21 GB, roughly 5 minutes at the 83 MB/s seen in plan 0018, plus load.
 - Flag check on b11515: `--spec-draft-p-min` was used in plan 0014 on this build; `--model-draft` with `--spec-type draft-mtp` and `--n-gpu-layers-draft` are standard. If the server rejects a flag at startup, the pod log says so before the model loads.
@@ -40,7 +40,7 @@ Prerequisites and open items for the operator:
 ## Steps and gates
 
 1. **This PR** merges: `pvc-nemotron.yaml`, `deployment-nemotron.yaml` (1 replica), `service-nemotron.yaml`; `deployment-ornith.yaml` to 0 replicas; Flux health check retargeted; LiteLLM route `nemotron-3.5-lightning-30b-a3b-intel`. Gate: pod Ready, 0 restarts, `/props` shows the alias and `n_ctx` 131072, **idle VRAM below 95%** (`xpu-smi stats -d 0 -j`), node free memory above 3 GiB, Flux `llm-serving-intel-llama` and `litellm` Ready, `/v1/models` lists the new route.
-2. **Pin checksums** from the init container log in a follow-up PR (no restart needed: the files exist and the next start verifies them).
+2. **Checksums**: confirm the init container log shows `OK` for both files.
 3. **Function gate** through the versioned route: one benign chat, one `tools` request (never execute the call), then `python3 automation/llm-autoresearch/evaluate.py --smoke --model nemotron-3.5-lightning-30b-a3b-intel`. No image check: the route is `supports_vision: false`.
 4. **Measure.** Two full runs of `evaluate.py --model nemotron-3.5-lightning-30b-a3b-intel`; read VRAM right after the 100K probe. Record rows in the Outcome table.
 5. **One tuning idea per rollout if close**, judged by a full run: `--spec-draft-p-min` removed (plan 0014 found p-min changed answers on Ornith's MTP head, scoring 40 at both 0.2 and 0.6; if quality lands below Ornith here, this is the first suspect), `--spec-draft-n-max 3` and `5`, `--temp 0.2` (the field writeup's code-generation setting), `--batch-size 4096` (watch VRAM). Stop after two consecutive ideas without a gain.
