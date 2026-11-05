@@ -7,5 +7,8 @@ resources:
   - pvc-ornith.yaml
   - deployment-ornith.yaml
   - service-ornith.yaml
+  - pvc-nemotron.yaml
+  - deployment-nemotron.yaml
+  - service-nemotron.yaml
   - metrics-service.yaml
   - servicemonitor.yaml

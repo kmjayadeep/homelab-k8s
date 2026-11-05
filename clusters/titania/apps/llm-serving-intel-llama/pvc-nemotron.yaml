@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-nemotron-models
+  labels:
+    app.kubernetes.io/name: intel-llama-nemotron
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 19.06 GB Q4_0 weights + 2.18 GB MTP draft head; allow checksum-verified partial downloads.
+      storage: 40Gi
+  storageClassName: local-path
