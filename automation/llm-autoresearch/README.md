@@ -5,7 +5,7 @@ This is a local, Claude Code–driven hill-climb over the B60 llama-server flags
 | File | Role | Who edits |
 | --- | --- | --- |
 | [`program.md`](program.md) | Agent instructions: setup, rules, loop, keep rule | human |
-| `clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml` | The experiment: llama-server `args` only | agent |
+| `clusters/titania/apps/llm-serving-intel-llama/deployment-<target>.yaml` | The experiment: llama-server `args` only (`ornith` by default; `nemotron` during plan 0025) | agent |
 | [`evaluate.py`](evaluate.py) | Fixed evaluator (ground truth) | nobody during a session |
 | [`experiment.py`](experiment.py) | `start`/`apply`/`run`/`verdict`/`record`/`archive`/`finish` tooling | nobody during a session |
 | `tasks/`, `sandbox/` | Eval data and the network-less grading container | nobody during a session |
@@ -14,7 +14,7 @@ This is a local, Claude Code–driven hill-climb over the B60 llama-server flags
 
 ## Running a session
 
-1. Stop agents and other consumers that use `qwen-intel`.
+1. Stop agents and other consumers of the target's route (`qwen-intel` for Ornith).
 2. Start Claude Code in the repo root and tell it: *"Read automation/llm-autoresearch/program.md and let's kick off a new experiment. Do the setup first."*
 3. Confirm the run tag and the baseline, then leave it running.
 4. Interrupt it when you're done. It summarizes, archives the results into `results/<tag>/`, opens a PR with the results and any kept changes, and resumes Flux.
@@ -26,7 +26,7 @@ Each experiment takes about 16–20 minutes: a 3-minute rollout plus 10–14 min
 ## Requirements
 
 - `kubectl` and `flux` with operator access, plus `kustomize`, `docker` and `pass` (entry `litellm/evals`) on the local machine.
-- The model is called through `https://litellm.cosmos.cboxlab.com/v1` as `qwen-intel`.
+- The model is called through `https://litellm.cosmos.cboxlab.com/v1` as `qwen-intel`, or as the target's versioned route (`experiment.py start --target`).
 - The key is read in-process (see `automation/llm-performance/bench.py`) and is never printed.
 - Memory on `titania-gpu` is read from Prometheus through the Kubernetes API service proxy.
 
