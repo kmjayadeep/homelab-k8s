@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: vaultwarden
-          image: "vaultwarden/server:1.37.4"
+          image: "vaultwarden/server:1.37.5"
           resources:
             requests:
               cpu: 100m
@@ -32,6 +32,20 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
           volumeMounts:
           - name: data
             mountPath: /data
