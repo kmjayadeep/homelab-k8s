@@ -12,6 +12,11 @@ spec:
   # 128K, text only (no vision projector exists). Holds the B60 while intel-llama-ornith is at 0 replicas;
   # ADR 0004's one-Deployment rule is restored when the trial ends with either removal or promotion.
   replicas: 1
+  # Cold start downloads ~20 GB (17.75 GiB Q4_0 weights + 2.02 GiB MTP head) into a fresh PVC, verifies both
+  # checksums, then loads the 30B MoE at 128K: measured ~10 min end to end. The default 600s deadline made
+  # the Deployment report ProgressDeadlineExceeded mid-startup, so the Flux Kustomization health check failed
+  # early and LlamaCppTargetDown fired while llama-server was still loading. 2400s covers download + load.
+  progressDeadlineSeconds: 2400
   strategy:
     type: Recreate
   selector:
