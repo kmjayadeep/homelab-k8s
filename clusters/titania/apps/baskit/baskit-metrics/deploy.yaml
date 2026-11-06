@@ -6,6 +6,8 @@ metadata:
     secret.reloader.stakater.com/reload: baskit-metrics-firebase-vault
   labels:
     app: baskit-metrics
+    app.kubernetes.io/name: baskit-metrics
+    app.kubernetes.io/instance: baskit-metrics
 spec:
   replicas: 1
   strategy:
@@ -17,6 +19,8 @@ spec:
     metadata:
       labels:
         app: baskit-metrics
+        app.kubernetes.io/name: baskit-metrics
+        app.kubernetes.io/instance: baskit-metrics
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
@@ -68,4 +72,3 @@ spec:
         - name: firebase-credentials
           secret:
             secretName: baskit-metrics-firebase-vault
-
