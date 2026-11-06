@@ -9,9 +9,9 @@ metadata:
     app.kubernetes.io/part-of: llm-serving
 spec:
   # NVIDIA Nemotron 3.5 Lightning 30B-A3B trial (plan 0025): bartowski Q4_0 + first-party MTP draft head,
-  # 128K, text only (no vision projector exists). Holds the B60 while intel-llama-ornith is at 0 replicas;
-  # ADR 0004's one-Deployment rule is restored when the trial ends with either removal or promotion.
-  replicas: 1
+  # 128K, text only (no vision projector exists). Rejected on 2026-11-06 and scaled to 0; the objects and the
+  # model PVC stay until the operator approves removing them (pruning them from Git deletes the PVC).
+  replicas: 0
   strategy:
     type: Recreate
   selector:

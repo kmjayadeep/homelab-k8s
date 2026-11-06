@@ -275,7 +275,8 @@ def archive(tag=None):
     local.mkdir(parents=True, exist_ok=True)
     RESULTS.rename(dest / "results.tsv")
     if SESSION.exists():
-        SESSION.rename(dest / "session.json")
+        # Copy, not move: `finish` runs after `archive` and still needs the session target.
+        (dest / "session.json").write_text(SESSION.read_text())
     kept = 0
     for f in sorted(RUNS.glob("*.json*")):
         if f.name == "latest.json":
