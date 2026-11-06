@@ -9,9 +9,8 @@ The operator runs this from Claude Code during a low-traffic window and has stop
 | Target | Manifest | LiteLLM route |
 | --- | --- | --- |
 | `ornith` (default) | `deployment-ornith.yaml` | `qwen-intel` |
-| `nemotron` ([plan 0025](../../plans/0025-nemotron-lightning-b60-trial.md) trial) | `deployment-nemotron.yaml` | `nemotron-3.5-lightning-30b-a3b-intel` |
 
-Only the Deployment that currently holds the B60 can be a target. Below, "the manifest" means the target's manifest.
+Only the Deployment that currently holds the B60 can be a target. A trial target (as `nemotron` was for [plan 0025](../../plans/0025-nemotron-lightning-b60-trial.md)) is added to `experiment.py`, `AGENTS.md` and ADR 0006 for the trial and removed with it. Below, "the manifest" means the target's manifest.
 
 ## Setup
 

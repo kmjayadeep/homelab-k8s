@@ -81,4 +81,4 @@ Results: [`results/nov05/`](../automation/llm-autoresearch/results/nov05/). Func
 - **No vision projector.**
 - Past sessions moved quality by about ±2 with flag changes, so tuning was not expected to close a 3–5 task gap.
 
-Rollback: Ornith back to 1 replica, Nemotron to 0, Flux health check back to Ornith. The Nemotron objects and its 40Gi PVC (about 21 GB on `titania-gpu`) stay until the operator approves removing them.
+Rollback: Ornith back to 1 replica and the Flux health check (PR #540). Cleanup on 2026-11-06, approved by the operator: the Nemotron Deployment, Service, LiteLLM route, `experiment.py` target and PVC were removed; Flux pruned the PVC (reclaim policy `Delete`, about 21 GB freed on `titania-gpu`).
