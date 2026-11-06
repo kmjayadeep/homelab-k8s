@@ -136,3 +136,11 @@ Results: [`results/oct15c/`](../automation/llm-autoresearch/results/oct15c/). Ra
   - `--spec-ngram-mod-n-match 32`: acceptance 0.66, decode 68.0, 41/49 tripped the quality guard (likely noise).
   - `--spec-ngram-mod-n-min/max 16/32`: acceptance 0.74, decode 68.2, but +11% time.
 - **Note:** raising acceptance did not cut total time. The defaults (n-match 24, draft 48–64) remain best.
+
+### 2026-11-06 `nov05` (Nemotron trial, plan 0025)
+
+Results: [`results/nov05/`](../automation/llm-autoresearch/results/nov05/). This was the first session with a non-default target (`start --target nemotron`), evaluated through the versioned route `nemotron-3.5-lightning-30b-a3b-intel`.
+
+- **Run:** two baseline runs only, with no experiments. The operator rejected the model on the baseline (plan 0025).
+- **Baseline:** 40 and 42/49 in 1,063 and 1,036 s; `decode_tps_100k` 36.5 and 36.0, `prefill_tps_100k` 1,328; at least 15 GiB of host memory free.
+- **Interruption:** the operator's PC suspended 6 s into the first attempt (21:02 to 08:34) and froze the evaluator mid-request, with nothing recorded. That attempt was discarded, and later runs ran under `systemd-inhibit --what=sleep:idle`. Wrap unattended sessions the same way.
