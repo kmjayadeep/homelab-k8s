@@ -1,0 +1,3 @@
+commit	passed	total	quality_seconds	decode_tps	ttft_8k_s	prefill_tps_24k	mtp_accept	decode_tps_100k	prefill_tps_100k	min_free_gib	status	description
+35b2a9f	40	49	1062.6	65.7	7.84	1568.0	0.698	36.5	1328.0	15.32	keep	baseline run 1 (Nemotron Q4_0 + MTP Q8_0, n-max 7, p-min 0.6, main 35b2a9f)
+35b2a9f	42	49	1035.7	67.5	7.84	1567.0	0.698	36.0	1328.0	15.05	keep	baseline run 2 (Nemotron, unchanged main 35b2a9f)

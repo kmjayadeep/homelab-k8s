@@ -1,6 +1,6 @@
 # Plan 0025: Trial NVIDIA Nemotron 3.5 Lightning 30B-A3B on the B60
 
-- Status: Draft (manifests in PR; operator evaluates)
+- Status: Completed 2026-11-06: rejected on quality and total time; rolled back to Ornith
 - Owner: Homelab operator
 - Related ADR: [ADR 0004](../adrs/0004-llamacpp-sycl-b60-behind-litellm.md) (one B60 Deployment behind LiteLLM), [ADR 0006](../adrs/0006-local-b60-autoresearch.md) (flag tuning)
 - Related plans: [0015](0015-ornith-ice-quant-b60-trial.md) (first rejected this model on quality: SWE-bench Verified 51.6), [0018](0018-b60-model-switch-baseline.md) (trial method and Ornith baseline numbers)
@@ -68,4 +68,17 @@ Gates, taken from plan 0018 phase 1 with the vision line struck:
 
 | Run | Config | short decode | decode 13K / 40K | `decode_tps_100k` | `prefill_tps_24k` / `100k` | accept | idle / peak VRAM | passed | `quality_seconds` |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| — | Q4_0 + MTP Q8_0, n-max 7, p-min 0.6, b11515 | | | | | | | | |
+| `nov05` baseline 1 | Q4_0 + MTP Q8_0, n-max 7, p-min 0.6, b11515 | 65.7 | 50.1 / 44.4 | 36.5 | 1,568 / 1,328 | 0.70 | 92.2% / 92.2% | 40 | 1,063 |
+| `nov05` baseline 2 | same | 67.5 | 47.9 / 41.8 | 36.0 | 1,567 / 1,328 | 0.70 | 92.2% / 92.2% | 42 | 1,036 |
+
+Results: [`results/nov05/`](../automation/llm-autoresearch/results/nov05/). Function gate passed: smoke 4/4 twice, checksums verified, `n_ctx` 131072, 0 restarts and no wedged slot over the trial.
+
+**Decision (operator, 2026-11-06): rejected, no tuning session.**
+
+- **Quality** fails the gate: a mean of 41.0/49 against Ornith's 44–46. Most of the gap is homelab manifests (4/8 and 6/8); code 26 and 25/30, tools 7 and 8/8, needles 3/3.
+- **Total time** is about 2.3× Ornith's (about 1,050 s against 420–460 s) at a similar short decode. The code suite alone took about 900 s for about 58K completion tokens, roughly 1,900 per task under `--reasoning-budget 2048`.
+- **It wins only at long context:** `decode_tps_100k` 36 tok/s (Ornith 27.2, gate 30) and prefill 1,328 tok/s at 100K. VRAM and host memory were comfortable.
+- **No vision projector.**
+- Past sessions moved quality by about ±2 with flag changes, so tuning was not expected to close a 3–5 task gap.
+
+Rollback: Ornith back to 1 replica, Nemotron to 0, Flux health check back to Ornith. The Nemotron objects and its 40Gi PVC (about 21 GB on `titania-gpu`) stay until the operator approves removing them.
