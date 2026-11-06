@@ -49,6 +49,8 @@ The operator wants to find better llama-server settings for the single B60 model
 
 The loop tunes whichever Deployment holds the B60 during an operator-started trial, not only Ornith. `experiment.py start --target <name>` records one target from a fixed list for the whole session: `ornith` (`deployment-ornith.yaml`, `qwen-intel`, the default) or `nemotron` (`deployment-nemotron.yaml`, its versioned LiteLLM route, for [plan 0025](../plans/0025-nemotron-lightning-b60-trial.md)). The keep rule, protected flags (now also `--model-draft`), memory guards and session controls are unchanged. Adding a target requires changing this ADR, `AGENTS.md` and `experiment.py`.
 
+The `nemotron` target was removed on 2026-11-06 with the rejected trial; `ornith` is again the only target.
+
 ## Implementation status
 
 The tooling is in `automation/llm-autoresearch/` (`program.md`, `evaluate.py`, `experiment.py`). The evaluator was smoke-tested on 2026-10-14 through LiteLLM. No experiment session has run yet.

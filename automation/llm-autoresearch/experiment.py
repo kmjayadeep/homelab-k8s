@@ -35,10 +35,8 @@ TARGETS = {
     "ornith": {"deploy": "intel-llama-ornith",
                "manifest": "clusters/titania/apps/llm-serving-intel-llama/deployment-ornith.yaml",
                "model": evaluate.MODEL},
-    # Plan 0025 trial: evaluated on its versioned LiteLLM route, since `qwen-intel` still names Ornith.
-    "nemotron": {"deploy": "intel-llama-nemotron",
-                 "manifest": "clusters/titania/apps/llm-serving-intel-llama/deployment-nemotron.yaml",
-                 "model": "nemotron-3.5-lightning-30b-a3b-intel"},
+    # A trial target uses its versioned LiteLLM route while `qwen-intel` still names Ornith
+    # (e.g. `nemotron` during plan 0025, removed 2026-11-06).
 }
 DEFAULT_TARGET = "ornith"
 SESSION = ROOT / "session.json"

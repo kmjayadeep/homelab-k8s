@@ -5,7 +5,7 @@ This is a local, Claude Code–driven hill-climb over the B60 llama-server flags
 | File | Role | Who edits |
 | --- | --- | --- |
 | [`program.md`](program.md) | Agent instructions: setup, rules, loop, keep rule | human |
-| `clusters/titania/apps/llm-serving-intel-llama/deployment-<target>.yaml` | The experiment: llama-server `args` only (`ornith` by default; `nemotron` during plan 0025) | agent |
+| `clusters/titania/apps/llm-serving-intel-llama/deployment-<target>.yaml` | The experiment: llama-server `args` only (`ornith`; trial targets are added per plan) | agent |
 | [`evaluate.py`](evaluate.py) | Fixed evaluator (ground truth) | nobody during a session |
 | [`experiment.py`](experiment.py) | `start`/`apply`/`run`/`verdict`/`record`/`archive`/`finish` tooling | nobody during a session |
 | `tasks/`, `sandbox/` | Eval data and the network-less grading container | nobody during a session |
