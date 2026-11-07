@@ -150,3 +150,7 @@ No tool writes to Jellyfin, Radarr or Seerr.
     - Pradhama Drishtiya Kuttakkar → Drishyam 1 and 2, Bramayugam, Kishkindha Kaandam, Charlie, Uyare
     - Thudakkam → Ohm Shanthi Oshaana, 2018, Rekhachithram, Lucifer
   - **`discover` in the last few months:** 63 Malayalam releases in 120 days, 109 Hindi in 90 days and 4601 English in 60 days. Malayalam votes are thin (0–10 per film), so for new releases the digest uses popularity, with a vote floor where votes exist. If that proves noisy, OMDb (IMDb ratings) is the next source.
+- **2026-11-07, steps 2, 3 and 5 (image, manifests, bot):**
+  - **Images:** docker-images `movie-mcp` (4 unit tests) built as `movie-mcp:20261107173638`. The bot now handles curator digests generically (`/movie`, `v:` callbacks; music keeps `f:`): `kagent-telegram-bot:20261107173552`.
+  - **Local smoke test** against live Jellyfin, Radarr and TMDB: `digest_candidates` took 2 s and returned 35 KB. Malayalam seeds gave Drishyam, Manjummel Boys, Bramayugam, Aavesham and Ayyappanum Koshiyum.
+  - **Logging issue it exposed:** httpx logged request URLs at INFO, including the TMDB key. music-mcp had been writing its Last.fm key to pod logs (and Loki) the same way. Both servers now keep `httpx` at WARNING (`music-mcp:20261107173625`). Rotating both keys is recommended.

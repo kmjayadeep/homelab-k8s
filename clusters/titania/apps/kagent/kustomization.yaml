@@ -20,4 +20,6 @@ resources:
   - vartha-editor.yaml
   - music-mcp.yaml
   - agent-music-curator.yaml
+  - movie-mcp.yaml
+  - agent-movie-curator.yaml
   - helm-release.yaml
