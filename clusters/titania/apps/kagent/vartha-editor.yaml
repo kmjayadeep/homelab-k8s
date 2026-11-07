@@ -124,8 +124,8 @@ metadata:
     app.kubernetes.io/name: vartha-editor
     app.kubernetes.io/instance: kagent
 spec:
-  # Morning edition, after the night's play.
-  schedule: "0 8 * * *"
+  # Early edition, after the night's play and before anyone is up.
+  schedule: "0 4 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1

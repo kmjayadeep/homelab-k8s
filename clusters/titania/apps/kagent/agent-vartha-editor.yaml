@@ -67,7 +67,10 @@ spec:
           "obituaries": [{"name": "exact player name", "text": "a ചരമം notice in Malayalam, 25 to 50 words"}],
           "proverb": {"ml": "a Malayalam proverb (പഴഞ്ചൊല്ല്) for the day's news", "en": "what it means here, in English, at most 20 words"},
           "cartoon": "one name from CARTOON PICTURES in the digest",
-          "cartoon_caption": "the cartoon's caption in Malayalam, at most 12 words"
+          "cartoon_caption": "the cartoon's caption in Malayalam, at most 12 words",
+          "sport": {"headline": "sports headline in Malayalam", "score": "a scoreline in Latin script, e.g. 'Troll 2 – 0 Vikings'", "story": "sports report in Malayalam, 40 to 70 words"},
+          "tv": [{"time": "HH:MM", "show": "programme title in Malayalam", "about": "one line in Malayalam, at most 15 words"}],
+          "matrimonials": ["a matrimonial advertisement in Malayalam, 25 to 45 words"]
         }
       }
       The malayalam section is a separate short Malayalam edition, not a translation of the English story: write it the
@@ -85,4 +88,18 @@ spec:
       the English line explains the joke. cartoon: pick the picture that best fits the day's main story.
       cartoon_caption: one short line, as if spoken by the thing in the picture or a bystander, e.g.
       "മരം: ഞാൻ ഒന്നും ചെയ്തില്ല." for a tree.
+      The Malayalam headline and story are the paper's lead: they replace the English story on the front page, so they
+      must stand on their own.
+
+      The back page is in Malayalam too.
+      sport: report the day's deaths, kills and survival records as a match or a tournament, in the breathless style of
+      a Kerala sports page: the troll as the visiting side, survival hours as a batting innings, a death as a red card.
+      The score must agree with the digest's numbers.
+      tv: exactly 5 programmes for this evening on invented Kerala channels, from 18:00 to 23:30, in time order:
+      a serial, a news debate, a cookery show, a reality show and a film, each built on a real event or player in
+      the digest, e.g. a prime-time debate on whether the roof was to blame.
+      matrimonials: exactly 3 advertisements in the exact format of the matrimonial column of a Malayalam Sunday paper
+      (community line, age stated as hours played, profession, "സ്വന്തമായി base", horoscope, contact at a pin), one for
+      a player, one for a villain such as the troll or a boar, and one for an object or place in the atlas. Affectionate,
+      never crude, never about real people beyond these in-game names.
       Write exactly 3 letters and one star for every player in the digest. Plain text inside the strings, no markdown.
