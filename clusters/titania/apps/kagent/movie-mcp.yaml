@@ -1,0 +1,202 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: movie-mcp
+  labels:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: movie-mcp
+    creationPolicy: Owner
+    deletionPolicy: Retain
+  data:
+    # TMDB API v3 key (catalogue reads); sent as a query parameter, so the server keeps httpx logs at WARNING.
+    - secretKey: TMDB_API_KEY
+      remoteRef:
+        key: services/tmdb/movie-mcp
+        property: api_key
+    # Jellyfin API key; movie-mcp calls GET endpoints only (plan 0027).
+    - secretKey: JELLYFIN_API_KEY
+      remoteRef:
+        key: services/jellyfin/movie-mcp
+        property: api_key
+    # Copy of the Radarr API key; movie-mcp calls GET /api/v3/movie only.
+    - secretKey: RADARR_API_KEY
+      remoteRef:
+        key: services/radarr/movie-mcp
+        property: api_key
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: movie-mcp-data
+  labels:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  # SQLite with movie digests, suggestions and feedback (the "want" list). Small, but the only state the
+  # movie-curator agent has; deleting it resets what was suggested before.
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-mcp
+  labels:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+  annotations:
+    secret.reloader.stakater.com/reload: movie-mcp
+spec:
+  replicas: 1
+  # SQLite on a ReadWriteOnce volume: never two pods at once.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: movie-mcp
+      app.kubernetes.io/instance: kagent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: movie-mcp
+        app.kubernetes.io/instance: kagent
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: movie-mcp
+          # Source: kmjayadeep/docker-images movie-mcp/.
+          image: ghcr.io/kmjayadeep/movie-mcp:20261107173638
+          env:
+            - name: JELLYFIN_URL
+              value: https://jellyfin.cosmos.cboxlab.com
+            # Jellyfin user whose watch state counts.
+            - name: JELLYFIN_USER
+              value: jd
+            # Radarr in the torrents namespace (no NetworkPolicy there); movies already added are never suggested.
+            - name: RADARR_URL
+              value: http://radarr.torrents.svc.cluster.local:7878
+            # Release windows for new releases per original language: Malayalam first, then English, some Hindi.
+            - name: NEW_RELEASE_WINDOWS
+              value: ml:120,en:60,hi:90
+            - name: DB_PATH
+              value: /data/movie.db
+            - name: ALLOWED_HOSTS
+              value: movie-mcp.kagent.svc.cluster.local,movie-mcp.kagent.svc,movie-mcp.kagent,movie-mcp
+            # Python wants a writable HOME and tmp with a read-only root.
+            - name: HOME
+              value: /tmp
+          envFrom:
+            - secretRef:
+                name: movie-mcp
+          ports:
+            - name: http
+              containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 20m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: movie-mcp-data
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-mcp
+  labels:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  selector:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: movie-mcp
+  labels:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  description: Movie library and watch state (Jellyfin), movies added (Radarr), discovery (TMDB) and digest/feedback store for movie-curator
+  protocol: STREAMABLE_HTTP
+  url: http://movie-mcp.kagent.svc.cluster.local:8000/mcp
+  # digest_candidates fans out to TMDB for several seeds and languages.
+  timeout: 120s
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: movie-mcp
+  labels:
+    app.kubernetes.io/name: movie-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  # Neither /mcp nor the bot routes (/digest, /feedback, /wants) authenticate callers; only pods in this
+  # namespace (controller, agents, Telegram bot) may reach them.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: movie-mcp
+      app.kubernetes.io/instance: kagent
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8000

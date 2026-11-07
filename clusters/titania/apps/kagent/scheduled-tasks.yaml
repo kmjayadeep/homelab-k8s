@@ -31,6 +31,12 @@ data:
       "title": "Music digest",
       "prompt": "Weekly music digest (origin: schedule). Follow your weekly digest workflow and answer in the digest format."
     }
+  movie-digest.json: |
+    {
+      "agent": "movie-curator",
+      "title": "Movie digest",
+      "prompt": "Weekly movie digest (origin: schedule). Follow your weekly digest workflow and answer in the digest format."
+    }
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -250,6 +256,66 @@ spec:
               image: curlimages/curl:8.23.0
               command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
                         "-H", "content-type: application/json", "-d", "@/prompts/music-digest.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-movie-digest
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: movie-digest
+spec:
+  schedule: "0 19 * * 2"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.23.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/movie-digest.json",
                         "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
               securityContext:
                 allowPrivilegeEscalation: false

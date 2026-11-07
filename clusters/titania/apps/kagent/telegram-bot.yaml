@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261107114856
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261107173552
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
@@ -90,6 +90,11 @@ spec:
               value: http://music-mcp.kagent.svc.cluster.local:8000
             - name: MUSIC_AGENT
               value: music-curator
+            # Movie digest (plan 0027): /movie <question> and 👍/👎/⬇ buttons (title opens TMDB) under each digest.
+            - name: MOVIE_MCP_URL
+              value: http://movie-mcp.kagent.svc.cluster.local:8000
+            - name: MOVIE_AGENT
+              value: movie-curator
             - name: MERGE_POLICY_INTERVAL_SECONDS
               value: "1800"
           envFrom:
