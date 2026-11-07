@@ -141,7 +141,7 @@ No tool writes to Jellyfin, Radarr or Seerr.
 
 ### Progress log
 
-- **2026-11-07, step 1 (Vault):** homelab-iac #133 merged; the operator imported the TMDB, Jellyfin and Radarr keys. The `terraform apply` for the kagent policy is still pending.
+- **2026-11-07, step 1 (Vault):** homelab-iac #133 merged; the operator imported the TMDB, Jellyfin and Radarr keys. The operator ran `terraform apply` for the kagent policy the same day.
 - **2026-11-07, step 0 (data check):**
   - **Jellyfin:** 102 of 105 movies carry a TMDB id. The 3 without one are badly named files (a French Harry Potter, Oru Jaathi Jathakam, a Star Wars release name) that need Identify in Jellyfin. Gate passed.
   - **TMDB recommendations:** 20 results for every seed, but **all English**, even for Malayalam and Hindi seeds. Thudakkam gave Beast and Interceptor; Bulbbul gave Hereditary. The gate failed for regional seeds.
@@ -154,3 +154,22 @@ No tool writes to Jellyfin, Radarr or Seerr.
   - **Images:** docker-images `movie-mcp` (4 unit tests) built as `movie-mcp:20261107173638`. The bot now handles curator digests generically (`/movie`, `v:` callbacks; music keeps `f:`): `kagent-telegram-bot:20261107173552`.
   - **Local smoke test** against live Jellyfin, Radarr and TMDB: `digest_candidates` took 2 s and returned 35 KB. Malayalam seeds gave Drishyam, Manjummel Boys, Bramayugam, Aavesham and Ayyappanum Koshiyum.
   - **Logging issue it exposed:** httpx logged request URLs at INFO, including the TMDB key. music-mcp had been writing its Last.fm key to pod logs (and Loki) the same way. Both servers now keep `httpx` at WARNING (`music-mcp:20261107173625`). Rotating both keys is recommended.
+- **2026-11-07, step 4 (first digest) and step 5 (bot), done:** homelab-k8s #558 merged.
+  - **Rollout:** RemoteMCPServer discovery failed at first because it ran before the pod was ready. An annotation nudge and an agent restart fixed it, as in plan 0026; all 9 tools were discovered.
+  - **Digests:** 6 manual digests of 8 movies each, 23–36 s per run, three tool calls, buttons posted, presses stored.
+  - **Ratings** (26 of 48 rated):
+    - **Malayalam:** 10 👍 and 1 👎. Older, well-known films do best (Drishyam 1 and 2, Manjummel Boys, Bangalore Days, Bramayugam, Jana Gana Mana, Kumbalangi Nights, Mukundan Unni Associates, Virus). New releases miss: Avaraachan & Sons 👎, and I'm Game unrated.
+    - **English:** 9 👎 and 1 ⬇ (Heart of the Beast, a survival thriller).
+    - **Hindi:** 2 👍 (Drishyam: The Conclusion, Kahaani), 2 👎, 1 ⬇ (Mom).
+    - **Want list:** Mom, Heart of the Beast.
+  - **Open-digest window:** it merged two quick manual reruns into the previous digest without buttons. Digests 2 and 4 were repaired by hand: the stray rows of digest 2 were deleted (operator approved), and digest 4's were moved to digest 5 with buttons re-posted through `/task`. `OPEN_DIGEST_MINUTES` is now 0 on both curators (#560, #561, #562).
+  - **Key leak:** the TMDB key appeared in a local smoke-test transcript through httpx INFO logs. The servers keep `httpx` at WARNING. **Rotate the TMDB key** (still open).
+
+### Next
+
+- **Rotate the TMDB and Last.fm keys** and re-import them with the import scripts.
+- **Prompt tuning (step 6):**
+  - Mix: about 6 Malayalam (mostly well-known older films, at most 1 new release), 1 Hindi, and 1 English drawn from seeds rather than "new this month".
+  - Reasons: say "because you liked" for feedback seeds and "because you watched" only for watch history, and never name the candidate as its own seed (digest 2 had "Bramayugam's seeds").
+- **Step 7:** ⬇ to Seerr or Radarr. The want list is at `GET /wants`.
+- **Jellyfin:** use Identify on the 3 movies without a TMDB id.
