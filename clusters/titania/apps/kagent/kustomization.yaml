@@ -16,6 +16,8 @@ resources:
   - github-mcp.yaml
   - repo-fetch.yaml
   - agent-homelab-gitops.yaml
+  - agent-vartha-editor.yaml
+  - vartha-editor.yaml
   - music-mcp.yaml
   - agent-music-curator.yaml
   - helm-release.yaml

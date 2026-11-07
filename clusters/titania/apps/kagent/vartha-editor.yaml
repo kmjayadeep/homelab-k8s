@@ -1,0 +1,179 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: vartha-editor
+  labels:
+    app.kubernetes.io/name: vartha-editor
+    app.kubernetes.io/instance: kagent
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: vartha-editor
+    creationPolicy: Owner
+    deletionPolicy: Retain
+  data:
+    # Bearer token the nomap Valheim dashboard accepts on POST /api/edition.
+    - secretKey: EDITOR_TOKEN
+      remoteRef:
+        key: apps/valheim-vartha/editor
+        property: token
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vartha-editor-script
+  labels:
+    app.kubernetes.io/name: vartha-editor
+    app.kubernetes.io/instance: kagent
+data:
+  publish.py: |
+    """Fetch the dashboard's digest, ask vartha-editor for an edition and publish it."""
+
+    import difflib
+    import json
+    import os
+    import re
+    import sys
+    import urllib.request
+    import uuid
+
+    DASHBOARD = os.environ["DASHBOARD_URL"].rstrip("/")
+    AGENT = os.environ["AGENT_URL"]
+    TOKEN = os.environ["EDITOR_TOKEN"]
+    # The only Malayalam the paper prints; anything else is respelled to the closest of these or dropped.
+    ALLOWED = ["അയ്യോ", "കഷ്ടം", "ചേട്ടൻ", "ചേച്ചി", "മോനേ", "പാവം", "അതേ"]
+    MALAYALAM = re.compile(r"[ഀ-ൿ‌‍]+")
+    OTHER_INDIC = re.compile(r"[ऀ-೿඀-෿]+")
+
+
+    def fetch(url, data=None, headers=None, timeout=60):
+        request = urllib.request.Request(url, data, headers or {})
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return response.read().decode()
+
+
+    def fix_malayalam(value):
+        if isinstance(value, list):
+            return [fix_malayalam(item) for item in value]
+        if isinstance(value, dict):
+            return {key: fix_malayalam(item) for key, item in value.items()}
+        if not isinstance(value, str):
+            return value
+
+        def respell(match):
+            word = match.group(0)
+            if word in ALLOWED:
+                return word
+            close = difflib.get_close_matches(word, ALLOWED, n=1, cutoff=0.5)
+            print(f"malayalam: {word} -> {close[0] if close else '(dropped)'}")
+            return close[0] if close else ""
+
+        text = MALAYALAM.sub(respell, OTHER_INDIC.sub("", value))
+        return re.sub(r"\s+([,.!?;:])", r"\1", re.sub(r"\s{2,}", " ", text)).strip()
+
+
+    def ask_editor(digest):
+        body = {"jsonrpc": "2.0", "id": 1, "method": "message/send", "params": {"message": {
+            "role": "user", "kind": "message", "messageId": str(uuid.uuid4()),
+            "parts": [{"kind": "text", "text": "Write the next edition of Valheim Vartha from this digest.\n\n" + digest}],
+        }}}
+        reply = json.loads(fetch(AGENT, json.dumps(body).encode(), {"Content-Type": "application/json"}, timeout=600))
+        if "error" in reply:
+            raise RuntimeError(f"agent error: {reply['error']}")
+        result = reply["result"]
+        text = "\n".join(part.get("text", "") for artifact in result.get("artifacts", []) for part in artifact.get("parts", []))
+        start, end = text.find("{"), text.rfind("}")
+        return json.loads(text[start:end + 1])
+
+
+    def main():
+        digest = fetch(DASHBOARD + "/api/digest")
+        if "[NEW]" not in digest and "- nothing happened" in digest:
+            print("No news since the last edition; nothing published.")
+            return
+        for attempt in (1, 2):
+            try:
+                edition = ask_editor(digest)
+                break
+            except (ValueError, KeyError) as error:
+                print(f"attempt {attempt}: the editor did not return an edition: {error}")
+        else:
+            sys.exit(1)
+        edition = fix_malayalam(edition)
+        edition["model"] = "frontier"
+        reply = fetch(DASHBOARD + "/api/edition", json.dumps(edition, ensure_ascii=False).encode(),
+                      {"Content-Type": "application/json", "Authorization": "Bearer " + TOKEN})
+        print(f"published: {reply} {edition['headline']}")
+
+
+    main()
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vartha-editor
+  labels:
+    app.kubernetes.io/name: vartha-editor
+    app.kubernetes.io/instance: kagent
+spec:
+  # Morning edition, after the night's play.
+  schedule: "0 8 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 1500
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: vartha-editor
+            app.kubernetes.io/instance: kagent
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: publish
+              image: python:3.13.17-alpine
+              command: ["python3", "-u", "/script/publish.py"]
+              env:
+                - name: DASHBOARD_URL
+                  value: http://valheim-nomap.cosmos.cboxlab.com:8000
+                - name: AGENT_URL
+                  value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/vartha-editor/
+                - name: EDITOR_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: vartha-editor
+                      key: EDITOR_TOKEN
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+              volumeMounts:
+                - name: script
+                  mountPath: /script
+                  readOnly: true
+          volumes:
+            - name: script
+              configMap:
+                name: vartha-editor-script
