@@ -88,9 +88,10 @@ spec:
             - name: YTM_LOCATION
               value: IN
             # A run that calls record_digest more than once within this window adds to one digest. Frontier runs
-            # finish in under 2 minutes; a longer window would merge a second run on the same evening.
+            # save their picks once, seconds apart at most; a longer window merged a manual rerun into the
+            # previous digest (2026-11-07, 6 minutes apart).
             - name: OPEN_DIGEST_MINUTES
-              value: "10"
+              value: "2"
             - name: DB_PATH
               value: /data/music.db
             - name: ALLOWED_HOSTS
