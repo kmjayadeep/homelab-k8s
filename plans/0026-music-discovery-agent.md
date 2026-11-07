@@ -160,4 +160,13 @@ Progress log:
   The 29 suggestions from the failed run were never delivered.
 - 2026-11-07, step 5, second manual digest (`frontier`, after PR #546), with the test store emptied (operator approved): 102 s end to end, 3 tool calls, one digest of 10 tracks and 3 albums, 2099 characters posted to Telegram. Every track had a working link and a seed reason. All three albums lacked links: candidate albums carried no URL, and the fallback search with the full credit list and "(Original Motion Picture Soundtrack)" matched nothing. Fixed in image `20261107083620` (album browse ids passed through from the radio; fallback search tries the short title with the first artist). Known data quirk: Jellyfin lists *Rasathanthram* (2006) as 2023, so its seed reason shows 2023.
 - 2026-11-07: the operator judged the second digest "okay", so step 5 passes. Step 6: bot image `20261107090052` (docker-images `kagent-telegram-bot`) adds `/music <question>` (own A2A session per chat) and the digest buttons. After a `music-curator` answer the bot fetches `GET /digest` and posts one row per item only if the digest was created during that run. Presses call `POST /feedback` and tick the button in place. A local test with fake Telegram and music-mcp covered posting, pressing, label cells, foreign chats, `/music` routing and the old-digest skip.
+- **2026-11-07, after step 6:**
+  - **Qobuz search buttons:** the title cell of each digest row opens a Qobuz `ch-fr` store search (bot `QOBUZ_STORE`, homelab-k8s #555). Exact streaming links were ruled out:
+    - song.link/Odesli's public API now returns 401.
+    - Amazon Music and Qobuz have closed catalogue APIs.
+    - Lucida.to was declined because it is a ripping service.
+    - Apple (iTunes Search) and Deezer search are public and found 5/5 and 4/5 digest tracks; that option is not used yet.
+  - **Key leak fixed:** httpx logged request URLs at INFO, so the Last.fm key (a query parameter) went to the pod logs and to Loki. Image `music-mcp:20261107173625` keeps `httpx` at WARNING. **Rotate the Last.fm key** (still open).
+  - **Open-digest window:** `OPEN_DIGEST_MINUTES` is now 0 (#560, #561, #562). The 40-minute window, needed for the local model's repeated `record_digest` calls, merged quick manual reruns into the previous digest without rating buttons. Frontier runs save their picks in one call.
+  - **Status:** 2 music digests (25 suggestions), not rated yet. The next scheduled digest is Friday 18:00.
 - Risk to watch at step 5: the bot's `A2A_TIMEOUT_SECONDS` is 600, and a digest makes about 15 tool calls on the local model.
