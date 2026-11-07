@@ -96,11 +96,11 @@ spec:
             # Release windows for new releases per original language: Malayalam first, then English, some Hindi.
             - name: NEW_RELEASE_WINDOWS
               value: ml:120,en:60,hi:90
-            # A run that calls record_digest more than once within this window adds to one digest. Frontier runs
-            # save their picks once, seconds apart at most; a longer window merged a manual rerun into the
-            # previous digest (2026-11-07, 6 minutes apart).
+            # 0: every record_digest call starts a new digest. Frontier runs save their picks in one call; the
+            # window (40, then 10, then 2 minutes) only merged manual reruns into the previous digest without
+            # rating buttons (2026-11-07).
             - name: OPEN_DIGEST_MINUTES
-              value: "2"
+              value: "0"
             - name: DB_PATH
               value: /data/movie.db
             - name: ALLOWED_HOSTS
