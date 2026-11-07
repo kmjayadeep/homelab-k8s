@@ -25,6 +25,12 @@ data:
       "title": "Renovate review",
       "prompt": "Renovate pre-review (origin: schedule). List open pull requests in kmjayadeep/homelab-k8s authored by Renovate (author login app/renovate, head branch starting with renovate/). For each one that does not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), do the review described in your Renovate review section and post one comment. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words. If every open Renovate PR is already reviewed, reply 'nothing new' only."
     }
+  music-digest.json: |
+    {
+      "agent": "music-curator",
+      "title": "Music digest",
+      "prompt": "Weekly music digest (origin: schedule). Follow your weekly digest workflow and answer in the digest format."
+    }
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -184,6 +190,66 @@ spec:
               image: curlimages/curl:8.23.0
               command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
                         "-H", "content-type: application/json", "-d", "@/prompts/renovate-review.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-music-digest
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: music-digest
+spec:
+  schedule: "0 18 * * 5"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.23.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/music-digest.json",
                         "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
               securityContext:
                 allowPrivilegeEscalation: false
