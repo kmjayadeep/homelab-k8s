@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261029050033
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261107090052
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
@@ -84,6 +84,12 @@ spec:
               value: patch,digest,pin,pinDigest
             - name: AUTOMERGE_BLOCK_LABELS
               value: critical-infra
+            # Music digest (plan 0026): /music <question> and 👍/👎/⬇ buttons under each digest; presses go to
+            # music-mcp POST /feedback (same namespace, admitted by the music-mcp NetworkPolicy).
+            - name: MUSIC_MCP_URL
+              value: http://music-mcp.kagent.svc.cluster.local:8000
+            - name: MUSIC_AGENT
+              value: music-curator
             - name: MERGE_POLICY_INTERVAL_SECONDS
               value: "1800"
           envFrom:
