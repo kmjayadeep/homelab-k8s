@@ -1,7 +1,7 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: vartha-editor
+  name: vartha-editor-token
   labels:
     app.kubernetes.io/name: vartha-editor
     app.kubernetes.io/instance: kagent
@@ -11,7 +11,8 @@ spec:
     kind: SecretStore
     name: vault
   target:
-    name: vartha-editor
+    # Not "vartha-editor": the kagent controller owns a Secret named after each Agent.
+    name: vartha-editor-token
     creationPolicy: Owner
     deletionPolicy: Retain
   data:
@@ -155,7 +156,7 @@ spec:
                 - name: EDITOR_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: vartha-editor
+                      name: vartha-editor-token
                       key: EDITOR_TOKEN
               securityContext:
                 allowPrivilegeEscalation: false
