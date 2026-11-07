@@ -96,6 +96,10 @@ spec:
             # Release windows for new releases per original language: Malayalam first, then English, some Hindi.
             - name: NEW_RELEASE_WINDOWS
               value: ml:120,en:60,hi:90
+            # A run that calls record_digest more than once within this window adds to one digest. Frontier runs
+            # finish in under 2 minutes; a longer window would merge a second run on the same evening.
+            - name: OPEN_DIGEST_MINUTES
+              value: "10"
             - name: DB_PATH
               value: /data/movie.db
             - name: ALLOWED_HOSTS
