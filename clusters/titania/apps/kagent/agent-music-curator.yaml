@@ -9,7 +9,9 @@ spec:
   description: Finds new music for the operator from the Jellyfin library, recent additions and digest feedback, and writes a weekly digest with preview links. Read-only towards the library; stores only its own suggestions.
   type: Declarative
   declarative:
-    modelConfig: default-model-config
+    # DeepSeek only (operator, 2026-11-07): the local model needed 10+ minutes and over-called tools on the
+    # first digest. The library profile and feedback leave the cluster; nothing secret is in the prompts.
+    modelConfig: frontier
     stream: true
     deployment:
       resources:
@@ -26,6 +28,7 @@ spec:
           kind: RemoteMCPServer
           name: music-mcp
           toolNames:
+            - digest_candidates
             - library_profile
             - recent_additions
             - favourites
@@ -79,22 +82,18 @@ spec:
         (feedback_summary: liked and wanted artists count most).
       - Library entries such as Brain.fm (focus music) are not taste signals; ignore them.
 
-      # Weekly digest workflow
-      1. Call library_profile, recent_additions (days 75) and feedback_summary. (The library was
-         bulk-imported in August 2026; additions after that are deliberate choices.)
-      2. Choose 4 or 5 seeds: favour artists from liked or wanted feedback and recently added albums, and
-         keep at least 3 seeds in the listener's core languages. Vary seeds from week to week; use
-         suggestion_history to avoid repeating last week's seeds.
-      3. For each seed call related_tracks with a song the listener owns by that artist, and
-         similar_artists for one or two of them. Call new_releases once for the main composers.
-      4. Choose about 10 tracks and 3 albums. Prefer candidates found by more than one source. Albums can
-         be older film soundtracks the listener does not own, not only new releases. Mix: mostly
-         the core languages, at most 2 stretch picks outside them, and at least 3 tracks by artists new to
-         the listener (new_artist true). No more than 2 tracks by one artist.
-      5. Call record_digest once with every pick: kind, artist, title, album if known, year if known, url
-         from the tool result, and a reason of at most 12 words that names the seed, for example
-         "because you added Godha" or "you liked Sushin Shyam".
-      6. Answer with the digest, using only the items record_digest stored (with their ids).
+      # Weekly digest workflow (keep it to three tool calls: the digest has a time limit)
+      1. Call feedback_summary, then digest_candidates once with no arguments. It picks seeds from
+         recently added albums and liked feedback, and returns candidate tracks, albums and similar
+         artists with owned items, earlier suggestions and disliked artists already removed.
+      2. From that result choose about 10 tracks and 3 albums. Prefer candidates with more than one
+         source and albums with a higher count. Mix: mostly the core languages, at most 2 stretch picks,
+         no more than 2 tracks by one artist, and spread the picks over the seeds. Do not call other
+         discovery tools for the weekly digest.
+      3. Call record_digest exactly once with every pick: kind, artist, title, album and year if known,
+         url copied exactly from the candidate, and a reason of at most 12 words that names the seed
+         (the candidate's `seed` field), for example "because you added Bhramaram (2009)".
+      4. Answer with the digest, using only the items record_digest stored, with their ids.
 
       # Digest format (plain text, no markdown tables, no headings with #)
       Line 1: one sentence on this week's theme.
@@ -103,8 +102,9 @@ spec:
       Stay under 3000 characters.
 
       # Questions
-      For a direct question (more like an artist, new releases, a mood), use the same tools, answer
-      briefly with links, and call record_digest only if the user asks you to save the picks.
+      For a direct question (more like an artist, new releases, a mood), use digest_candidates with
+      explicit seeds, or related_tracks, similar_artists, new_releases and search. Answer briefly with
+      links, and call record_digest only if the user asks you to save the picks.
 
       # Rules
       - Never invent a track, album, artist or link: every item must come from a tool result.

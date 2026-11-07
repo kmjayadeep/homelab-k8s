@@ -85,7 +85,7 @@ No tool writes to Lidarr, Jellyfin or the NAS.
 
 ### Agent
 
-- `music-curator`, Declarative, `modelConfig: default-model-config` (local-first). Listening history is low-sensitivity, so `sensitive` (local only) is an option if preferred.
+- `music-curator`, Declarative, `modelConfig: frontier` (DeepSeek), switched from `local-first` on 2026-11-07 for speed and accuracy.
 - Workflow in the system message:
   1. Profile the library, recent additions and feedback.
   2. Pick 3–5 seeds, weighted towards liked feedback and recent additions.
@@ -136,7 +136,7 @@ No tool writes to Lidarr, Jellyfin or the NAS.
 
 ## Open decisions
 
-Decided 2026-11-07: Jellyfin play counts are not a signal (listening happens on the Echo Mini); `local-first` model; weekly digest of about 10 tracks and 3 albums; keys in Vault.
+Decided 2026-11-07: Jellyfin play counts are not a signal (listening happens on the Echo Mini); `frontier` model (changed from `local-first` after the first run); weekly digest of about 10 tracks and 3 albums; keys in Vault.
 
 Still open:
 
@@ -153,4 +153,9 @@ Progress log:
   - **Jellyfin:** 722 tracks, 136 albums, 397 artists (the August CSV export is stale). Albums were added as a bulk import in August 2026 (106), then 14 in September and 16 in October. The recent additions are late-1990s and 2000s Malayalam film albums (Vidyasagar, Mohan Sithara, Ouseppachan, Deepak Dev, Ilaiyaraaja), and the 2000s are the largest decade (261 tracks). The agent prompt now matches era as well as composer. User `jd` has no favourites yet.
   - **Last.fm:** `artist.getSimilar` gives strong Malayalam neighbours (Shaan Rahman → Deepak Dev, Gopi Sundar, Sushin Shyam, Jakes Bejoy; Bijibal → Shahabaz Aman, M. Jayachandran, Ouseppachan), but drifts into Telugu for Gopi Sunder. `track.getSimilar` returns nothing for regional tracks, so YouTube Music carries track-level discovery.
   - **Vault policy:** `terraform plan` shows only `vault_policy.external_secrets["kagent"]` gaining the two paths.
+- 2026-11-07, step 5, first manual digest (`local-first`): the job ran 10 minutes and the bot timed out (`A2A_TIMEOUT_SECONDS` 600) before the answer arrived. 40 tool calls were made. `record_digest` was called five times, the last after the timeout. The digest stored three owned albums (no album ownership check) and some truncated album links. The picks themselves fit well: 1990s and 2000s Malayalam film songs and classic soundtracks seeded from the October additions. Fixes:
+  - **Server:** new `digest_candidates` tool, which does the whole fan-out in one call (8.6 s live, 32 tracks, 8 albums, 33 owned dropped). `record_digest` now rejects owned albums, re-resolves links that are not valid YouTube Music URLs, and appends to the run's open digest (40 minutes).
+  - **Agent:** a three-call workflow, and the `frontier` model at the operator's request.
+  - **Bot:** `A2A_TIMEOUT_SECONDS` raised to 1200.
+  The 29 suggestions from the failed run were never delivered.
 - Risk to watch at step 5: the bot's `A2A_TIMEOUT_SECONDS` is 600, and a digest makes about 15 tool calls on the local model.
