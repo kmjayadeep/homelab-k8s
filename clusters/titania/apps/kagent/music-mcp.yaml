@@ -78,7 +78,7 @@ spec:
       containers:
         - name: music-mcp
           # Source: kmjayadeep/docker-images music-mcp/.
-          image: ghcr.io/kmjayadeep/music-mcp:20261107082725
+          image: ghcr.io/kmjayadeep/music-mcp:20261107083620
           env:
             - name: JELLYFIN_URL
               value: https://jellyfin.cosmos.cboxlab.com

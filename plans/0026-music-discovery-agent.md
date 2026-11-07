@@ -158,4 +158,5 @@ Progress log:
   - **Agent:** a three-call workflow, and the `frontier` model at the operator's request.
   - **Bot:** `A2A_TIMEOUT_SECONDS` raised to 1200.
   The 29 suggestions from the failed run were never delivered.
+- 2026-11-07, step 5, second manual digest (`frontier`, after PR #546), with the test store emptied (operator approved): 102 s end to end, 3 tool calls, one digest of 10 tracks and 3 albums, 2099 characters posted to Telegram. Every track had a working link and a seed reason. All three albums lacked links: candidate albums carried no URL, and the fallback search with the full credit list and "(Original Motion Picture Soundtrack)" matched nothing. Fixed in image `20261107083620` (album browse ids passed through from the radio; fallback search tries the short title with the first artist). Known data quirk: Jellyfin lists *Rasathanthram* (2006) as 2023, so its seed reason shows 2023.
 - Risk to watch at step 5: the bot's `A2A_TIMEOUT_SECONDS` is 600, and a digest makes about 15 tool calls on the local model.
