@@ -103,8 +103,12 @@ data:
                 print(f"attempt {attempt}: the editor did not return an edition: {error}")
         else:
             sys.exit(1)
+        # The Malayalam edition is free Malayalam; only the English sections keep to the short word list.
+        malayalam = edition.pop("malayalam", None)
         edition = fix_malayalam(edition)
-        edition["model"] = "frontier"
+        if isinstance(malayalam, dict):
+            edition["malayalam"] = malayalam
+        edition["model"] = "claude-opus-5-5"
         reply = fetch(DASHBOARD + "/api/edition", json.dumps(edition, ensure_ascii=False).encode(),
                       {"Content-Type": "application/json", "Authorization": "Bearer " + TOKEN})
         print(f"published: {reply} {edition['headline']}")
