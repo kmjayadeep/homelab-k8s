@@ -66,8 +66,10 @@ spec:
               value: homelab-sre
             - name: ALERT_DEDUP_SECONDS
               value: "3600"
+            # Scheduled tasks on the local model can run long (the music digest makes a few tool calls and
+            # writes about 3000 characters); the CronJob curl allows 1500 s and the Job 1800 s.
             - name: A2A_TIMEOUT_SECONDS
-              value: "600"
+              value: "1200"
             # Flux failure investigation (POST /flux from Alertmanager, error events only): wait so transient
             # errors can heal; answers starting with OK are logged, not posted.
             - name: FLUX_VERIFY_DELAY_SECONDS
