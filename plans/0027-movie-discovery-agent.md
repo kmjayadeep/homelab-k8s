@@ -1,6 +1,6 @@
 # Plan 0027: Movie discovery agent on kagent
 
-- Status: Draft
+- Status: In progress
 - Owner: operator (jd)
 - Related: [plan 0026](0026-music-discovery-agent.md) (music-curator, same pattern)
 
@@ -76,7 +76,9 @@ It reuses plan 0026 code where it fits: the store layout, open-digest appending,
 
 `digest_candidates` works as follows:
 
-- Seeds are the last 5 watched movies plus liked or wanted feedback. Each seed is expanded through TMDB recommendations.
+- Seeds are the last 5 watched movies plus liked or wanted feedback. Each seed is expanded by its language (step 0 finding):
+  - **English seeds:** TMDB recommendations.
+  - **Malayalam and Hindi seeds:** TMDB recommendations return only English films, so these use `discover` in the seed's language with its first two genres, sorted by vote count, plus the filmography of the seed's director and two leading actors in that language.
 - It adds `discover` results for Malayalam (last 120 days), English (last 60 days) and Hindi (last 90 days).
 - It drops owned, already added, already suggested and disliked movies, and merges movies found from more than one seed.
 - It returns candidates with their language, year, genres, rating, runtime and a short overview.
@@ -137,4 +139,14 @@ No tool writes to Jellyfin, Radarr or Seerr.
 
 ## Outcome
 
-Not started.
+### Progress log
+
+- **2026-11-07, step 1 (Vault):** homelab-iac #133 merged; the operator imported the TMDB, Jellyfin and Radarr keys. The `terraform apply` for the kagent policy is still pending.
+- **2026-11-07, step 0 (data check):**
+  - **Jellyfin:** 102 of 105 movies carry a TMDB id. The 3 without one are badly named files (a French Harry Potter, Oru Jaathi Jathakam, a Star Wars release name) that need Identify in Jellyfin. Gate passed.
+  - **TMDB recommendations:** 20 results for every seed, but **all English**, even for Malayalam and Hindi seeds. Thudakkam gave Beast and Interceptor; Bulbbul gave Hereditary. The gate failed for regional seeds.
+  - **Fallback test:** same language and genres sorted by votes, plus filmographies. Gate passed, so the design above changed:
+    - Bulbbul → Tumbbad, Stree, Qala (same director)
+    - Pradhama Drishtiya Kuttakkar → Drishyam 1 and 2, Bramayugam, Kishkindha Kaandam, Charlie, Uyare
+    - Thudakkam → Ohm Shanthi Oshaana, 2018, Rekhachithram, Lucifer
+  - **`discover` in the last few months:** 63 Malayalam releases in 120 days, 109 Hindi in 90 days and 4601 English in 60 days. Malayalam votes are thin (0–10 per film), so for new releases the digest uses popularity, with a vote floor where votes exist. If that proves noisy, OMDb (IMDb ratings) is the next source.
