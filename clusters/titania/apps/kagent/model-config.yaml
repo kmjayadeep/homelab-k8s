@@ -49,3 +49,20 @@ spec:
   apiKeySecretKey: LITELLM_API_KEY
   openAI:
     baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1
+---
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  # Anthropic Claude Opus 5.5 through LiteLLM (database-managed entry `claude-opus-5-5`). It accepts only the
+  # default temperature, so none is set here.
+  name: claude-opus
+  labels:
+    app.kubernetes.io/name: kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  provider: OpenAI
+  model: claude-opus-5-5
+  apiKeySecret: kagent-litellm
+  apiKeySecretKey: LITELLM_API_KEY
+  openAI:
+    baseUrl: http://litellm.litellm.svc.cluster.local:4000/v1
