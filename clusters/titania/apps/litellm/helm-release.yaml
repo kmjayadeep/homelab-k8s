@@ -156,6 +156,48 @@ spec:
         master_key: os.environ/PROXY_MASTER_KEY
         database_connection_pool_limit: 2
         disable_master_key_return: true
+      # kagent agents on the A2A gateway (README "kagent agents"). kagent's cards report protocol 0.3.
+      agents:
+        - agent_name: homelab-sre
+          agent_card_params:
+            name: homelab-sre
+            description: Read-only SRE for the titania homelab cluster.
+            url: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
+            protocolVersion: "0.3"
+            capabilities:
+              streaming: true
+        - agent_name: homelab-gitops
+          agent_card_params:
+            name: homelab-gitops
+            description: Turns a requested homelab change into a pull request. Never merges.
+            url: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-gitops/
+            protocolVersion: "0.3"
+            capabilities:
+              streaming: true
+        - agent_name: music-curator
+          agent_card_params:
+            name: music-curator
+            description: Finds new music from the Jellyfin library and digest feedback.
+            url: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/music-curator/
+            protocolVersion: "0.3"
+            capabilities:
+              streaming: true
+        - agent_name: movie-curator
+          agent_card_params:
+            name: movie-curator
+            description: Finds movies from Jellyfin watch history, Radarr and digest feedback.
+            url: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/movie-curator/
+            protocolVersion: "0.3"
+            capabilities:
+              streaming: true
+        - agent_name: vartha-editor
+          agent_card_params:
+            name: vartha-editor
+            description: Writes editions of Valheim Vartha from a digest of game events.
+            url: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/vartha-editor/
+            protocolVersion: "0.3"
+            capabilities:
+              streaming: true
 
     ingress:
       enabled: true

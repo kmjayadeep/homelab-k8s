@@ -58,6 +58,14 @@ The B60 has room for one inference Deployment at a time (`gpu.intel.com/xe: 1`; 
 
 kagent ([plan 0019](../../../../plans/0019-kagent-deployment.md)) reaches LiteLLM in-cluster with its own virtual key (alias `kagent`, Vault path `apps/litellm/kagent`). `clusters/titania/apps/kagent/model-config.yaml` defines one `ModelConfig` per router (`default-model-config` = `local-first`, plus `sensitive` and `frontier`); both agents use the default (before 2026-10-30 it was pinned to `deepseek-v4-flash`). DeepSeek is Git-managed (see Remote providers); Anthropic and OpenRouter entries are configured in the LiteLLM Admin UI and stored in its database, not in this repository. Verify a router change with `GET /router/settings` (`fallbacks`, `retry_policy` and the alias map present) and the LiteLLM spend log for the `kagent` key. During a B60 autoresearch session `local-first` traffic runs on DeepSeek while `qwen-intel` restarts.
 
+## kagent agents
+
+The kagent agents are registered on LiteLLM's A2A gateway under `proxy_config.agents` in `helm-release.yaml`, using the in-cluster controller URL. Config-defined agents are not stored in the database and cannot be edited in the Admin UI, so add or remove one in Git. Call one with a LiteLLM key: `POST /a2a/<agent>` with a JSON-RPC `message/send` body.
+
+The Admin UI's discovery rejects these URLs because they resolve to private addresses (`user_url_allowed_hosts` would allow them). Registration from config does not go through that check, so the setting is not used here.
+
+A key with no `object_permission.agents` or `agent_access_groups` can call every agent, including `homelab-gitops`. Restrict a key that should not have that access.
+
 ## Alias drift (`STORE_MODEL_IN_DB=True`)
 
 LiteLLM persists Router Settings in its database and deep-merges them over the HelmRelease values at startup: a key stored in the database wins, a key never written through the UI or `/config/update` comes from Git (`fallbacks` and `retry_policy` were not stored as of 2026-10-30). A persisted `model_group_alias` overrides the HelmRelease value after a Helm upgrade; this happened on every alias change so far, most recently on 2026-10-25 (plan 0018 promotion: the alias kept pointing at the stopped Ornith backend and `qwen-intel` returned HTTP 500 until corrected). After any alias change:
