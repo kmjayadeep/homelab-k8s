@@ -50,7 +50,7 @@ spec:
   schedule: "30 7 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
@@ -110,7 +110,7 @@ spec:
   schedule: "0 7 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
@@ -170,7 +170,7 @@ spec:
   schedule: "15 */6 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
@@ -230,7 +230,7 @@ spec:
   schedule: "0 18 * * 5"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
@@ -290,7 +290,7 @@ spec:
   schedule: "0 19 * * 2"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:

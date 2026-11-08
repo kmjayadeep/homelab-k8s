@@ -128,7 +128,7 @@ spec:
   schedule: "0 4,16 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
