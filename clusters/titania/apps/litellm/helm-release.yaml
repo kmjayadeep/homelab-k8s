@@ -92,6 +92,23 @@ spec:
             supports_function_calling: true
             max_input_tokens: 114688
             max_output_tokens: 16384
+        # Gemma 4 26B-A4B trial (plan 0028), versioned route only; `qwen-intel` is not moved until the trial
+        # is judged. Vision through the QAT repo's mmproj; one benign image check is part of the function gate.
+        - model_name: gemma-4-26b-a4b-intel
+          litellm_params:
+            model: openai/gemma-4-26b-a4b-intel
+            api_base: http://intel-llama-gemma4.llm-serving.svc.cluster.local:8080/v1
+            api_key: not-used
+          model_info:
+            mode: chat
+            supports_reasoning: true
+            input_cost_per_token: 0.0000001
+            cache_read_input_token_cost: 0.00000001
+            output_cost_per_token: 0.000001
+            supports_vision: true
+            supports_function_calling: true
+            max_input_tokens: 114688
+            max_output_tokens: 16384
         # `local-first` router (README "Routers"): the local backend above as its own deployment, so that
         # the busy signal applies only to this name: capped at the server's single slot (`--parallel 1` in
         # deployment-ornith.yaml) with a 120 s time-to-first-token budget on streamed calls. On busy, late
