@@ -202,6 +202,24 @@ spec:
               summary: "Helios Postgres backup is stale for repo {{ $labels.repo }}"
               description: "The latest Restic snapshot for {{ $labels.repo }} is older than 2 hours. RPO target is <= 1 hour, so the backup pipeline should be checked."
 
+          - alert: PostgreSQLBackupFailed
+            expr: node_systemd_unit_state{job="helios",name="backup-postgres.service",state="failed"} == 1
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Helios Postgres backup job failed"
+              description: "backup-postgres.service is in the failed state on Helios. Check its journal; the unit runs again at the next hourly timer."
+
+          - alert: HeliosSystemdUnitFailed
+            expr: node_systemd_unit_state{job="helios",name!="backup-postgres.service",state="failed"} == 1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Systemd unit {{ $labels.name }} failed on Helios"
+              description: "{{ $labels.name }} has been in the failed state on Helios for 5 minutes."
+
 
     prometheus:
       enabled: true

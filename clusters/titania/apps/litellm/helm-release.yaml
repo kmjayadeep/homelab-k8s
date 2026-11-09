@@ -156,6 +156,8 @@ spec:
         master_key: os.environ/PROXY_MASTER_KEY
         database_connection_pool_limit: 2
         disable_master_key_return: true
+        # Spend logs are most of Helios Postgres and its hourly dump. Daily rollups are kept.
+        maximum_spend_logs_retention_period: "30d"
       # kagent agents on the A2A gateway (README "kagent agents"). kagent's cards report protocol 0.3.
       agents:
         - agent_name: homelab-sre
