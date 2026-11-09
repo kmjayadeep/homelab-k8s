@@ -6,6 +6,20 @@ metadata:
     app.kubernetes.io/name: comfyui
     app.kubernetes.io/instance: comfyui
 ---
+# Runtime GPU selection, written by the GPU portal (ADR 0009). Flux only creates it if absent.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gpu-active
+  namespace: comfyui
+  labels:
+    app.kubernetes.io/name: comfyui
+    app.kubernetes.io/instance: comfyui
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+data:
+  COMFYUI_REPLICAS: "0"
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -25,3 +39,17 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  # The GPU portal selects the owner; these defaults apply if gpu-active is missing.
+  patches:
+    - target:
+        kind: Deployment
+        name: comfyui
+      patch: |
+        - op: replace
+          path: /spec/replicas
+          value: ${COMFYUI_REPLICAS:=0}
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: gpu-active
+        optional: true

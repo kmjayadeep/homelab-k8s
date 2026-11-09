@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B60 Control</title>
+<style>
+  :root { color-scheme: light; --bg: #eef1f2; --panel: #fff; --inset: #e3e8ea; --fg: #17242b; --muted: #566870; --line: #c3ced3; --accent: #0a62a8; --accent-fg: #fff; --good: #18794e; --warn: #9a5b00; --bad: #b42318; }
+  @media (prefers-color-scheme: dark) { :root { color-scheme: dark; --bg: #11181c; --panel: #1a242a; --inset: #243138; --fg: #e6edf0; --muted: #9db0b9; --line: #38484f; --accent: #6cb6f5; --accent-fg: #0d1a22; --good: #5fd39b; --warn: #f0b552; --bad: #ff9a8f; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 20px; }
+  h1, h2, h3, p { margin: 0; }
+  h1 { font-size: 16px; color: var(--muted); }
+  h2 { font-size: 24px; line-height: 1.2; }
+  h3 { font-size: 16px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 18px; }
+  .now { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+  .now > div { min-width: 0; }
+  .eyebrow { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .chip { font: 12px ui-monospace, Menlo, monospace; background: var(--inset); border-radius: 4px; padding: 2px 7px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+  .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .good { color: var(--good); } .warn { color: var(--warn); } .bad { color: var(--bad); } .unknown { color: var(--muted); }
+  .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; }
+  .mono { font-family: ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+  .track { height: 14px; background: var(--inset); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); transition: width .5s ease; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .stat { background: var(--panel); padding: 10px 12px; min-width: 0; }
+  .stat b { display: block; font: 600 18px ui-monospace, Menlo, monospace; }
+  .stat span { font-size: 13px; color: var(--muted); }
+  .notice { padding: 10px 12px; border: 1px solid currentColor; border-radius: 6px; display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  .notice span { color: var(--fg); min-width: 0; flex: 1 1 240px; }
+  .configs { display: grid; gap: 8px; }
+  .cfg { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; border: 1px solid var(--line); border-radius: 6px; padding: 12px; }
+  .cfg.active { border-color: var(--accent); }
+  .d { font-size: 14px; color: var(--muted); }
+  .confirm { grid-column: 1 / -1; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; display: grid; gap: 10px; }
+  .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; font-weight: 700; border-radius: 6px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>B60 Control</h1>
+  <div class="panel">
+    <div class="now">
+      <div>
+        <div class="eyebrow" id="label">Loading</div>
+        <h2 id="name"></h2>
+        <div class="chips" id="routes"></div>
+      </div>
+      <div id="pill" role="status" aria-live="polite"></div>
+    </div>
+    <div id="notice"></div>
+    <div>
+      <div class="row"><strong>VRAM</strong><span class="mono" id="vram"></span></div>
+      <div class="track"><div class="fill" id="fill" style="width:0"></div></div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="configs" id="configs"></div>
+  </div>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const gib = (b) => (b / 1024 ** 3).toFixed(1);
+  const PILLS = { ready: ["good", "Ready"], switching: ["warn", "Switching"], failed: ["bad", "Failed"], unknown: ["unknown", "Unknown"] };
+  let state = null, confirming = null, error = null, posting = false;
+
+  const stat = (value, label) => '<div class="stat"><b>' + esc(value === null || value === undefined ? "–" : value) + "</b><span>" + esc(label) + "</span></div>";
+
+  function render() {
+    if (!state) return;
+    const cfgs = Object.fromEntries(state.configs.map((c) => [c.id, c]));
+    const cur = cfgs[state.desired];
+    const [cls, text] = PILLS[state.phase] || PILLS.unknown;
+    $("label").textContent = state.phase === "switching" ? "Switching to" : state.phase === "failed" ? "Failed to start" : "Running now";
+    $("name").textContent = cur ? cur.name : "No config selected";
+    $("routes").innerHTML = cur && state.phase === "ready" ? cur.routes.map((r) => '<span class="chip">' + esc(r) + "</span>").join("") : "";
+    $("pill").innerHTML = '<span class="pill ' + cls + '">' + text + "</span>";
+
+    let notice = "";
+    const back = cfgs[state.last_good];
+    if (error) notice += '<div class="notice bad"><span>' + esc(error) + "</span></div>";
+    if (state.phase === "failed") notice += '<div class="notice bad"><span>' + esc(cur.name) + " did not become ready: " + esc(state.reason) + ". No model is serving.</span>" + (back && back.id !== cur.id && !state.locked ? '<button class="primary" data-go="' + esc(back.id) + '">Return to ' + esc(back.name) + "</button>" : "") + "</div>";
+    else if (state.phase === "switching") notice += '<div class="notice warn"><span>' + esc(state.step || "Working") + "…</span></div>";
+    if (state.locked) notice += '<div class="notice warn"><span>' + esc(state.locked) + " Switching is off until it ends.</span></div>";
+    $("notice").innerHTML = notice;
+
+    const gpu = state.gpu;
+    $("vram").textContent = gpu ? gib(gpu.vram_used_bytes) + " / " + gib(gpu.vram_total_bytes) + " GiB" : "unavailable";
+    $("fill").style.width = gpu ? (gpu.vram_used_bytes / gpu.vram_total_bytes * 100) + "%" : "0";
+    const m = state.metrics || {};
+    const isLlm = cur && cur.kind === "LLM";
+    $("stats").innerHTML =
+      stat(isLlm ? (m.tokens_per_second != null ? m.tokens_per_second.toFixed(1) : null) : m.queued, isLlm ? "avg tok/s" : "images queued") +
+      stat(m.in_flight, isLlm ? "requests in flight" : "images running") +
+      stat(gpu && gpu.power_watts != null ? gpu.power_watts + " W" : null, "GPU power") +
+      stat(gpu && gpu.temperature_celsius != null ? gpu.temperature_celsius + " °C" : null, "GPU temp");
+
+    const off = state.locked || state.phase === "switching" || posting;
+    $("configs").innerHTML = state.configs.map((c) => {
+      const isActive = c.id === state.desired && state.phase === "ready";
+      let html = '<div class="cfg' + (isActive ? " active" : "") + '"><div><h3>' + esc(c.name) + '</h3><div class="d">' + esc(c.kind) + " · " + esc(c.description) + "</div></div>";
+      html += isActive ? '<span class="pill good">Active</span>' : '<button data-pick="' + esc(c.id) + '"' + (off ? " disabled" : "") + ">Switch</button>";
+      if (confirming === c.id && !off) {
+        const impact = cur && state.phase === "ready" ? cur.stops : "No model is serving right now.";
+        html += '<div class="confirm"><div>' + esc(impact) + '</div><div class="acts"><button class="primary" data-go="' + esc(c.id) + '">Switch to ' + esc(c.name) + '</button><button data-cancel="1">Keep current model</button></div></div>';
+      }
+      return html + "</div>";
+    }).join("");
+  }
+
+  document.addEventListener("click", (event) => {
+    const el = event.target.closest("button");
+    if (!el) return;
+    if (el.dataset.pick) { confirming = el.dataset.pick; render(); }
+    if (el.dataset.cancel) { confirming = null; render(); }
+    if (el.dataset.go) go(el.dataset.go);
+  });
+
+  async function go(id) {
+    posting = true; confirming = null; error = null; render();
+    try {
+      const res = await fetch("api/switch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ config: id }) });
+      if (!res.ok) error = (await res.json()).error || "The switch was refused.";
+    } catch (e) {
+      error = "Could not reach the portal.";
+    }
+    posting = false;
+    await poll();
+  }
+
+  async function poll() {
+    try {
+      const res = await fetch("api/state");
+      if (!res.ok) throw new Error();
+      state = await res.json();
+      if (error === "Could not read the cluster state.") error = null;
+    } catch (e) {
+      error = "Could not read the cluster state.";
+    }
+    // Rebuilding the list while a confirmation is open would steal focus.
+    if (!confirming) render(); else if (error) render();
+  }
+
+  poll();
+  setInterval(poll, 3000);
+</script>
+</body>
+</html>

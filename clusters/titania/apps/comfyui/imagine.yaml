@@ -109,6 +109,11 @@ metadata:
   labels:
     app.kubernetes.io/name: imagine
     app.kubernetes.io/instance: comfyui
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: ui-basic-auth
+    nginx.ingress.kubernetes.io/auth-secret-type: auth-file
+    nginx.ingress.kubernetes.io/auth-realm: GPU portal
 spec:
   tls:
     - hosts:

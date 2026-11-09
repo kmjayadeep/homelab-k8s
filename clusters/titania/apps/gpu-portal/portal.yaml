@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-portal
+  namespace: gpu-portal
+  labels:
+    app.kubernetes.io/name: gpu-portal
+    app.kubernetes.io/instance: gpu-portal
+spec:
+  # Switches the B60 between the validated configs in portal/configs.json (ADR 0009, plan 0030).
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gpu-portal
+      app.kubernetes.io/instance: gpu-portal
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gpu-portal
+        app.kubernetes.io/instance: gpu-portal
+    spec:
+      serviceAccountName: gpu-portal
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: portal
+          image: python:3.15.2-alpine@sha256:a0f2e268f2ce8f3709611a90054ec6a8ae31f6251f5896b8648b9bb99835e30a
+          command:
+            - python3
+            - /app/app.py
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 20
+          volumeMounts:
+            - name: app
+              mountPath: /app
+              readOnly: true
+      volumes:
+        - name: app
+          configMap:
+            name: gpu-portal-app
+            items:
+              - key: app.py
+                path: app.py
+              - key: index.html
+                path: index.html
+              - key: configs.json
+                path: configs.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-portal
+  namespace: gpu-portal
+  labels:
+    app.kubernetes.io/name: gpu-portal
+    app.kubernetes.io/instance: gpu-portal
+spec:
+  selector:
+    app.kubernetes.io/name: gpu-portal
+    app.kubernetes.io/instance: gpu-portal
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gpu-portal
+  namespace: gpu-portal
+  labels:
+    app.kubernetes.io/name: gpu-portal
+    app.kubernetes.io/instance: gpu-portal
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: ui-basic-auth
+    nginx.ingress.kubernetes.io/auth-secret-type: auth-file
+    nginx.ingress.kubernetes.io/auth-realm: GPU portal
+spec:
+  tls:
+    - hosts:
+        - "*.cosmos.cboxlab.com"
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: gpu.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gpu-portal
+                port:
+                  name: http
