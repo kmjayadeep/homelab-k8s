@@ -19,14 +19,17 @@ spec:
           annotations:
             summary: "llama.cpp metrics target is unavailable"
             description: "The llama.cpp metrics endpoint for {{ $labels.service }} in {{ $labels.namespace }} has been unavailable for 10 minutes."
+        # With --parallel 1 a queue depth of 1 is normal whenever two clients overlap, so measure a sustained
+        # queue instead of any deferral: depth 1 that drains on the next scrape is a busy slot, not a fault.
+        # A wedged slot is still caught by LlamaCppSlotWedged below.
         - alert: LlamaCppRequestsDeferred
-          expr: max_over_time(llamacpp:requests_deferred{job="llama-cpp"}[5m]) > 0
+          expr: min_over_time(llamacpp:requests_deferred{job="llama-cpp"}[5m]) >= 2
           for: 10m
           labels:
             severity: warning
           annotations:
             summary: "llama.cpp requests are deferred"
-            description: "The llama.cpp predictor for {{ $labels.service }} has deferred requests for at least 10 minutes."
+            description: "The llama.cpp predictor for {{ $labels.service }} has had 2 or more requests queued continuously for at least 10 minutes (single-slot server saturated)."
         # A slot can wedge mid-generation while /health keeps returning 200: the HTTP listener is alive, the
         # task never releases, and with --parallel 1 every later request queues behind it (seen in the field
         # on the same llama.cpp SYCL stack; the liveness probe only checks /health). Completion counters
