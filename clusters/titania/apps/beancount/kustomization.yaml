@@ -5,6 +5,7 @@ namespace: beancount
 
 resources:
   - external-secret.yaml
+  - known-hosts.yaml
   - pvc.yaml
   - deploy.yaml
   - svc.yaml

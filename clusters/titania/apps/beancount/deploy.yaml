@@ -19,7 +19,75 @@ spec:
         app.kubernetes.io/instance: fava
         app.kubernetes.io/name: fava
     spec:
+      initContainers:
+      # Fava starts only after a first successful clone, so a missing or wrong key leaves the old pod serving.
+      - name: ledger-clone
+        image: alpine/git:v2.54.0
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-euc"]
+        args:
+          - exec git clone --quiet --depth 1 --branch master "$LEDGER_REPO" /bean
+        env: &ledger-git-env
+          - name: LEDGER_REPO
+            value: git@gitlab.com:kmjayadeep/beancount-ledger.git
+          - name: GIT_SSH_COMMAND
+            value: ssh -i /etc/git-secret/ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/etc/git-known-hosts/known_hosts
+        securityContext: &ledger-git-security
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources: &ledger-git-resources
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts: &ledger-git-mounts
+        - name: ledger
+          mountPath: /bean
+        - name: git-secret
+          mountPath: /etc/git-secret
+          readOnly: true
+        - name: git-known-hosts
+          mountPath: /etc/git-known-hosts
+          readOnly: true
       containers:
+      # Updates one fixed directory in place. git-sync's symlink swap does not work here: Fava resolves the
+      # journal path at startup, so it returns 404 once the old worktree is removed. Fava also ignores files it
+      # does not know yet, so a new commit touches the journal to force a reload.
+      - name: ledger-sync
+        image: alpine/git:v2.54.0
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-uc"]
+        args:
+          - |
+            touch /tmp/last-sync-ok
+            while true; do
+              before=$(git -C /bean rev-parse HEAD)
+              if git -C /bean fetch --quiet --depth 1 origin master && git -C /bean reset --quiet --hard FETCH_HEAD; then
+                touch /tmp/last-sync-ok
+                [ "$before" = "$(git -C /bean rev-parse HEAD)" ] || touch /bean/journal.beancount
+              else
+                echo "ledger sync failed" >&2
+              fi
+              sleep 60
+            done
+        env: *ledger-git-env
+        securityContext: *ledger-git-security
+        resources: *ledger-git-resources
+        volumeMounts: *ledger-git-mounts
+        readinessProbe:
+          exec:
+            command: ["test", "-f", "/bean/journal.beancount"]
+          periodSeconds: 30
+        # A sync that fails for over an hour restarts this container, so a stale ledger shows up as restarts.
+        livenessProbe:
+          exec:
+            command: ["sh", "-c", "find /tmp/last-sync-ok -mmin -60 | grep -q ."]
+          initialDelaySeconds: 120
+          periodSeconds: 300
+          timeoutSeconds: 10
       - image: yegle/fava:v1.30
         imagePullPolicy: IfNotPresent
         name: fava
@@ -50,10 +118,18 @@ spec:
             cpu: 500m
             memory: 512Mi
         volumeMounts:
-        - name: data
+        - name: ledger
           mountPath: /bean
+          readOnly: true
       restartPolicy: Always
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: fava-data
+      - name: ledger
+        emptyDir:
+          sizeLimit: 256Mi
+      - name: git-secret
+        secret:
+          secretName: fava-ledger-git
+          defaultMode: 0400
+      - name: git-known-hosts
+        configMap:
+          name: fava-ledger-known-hosts
