@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: comfyui
+  labels:
+    app.kubernetes.io/name: comfyui
+    app.kubernetes.io/instance: comfyui
+  annotations:
+    # Image uploads and large workflow payloads.
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    # ComfyUI streams progress over a long-lived websocket (/ws).
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  tls:
+    - hosts:
+        - "*.cosmos.cboxlab.com"
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: comfyui.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: comfyui
+                port:
+                  name: http
