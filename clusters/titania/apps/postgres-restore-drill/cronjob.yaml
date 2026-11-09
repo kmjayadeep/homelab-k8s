@@ -1,0 +1,112 @@
+# Monthly proof that the Helios Postgres backups restore. The R2 token is
+# read-only, so restic runs with --no-lock and cannot touch the repository.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-restore-drill
+  namespace: postgres-restore-drill
+  labels:
+    app.kubernetes.io/name: postgres-restore-drill
+spec:
+  schedule: "0 5 7 * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: postgres-restore-drill
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          # The only node with memory to spare for a throwaway Postgres.
+          nodeSelector:
+            kubernetes.io/hostname: titania-gpu
+          tolerations:
+            - key: workload
+              operator: Equal
+              value: ai
+              effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: restic-restore
+              image: restic/restic:0.18.1
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  restic --no-lock --no-cache snapshots --latest 1
+                  restic --no-lock --no-cache restore latest:/var/tmp/postgres-backup/current --target /restore
+              envFrom:
+                - secretRef:
+                    name: postgres-restic
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "2"
+                  memory: 1Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: work
+                  mountPath: /restore
+                  subPath: restore
+          containers:
+            - name: restore-drill
+              image: pgvector/pgvector:0.8.7-pg16
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - /scripts/restore-drill.sh
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: "4"
+                  memory: 4Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: work
+                  mountPath: /restore
+                  subPath: restore
+                  readOnly: true
+                - name: work
+                  mountPath: /pgdata
+                  subPath: pgdata
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: run
+                  mountPath: /tmp
+          volumes:
+            - name: scripts
+              configMap:
+                name: postgres-restore-drill-script
+            - name: work
+              emptyDir:
+                sizeLimit: 30Gi
+            - name: run
+              emptyDir:
+                sizeLimit: 64Mi
