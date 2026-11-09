@@ -3,7 +3,7 @@
 - Status: Proposed
 - Date: 2026-11-09
 - Related plan: [0029 ComfyUI on the B60](../plans/0029-comfyui-b60-timeshare.md)
-- Amends: [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (a second B60 Deployment exists in Git, at 0 replicas; "one inference Deployment" still holds for LLMs)
+- Amends: [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (a second B60 Deployment exists in Git and `replicas` selects which one runs; "one inference Deployment" still holds for LLMs)
 
 ## Context
 
@@ -13,26 +13,26 @@ Image generation on Battlemage is now a supported path: upstream ComfyUI runs on
 
 ## Decision
 
-- Add `clusters/titania/apps/comfyui/` running the pinned Intel image as a plain Deployment with `gpu.intel.com/xe: 1`, a `local-path` model PVC filled by a checksum-verified init container (SDXL 1.0 base first), an Ingress at `comfyui.cosmos.cboxlab.com`, and `replicas: 0` in Git.
+- Add `clusters/titania/apps/comfyui/` running the pinned Intel image as a plain Deployment with `gpu.intel.com/xe: 1`, a `local-path` model PVC filled by a checksum-verified init container (SDXL 1.0 base first), and an Ingress at `comfyui.cosmos.cboxlab.com`.
 - Keep `-shared-dev-num=1`. The scheduler is the guard against co-residency; it is not a limitation to work around.
-- Swap ownership for a session with `automation/gpu-owner/gpu-owner.sh`: suspend Flux for both apps with a marker, scale the LLM to 0 and ComfyUI to 1; hand back by scaling ComfyUI to 0 and resuming Flux, so Git state (LLM up) is the rollback. The same marker pattern as the autoresearch loop (ADR 0006), and the two refuse to take over each other's suspension.
-- Open WebUI points its image-generation engine at the ComfyUI Service with the built-in checkpoint workflow. It works only while ComfyUI owns the GPU; chat is unaffected otherwise.
+- Switch ownership through Git: one PR sets `replicas` on both Deployments, ComfyUI to 1 and `intel-llama-ornith` to 0, or the reverse. Flux applies it, Git always describes the running state, and the PVCs of both apps stay in place across switches. The first switch ships with the PR that adds ComfyUI.
+- Open WebUI and LiteLLM are not wired to ComfyUI. Use the ComfyUI UI directly.
 
 ## Alternatives considered
 
 - **Co-residency with `-shared-dev-num=2`.** Both pods would schedule, but Ornith would have to drop to about 32K context to leave VRAM, host RAM (24 GiB, Ornith limit 16 Gi, ComfyUI needs ~7 GiB to stage SDXL) does not fit both, and a spill repeats the documented node loss. Rejected.
 - **Community images** (`yanwk/comfyui-boot:xpu`, `ghcr.io/haasanen/comfyui-arc`). Plain PyTorch XPU without Intel's kernels; Intel's own measurements and a third-party rebuild show the omni kernels ahead. Rejected for the default, acceptable fallback if the Intel image misbehaves.
-- **Scaling through Git commits** (PR flips replicas). Slow for an interactive session and leaves Git describing a transient state. Rejected.
+- **An imperative swap script** (suspend Flux for both apps, scale by hand, resume). Faster per switch, but Git stops describing the cluster, and a failed swap leaves the LLM stopped with Flux suspended. Rejected; a PR per switch is acceptable for infrequent, longer image periods.
 - **Giving the LLM a smaller context when ComfyUI is up.** Reconsider if image sessions become long and the LLM must stay reachable; `local-first` already falls back to DeepSeek.
 
 ## Consequences
 
-- `qwen-intel` and `sensitive` are down during an image session; agents on them are degraded. `local-first` keeps working via its DeepSeek fallback.
+- `qwen-intel` and `sensitive` are down while ComfyUI owns the GPU, with no fallback by design, so the local-only `finance-curator` agent and Open WebUI's default chat model do not work. `local-first` and the agents on it keep working via its DeepSeek fallback. Do not start an autoresearch session (ADR 0006) in this state.
 - First ComfyUI start costs a 7 GB image pull and a 6.94 GB model download; later starts about a minute, plus 30–60 s to stage the checkpoint on the first generation.
-- A second GPU Deployment in Git is a deliberate exception to ADR 0004's "exactly one"; it is not an LLM and is 0 replicas by default. The rule for LLM Deployments is unchanged.
+- A second GPU Deployment in Git is a deliberate exception to ADR 0004's "exactly one"; it is not an LLM. The rule for LLM Deployments is unchanged.
 - Performance, host-memory behaviour and OOM behaviour of the Intel image on this node are unmeasured until plan 0029 records them. Treat the published estimates as hypotheses.
 - The Intel image runs as root and ComfyUI Manager can install nodes at runtime; those changes live in the pod's writable layer and vanish on restart. Reproducible node changes go through the image tag.
 
 ## Implementation status
 
-Manifests, the swap script and the Open WebUI wiring are in this repository as of 2026-11-09 (plan 0029). Nothing has been applied to the cluster; check `flux get ks -n comfyui` and `kubectl -n comfyui get deploy,pvc` for live state.
+Manifests are in this repository as of 2026-11-09 (plan 0029), with ComfyUI as the GPU owner in Git. Check `flux get ks -n comfyui` and `kubectl -n comfyui get deploy,pvc` for live state.

@@ -9,12 +9,10 @@ metadata:
     app.kubernetes.io/part-of: comfyui
 spec:
   # ComfyUI on the sole B60 (plan 0029, ADR 0008). The GPU is time-shared with
-  # intel-llama-ornith: Git keeps this at 0 replicas and the LLM at 1, and
-  # `automation/gpu-owner/gpu-owner.sh comfyui` swaps the owner while Flux is
-  # suspended for both apps. `gpu-owner.sh llm` resumes Flux, which restores this state.
+  # intel-llama-ornith through Git: a PR sets this to 1 and Ornith to 0, or the reverse.
   # Both Deployments request gpu.intel.com/xe: 1 and the plugin advertises exactly one,
   # so the scheduler itself prevents the two from ever running at the same time.
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -46,8 +44,7 @@ spec:
             - -ec
             - |
               mkdir -p /models/host/checkpoints /models/host/loras /models/host/vae /models/host/upscale_models
-              # SDXL 1.0 base (stabilityai, commit f298da3). One plain checkpoint keeps Open WebUI's
-              # default ComfyUI workflow usable without a custom node map; Z-Image/Flux are plan 0029 follow-ups.
+              # SDXL 1.0 base (stabilityai, commit f298da3). Z-Image/Flux are plan 0029 follow-ups.
               f=/models/host/checkpoints/sd_xl_base_1.0.safetensors
               sum='31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b'
               if test -f "$f"; then

@@ -51,24 +51,7 @@ spec:
         value: openai
       - name: USER_PERMISSIONS_CHAT_FILE_UPLOAD
         value: "False"
-      # Image generation through ComfyUI on the B60 (plan 0029). Works only while ComfyUI owns the
-      # GPU (`automation/gpu-owner/gpu-owner.sh comfyui`); otherwise the image button errors and chat
-      # is unaffected. With COMFYUI_WORKFLOW unset, Open WebUI uses its built-in checkpoint workflow,
-      # which is why the first model is a plain SDXL checkpoint rather than a split diffusion model.
       - name: ENABLE_IMAGE_GENERATION
-        value: "True"
-      - name: IMAGE_GENERATION_ENGINE
-        value: comfyui
-      - name: COMFYUI_BASE_URL
-        value: http://comfyui.comfyui.svc.cluster.local:8188
-      - name: IMAGE_GENERATION_MODEL
-        value: sd_xl_base_1.0.safetensors
-      - name: IMAGE_SIZE
-        value: 1024x1024
-      - name: IMAGE_STEPS
-        value: "25"
-      # The default model is the local LLM; prompt rewriting would hit it for every image.
-      - name: ENABLE_IMAGE_PROMPT_GENERATION
         value: "False"
       - name: ENABLE_CODE_INTERPRETER
         value: "False"

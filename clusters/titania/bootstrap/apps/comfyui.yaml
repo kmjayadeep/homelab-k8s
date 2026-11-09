@@ -19,15 +19,9 @@ spec:
   interval: 15m
   prune: true
   wait: true
-  # Model download plus a 7 GB image pull on first start when the owner is swapped in.
+  # First start pulls a 7 GB image and downloads the 6.94 GB checkpoint, after Ornith releases the GPU.
   timeout: 30m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  healthChecks:
-    # Passes at the Git default of 0 replicas (kstatus treats a 0-replica Deployment as Current).
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: comfyui
-      namespace: comfyui
