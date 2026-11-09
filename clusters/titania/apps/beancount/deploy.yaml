@@ -88,6 +88,53 @@ spec:
           initialDelaySeconds: 120
           periodSeconds: 300
           timeoutSeconds: 10
+      # Read-only money questions for the kagent finance-curator agent. Shares this pod so it reads the same
+      # checkout. Port 8000 is limited by the NetworkPolicy in finance-mcp.yaml.
+      - name: finance-mcp
+        # Source: kmjayadeep/docker-images finance-mcp/.
+        image: ghcr.io/kmjayadeep/finance-mcp:20261109053130
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: ALLOWED_HOSTS
+            value: finance-mcp.beancount.svc.cluster.local,finance-mcp.beancount.svc,finance-mcp.beancount,finance-mcp
+        ports:
+          - name: mcp
+            containerPort: 8000
+            protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: mcp
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: mcp
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: 20m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65532
+          runAsGroup: 65532
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: ledger
+            mountPath: /bean
+            readOnly: true
+          - name: finance-mcp-tmp
+            mountPath: /tmp
       - image: yegle/fava:v1.30
         imagePullPolicy: IfNotPresent
         name: fava
@@ -126,6 +173,9 @@ spec:
       - name: ledger
         emptyDir:
           sizeLimit: 256Mi
+      - name: finance-mcp-tmp
+        emptyDir:
+          sizeLimit: 16Mi
       - name: git-secret
         secret:
           secretName: fava-ledger-git

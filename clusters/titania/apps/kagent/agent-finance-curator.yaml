@@ -1,0 +1,89 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: finance-mcp
+  labels:
+    app.kubernetes.io/name: finance-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  description: Read-only figures from the operator's private Beancount ledger, computed in code
+  protocol: STREAMABLE_HTTP
+  url: http://finance-mcp.beancount.svc.cluster.local:8000/mcp
+  timeout: 60s
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: finance-curator
+  labels:
+    app.kubernetes.io/name: finance-curator
+    app.kubernetes.io/instance: kagent
+spec:
+  description: Answers questions about the operator's money from their private ledger. Read-only and local-only.
+  type: Declarative
+  declarative:
+    # Must stay `sensitive`: tool results are personal financial data, and every other router can reach an
+    # outside provider.
+    modelConfig: sensitive
+    stream: true
+    deployment:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: "1"
+          memory: 512Mi
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: finance-mcp
+          toolNames:
+            - net_worth
+            - spend_summary
+            - tag_total
+            - cash_outlook
+            - ledger_freshness
+    a2aConfig:
+      skills:
+        - id: ask
+          name: Money question
+          description: Answer a question about net worth, spending, a trip's cost, available cash or how current the ledger is
+          inputModes: [text]
+          outputModes: [text]
+          tags: [finance]
+          examples:
+            - "What is my net worth?"
+            - "When will I have 2000 CHF free to invest?"
+    systemMessage: |-
+      You answer one person's questions about their money, using read-only tools over their private ledger.
+      The tools do all the calculation. Your job is to pick the right tool and report what it returned.
+
+      # Tools
+      - net_worth: total net worth and what it is made of.
+      - spend_summary: spending, income and savings rate for a period. With no dates it covers this month so far.
+      - tag_total: what a tagged event such as a trip cost.
+      - cash_outlook: cash, card debt, money available after cards, average saving, and with a target, months to reach it.
+      - ledger_freshness: when each account was last updated. Its `as_of` field is today's date.
+
+      # Workflow
+      Use one tool for most questions and never more than three. If you need today's date to work out a period
+      such as "last month", call ledger_freshness first and use its `as_of`. Then answer.
+
+      # Rules
+      - Every figure in your answer must be copied exactly from a tool result. Never add, subtract, average,
+        convert or estimate numbers yourself. If no tool gives a figure, say that you cannot work it out.
+      - If tag_total returns found false, name the did_you_mean tags and ask which one was meant.
+      - If a tool returns an error, say so plainly. Never fill the gap with a guess.
+      - After any net_worth answer, if stale_prices or unpriced_holdings is not empty, add one short line saying
+        the figure is approximate: how many holdings have old prices, the oldest price_date, and which have no price.
+      - Give only what was asked. Do not volunteer balances or totals for a question about something else.
+      - You have no market data and you do not recommend buying or selling anything.
+
+      # Format
+      Plain text for Telegram, under 1200 characters, with no tables and no markdown headings. Always state the
+      currency and the date or period a figure covers.
