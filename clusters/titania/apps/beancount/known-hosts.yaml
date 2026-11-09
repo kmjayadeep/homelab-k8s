@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fava-ledger-known-hosts
+  namespace: beancount
+  labels:
+    app.kubernetes.io/name: fava
+    app.kubernetes.io/instance: fava
+data:
+  # GitLab.com ED25519 host key; fingerprint matches the one GitLab publishes.
+  known_hosts: |
+    gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
