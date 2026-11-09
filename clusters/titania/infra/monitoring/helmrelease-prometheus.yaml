@@ -91,7 +91,13 @@ spec:
         kubePrometheusGeneral: true
         kubePrometheusNodeRecording: true
         kubernetesApps: true
-        kubernetesResources: true
+        # The chart's kubernetesResources group uses the HA branch of the overcommit rules (requests must fit
+        # after losing the largest node). Titania has 16 allocatable CPU and 10.46 CPU of requests, so that
+        # budget (8 CPU) is permanently exceeded and KubeCPUOvercommit fires on normal operation. The group also
+        # carries KubeCPUQuotaOvercommit, KubeMemoryQuotaOvercommit, KubeQuota* and CPUThrottlingHigh, so it is
+        # disabled wholesale; the two overcommit alerts are restored from additionalPrometheusRulesMap below as
+        # ratios against total allocatable.
+        kubernetesResources: false
         kubernetesStorage: true
         kubernetesSystem: false
         kubeSchedulerAlerting: false
@@ -229,6 +235,35 @@ spec:
               summary: "Systemd unit {{ $labels.name }} failed on Helios"
               description: "{{ $labels.name }} has been in the failed state on Helios for 5 minutes."
 
+      # Replaces the two overcommit alerts lost by disabling defaultRules.rules.kubernetesResources above, using a
+      # ratio against total allocatable instead of the chart's "survive the loss of the largest node" test: a
+      # three-node homelab with 16 allocatable CPU cannot keep 16 CPU of requests schedulable after losing a node.
+      kubernetes-resources-homelab:
+        groups:
+        - name: kubernetes-resources-homelab
+          rules:
+          - alert: KubeCPUOvercommit
+            annotations:
+              description: Cluster {{ $labels.cluster }} has overcommitted CPU resource requests for Pods by {{ printf "%.2f" $value }}x total allocatable.
+              summary: Cluster has overcommitted CPU resource requests.
+            expr: |
+              sum by (cluster) (namespace_cpu:kube_pod_container_resource_requests:sum)
+              /
+              sum by (cluster) (kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) > 1.5
+            for: 30m
+            labels:
+              severity: warning
+          - alert: KubeMemoryOvercommit
+            annotations:
+              description: Cluster {{ $labels.cluster }} has overcommitted memory resource requests for Pods by {{ printf "%.2f" $value }}x total allocatable.
+              summary: Cluster has overcommitted memory resource requests.
+            expr: |
+              sum by (cluster) (namespace_memory:kube_pod_container_resource_requests:sum)
+              /
+              sum by (cluster) (kube_node_status_allocatable{job="kube-state-metrics",resource="memory"}) > 1.5
+            for: 30m
+            labels:
+              severity: warning
 
     prometheus:
       enabled: true
