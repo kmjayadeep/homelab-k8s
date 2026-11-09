@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-gemma4-models
+  labels:
+    app.kubernetes.io/name: intel-llama-gemma4
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 14.4 GB QAT Q4_0 weights + 1.19 GB mmproj + 0.46 GB MTP draft head; room for a `.partial` download.
+      storage: 25Gi
+  storageClassName: local-path

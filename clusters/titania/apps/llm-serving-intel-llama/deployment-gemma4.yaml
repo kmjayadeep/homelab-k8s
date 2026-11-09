@@ -1,0 +1,198 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intel-llama-gemma4
+  labels:
+    app.kubernetes.io/name: intel-llama-gemma4
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # Gemma 4 26B-A4B trial (plan 0028): Google's QAT Q4_0 GGUF + its mmproj, first-party MTP draft head
+  # (Janvitos Q8_0 GGUF), 128K Q8 KV, vision on the GPU. Holds the B60 while intel-llama-ornith is at
+  # 0 replicas; ADR 0004's one-Deployment rule is restored when the trial ends with removal or promotion.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-llama-gemma4
+      app.kubernetes.io/instance: llm-serving
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-llama-gemma4
+        app.kubernetes.io/instance: llm-serving
+        app.kubernetes.io/component: inference
+        app.kubernetes.io/part-of: llm-serving
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:3b8fde20978e330b401837f24b871ebe2c8d14ff7f07b87990bcd832588a1a75
+          # Hugging Face LFS hashes read from the file pages on 2026-11-08 at the pinned repo revisions.
+          # A mismatch on first download means re-read the hash from Hugging Face, never skip the check.
+          env:
+            - name: MODEL_SHA256
+              value: 3eca3b8f6d7baf218a7dd6bba5fb59a56ee25fe2d567b6f5f589b4f697eca51d
+            - name: MMPROJ_SHA256
+              value: a359953a076b877db30c31dbbb4c6d93b4a6e017ee5db5784247e4d4c0dd4f3b
+            - name: MTP_SHA256
+              value: 18f5d008f598e80972a405791fa6bcf0be58dd6d8fa46a25e71a6e9bcd737c56
+            - name: HF_MODEL_REPO
+              value: https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf/resolve/d1c082be9cf3c8a514acf63b8761f4b41935842e
+            - name: HF_MTP_REPO
+              value: https://huggingface.co/Janvitos/gemma-4-26B-A4B-it-qat-assistant-MTP-Q8_0-GGUF/resolve/f18d498f5b844d8cc0fceb0e9a55012fe9128221
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              fetch() { # fetch <url> <dest> <sha256>
+                if ! test -f "$2"; then
+                  curl --fail --location --retry 5 --output "$2.partial" "$1"
+                  mv "$2.partial" "$2"
+                fi
+                echo "$3  $2" | sha256sum -c -
+              }
+              fetch "$HF_MODEL_REPO/gemma-4-26B_q4_0-it.gguf" /models/model-qat-q4_0.gguf "$MODEL_SHA256"
+              fetch "$HF_MODEL_REPO/gemma-4-26B-it-mmproj.gguf" /models/mmproj.gguf "$MMPROJ_SHA256"
+              fetch "$HF_MTP_REPO/gemma-4-26B-A4B-it-qat-assistant-MTP-Q8_0.gguf" /models/mtp-q8_0.gguf "$MTP_SHA256"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      containers:
+        - name: llama-server
+          # Same image as deployment-ornith.yaml: server-intel b11515, oneAPI 2026.1.1 / FP16.
+          image: ghcr.io/ggml-org/llama.cpp@sha256:86b37d266ce85b485127adea68c9dc6d04d0ec9a64b0979844d5bbd8d66c53c5
+          args:
+            - --model
+            - /models/model-qat-q4_0.gguf
+            - --mmproj
+            - /models/mmproj.gguf
+            - --alias
+            - gemma-4-26b-a4b-intel
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --metrics
+            # Required: without --jinja the built-in template drops Gemma 4's tool delimiters (field report).
+            - --jinja
+            # 128K, not the native 256K: the field config measured 19.9 GiB loaded at 131K with Q8 KV and the
+            # drafter, and no VRAM margin at 256K.
+            - --ctx-size
+            - "131072"
+            - --cache-type-k
+            - q8_0
+            - --cache-type-v
+            - q8_0
+            - --flash-attn
+            - "on"
+            - --parallel
+            - "1"
+            - --n-gpu-layers
+            - "99"
+            - --cache-ram
+            - "4096"
+            # 2048/2048 as in the field config; 4096/2048 (Ornith) is an autoresearch idea, watch VRAM.
+            - --batch-size
+            - "2048"
+            - --ubatch-size
+            - "2048"
+            # Kept equal to Ornith so evaluate.py compares like for like. The field config ran
+            # `--reasoning off` on b10xxx because the thinking parser returned HTTP 500; if that recurs on
+            # b11515 it is the first thing to change (plan 0028 step 3).
+            - --reasoning-budget
+            - "2048"
+            # Sampling kept equal to Ornith's for the comparison. Gemma's published setting (temp 1.0,
+            # top-k 64) is an autoresearch idea.
+            - --temp
+            - "0.6"
+            - --top-p
+            - "0.95"
+            - --top-k
+            - "20"
+            - --min-p
+            - "0"
+            - --presence-penalty
+            - "0"
+            - --repeat-penalty
+            - "1.0"
+            # First-party MTP head as a separate draft file, fully offloaded. n-max 5 measured +10% over the
+            # default 3 on this card (field n-max sweep: 3 → 59.5, 5 → 65.3, 7 → 61.9, 8 → 44.1 tok/s); never 8+.
+            - --model-draft
+            - /models/mtp-q8_0.gguf
+            - --n-gpu-layers-draft
+            - "99"
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "5"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 4
+              memory: 8Gi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 6
+              memory: 16Gi
+              gpu.intel.com/xe: 1
+          securityContext:
+            allowPrivilegeEscalation: false
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 90
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: intel-llama-gemma4-models
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

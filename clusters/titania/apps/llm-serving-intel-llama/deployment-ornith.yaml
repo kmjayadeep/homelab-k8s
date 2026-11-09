@@ -13,7 +13,8 @@ spec:
   # operator rolled back from Swift Qwen3.8-27B (plan 0018) and removed the Swift manifests. Renamed from
   # intel-llama-tiel-coder-trial on 2026-10-28; Tiel-Coder was a requant of the same weights.
   # Back on the B60 since 2026-11-06, after the Nemotron 3.5 Lightning trial was rejected (plan 0025).
-  replicas: 1
+  # 0 replicas during the Gemma 4 26B-A4B trial (plan 0028); set back to 1 to roll back.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
