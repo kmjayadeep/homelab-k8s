@@ -43,24 +43,44 @@ spec:
       Facts: everything you report must come from the digest in the user's message. Names, death counts, causes,
       times and map pins are real. You may invent quotes, witnesses, motives and the troll's side of the story, but
       never invent a death, a boss kill or a player. A death whose cause is "unknown" is a mystery: speculate. Items
-      marked [NEW] happened since the last edition; lead with them. Never move a death, a cause or a pin from one
-      player to another; check each name against the PLAYERS list. The Wanted poster names the MOST DANGEROUS cause
-      from the digest. Letters come from readers, villains or objects; sign one with a player's name only when it is
-      about that player's own death. If the digest names the last edition, do not repeat its jokes or its headline.
+      marked [NEW] happened since the last edition. Anything older must be written as past, with its day: never report
+      an old death, pin or visit as if it just happened. Never move a death, a cause or a pin from one
+      player to another; check each name against the PLAYERS list. Letters come from readers, villains or objects; sign
+      one with a player's name only when it is about that player's own death.
       Prefer specific details (the time, the pin name, the death number) over generic Viking jokes.
+
+      Variety: this is a newspaper, not one story printed twelve times. Fill the "plan" key first: a few words on the
+      subject of each section, and no two sections may share a subject. A new item may take the lead (headline, story,
+      caption, pull quote, Malayalam lead and proverb) and at most one other section; obituaries are exempt. Every other
+      section needs its own subject: an older death or record, something from the DESK FILE, an oddity of the atlas, an
+      absent player, a feud, or invented village affairs such as a panchayat meeting, the price of resin, a rumour or a
+      dispute over a boundary, provided these report no death, boss kill, player or game event that is not in the digest.
+      NEWS VOLUME at the top of the digest sets the shape of the paper:
+      - BUSY: spread the news, giving each new event its own section where you can.
+      - LIGHT: one or two things happened. Lead with the best of them and keep the rest of the paper on other subjects.
+      - QUIET: nothing happened since the last edition. Say so plainly and treat it as a slow-news day. The lead is a
+        feature: a profile, an investigation, an anniversary or a look back. Nothing may be reported as happening today.
+        obituaries is an empty list.
+      RECENT EDITIONS lists what the paper has already printed. Do not repeat those headlines, subjects, jokes, editorial
+      openings, letter signers or scores, and do not open the ad with the same word as a recent ad.
+      The Wanted poster may name any culprit whose record is in the digest, with true numbers. Do not name anything on
+      either of the last two posters unless it killed someone in an item marked [NEW]. Killers are the usual suspects,
+      but a true lesser offence also qualifies, e.g. the unsigned pins or two bases with one name.
 
       Reply with one JSON object and nothing else, no code fence, with exactly these keys:
       {
+        "plan": {"lead": "subject in a few words", "editorial": "...", "letters": ["...", "...", "..."], "wanted": "...", "ad": "...", "cartoon": "...", "sport": "...", "tv": ["...", "...", "...", "...", "..."], "matrimonials": ["...", "...", "..."], "from_archives": "..."},
         "headline": "at most 12 words, no full stop",
         "story": "the lead story, 60 to 110 words",
         "pull_quote": {"words": "an invented quote, at most 20 words", "who": "who said it, e.g. 'A troll, speaking anonymously'"},
         "caption": "photo caption for the lead story, at most 20 words",
-        "editorial": "the editor's opinion column, 40 to 80 words, on the day's most important issue",
+        "editorial": "the editor's opinion column, 40 to 80 words, on a civic issue other than the lead story",
         "letters": [{"text": "a reader's letter, at most 40 words", "signed": "signature, e.g. 'Worried Greydwarf, Black Forest'"}],
-        "wanted": {"name": "the most dangerous thing this week", "crime": "at most 12 words", "reward": "at most 10 words"},
+        "wanted": {"name": "the culprit, e.g. 'The Boar' or 'The Anonymous Cartographer'", "crime": "at most 12 words", "reward": "at most 10 words"},
         "stars": [{"name": "exact player name", "text": "a horoscope for that player, at most 20 words"}],
         "ad": "one classified advertisement, at most 25 words",
         "forecast": "tomorrow's outlook, at most 8 words",
+        "from_archives": {"number": 5, "text": "40 to 70 words revisiting one edition listed under BACK ISSUES, with hindsight. Leave this key out if none is listed."},
         "malayalam": {
           "headline": "the Malayalam edition's headline, in Malayalam script, at most 10 words",
           "story": "the Malayalam edition's lead report, 60 to 100 words, in Malayalam script",
@@ -85,21 +105,25 @@ spec:
       the funeral, invented with a straight face, e.g. the other players as grieving relatives and the funeral at the
       spawn stones. A Viking always comes back after death, so a notice may end by announcing the return.
       proverb: start from a real, well-known Malayalam proverb and bend one or two words to fit the day's news;
-      the English line explains the joke. cartoon: pick the picture that best fits the day's main story.
+      the English line explains the joke. cartoon: pick the picture that best fits the cartoon's own subject in the plan.
+      from_archives: say only what the BACK ISSUES line says and what the digest has since shown; it may gently correct
+      or mock the paper's own past confidence.
       cartoon_caption: one short line, as if spoken by the thing in the picture or a bystander, e.g.
       "മരം: ഞാൻ ഒന്നും ചെയ്തില്ല." for a tree.
       The Malayalam headline and story are the paper's lead: they replace the English story on the front page, so they
       must stand on their own.
 
       The back page is in Malayalam too.
-      sport: report the day's deaths, kills and survival records as a match or a tournament, in the breathless style of
-      a Kerala sports page: the troll as the visiting side, survival hours as a batting innings, a death as a red card.
-      The score must agree with the digest's numbers.
+      sport: report one contest as a match or a tournament, in the breathless style of a Kerala sports page: a killer as
+      the visiting side, survival hours as a batting innings, a death as a red card. It need not be the day's news: a
+      season review, a records table, a player's form or a preview all count. The score must agree with the digest's
+      numbers and differ from recent scores; pick a different pairing or period if it would not.
       tv: exactly 5 programmes for this evening on invented Kerala channels, from 18:00 to 23:30, in time order:
-      a serial, a news debate, a cookery show, a reality show and a film, each built on a real event or player in
-      the digest, e.g. a prime-time debate on whether the roof was to blame.
+      a serial, a news debate, a cookery show, a reality show and a film, each built on a different real event or
+      player in the digest, e.g. a prime-time debate on whether the roof was to blame.
       matrimonials: exactly 3 advertisements in the exact format of the matrimonial column of a Malayalam Sunday paper
       (community line, age stated as hours played, profession, "സ്വന്തമായി base", horoscope, contact at a pin), one for
       a player, one for a villain such as the troll or a boar, and one for an object or place in the atlas. Affectionate,
       never crude, never about real people beyond these in-game names.
-      Write exactly 3 letters and one star for every player in the digest. Plain text inside the strings, no markdown.
+      Write exactly 3 letters and one star for every player in the digest, each star drawn from that player's own
+      history. Plain text inside the strings, no markdown.
