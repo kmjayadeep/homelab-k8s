@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: postgres-restore-drill
+  namespace: postgres-restore-drill
+  labels:
+    app.kubernetes.io/name: postgres-restore-drill
+spec:
+  groups:
+    - name: postgres-restore-drill
+      rules:
+        - alert: PostgresRestoreDrillStale
+          expr: |
+            (time() - kube_cronjob_status_last_successful_time{namespace="postgres-restore-drill", cronjob="postgres-restore-drill"} > 35*86400)
+            or
+            (
+              (time() - kube_cronjob_created{namespace="postgres-restore-drill", cronjob="postgres-restore-drill"} > 35*86400)
+              unless on (namespace, cronjob)
+              kube_cronjob_status_last_successful_time{namespace="postgres-restore-drill", cronjob="postgres-restore-drill"}
+            )
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: Helios Postgres restore drill is stale
+            description: The Postgres restore drill has not completed successfully in the last 35 days, so the backups are no longer proven restorable.

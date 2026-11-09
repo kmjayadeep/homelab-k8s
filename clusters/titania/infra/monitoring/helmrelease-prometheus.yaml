@@ -211,8 +211,17 @@ spec:
               summary: "Helios Postgres backup job failed"
               description: "backup-postgres.service is in the failed state on Helios. Check its journal; the unit runs again at the next hourly timer."
 
+          - alert: PostgreSQLBackupCheckFailed
+            expr: node_systemd_unit_state{job="helios",name="backup-postgres-check.service",state="failed"} == 1
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Helios Postgres backup repository check failed"
+              description: "restic check failed on the Postgres repository, so existing backups may be damaged. Check the backup-postgres-check.service journal on Helios."
+
           - alert: HeliosSystemdUnitFailed
-            expr: node_systemd_unit_state{job="helios",name!="backup-postgres.service",state="failed"} == 1
+            expr: node_systemd_unit_state{job="helios",name!~"backup-postgres(-check)?\\.service",state="failed"} == 1
             for: 5m
             labels:
               severity: warning
