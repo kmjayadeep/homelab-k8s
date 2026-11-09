@@ -88,6 +88,10 @@ data:
             raise RuntimeError(f"agent error: {reply['error']}")
         result = reply["result"]
         text = "\n".join(part.get("text", "") for artifact in result.get("artifacts", []) for part in artifact.get("parts", []))
+        if not text.strip():
+            # A failed task has no artifacts; its reason (e.g. the LiteLLM budget) is in the status message.
+            status = result.get("status", {}).get("message", {}).get("parts", [])
+            raise ValueError(" ".join(part.get("text", "") for part in status) or "empty reply")
         start, end = text.find("{"), text.rfind("}")
         return json.loads(text[start:end + 1])
 
@@ -135,7 +139,8 @@ spec:
   schedule: "0 4,16 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 0
+  # Keeps two days of logs, including the plan each edition prints.
+  successfulJobsHistoryLimit: 4
   failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
