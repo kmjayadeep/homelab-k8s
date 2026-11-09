@@ -44,6 +44,8 @@ spec:
             - -ec
             - |
               mkdir -p /models/host/checkpoints /models/host/loras /models/host/vae /models/host/upscale_models
+              # start_comfyui.sh passes these paths and ComfyUI exits if they are missing on a fresh PVC.
+              mkdir -p /data/input /data/output /data/user
               # SDXL 1.0 base (stabilityai, commit f298da3). Z-Image/Flux are plan 0029 follow-ups.
               f=/models/host/checkpoints/sd_xl_base_1.0.safetensors
               sum='31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b'
@@ -71,6 +73,8 @@ spec:
           volumeMounts:
             - name: models
               mountPath: /models/host
+            - name: data
+              mountPath: /data
       containers:
         - name: comfyui
           # Intel llm-scaler-omni 0.2.0-b2: the ComfyUI-only Battlemage image (ComfyUI 0.37.0,
