@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/part-of: llm-serving
 spec:
   # Ornith-1.5 35B-A3B 21G-ICE (plan 0015), 128K, BF16 projector on GPU, ngram-mod speculation.
-  # The only B60 LLM Deployment (ADR 0004). Served 2026-10-15 to 2026-10-25 and again since 2026-10-28, when the
+  # The default B60 LLM (ADR 0004, ADR 0009). Served 2026-10-15 to 2026-10-25 and again since 2026-10-28, when the
   # operator rolled back from Swift Qwen3.8-27B (plan 0018) and removed the Swift manifests. Renamed from
   # intel-llama-tiel-coder-trial on 2026-10-28; Tiel-Coder was a requant of the same weights.
   # Back on the B60 since 2026-11-06, after the Nemotron 3.5 Lightning trial was rejected (plan 0025).

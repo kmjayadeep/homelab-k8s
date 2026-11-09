@@ -7,5 +7,7 @@ resources:
   - pvc-ornith.yaml
   - deployment-ornith.yaml
   - service-ornith.yaml
+  - pvc-swift.yaml
+  - deployment-swift.yaml
   - metrics-service.yaml
   - servicemonitor.yaml

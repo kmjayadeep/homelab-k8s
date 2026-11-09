@@ -1,0 +1,171 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intel-llama-swift
+  labels:
+    app.kubernetes.io/name: intel-llama-swift
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  # Swift Qwen3.8-27B Q3_K_M (dense) on llama.cpp b11854 with the F16 projector, 128K Q8 KV and MTP draft 3.
+  # Validated in plan 0018 (43/49, 14.8 tok/s at 100K) and restored as a GPU portal config (ADR 0009).
+  # Flux overrides this value from the gpu-active ConfigMap, set by the GPU portal.
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intel-llama-swift
+      app.kubernetes.io/instance: llm-serving
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intel-llama-swift
+        app.kubernetes.io/instance: llm-serving
+        app.kubernetes.io/component: inference
+        app.kubernetes.io/part-of: llm-serving
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:3b8fde20978e330b401837f24b871ebe2c8d14ff7f07b87990bcd832588a1a75
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              fetch() { # file sha256 url
+                f="/models/$1"
+                # A file only gets its final name after its checksum passed, so existing files are not re-hashed.
+                test -f "$f" && return 0
+                curl --fail --location --retry 5 --output "$f.partial" "$3"
+                echo "$2  $f.partial" | sha256sum -c -
+                mv "$f.partial" "$f"
+              }
+              # Hashes are the HF LFS object hashes, which plan 0009 verified; the repo's SHA256SUMS disagrees for the projector.
+              fetch model-q3km.gguf 5ae067582f921ff9a1847ce4aab0b41ecad4c38c386e76fd4714f9a8b98e586e \
+                https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/Swift-Qwen3.8-27B-Q3_K_M.gguf
+              fetch mmproj-f16.gguf 9f3a5e81486b0c0270eff405b9a22911bf388aa7b58f3788eed9b0774904283b \
+                https://huggingface.co/ukisai/Swift-Qwen3.8-27B-GGUF/resolve/98a6100719e3aafa186041089b71c7b48390dbe1/mmproj-Swift-Qwen3.8-27B-F16.gguf
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+      containers:
+        - name: llama-server
+          # Official server-intel b11854, the build Swift was validated on (Ornith stays on b11515).
+          image: ghcr.io/ggml-org/llama.cpp@sha256:2ecfe61c6aa395589ca3b437999ae97f07ca909a88fe2fe426e150ea88a06117
+          args:
+            - --model
+            - /models/model-q3km.gguf
+            - --mmproj
+            - /models/mmproj-f16.gguf
+            # The alias LiteLLM already routes to, so switching LLMs never changes LiteLLM (ADR 0009).
+            - --alias
+            - ornith-1.5-35b-a3b-intel
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --metrics
+            - --jinja
+            - --ctx-size
+            - "131072"
+            - --cache-type-k
+            - q8_0
+            - --cache-type-v
+            - q8_0
+            - --flash-attn
+            - "on"
+            - --parallel
+            - "1"
+            - --n-gpu-layers
+            - "99"
+            - --cache-ram
+            - "4096"
+            # Publisher sampling defaults; explicit request parameters override them.
+            - --temp
+            - "1.0"
+            - --top-p
+            - "0.95"
+            - --top-k
+            - "20"
+            - --min-p
+            - "0"
+            - --presence-penalty
+            - "0"
+            - --repeat-penalty
+            - "1.0"
+            # Embedded MTP head, draft length 3, the optimum from plan 0018.
+            - --spec-type
+            - draft-mtp
+            - --spec-draft-n-max
+            - "3"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 4
+              memory: 8Gi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 6
+              memory: 16Gi
+              gpu.intel.com/xe: 1
+          # The GPU device plugin injects the allocated DRM nodes; no privileged access needed.
+          securityContext:
+            allowPrivilegeEscalation: false
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 90
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: model-cache
+              mountPath: /models
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: intel-llama-swift-models
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

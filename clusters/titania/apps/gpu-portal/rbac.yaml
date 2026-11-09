@@ -26,7 +26,7 @@ rules:
     verbs: ["get", "patch"]
   - apiGroups: ["apps"]
     resources: ["deployments"]
-    resourceNames: ["intel-llama-ornith"]
+    resourceNames: ["intel-llama-ornith", "intel-llama-swift"]
     verbs: ["get"]
   - apiGroups: [""]
     resources: ["pods"]

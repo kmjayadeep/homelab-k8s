@@ -111,7 +111,8 @@
       let html = '<div class="cfg' + (isActive ? " active" : "") + '"><div><h3>' + esc(c.name) + '</h3><div class="d">' + esc(c.kind) + " · " + esc(c.description) + "</div></div>";
       html += isActive ? '<span class="pill good">Active</span>' : '<button data-pick="' + esc(c.id) + '"' + (off ? " disabled" : "") + ">Switch</button>";
       if (confirming === c.id && !off) {
-        const impact = cur && state.phase === "ready" ? cur.stops : "No model is serving right now.";
+        const sameKind = cur && cur.kind === "LLM" && c.kind === "LLM";
+        const impact = !cur || state.phase !== "ready" ? "No model is serving right now." : sameKind ? "Local LLM requests fail for a few minutes while the new model loads. Callers keep the same names." : cur.stops;
         html += '<div class="confirm"><div>' + esc(impact) + '</div><div class="acts"><button class="primary" data-go="' + esc(c.id) + '">Switch to ' + esc(c.name) + '</button><button data-cancel="1">Keep current model</button></div></div>';
       }
       return html + "</div>";
