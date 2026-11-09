@@ -22,4 +22,5 @@ resources:
   - agent-music-curator.yaml
   - movie-mcp.yaml
   - agent-movie-curator.yaml
+  - agent-finance-curator.yaml
   - helm-release.yaml
