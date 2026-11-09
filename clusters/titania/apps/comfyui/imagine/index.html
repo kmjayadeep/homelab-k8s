@@ -34,9 +34,8 @@
   <a id="save" download hidden>Save image</a>
 </main>
 <script>
-  // RealVisXL V5 settings from its model card: DPM++ 2M Karras with 50+ steps and this negative prompt.
-  const CHECKPOINT = "RealVisXL_V5.0_fp16.safetensors";
-  const NEGATIVE = "bad hands, bad anatomy, ugly, deformed, (face asymmetry, eyes asymmetry, deformed eyes, deformed mouth, open mouth)";
+  // Chroma1-HD with the settings and negative prompt from its official ComfyUI workflow.
+  const NEGATIVE = "This greyscale unfinished sketch has bad proportions, is featureless and disfigured. It is a blurry ugly mess and with excessive gaussian blur. It is riddled with watermarks and signatures. Everything is smudged with leaking colors and nonsensical orientation of objects. Messy and abstract image filled with artifacts disrupt the coherency of the overall composition. The image has extreme chromatic abberations and inconsistent lighting. Dull, monochrome colors and countless artistic errors.";
   const TIMEOUT_MS = 600000;
 
   const $ = (id) => document.getElementById(id);
@@ -45,14 +44,21 @@
 
   function workflow(text) {
     return {
-      "4": { class_type: "CheckpointLoaderSimple", inputs: { ckpt_name: CHECKPOINT } },
-      "5": { class_type: "EmptyLatentImage", inputs: { width: 1024, height: 1024, batch_size: 1 } },
-      "6": { class_type: "CLIPTextEncode", inputs: { clip: ["4", 1], text } },
-      "7": { class_type: "CLIPTextEncode", inputs: { clip: ["4", 1], text: NEGATIVE } },
-      "3": { class_type: "KSampler", inputs: { model: ["4", 0], positive: ["6", 0], negative: ["7", 0], latent_image: ["5", 0],
-        seed: Math.floor(Math.random() * 2 ** 48), steps: 50, cfg: 5, sampler_name: "dpmpp_2m", scheduler: "karras", denoise: 1 } },
-      "8": { class_type: "VAEDecode", inputs: { samples: ["3", 0], vae: ["4", 2] } },
-      "9": { class_type: "SaveImage", inputs: { images: ["8", 0], filename_prefix: "imagine" } },
+      "1": { class_type: "UNETLoader", inputs: { unet_name: "Chroma1-HD.safetensors", weight_dtype: "default" } },
+      "2": { class_type: "CLIPLoader", inputs: { clip_name: "t5xxl_fp8_e4m3fn.safetensors", type: "chroma", device: "default" } },
+      "3": { class_type: "T5TokenizerOptions", inputs: { clip: ["2", 0], min_padding: 1, min_length: 0 } },
+      "4": { class_type: "VAELoader", inputs: { vae_name: "ae.safetensors" } },
+      "5": { class_type: "ModelSamplingAuraFlow", inputs: { model: ["1", 0], shift: 1 } },
+      "6": { class_type: "CLIPTextEncode", inputs: { clip: ["3", 0], text } },
+      "7": { class_type: "CLIPTextEncode", inputs: { clip: ["3", 0], text: NEGATIVE } },
+      "8": { class_type: "EmptySD3LatentImage", inputs: { width: 1024, height: 1024, batch_size: 1 } },
+      "10": { class_type: "CFGGuider", inputs: { model: ["5", 0], positive: ["6", 0], negative: ["7", 0], cfg: 3.8 } },
+      "11": { class_type: "KSamplerSelect", inputs: { sampler_name: "euler" } },
+      "12": { class_type: "BetaSamplingScheduler", inputs: { model: ["5", 0], steps: 26, alpha: 0.45, beta: 0.45 } },
+      "13": { class_type: "RandomNoise", inputs: { noise_seed: Math.floor(Math.random() * 2 ** 48) } },
+      "14": { class_type: "SamplerCustomAdvanced", inputs: { noise: ["13", 0], guider: ["10", 0], sampler: ["11", 0], sigmas: ["12", 0], latent_image: ["8", 0] } },
+      "15": { class_type: "VAEDecode", inputs: { samples: ["14", 0], vae: ["4", 0] } },
+      "9": { class_type: "SaveImage", inputs: { images: ["15", 0], filename_prefix: "imagine" } },
     };
   }
 
