@@ -40,7 +40,7 @@ spec:
               type: RuntimeDefault
           initContainers:
             - name: restic-restore
-              image: restic/restic:0.18.1
+              image: restic/restic:0.19.1
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
