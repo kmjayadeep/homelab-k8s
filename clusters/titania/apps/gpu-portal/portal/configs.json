@@ -1,0 +1,33 @@
+{
+  "state_namespace": "llm-serving",
+  "configs": [
+    {
+      "id": "ornith",
+      "name": "Ornith-1.5 35B-A3B",
+      "kind": "LLM",
+      "description": "128K context, tools and vision",
+      "namespace": "llm-serving",
+      "deployment": "intel-llama-ornith",
+      "selector": "app.kubernetes.io/name=intel-llama-ornith",
+      "variable": "ORNITH_REPLICAS",
+      "kustomization": "llm-serving-intel-llama",
+      "routes": ["qwen-intel", "sensitive", "local-first"],
+      "stops": "qwen-intel, sensitive, /money and Open WebUI's default chat will stop. local-first falls back to DeepSeek.",
+      "metrics": { "type": "llama", "url": "http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/metrics" }
+    },
+    {
+      "id": "comfyui",
+      "name": "ComfyUI with Chroma1-HD",
+      "kind": "Image",
+      "description": "imagine page, 60 to 70 s per image",
+      "namespace": "comfyui",
+      "deployment": "comfyui",
+      "selector": "app.kubernetes.io/name=comfyui",
+      "variable": "COMFYUI_REPLICAS",
+      "kustomization": "comfyui",
+      "routes": ["imagine", "comfyui"],
+      "stops": "Image generation and the imagine page will stop.",
+      "metrics": { "type": "comfyui", "url": "http://comfyui.comfyui.svc.cluster.local:8188/queue" }
+    }
+  ]
+}

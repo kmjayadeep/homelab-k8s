@@ -3,6 +3,7 @@
 - Status: Proposed
 - Date: 2026-11-09
 - Related plan: [0029 ComfyUI on the B60](../plans/0029-comfyui-b60-timeshare.md)
+- Amended by: [ADR 0009](0009-gpu-portal-runtime-selection.md) (the portal selects the GPU owner at runtime; switching through `replicas` PRs is replaced)
 - Amends: [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (a second B60 Deployment exists in Git and `replicas` selects which one runs; "one inference Deployment" still holds for LLMs)
 
 ## Context

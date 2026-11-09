@@ -6,6 +6,20 @@ metadata:
     app.kubernetes.io/name: llm-serving
     app.kubernetes.io/instance: llm-serving
 ---
+# Runtime GPU selection, written by the GPU portal (ADR 0009). Flux only creates it if absent.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gpu-active
+  namespace: llm-serving
+  labels:
+    app.kubernetes.io/name: llm-serving
+    app.kubernetes.io/instance: llm-serving
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+data:
+  ORNITH_REPLICAS: "1"
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -24,6 +38,20 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  # The GPU portal selects the owner; these defaults apply if gpu-active is missing.
+  patches:
+    - target:
+        kind: Deployment
+        name: intel-llama-ornith
+      patch: |
+        - op: replace
+          path: /spec/replicas
+          value: ${ORNITH_REPLICAS:=1}
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: gpu-active
+        optional: true
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment

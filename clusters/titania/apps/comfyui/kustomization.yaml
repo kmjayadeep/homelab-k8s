@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: comfyui
 
 resources:
+  - external-secret.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml
