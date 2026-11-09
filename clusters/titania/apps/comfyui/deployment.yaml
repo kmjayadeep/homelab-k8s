@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comfyui
+  labels:
+    app.kubernetes.io/name: comfyui
+    app.kubernetes.io/instance: comfyui
+    app.kubernetes.io/component: image-generation
+    app.kubernetes.io/part-of: comfyui
+spec:
+  # ComfyUI on the sole B60 (plan 0029, ADR 0008). The GPU is time-shared with
+  # intel-llama-ornith through Git: a PR sets this to 1 and Ornith to 0, or the reverse.
+  # Both Deployments request gpu.intel.com/xe: 1 and the plugin advertises exactly one,
+  # so the scheduler itself prevents the two from ever running at the same time.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: comfyui
+      app.kubernetes.io/instance: comfyui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: comfyui
+        app.kubernetes.io/instance: comfyui
+        app.kubernetes.io/component: image-generation
+        app.kubernetes.io/part-of: comfyui
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      initContainers:
+        - name: model-download
+          image: curlimages/curl@sha256:3b8fde20978e330b401837f24b871ebe2c8d14ff7f07b87990bcd832588a1a75
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              mkdir -p /models/host/checkpoints /models/host/loras /models/host/vae /models/host/upscale_models
+              # SDXL 1.0 base (stabilityai, commit f298da3). Z-Image/Flux are plan 0029 follow-ups.
+              f=/models/host/checkpoints/sd_xl_base_1.0.safetensors
+              sum='31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b'
+              if test -f "$f"; then
+                echo "$sum  $f" | sha256sum -c -
+              else
+                curl --fail --location --retry 5 --output "$f.partial" \
+                  https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/f298da3c058bd8f1f1c62f3ecfa775244a243897/sd_xl_base_1.0.safetensors
+                echo "$sum  $f.partial" | sha256sum -c -
+                mv "$f.partial" "$f"
+              fi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - name: models
+              mountPath: /models/host
+      containers:
+        - name: comfyui
+          # Intel llm-scaler-omni 0.2.0-b2: the ComfyUI-only Battlemage image (ComfyUI 0.37.0,
+          # torch XPU, omni_xpu_kernel attention, ComfyUI-OmniXPU, GGUF-XPU, nunchaku-XPU).
+          # Pinned to the Docker Hub digest; Renovate tracks the tag.
+          image: intel/llm-scaler-omni:0.2.0-b2@sha256:cc127efc23f8d6033d00e9d759468241ef478562ba63a56bb1dd8e83bbab46e3
+          # The image ENTRYPOINT (omix_torch_runtime.sh) sets up the oneAPI/XPU runtime and execs
+          # this. start_comfyui.sh adds --listen 0.0.0.0 --port 8188, the host-models path config,
+          # /data/{input,output,user}, --enable-manager and DynamicVRAM with a reserve (below).
+          args:
+            - /llm/entrypoints/start_comfyui.sh
+          env:
+            # DynamicVRAM headroom for model switching; the image default is 4 GiB.
+            - name: OMNI_COMFYUI_RESERVE_VRAM_GB
+              value: "2"
+          ports:
+            - name: http
+              containerPort: 8188
+          resources:
+            requests:
+              cpu: 2
+              memory: 6Gi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 6
+              # The node has 24 GiB; Ornith is never co-resident (one xe resource), so this can
+              # take the same envelope. SDXL fp16 is ~7 GB on disk and is staged through host RAM.
+              memory: 14Gi
+              gpu.intel.com/xe: 1
+          # The GPU device plugin injects the allocated DRM nodes; no privileged access needed.
+          # The image runs as root (no USER in the Dockerfile) and writes custom nodes under /llm.
+          securityContext:
+            allowPrivilegeEscalation: false
+          startupProbe:
+            httpGet:
+              path: /system_stats
+              port: http
+            # Runtime bootstrap plus first-start node imports; the image is 7 GB and cold.
+            failureThreshold: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /system_stats
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /system_stats
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: models
+              mountPath: /models/host
+              readOnly: true
+            - name: data
+              mountPath: /data
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: comfyui-models
+        - name: data
+          persistentVolumeClaim:
+            claimName: comfyui-data
+        - name: dshm
+          # Intel documents --shm-size=64g for multi-XPU; a single XPU needs far less, and this
+          # emptyDir counts against the container memory limit.
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

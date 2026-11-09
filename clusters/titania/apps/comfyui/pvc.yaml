@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: comfyui-models
+  labels:
+    app.kubernetes.io/name: comfyui
+    app.kubernetes.io/instance: comfyui
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: comfyui
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # SDXL base is 6.94 GB; leave room for a Z-Image-Turbo or Flux GGUF set plus LoRAs.
+      storage: 60Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: comfyui-data
+  labels:
+    app.kubernetes.io/name: comfyui
+    app.kubernetes.io/instance: comfyui
+    app.kubernetes.io/component: data
+    app.kubernetes.io/part-of: comfyui
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # /data/{input,output,user}: generated images, uploads, saved workflows and settings.
+      storage: 20Gi
+  # local-path, not Longhorn: the pod is pinned to titania-gpu anyway and image output is
+  # regenerable. Move to longhorn if outputs become worth backing up.
+  storageClassName: local-path
