@@ -12,7 +12,7 @@ spec:
   # intel-llama-ornith through Git: a PR sets this to 1 and Ornith to 0, or the reverse.
   # Both Deployments request gpu.intel.com/xe: 1 and the plugin advertises exactly one,
   # so the scheduler itself prevents the two from ever running at the same time.
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:

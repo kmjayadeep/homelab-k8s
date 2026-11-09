@@ -35,4 +35,4 @@ Image generation on Battlemage is now a supported path: upstream ComfyUI runs on
 
 ## Implementation status
 
-Manifests are in this repository as of 2026-11-09 (plan 0029), with ComfyUI as the GPU owner in Git. Check `flux get ks -n comfyui` and `kubectl -n comfyui get deploy,pvc` for live state.
+Manifests are in this repository as of 2026-11-09 (plan 0029), with `replicas` in Git selecting the GPU owner. Check `flux get ks -n comfyui` and `kubectl -n comfyui get deploy,pvc` for live state.
