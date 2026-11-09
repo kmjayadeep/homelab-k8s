@@ -57,4 +57,6 @@ Cold start after a switch: about a minute to Ready, then 30–60 s on the first 
 
 `imagine.cosmos.cboxlab.com` is a one-page prompt-to-image frontend (`clusters/titania/apps/comfyui/imagine/`), using Chroma1-HD with its official workflow settings and the T5 fp8 encoder. It proxies only `/prompt`, `/history` and `/view`. Chroma at 1024², 26 steps, CFG 3.8: 70 s cold, 60 s warm. The pod reached its 16 Gi limit, mostly reclaimable page cache, with no restart and at least 18.9 GiB still available on the node.
 
+GPU handed back to Ornith by a `replicas` PR (step 4). ComfyUI is paused at 0 replicas, its PVCs and models are kept, and the `imagine` page reports that ComfyUI is not running.
+
 Open risk: neither Ingress has authentication yet, and the host has a global AAAA record. Basic auth needs a Vault path, a policy in `homelab-iac` and a `SecretStore` in the `comfyui` namespace.

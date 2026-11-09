@@ -13,8 +13,8 @@ spec:
   # operator rolled back from Swift Qwen3.8-27B (plan 0018) and removed the Swift manifests. Renamed from
   # intel-llama-tiel-coder-trial on 2026-10-28; Tiel-Coder was a requant of the same weights.
   # Back on the B60 since 2026-11-06, after the Nemotron 3.5 Lightning trial was rejected (plan 0025).
-  # 0 while ComfyUI owns the GPU (ADR 0008); a follow-up PR sets this to 1 and ComfyUI to 0 to hand it back.
-  replicas: 0
+  # Time-shares the GPU with ComfyUI through Git (ADR 0008): a PR sets this to 0 and ComfyUI to 1, or the reverse.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
