@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imagine</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f6f6f4; --fg: #1c1c1a; --muted: #6d6d68; --panel: #fff; --line: #d9d9d3; --accent: #3a5bd9; --err: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #151514; --fg: #ececE8; --muted: #9a9a93; --panel: #1f1f1d; --line: #35352f; --accent: #8aa2ff; --err: #ff9c94; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 32px 16px; }
+  h1 { font-size: 20px; margin: 0 0 16px; }
+  textarea { width: 100%; min-height: 96px; padding: 12px; font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; resize: vertical; }
+  button { margin-top: 12px; width: 100%; padding: 12px; font: inherit; font-weight: 600; color: var(--bg); background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: progress; }
+  #status { min-height: 24px; margin: 12px 0; color: var(--muted); }
+  #status.error { color: var(--err); }
+  img { display: block; width: 100%; height: auto; border-radius: 8px; }
+  a { color: var(--accent); }
+  #save { display: inline-block; margin-top: 8px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Imagine</h1>
+  <form id="form">
+    <textarea id="prompt" required autofocus aria-label="Describe the image" placeholder="Describe the image"></textarea>
+    <button id="go" type="submit">Generate</button>
+  </form>
+  <div id="status" role="status"></div>
+  <img id="result" alt="Generated image" hidden>
+  <a id="save" download hidden>Save image</a>
+</main>
+<script>
+  // RealVisXL V5 settings from its model card: DPM++ 2M Karras with 50+ steps and this negative prompt.
+  const CHECKPOINT = "RealVisXL_V5.0_fp16.safetensors";
+  const NEGATIVE = "bad hands, bad anatomy, ugly, deformed, (face asymmetry, eyes asymmetry, deformed eyes, deformed mouth, open mouth)";
+  const TIMEOUT_MS = 600000;
+
+  const $ = (id) => document.getElementById(id);
+  const setStatus = (text, isError) => { $("status").textContent = text; $("status").className = isError ? "error" : ""; };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function workflow(text) {
+    return {
+      "4": { class_type: "CheckpointLoaderSimple", inputs: { ckpt_name: CHECKPOINT } },
+      "5": { class_type: "EmptyLatentImage", inputs: { width: 1024, height: 1024, batch_size: 1 } },
+      "6": { class_type: "CLIPTextEncode", inputs: { clip: ["4", 1], text } },
+      "7": { class_type: "CLIPTextEncode", inputs: { clip: ["4", 1], text: NEGATIVE } },
+      "3": { class_type: "KSampler", inputs: { model: ["4", 0], positive: ["6", 0], negative: ["7", 0], latent_image: ["5", 0],
+        seed: Math.floor(Math.random() * 2 ** 48), steps: 50, cfg: 5, sampler_name: "dpmpp_2m", scheduler: "karras", denoise: 1 } },
+      "8": { class_type: "VAEDecode", inputs: { samples: ["3", 0], vae: ["4", 2] } },
+      "9": { class_type: "SaveImage", inputs: { images: ["8", 0], filename_prefix: "imagine" } },
+    };
+  }
+
+  async function generate(text) {
+    const res = await fetch("comfy/prompt", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: workflow(text) }) });
+    if (res.status === 502 || res.status === 503 || res.status === 504) throw new Error("ComfyUI is not running. The GPU may be assigned to the LLM.");
+    if (!res.ok) throw new Error("ComfyUI rejected the request (HTTP " + res.status + ").");
+    const id = (await res.json()).prompt_id;
+    const started = Date.now();
+    while (Date.now() - started < TIMEOUT_MS) {
+      await sleep(700);
+      setStatus("Generating… " + Math.round((Date.now() - started) / 1000) + " s");
+      const poll = await fetch("comfy/history/" + id);
+      if (!poll.ok) continue;
+      const entry = (await poll.json())[id];
+      if (!entry) continue;
+      if (entry.status && entry.status.status_str === "error") throw new Error("Generation failed in ComfyUI.");
+      if (entry.status && entry.status.completed) {
+        const img = entry.outputs["9"].images[0];
+        return { url: "comfy/view?" + new URLSearchParams(img), name: img.filename, seconds: Math.round((Date.now() - started) / 1000) };
+      }
+    }
+    throw new Error("Timed out after 10 minutes.");
+  }
+
+  $("form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const text = $("prompt").value.trim();
+    if (!text) return;
+    $("go").disabled = true;
+    setStatus("Starting…");
+    try {
+      const out = await generate(text);
+      $("result").src = out.url;
+      $("result").hidden = false;
+      $("save").href = out.url;
+      $("save").download = out.name;
+      $("save").hidden = false;
+      setStatus("Done in " + out.seconds + " s");
+    } catch (err) {
+      setStatus(err.message, true);
+    } finally {
+      $("go").disabled = false;
+    }
+  });
+
+  // Enter generates, Shift+Enter adds a new line.
+  $("prompt").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); $("form").requestSubmit(); }
+  });
+</script>
+</body>
+</html>

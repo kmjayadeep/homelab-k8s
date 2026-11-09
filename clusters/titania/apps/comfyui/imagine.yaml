@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imagine
+  labels:
+    app.kubernetes.io/name: imagine
+    app.kubernetes.io/instance: comfyui
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: comfyui
+spec:
+  # A one-page prompt-to-image frontend for ComfyUI (plan 0029). It holds no GPU; while ComfyUI
+  # is at 0 replicas the page reports that ComfyUI is not running.
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: imagine
+      app.kubernetes.io/instance: comfyui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: imagine
+        app.kubernetes.io/instance: comfyui
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: comfyui
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: nginx
+          image: nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 20
+          volumeMounts:
+            - name: page
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+            - name: conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: page
+          configMap:
+            name: imagine
+            items:
+              - key: index.html
+                path: index.html
+        - name: conf
+          configMap:
+            name: imagine
+            items:
+              - key: default.conf
+                path: default.conf
+        - name: tmp
+          emptyDir:
+            sizeLimit: 16Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imagine
+  labels:
+    app.kubernetes.io/name: imagine
+    app.kubernetes.io/instance: comfyui
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: comfyui
+spec:
+  selector:
+    app.kubernetes.io/name: imagine
+    app.kubernetes.io/instance: comfyui
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: imagine
+  labels:
+    app.kubernetes.io/name: imagine
+    app.kubernetes.io/instance: comfyui
+spec:
+  tls:
+    - hosts:
+        - "*.cosmos.cboxlab.com"
+      secretName: cosmos-cboxlab-cert
+  rules:
+    - host: imagine.cosmos.cboxlab.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: imagine
+                port:
+                  name: http

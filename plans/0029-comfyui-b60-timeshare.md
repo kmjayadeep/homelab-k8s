@@ -53,4 +53,8 @@ Cold start after a switch: about a minute to Ready, then 30–60 s on the first 
 
 ## Outcome
 
-Not started.
+2026-11-09: merged and running, with ComfyUI as the GPU owner. SDXL base at 1024², 25 steps, Euler: 16 s cold, about 7 s warm, on `xpu:0`, pod working set about 4.9 GiB afterwards.
+
+`imagine.cosmos.cboxlab.com` is a one-page prompt-to-image frontend (`clusters/titania/apps/comfyui/imagine/`), using RealVisXL V5.0 fp16 with the settings from its model card. It proxies only `/prompt`, `/history` and `/view`.
+
+Open risk: neither Ingress has authentication yet, and the host has a global AAAA record. Basic auth needs a Vault path, a policy in `homelab-iac` and a `SecretStore` in the `comfyui` namespace.
