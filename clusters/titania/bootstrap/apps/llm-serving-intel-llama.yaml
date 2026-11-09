@@ -19,6 +19,7 @@ metadata:
     kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
 data:
   ORNITH_REPLICAS: "1"
+  SWIFT_REPLICAS: "0"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -32,7 +33,8 @@ spec:
       namespace: intel-gpu
   interval: 15m
   prune: true
-  wait: true
+  # Not wait: true, which would also health-check Swift's PVC. local-path binds it only on Swift's first start.
+  wait: false
   timeout: 30m
   sourceRef:
     kind: GitRepository
@@ -47,6 +49,13 @@ spec:
         - op: replace
           path: /spec/replicas
           value: ${ORNITH_REPLICAS:=1}
+    - target:
+        kind: Deployment
+        name: intel-llama-swift
+      patch: |
+        - op: replace
+          path: /spec/replicas
+          value: ${SWIFT_REPLICAS:=0}
   postBuild:
     substituteFrom:
       - kind: ConfigMap
@@ -56,4 +65,8 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: intel-llama-ornith
+      namespace: llm-serving
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: intel-llama-swift
       namespace: llm-serving

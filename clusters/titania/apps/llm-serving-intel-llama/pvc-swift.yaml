@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intel-llama-swift-models
+  labels:
+    app.kubernetes.io/name: intel-llama-swift
+    app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: model-cache
+    app.kubernetes.io/part-of: llm-serving
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # 13.6 GB Q3_K_M + 0.9 GB projector.
+      storage: 20Gi
+  storageClassName: local-path

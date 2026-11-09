@@ -8,9 +8,11 @@ metadata:
     app.kubernetes.io/component: inference
     app.kubernetes.io/part-of: llm-serving
 spec:
+  # The stable LLM endpoint LiteLLM calls: it selects whichever llama.cpp Deployment owns the B60 (ADR 0009).
   selector:
-    app.kubernetes.io/name: intel-llama-ornith
     app.kubernetes.io/instance: llm-serving
+    app.kubernetes.io/component: inference
+    app.kubernetes.io/part-of: llm-serving
   ports:
     - name: http
       port: 8080

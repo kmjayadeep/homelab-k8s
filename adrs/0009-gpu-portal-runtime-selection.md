@@ -3,7 +3,7 @@
 - Status: Proposed
 - Date: 2026-11-09
 - Related plan: [0030 GPU portal](../plans/0030-gpu-portal.md)
-- Amends: [ADR 0008](0008-comfyui-b60-timeshare.md) (switching through `replicas` PRs is replaced)
+- Amends: [ADR 0008](0008-comfyui-b60-timeshare.md) (switching through `replicas` PRs is replaced); [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (validated LLM configs may stay stopped in Git)
 
 ## Context
 
@@ -16,6 +16,8 @@ ADR 0008 switches the single B60 between Ornith and ComfyUI with one PR per swit
 - Each Flux Kustomization patches `spec.replicas` to a variable with a safe default. Plain `replicas` values stay in the manifests so CI schema validation still passes.
 - The portal changes only those ConfigMaps and requests a reconcile. Flux remains the only actor that changes workloads.
 - The portal's ServiceAccount is limited by `resourceNames` to those ConfigMaps, Kustomizations and Deployments, plus listing pods in the two namespaces.
+- Validated LLM configs stay in Git at 0 replicas with their model caches. This is the catalog, so ADR 0004's rule against stopped Deployments still applies to trials that are not in it.
+- All LLM configs sit behind the `intel-llama-ornith` Service and serve the same `--alias`, so a switch never changes LiteLLM. Those names are historical and do not identify the model running.
 - `-shared-dev-num` stays 1, so the scheduler still prevents two GPU workloads running at once.
 - Basic auth from Vault protects the portal, `imagine` and `comfyui`.
 

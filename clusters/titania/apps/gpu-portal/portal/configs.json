@@ -16,6 +16,20 @@
       "metrics": { "type": "llama", "url": "http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/metrics" }
     },
     {
+      "id": "swift",
+      "name": "Swift Qwen3.8-27B Q3_K_M",
+      "kind": "LLM",
+      "description": "128K context, 43/49, 14.8 tok/s at 100K. First start downloads 14.5 GB",
+      "namespace": "llm-serving",
+      "deployment": "intel-llama-swift",
+      "selector": "app.kubernetes.io/name=intel-llama-swift",
+      "variable": "SWIFT_REPLICAS",
+      "kustomization": "llm-serving-intel-llama",
+      "routes": ["qwen-intel", "sensitive", "local-first"],
+      "stops": "qwen-intel, sensitive, /money and Open WebUI's default chat will stop. local-first falls back to DeepSeek.",
+      "metrics": { "type": "llama", "url": "http://intel-llama-ornith.llm-serving.svc.cluster.local:8080/metrics" }
+    },
+    {
       "id": "comfyui",
       "name": "ComfyUI with Chroma1-HD",
       "kind": "Image",

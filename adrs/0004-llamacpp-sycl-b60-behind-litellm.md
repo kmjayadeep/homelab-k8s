@@ -4,7 +4,7 @@
 - Date: 2026-10-12
 - Related plans: [B60 evaluation](../plans/0005-intel-arc-b60-llm-serving-evaluation.md), [Tiel trial](../plans/0008-tiel-coder-b60-trial.md), [performance comparison](../plans/0007-local-llm-performance-comparison.md)
 - Supersedes: [ADR 0003](0003-intel-b60-llm-serving.md)
-- Amended by: [ADR 0008](0008-comfyui-b60-timeshare.md) (a ComfyUI Deployment time-shares the GPU, selected by `replicas` in Git; "exactly one" applies to LLM Deployments); [ADR 0006](0006-local-b60-autoresearch.md) (operator-started autoresearch sessions may tune production llama-server args); 2026-10-25 amendment below (dense Swift Qwen3.8-27B adopted, Ornith kept as a stopped rollback); 2026-10-28: rolled back to Ornith, Swift manifests and PVCs removed, Deployment renamed `intel-llama-ornith`
+- Amended by: [ADR 0009](0009-gpu-portal-runtime-selection.md) (validated LLM configs in the GPU portal catalog stay in Git at 0 replicas with their model caches; one LLM runs at a time); [ADR 0008](0008-comfyui-b60-timeshare.md) (a ComfyUI Deployment time-shares the GPU, selected by `replicas` in Git; "exactly one" applies to LLM Deployments); [ADR 0006](0006-local-b60-autoresearch.md) (operator-started autoresearch sessions may tune production llama-server args); 2026-10-25 amendment below (dense Swift Qwen3.8-27B adopted, Ornith kept as a stopped rollback); 2026-10-28: rolled back to Ornith, Swift manifests and PVCs removed, Deployment renamed `intel-llama-ornith`
 
 ## Context
 

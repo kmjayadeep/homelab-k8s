@@ -8,7 +8,7 @@
 
 Switch the B60 between validated configs from `gpu.cosmos.cboxlab.com`, and show the active config, VRAM, power, temperature and workload stats.
 
-In scope: the portal, `gpu-stats`, Ornith and ComfyUI as catalog entries, and basic auth on the portal, `imagine` and `comfyui`. Out of scope: restoring Swift Q3_K_M, which needs its own PR and an ADR 0004 update because that ADR forbids stopped LLM Deployments.
+In scope: the portal, `gpu-stats`, Ornith, Swift Q3_K_M and ComfyUI as catalog entries, and basic auth on the portal, `imagine` and `comfyui`.
 
 ## Starting state and prerequisites
 
@@ -38,4 +38,6 @@ Approvals needed: the Terraform apply and password import below. Merging restart
 
 ## Outcome
 
-Not started.
+2026-11-09: portal deployed. The operator confirmed that switching and the UI work. VRAM reads 23.0 of 23.9 GiB with Ornith loaded.
+
+Swift Q3_K_M restored as a catalog entry, under the shared Service and alias. Its first start downloads 14.5 GB, so it needs a longer first switch. Swift's llama.cpp build and arguments are the ones validated in plan 0018. Its behaviour behind the portal is unverified until the first switch.
