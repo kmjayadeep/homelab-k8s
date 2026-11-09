@@ -8,3 +8,14 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - imagine.yaml
+
+configMapGenerator:
+  - name: imagine
+    files:
+      - imagine/index.html
+      - imagine/default.conf
+    options:
+      labels:
+        app.kubernetes.io/name: imagine
+        app.kubernetes.io/instance: comfyui

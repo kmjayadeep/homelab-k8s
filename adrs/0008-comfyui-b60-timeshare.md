@@ -16,7 +16,7 @@ Image generation on Battlemage is now a supported path: upstream ComfyUI runs on
 - Add `clusters/titania/apps/comfyui/` running the pinned Intel image as a plain Deployment with `gpu.intel.com/xe: 1`, a `local-path` model PVC filled by a checksum-verified init container (SDXL 1.0 base first), and an Ingress at `comfyui.cosmos.cboxlab.com`.
 - Keep `-shared-dev-num=1`. The scheduler is the guard against co-residency; it is not a limitation to work around.
 - Switch ownership through Git: one PR sets `replicas` on both Deployments, ComfyUI to 1 and `intel-llama-ornith` to 0, or the reverse. Flux applies it, Git always describes the running state, and the PVCs of both apps stay in place across switches. The first switch ships with the PR that adds ComfyUI.
-- Open WebUI and LiteLLM are not wired to ComfyUI. Use the ComfyUI UI directly.
+- Open WebUI and LiteLLM are not wired to ComfyUI. Use the ComfyUI UI directly, or the one-page frontend at `imagine.cosmos.cboxlab.com`.
 
 ## Alternatives considered
 

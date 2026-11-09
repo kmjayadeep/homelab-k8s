@@ -46,17 +46,22 @@ spec:
               mkdir -p /models/host/checkpoints /models/host/loras /models/host/vae /models/host/upscale_models
               # start_comfyui.sh passes these paths and ComfyUI exits if they are missing on a fresh PVC.
               mkdir -p /data/input /data/output /data/user
-              # SDXL 1.0 base (stabilityai, commit f298da3). Z-Image/Flux are plan 0029 follow-ups.
-              f=/models/host/checkpoints/sd_xl_base_1.0.safetensors
-              sum='31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b'
-              if test -f "$f"; then
-                echo "$sum  $f" | sha256sum -c -
-              else
-                curl --fail --location --retry 5 --output "$f.partial" \
-                  https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/f298da3c058bd8f1f1c62f3ecfa775244a243897/sd_xl_base_1.0.safetensors
-                echo "$sum  $f.partial" | sha256sum -c -
-                mv "$f.partial" "$f"
-              fi
+              fetch() { # filename sha256 url
+                f="/models/host/checkpoints/$1"
+                if test -f "$f"; then
+                  echo "$2  $f" | sha256sum -c -
+                else
+                  curl --fail --location --retry 5 --output "$f.partial" "$3"
+                  echo "$2  $f.partial" | sha256sum -c -
+                  mv "$f.partial" "$f"
+                fi
+              }
+              # SDXL 1.0 base (stabilityai, commit f298da3).
+              fetch sd_xl_base_1.0.safetensors 31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b \
+                https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/f298da3c058bd8f1f1c62f3ecfa775244a243897/sd_xl_base_1.0.safetensors
+              # RealVisXL V5.0 fp16 (SG161222, commit ac93e0d): the model used by the imagine page.
+              fetch RealVisXL_V5.0_fp16.safetensors 6a35a7855770ae9820a3c931d4964c3817b6d9e3c6f9c4dabb5b3a94e5643b80 \
+                https://huggingface.co/SG161222/RealVisXL_V5.0/resolve/ac93e0dda1f6d448cae19bbfab8c5e720a5e48bc/RealVisXL_V5.0_fp16.safetensors
           resources:
             requests:
               cpu: 100m
