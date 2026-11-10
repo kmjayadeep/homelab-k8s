@@ -33,9 +33,9 @@ spec:
       namespace: intel-gpu
   interval: 15m
   prune: true
-  # Not wait: true, which would also health-check Swift's PVC. local-path binds it only on Swift's first start.
+  # No health checks: a reconcile waiting on a slow or failing model start would hold back the next GPU switch.
+  # The GPU portal reports rollout state from the pods (ADR 0009).
   wait: false
-  timeout: 30m
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -61,12 +61,3 @@ spec:
       - kind: ConfigMap
         name: gpu-active
         optional: true
-  healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: intel-llama-ornith
-      namespace: llm-serving
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: intel-llama-swift
-      namespace: llm-serving

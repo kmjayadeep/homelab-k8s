@@ -32,9 +32,9 @@ spec:
       namespace: intel-gpu
   interval: 15m
   prune: true
-  wait: true
-  # First start pulls a 7 GB image and downloads the 6.94 GB checkpoint, after Ornith releases the GPU.
-  timeout: 30m
+  # No health checks: a reconcile waiting on a slow or failing start would hold back the next GPU switch.
+  # The GPU portal reports rollout state from the pods (ADR 0009).
+  wait: false
   sourceRef:
     kind: GitRepository
     name: flux-system

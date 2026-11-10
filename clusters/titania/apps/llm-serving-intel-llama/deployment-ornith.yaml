@@ -45,23 +45,19 @@ spec:
           args:
             - -ec
             - |
-              if test -f /models/mmproj-bf16.gguf; then
-                echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf' | sha256sum -c -
-              else
-                curl --fail --location --retry 5 --output /models/mmproj-bf16.gguf.partial \
-                  https://huggingface.co/peculiar-ragdoll/Tiel-Coder-35B-A3B-GGUF-MTP/resolve/bbe9e566f39e4fc9652ac66b71968289a03c520a/mmproj-BF16.gguf
-                echo 'd9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837  /models/mmproj-bf16.gguf.partial' | sha256sum -c -
-                mv /models/mmproj-bf16.gguf.partial /models/mmproj-bf16.gguf
-              fi
+              fetch() { # file sha256 url
+                f="/models/$1"
+                # A file only gets its final name after its checksum passed, so existing files are not re-hashed.
+                test -f "$f" && return 0
+                curl --fail --location --retry 5 --output "$f.partial" "$3"
+                echo "$2  $f.partial" | sha256sum -c -
+                mv "$f.partial" "$f"
+              }
+              fetch mmproj-bf16.gguf d9ce31026d1cb1f3f8d5152e2e2a014d9d2b302b6c93a7dc07bb0a0487f52837 \
+                https://huggingface.co/peculiar-ragdoll/Tiel-Coder-35B-A3B-GGUF-MTP/resolve/bbe9e566f39e4fc9652ac66b71968289a03c520a/mmproj-BF16.gguf
               # Ornith-1.5 21G-ICE (plan 0015). The BF16 projector above is the same Ornith projector, from Tiel's repo.
-              if test -f /models/model-21g-ice.gguf; then
-                echo '42fb3674d92d4ae90928dac0b3a22190702874ec71d7f94c176eb68ca4ca3881  /models/model-21g-ice.gguf' | sha256sum -c -
-              else
-                curl --fail --location --retry 5 --output /models/model-21g-ice.gguf.partial \
-                  https://huggingface.co/gbuzhf/Ornith-1.5-35B-A3B-TIEL-Calibrated-MTPv2-ICE-GGUF/resolve/9991338360005ec7785aefe8c26e9847ced3f1cf/Ornith-1.5-35B-A3B-TIEL_Calibrated-MTPv2-21G-ICE.gguf
-                echo '42fb3674d92d4ae90928dac0b3a22190702874ec71d7f94c176eb68ca4ca3881  /models/model-21g-ice.gguf.partial' | sha256sum -c -
-                mv /models/model-21g-ice.gguf.partial /models/model-21g-ice.gguf
-              fi
+              fetch model-21g-ice.gguf 42fb3674d92d4ae90928dac0b3a22190702874ec71d7f94c176eb68ca4ca3881 \
+                https://huggingface.co/gbuzhf/Ornith-1.5-35B-A3B-TIEL-Calibrated-MTPv2-ICE-GGUF/resolve/9991338360005ec7785aefe8c26e9847ced3f1cf/Ornith-1.5-35B-A3B-TIEL_Calibrated-MTPv2-21G-ICE.gguf
           resources:
             requests:
               cpu: 100m
