@@ -17,6 +17,13 @@ spec:
     crds: Create
   upgrade:
     crds: CreateReplace
+    # A transient registry failure (e.g. quay.io 502/504 on a sidecar image pull) can push an upgrade past its
+    # timeout; helm-controller then marks the release Stalled/RetriesExceeded and never retries on its own, so
+    # the Kustomization keeps failing its health check until someone forces a reconcile. Retry the upgrade a few
+    # times instead. This does not unstick a release that is already Stalled.
+    remediation:
+      retries: 3
+      remediateLastFailure: true
   values:
     kubeApiServer:
       enabled: false
