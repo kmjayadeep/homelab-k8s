@@ -7,6 +7,7 @@ resources:
   - rbac.yaml
   - portal.yaml
   - gpu-stats.yaml
+  - network-policy.yaml
 
 configMapGenerator:
   - name: gpu-portal-app

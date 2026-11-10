@@ -1,6 +1,6 @@
 # ADR 0009: Select the B60 owner at runtime through a portal
 
-- Status: Proposed
+- Status: Accepted 2026-11-10
 - Date: 2026-11-09
 - Related plan: [0030 GPU portal](../plans/0030-gpu-portal.md)
 - Amends: [ADR 0008](0008-comfyui-b60-timeshare.md) (switching through `replicas` PRs is replaced); [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (validated LLM configs may stay stopped in Git)
@@ -34,9 +34,9 @@ ADR 0008 switches the single B60 between Ornith and ComfyUI with one PR per swit
 - A cluster rebuild restores the defaults: Ornith at 1, ComfyUI at 0.
 - A Kustomization showing Ready means its manifests applied, not that the model started. Use the portal or the Deployment status for that.
 - `gpu-stats` runs with `hostPID` and `SYS_PTRACE` on the GPU node, because the xe driver's per-process fdinfo is the only in-cluster VRAM source found.
-- The portal authenticates callers only at the Ingress. A pod inside the cluster could call its Service and switch between catalog entries.
+- The portal authenticates callers only at the Ingress, so a NetworkPolicy admits only the ingress controller. Cilium still admits traffic from the portal's own node, including host-network pods there, and those callers could switch between catalog entries.
 - The portal refuses to switch while a Kustomization is suspended, which covers autoresearch sessions (ADR 0006). Start an autoresearch session only while Ornith is active.
 
 ## Implementation status
 
-Manifests are proposed in plan 0030. Check `kubectl -n gpu-portal get deploy,ds` and `flux get ks -n gpu-portal` for live state.
+Deployed through plan 0030. Check `kubectl -n gpu-portal get deploy,ds` and `flux get ks -n gpu-portal` for live state.

@@ -1,6 +1,6 @@
 # Plan 0030: GPU portal
 
-- Status: Draft
+- Status: Completed 2026-11-10 with follow-up work
 - Owner: operator
 - Related ADR: [ADR 0009](../adrs/0009-gpu-portal-runtime-selection.md)
 
@@ -40,4 +40,20 @@ Approvals needed: the Terraform apply and password import below. Merging restart
 
 2026-11-09: portal deployed. The operator confirmed that switching and the UI work. VRAM reads 23.0 of 23.9 GiB with Ornith loaded.
 
-Swift Q3_K_M restored as a catalog entry, under the shared Service and alias. Its first start downloads 14.5 GB, so it needs a longer first switch. Swift's llama.cpp build and arguments are the ones validated in plan 0018. Its behaviour behind the portal is unverified until the first switch.
+Swift Q3_K_M restored as a catalog entry, under the shared Service and alias. Its first start downloads 14.5 GB, so it needs a longer first switch. Swift's llama.cpp build and arguments are the ones validated in plan 0018. 
+
+2026-11-10: Swift verified behind the portal. `qwen-intel` answered through LiteLLM, and the pod ran real traffic for over 7 hours with no restarts.
+
+Measured switches, before the startup changes below:
+
+- To Swift, first time: 520 s, of which 35 s stopping ComfyUI, about 6 min 40 s downloading and verifying, and 1 min 18 s loading.
+- To Ornith: 4 min 15 s, of which about 30 s stopping, 2 min 10 s re-hashing and about 1 min loading.
+
+Flux no longer waits on model health for these Kustomizations, and Ornith no longer re-hashes existing files. A NetworkPolicy now admits only the ingress controller to the portal.
+
+Follow-up work:
+
+- Confirm the portal still loads after the NetworkPolicy merges, and that another pod cannot reach it.
+- Time regular switches. The expected figure is about 2 minutes, from the measured stop and load times.
+- Confirm the `comfyui` login. It returned 503 while ComfyUI was stopped, so the login has not been exercised.
+- Step 5, the autoresearch lock, at the next real session.

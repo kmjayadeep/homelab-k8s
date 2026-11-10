@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gpu-portal
+  namespace: gpu-portal
+  labels:
+    app.kubernetes.io/name: gpu-portal
+    app.kubernetes.io/instance: gpu-portal
+spec:
+  # The portal authenticates callers only at the Ingress, so nothing else may reach it (ADR 0009).
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: gpu-portal
+      app.kubernetes.io/instance: gpu-portal
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+              app.kubernetes.io/component: controller
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gpu-stats
+  namespace: gpu-portal
+  labels:
+    app.kubernetes.io/name: gpu-stats
+    app.kubernetes.io/instance: gpu-portal
+spec:
+  # Only the portal reads the stats endpoint.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: gpu-stats
+      app.kubernetes.io/instance: gpu-portal
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: gpu-portal
+              app.kubernetes.io/instance: gpu-portal
+      ports:
+        - protocol: TCP
+          port: 9400
