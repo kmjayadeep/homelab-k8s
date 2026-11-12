@@ -95,6 +95,11 @@ spec:
     recordType: A
     targets:
     - 192.168.1.77
+  - dnsName: pgctl.cosmos.cboxlab.com
+    recordTTL: 60
+    recordType: A
+    targets:
+    - 192.168.1.77
   - dnsName: hp.sreepadam.cboxlab.com
     recordTTL: 60
     recordType: A
