@@ -15,8 +15,15 @@ spec:
   interval: 1h0m0s
   install:
     crds: Create
+    remediation:
+      retries: 3
   upgrade:
     crds: CreateReplace
+    # A single slow rollout (Grafana, 2026-11-10) previously left the release Stalled with
+    # RetriesExceeded, blocking the monitoring Kustomization and its dependents for days.
+    remediation:
+      retries: 3
+      strategy: rollback
   values:
     kubeApiServer:
       enabled: false
