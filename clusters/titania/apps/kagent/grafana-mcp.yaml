@@ -51,7 +51,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: grafana-mcp
-          image: docker.io/grafana/mcp-grafana:2.2.0
+          image: docker.io/grafana/mcp-grafana:2.3.0
           # The image entrypoint defaults to SSE; set the command so our flags are the only ones.
           # 2.1.1 rejects requests whose Host header is not in --allowed-hosts (defaults to loopback), so list
           # the Service names agents use and serve /healthz on a side listener for kubelet probes.
