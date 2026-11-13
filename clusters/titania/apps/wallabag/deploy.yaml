@@ -22,7 +22,7 @@ spec:
     spec:
       initContainers:
         - name: initialize-database
-          image: wallabag/wallabag:2.6.15
+          image: wallabag/wallabag:2.6.17
           command:
             - /bin/sh
             - -ec
@@ -62,7 +62,7 @@ spec:
               memory: 512Mi
       containers:
         - name: wallabag
-          image: wallabag/wallabag:2.6.15
+          image: wallabag/wallabag:2.6.17
           command:
             - /bin/sh
             - -ec
