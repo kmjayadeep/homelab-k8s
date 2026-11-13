@@ -164,7 +164,7 @@ pages:
                 url: https://backrest.cosmos.cboxlab.com
                 icon: di:backrest
               - title: Postgres
-                url: https://pgweb.cosmos.cboxlab.com
+                url: https://pgctl.cosmos.cboxlab.com
                 icon: di:postgres
                 alt-status-codes: [401]
 
