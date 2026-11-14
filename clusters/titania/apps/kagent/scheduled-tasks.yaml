@@ -23,7 +23,7 @@ data:
     {
       "agent": "homelab-gitops",
       "title": "Renovate review",
-      "prompt": "Renovate pre-review (origin: schedule). List open pull requests in kmjayadeep/homelab-k8s authored by Renovate (author login app/renovate, head branch starting with renovate/). For each one that does not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), do the review described in your Renovate review section and post one comment. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words. If every open Renovate PR is already reviewed, reply 'nothing new' only."
+      "prompt": "Renovate pre-review (origin: schedule). List open pull requests in kmjayadeep/homelab-k8s authored by Renovate (author login app/renovate, head branch starting with renovate/). Take at most 3 of those that do not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), oldest first, do the review described in your Renovate review section and post one comment each. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words, plus how many unreviewed Renovate PRs are left for the next run. If every open Renovate PR is already reviewed, reply 'nothing new' only."
     }
   music-digest.json: |
     {
