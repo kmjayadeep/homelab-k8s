@@ -165,7 +165,7 @@ spec:
               description: "Prometheus cannot scrape {{ $labels.instance }} for job {{ $labels.job }}. Helios or one of its exporters may be unavailable."
 
           - alert: PostgreSQLImportantDatabaseMissingMetrics
-            expr: absent(pg_stat_database_xact_commit{job="helios",datname=~"immich|uptimekuma"})
+            expr: absent(pg_stat_database_xact_commit{job="helios",datname="immich"})
             for: 10m
             labels:
               severity: warning
@@ -173,14 +173,14 @@ spec:
               summary: "PostgreSQL important database metrics are missing"
               description: "Prometheus is not seeing transaction metrics for one or more important Helios databases. Check postgres_exporter and the database catalog."
 
-          - alert: PostgreSQLSlowQueries
-            expr: avg(rate(pg_stat_activity_max_tx_duration{datname!~"template.*"}[2m])) by (datname) > 2 * 60
-            for: 2m
+          - alert: PostgreSQLLongTransaction
+            expr: max by (datname) (pg_stat_activity_max_tx_duration{job="helios",datname!~"template.*"}) > 5 * 60
+            for: 5m
             labels:
-              severity: critical
+              severity: warning
             annotations:
-              summary: "PostgreSQL high number of slow on {{ $labels.cluster }} for database {{ $labels.datname }} "
-              description: "PostgreSQL high number of slow queries {{ $labels.cluster }} for database {{ $labels.datname }} with a value of {{ $value }} "
+              summary: "Long-running transaction in Helios database {{ $labels.datname }}"
+              description: "A transaction in {{ $labels.datname }} has been open for {{ $value | humanizeDuration }}. Long transactions hold locks and stop vacuum. The hourly dumps take under a minute. Check pg_stat_activity on Helios."
 
           - alert: PostgreSQLQPS
             expr: avg(irate(pg_stat_database_xact_commit{datname!~"template.*"}[5m]) + irate(pg_stat_database_xact_rollback{datname!~"template.*"}[5m])) by (datname) > 10000
