@@ -21,7 +21,7 @@ spec:
         cpu: 20m
         memory: 64Mi
       limits:
-        cpu: 500m
+        # No CPU limit: bursty Python fetches were CFS-throttled ~50% at 500m while averaging ~30m.
         memory: 256Mi
     podSecurityContext:
       runAsNonRoot: true
