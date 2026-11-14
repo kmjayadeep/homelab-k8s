@@ -11,6 +11,16 @@ spec:
   declarative:
     modelConfig: default-model-config
     stream: true
+    # Telegram chats reuse one A2A session per chat, so history grows until the bot restarts. Compact it
+    # after each invocation once the prompt passes 60K tokens (local context is 131K), keeping a summary.
+    # Scheduled tasks and alert investigations use a fresh session per run and are not affected.
+    context:
+      compaction:
+        compactionInterval: 5
+        overlapSize: 1
+        tokenThreshold: 60000
+        summarizer:
+          modelConfig: default-model-config
     deployment:
       resources:
         requests:
@@ -127,6 +137,10 @@ spec:
       resource you cannot see). To read a file, use fetch with
       url = https://raw.githubusercontent.com/kmjayadeep/<repo>/<ref>/<path> (ref "main" or your branch),
       raw = true and max_length = 500000; use start_index to page if the response says it was truncated.
+      That limit is for files in kmjayadeep repositories you are about to edit. For upstream pages
+      (release notes, changelogs, chart values.yaml of other projects) use max_length = 20000 and page only
+      while the part you need has not appeared yet: your whole context is about 110K tokens and one
+      unbounded upstream file can fill it.
       Use get_file_contents only to list directories or confirm a path exists. raw.githubusercontent.com may
       lag a few minutes behind a push; after pushing, verify with list_commits, not by re-fetching.
 
@@ -152,12 +166,16 @@ spec:
          paths, approvals).
 
       # Renovate review (comments only, no branch, no PR)
-      When asked to review Renovate pull requests, for each PR: read pull_request_read (get, get_files, get_diff)
-      to learn the package, old and new version and the files touched; fetch the upstream release notes or
-      changelog for that range (GitHub releases page of the chart or image source, or the repository's
-      CHANGELOG via raw.githubusercontent.com); for a Helm chart, fetch the chart's values.yaml at the new
-      version and compare it with the values this repository sets in the HelmRelease for removed, renamed or
-      newly required keys; for an image, check the project's breaking-change notes. Then post exactly one
+      When asked to review Renovate pull requests, review at most 3 PRs per run, oldest first; the next
+      scheduled run picks up the rest, so say how many are left. For each PR: read pull_request_read (get,
+      get_diff) to learn the package, old and new version and the files touched; fetch the upstream release
+      notes or changelog for that range (GitHub releases page of the chart or image source, or the
+      repository's CHANGELOG via raw.githubusercontent.com) with max_length = 20000 and read only the
+      entries between the old and new version; for a Helm chart, read the values this repository sets in
+      the HelmRelease, then check the changelog and the chart's upgrade notes (UPGRADING.md or the README
+      upgrade section) for those keys being removed, renamed or newly required. Fetch the chart's full
+      values.yaml only for a major bump, at most two 20000-character pages; if that is not enough to
+      decide, the verdict is hold. For an image, check the project's breaking-change notes. Then post exactly one
       comment with add_issue_comment whose first line is the marker "<!-- kagent-renovate-review -->" and
       whose body has: Verdict (merge, hold, needs human), Why (two to four bullets with the facts and links you
       checked), and Checks the reviewer should do after merge. Hold when a major bump, a renamed or removed

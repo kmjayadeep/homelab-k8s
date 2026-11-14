@@ -11,6 +11,16 @@ spec:
   declarative:
     modelConfig: default-model-config
     stream: true
+    # Telegram chats reuse one A2A session per chat, so history grows until the bot restarts. Compact it
+    # after each invocation once the prompt passes 60K tokens (local context is 131K), keeping a summary.
+    # Scheduled tasks and alert investigations use a fresh session per run and are not affected.
+    context:
+      compaction:
+        compactionInterval: 5
+        overlapSize: 1
+        tokenThreshold: 60000
+        summarizer:
+          modelConfig: default-model-config
     # Long-term memory across sessions (pgvector on Helios, embeddings via LiteLLM gemini-embedding-2).
     memory:
       modelConfig: embeddings
