@@ -127,6 +127,15 @@ spec:
           litellm_params:
             model: deepseek/deepseek-v4-flash
             api_key: os.environ/DEEPSEEK_API_KEY
+        # Fallback target for `local-first` only. DeepSeek's thinking mode rejects a multi-turn tool
+        # conversation unless every earlier assistant turn carries its `reasoning_content`; a run that
+        # started on the local model has none, so with thinking on every mid-run fallback failed with a
+        # 400 (reproduced 2026-11-14). `frontier` keeps thinking: its runs are DeepSeek from turn one.
+        - model_name: deepseek-v4-flash-fallback
+          litellm_params:
+            model: deepseek/deepseek-v4-flash
+            api_key: os.environ/DEEPSEEK_API_KEY
+            reasoning_effort: none
         - model_name: deepseek-v4-pro
           litellm_params:
             model: deepseek/deepseek-v4-pro
@@ -144,7 +153,7 @@ spec:
         # `retry_policy` are not stored there (checked 2026-10-30), so these values apply.
         fallbacks:
           - local-first:
-              - deepseek-v4-flash
+              - deepseek-v4-flash-fallback
         # A timed-out call is not retried on the same group (each retry would wait another stream_timeout
         # or request_timeout before falling back). Other errors keep the default two retries.
         retry_policy:
