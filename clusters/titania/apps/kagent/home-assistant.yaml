@@ -1,0 +1,276 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: home-assistant-kagent
+  labels:
+    app.kubernetes.io/name: home-assistant-kagent
+    app.kubernetes.io/instance: kagent
+spec:
+  # Long-lived token of the non-admin, local-only Home Assistant user `kagent` (plan 0031).
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: SecretStore
+    name: vault
+  target:
+    name: home-assistant-kagent
+    creationPolicy: Owner
+    deletionPolicy: Retain
+    template:
+      data:
+        # Header value for the RemoteMCPServer.
+        authorization: "Bearer {{ .token }}"
+        # Raw token for the briefing-note CronJob.
+        HA_TOKEN: "{{ .token }}"
+  data:
+    - secretKey: token
+      remoteRef:
+        key: services/home-assistant/kagent
+        property: token
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: home-assistant
+  labels:
+    app.kubernetes.io/name: home-assistant-mcp
+    app.kubernetes.io/instance: kagent
+spec:
+  # Home Assistant's built-in MCP server, configured with the Assist API only ("Device control"). The agent
+  # sees and controls only entities exposed to Assist; the homelab socket switches are deliberately not exposed.
+  description: Home Assistant Assist tools (exposed entities only) for the living room light, Echo Dot, wake time and power sensors
+  protocol: STREAMABLE_HTTP
+  url: https://home-assistant.cosmos.cboxlab.com/api/mcp
+  headersFrom:
+    - name: Authorization
+      valueFrom:
+        type: Secret
+        name: home-assistant-kagent
+        key: authorization
+  timeout: 30s
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: home
+  labels:
+    app.kubernetes.io/name: home
+    app.kubernetes.io/instance: kagent
+spec:
+  description: Answers questions about the home and controls the living room light, Echo Dot and wake time through Home Assistant.
+  type: Declarative
+  declarative:
+    # `sensitive` (local only): tool results include presence and household state.
+    modelConfig: sensitive
+    stream: true
+    deployment:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: "1"
+          memory: 512Mi
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: home-assistant
+          toolNames:
+            - homeassistant__GetLiveContext
+            - llm__GetDateTime
+            - intent__HassTurnOn
+            - intent__HassTurnOff
+            - light__HassLightSet
+            - media_player__HassMediaPause
+            - media_player__HassMediaUnpause
+            - media_player__HassSetVolume
+            - todo__get_items
+            - todo__HassListAddItem
+            - todo__HassListCompleteItem
+            - script__set_wake_time
+    a2aConfig:
+      skills:
+        - id: home
+          name: Home question or action
+          description: Check or change the living room light, the Echo Dot, the weekday wake time, to-do lists, or read the homelab sockets' power use
+          inputModes: [text]
+          outputModes: [text]
+          tags: [home]
+          examples:
+            - "Is the living room light on?"
+            - "Set the wake time to 06:30"
+            - "How much power are the servers drawing?"
+    systemMessage: |-
+      You look after one person's home through Home Assistant. You can read the current state of what is
+      exposed to you and change a few things: the living room entrance bulb, the living room Echo Dot's playback
+      and volume, the weekday wake time, and to-do lists.
+
+      # Tools
+      - homeassistant__GetLiveContext: current state of every exposed entity. Call it first for any question
+        about the home, and before changing something so you use the exact name it reports.
+      - light__HassLightSet: brightness (0-100) or colour of the light. intent__HassTurnOn / intent__HassTurnOff
+        switch it on or off.
+      - script__set_wake_time: weekday wake time in 24-hour HH:MM. The dim wake-up light starts then, Monday to
+        Friday; the spoken briefing is at 08:00 regardless.
+      - media_player tools: pause, resume or set the volume of the Echo Dot.
+      - todo tools: read, add to or complete items on a list.
+
+      # Rules
+      - The sockets named Jupiter, Orion, Pluto and mars power the homelab servers. You can read their power and
+        daily energy but you must never try to switch them, and you must refuse if asked. Only the operator does
+        that, by hand.
+      - Report figures exactly as the tools return them, with units. Daily energy resets at midnight.
+      - A person state of "unknown" means the phone is not reporting location; say that rather than guessing
+        whether they are home.
+      - If a tool fails or the entity is unavailable (the bulb is unavailable when its wall switch is off), say so
+        plainly.
+      - Act on clear requests without asking for confirmation, then confirm what changed.
+
+      # Format
+      Plain text for Telegram, under 600 characters, no tables or headings.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: home-briefing-note-script
+  labels:
+    app.kubernetes.io/name: home-briefing-note
+    app.kubernetes.io/instance: kagent
+data:
+  note.py: |
+    """Ask homelab-sre for one spoken sentence about anything needing attention and store it in Home Assistant.
+
+    Home Assistant's 08:00 weekday briefing reads input_text.briefing_homelab_note when it changed today and is
+    not "OK" (plan 0031). Any failure leaves the note untouched, so the briefing simply skips the line.
+    """
+
+    import json
+    import os
+    import re
+    import urllib.request
+    import uuid
+
+    AGENT = os.environ["AGENT_URL"]
+    HA = os.environ["HA_URL"].rstrip("/")
+    TOKEN = os.environ["HA_TOKEN"]
+    ENTITY = "input_text.briefing_homelab_note"
+    PROMPT = (
+        "Morning check for a spoken home briefing (origin: schedule). Check firing alerts (ignore Watchdog and "
+        "InfoInhibitor), Flux objects, pods that are not ready, Longhorn volumes and last night's backups. If "
+        "nothing needs the operator's attention today, reply with exactly OK and nothing else. Otherwise reply "
+        "with one sentence of at most 200 characters, for text-to-speech: plain words, no symbols, no markdown, "
+        "no pod hashes or IDs, name the app and what is wrong, most important problem only. Do not open a pull "
+        "request and do not save memories."
+    )
+
+
+    def fetch(url, data=None, headers=None, timeout=60):
+        request = urllib.request.Request(url, data, headers or {})
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return response.read().decode()
+
+
+    def ask():
+        body = {"jsonrpc": "2.0", "id": 1, "method": "message/send", "params": {"message": {
+            "role": "user", "kind": "message", "messageId": str(uuid.uuid4()),
+            "parts": [{"kind": "text", "text": PROMPT}],
+        }}}
+        reply = json.loads(fetch(AGENT, json.dumps(body).encode(), {"Content-Type": "application/json"}, timeout=900))
+        if "error" in reply:
+            raise RuntimeError(f"agent error: {reply['error']}")
+        result = reply["result"]
+        text = " ".join(part.get("text", "") for artifact in result.get("artifacts", []) for part in artifact.get("parts", []))
+        return re.sub(r"[*_`#>|]", "", re.sub(r"\s+", " ", text)).strip()
+
+
+    def set_note(value):
+        fetch(HA + "/api/services/input_text/set_value",
+              json.dumps({"entity_id": ENTITY, "value": value}).encode(),
+              {"Content-Type": "application/json", "Authorization": "Bearer " + TOKEN})
+
+
+    def main():
+        note = ask()
+        if not note:
+            raise SystemExit("empty reply; note left unchanged")
+        if note.rstrip(".").upper() == "OK":
+            note = "OK"
+        else:
+            note = note[:250].rsplit(" ", 1)[0] + "." if len(note) > 250 else note
+        # Clear first so an unchanged sentence still counts as written today.
+        set_note("")
+        set_note(note)
+        print(f"note: {note}")
+
+
+    main()
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: home-briefing-note
+  labels:
+    app.kubernetes.io/name: home-briefing-note
+    app.kubernetes.io/instance: kagent
+spec:
+  # Before Home Assistant's 08:00 weekday briefing, after the 07:30 daily report has freed the local model.
+  schedule: "45 7 * * 1-5"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: home-briefing-note
+            app.kubernetes.io/instance: kagent
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: note
+              image: python:3.15.2-alpine
+              command: ["python3", "-u", "/script/note.py"]
+              env:
+                - name: AGENT_URL
+                  value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
+                - name: HA_URL
+                  value: https://home-assistant.cosmos.cboxlab.com
+                - name: HA_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: home-assistant-kagent
+                      key: HA_TOKEN
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+              volumeMounts:
+                - name: script
+                  mountPath: /script
+                  readOnly: true
+          volumes:
+            - name: script
+              configMap:
+                name: home-briefing-note-script

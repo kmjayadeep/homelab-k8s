@@ -275,6 +275,9 @@ spec:
               resources:
                 requests:
                   storage: 5Gi
+        # Mounted at /etc/prometheus/secrets/<name>/ for scrape credentials.
+        secrets:
+          - home-assistant-prometheus
         thanos:
           objectStorageConfig:
             existingSecret:
@@ -294,6 +297,17 @@ spec:
           static_configs:
           - targets:
             - traefik.cosmos.cboxlab.com:8899 # traefik
+
+        # Home Assistant: Hombli socket power/energy and the living room bulb (plan 0031).
+        - job_name: home-assistant
+          scrape_interval: 60s
+          metrics_path: /api/prometheus
+          scheme: https
+          authorization:
+            credentials_file: /etc/prometheus/secrets/home-assistant-prometheus/token
+          static_configs:
+          - targets:
+            - home-assistant.cosmos.cboxlab.com:443
 
       additionalPodMonitors:
       - name: flux-system
