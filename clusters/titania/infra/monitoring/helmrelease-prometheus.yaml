@@ -110,6 +110,10 @@ spec:
         nodeExporterRecording: true
         prometheus: true
         prometheusOperator: true
+      disabled:
+        # Assumes any pod can fail over to any node. titania-gpu holds half the cluster's CPU and
+        # the GPU-pinned llama-server requests 4 CPU that could never move, so this fires permanently.
+        KubeCPUOvercommit: true
 
     additionalPrometheusRulesMap:
       flux:
