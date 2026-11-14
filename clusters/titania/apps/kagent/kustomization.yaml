@@ -23,4 +23,5 @@ resources:
   - movie-mcp.yaml
   - agent-movie-curator.yaml
   - agent-finance-curator.yaml
+  - home-assistant.yaml
   - helm-release.yaml

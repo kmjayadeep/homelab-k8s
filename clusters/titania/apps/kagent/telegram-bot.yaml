@@ -98,6 +98,10 @@ spec:
             # Finance questions (plan 0028): /money <question>, answered by the local-only finance-curator.
             - name: FINANCE_AGENT
               value: finance-curator
+            # Home questions and light/wake-time control (plan 0031): /home <question>, answered by `home`.
+            # Needs a bot image with HOME_AGENT support; older images ignore it.
+            - name: HOME_AGENT
+              value: home
             - name: MERGE_POLICY_INTERVAL_SECONDS
               value: "1800"
           envFrom:
