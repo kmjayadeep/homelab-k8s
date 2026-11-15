@@ -22,7 +22,7 @@ spec:
       initContainers:
       # Fava starts only after a first successful clone, so a missing or wrong key leaves the old pod serving.
       - name: ledger-clone
-        image: alpine/git:v2.54.0
+        image: alpine/git:v2.54.1
         imagePullPolicy: IfNotPresent
         command: ["sh", "-euc"]
         args:
@@ -57,7 +57,7 @@ spec:
       # journal path at startup, so it returns 404 once the old worktree is removed. Fava also ignores files it
       # does not know yet, so a new commit touches the journal to force a reload.
       - name: ledger-sync
-        image: alpine/git:v2.54.0
+        image: alpine/git:v2.54.1
         imagePullPolicy: IfNotPresent
         command: ["sh", "-uc"]
         args:
