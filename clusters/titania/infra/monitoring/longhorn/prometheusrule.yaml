@@ -43,20 +43,20 @@ spec:
     - alert: LonghornNodeStorageWarning
       annotations:
         description: The used storage of node {{$labels.node}} is at {{$value}}% capacity for
-          more than 5 minutes.
-        summary:  The used storage of node is over 70% of the capacity.
-      expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) * 100 > 70
-      for: 5m
+          more than 30 minutes.
+        summary:  The used storage of node is over 80% of the capacity.
+      expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) * 100 > 80
+      for: 30m
       labels:
         issue: The used storage of node {{$labels.node}} is high.
         severity: warning
     - alert: LonghornDiskStorageWarning
       annotations:
         description: The used storage of disk {{$labels.disk}} on node {{$labels.node}} is at {{$value}}% capacity for
-          more than 5 minutes.
-        summary:  The used storage of disk is over 70% of the capacity.
-      expr: (longhorn_disk_usage_bytes / longhorn_disk_capacity_bytes) * 100 > 70
-      for: 5m
+          more than 30 minutes.
+        summary:  The used storage of disk is over 80% of the capacity.
+      expr: (longhorn_disk_usage_bytes / longhorn_disk_capacity_bytes) * 100 > 80
+      for: 30m
       labels:
         issue: The used storage of disk {{$labels.disk}} on node {{$labels.node}} is high.
         severity: warning
