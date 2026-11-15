@@ -16,7 +16,7 @@ spec:
       diskType: filesystem
       evictionRequested: false
       path: /var/lib/longhorn/
-      storageReserved: "50000000000"
+      storageReserved: 50000000000
       tags: []
   evictionRequested: false
   instanceManagerCPURequest: 0
