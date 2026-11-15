@@ -83,10 +83,10 @@ spec:
             # its apps is mounted at the same location in both containers.
             - name: state
               mountPath: /etc/wolf
+            # Not under /tmp: the dind entrypoint mounts a tmpfs over /tmp, which hides anything
+            # mounted below it, and the apps then get empty directories instead of Wolf's sockets.
             - name: sockets
-              mountPath: /tmp/sockets
-            - name: wolf-api
-              mountPath: /var/run/wolf
+              mountPath: /run/user/wolf
             - name: udev
               mountPath: /run/udev
               readOnly: true
@@ -97,9 +97,10 @@ spec:
           env:
             - name: WOLF_DOCKER_SOCKET
               value: /run/dind/docker.sock
-            # Sockets for the virtual display and audio, shared with the app containers.
+            # Wolf's API socket and the sockets for the virtual display and audio, shared with the
+            # app containers. This is the image default, stated because the dind mount must match.
             - name: XDG_RUNTIME_DIR
-              value: /tmp/sockets
+              value: /run/user/wolf
             - name: HOST_APPS_STATE_FOLDER
               value: /etc/wolf
             # The address Moonlight is told to stream from: the LoadBalancer IP in service.yaml.
@@ -162,9 +163,7 @@ spec:
             - name: docker-socket
               mountPath: /run/dind
             - name: sockets
-              mountPath: /tmp/sockets
-            - name: wolf-api
-              mountPath: /var/run/wolf
+              mountPath: /run/user/wolf
             # The live host /dev and udev database, as upstream documents: virtual input devices
             # appear after the container starts, so the static /dev of a privileged container is
             # not enough.
@@ -182,8 +181,6 @@ spec:
         - name: docker-socket
           emptyDir: {}
         - name: sockets
-          emptyDir: {}
-        - name: wolf-api
           emptyDir: {}
         - name: dev
           hostPath:
