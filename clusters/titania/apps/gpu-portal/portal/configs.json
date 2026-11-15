@@ -42,6 +42,19 @@
       "routes": ["imagine", "comfyui"],
       "stops": "Image generation and the imagine page will stop.",
       "metrics": { "type": "comfyui", "url": "http://comfyui.comfyui.svc.cluster.local:8188/queue" }
+    },
+    {
+      "id": "wolf",
+      "name": "Wolf game streaming",
+      "kind": "Games",
+      "description": "Moonlight host at 192.168.1.184. First start of each app downloads its image",
+      "namespace": "wolf",
+      "deployment": "wolf",
+      "selector": "app.kubernetes.io/name=wolf",
+      "variable": "WOLF_REPLICAS",
+      "kustomization": "wolf",
+      "routes": ["moonlight"],
+      "stops": "Game streaming will stop and a running game is killed without saving."
     }
   ]
 }

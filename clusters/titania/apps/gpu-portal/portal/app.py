@@ -116,6 +116,9 @@ def parse_llama_metrics(text):
 
 
 def active_metrics(config):
+    # Not every workload has a metrics endpoint (Wolf has none).
+    if "metrics" not in config:
+        return None
     text = fetch_text(config["metrics"]["url"])
     if text is None:
         return None

@@ -4,6 +4,7 @@
 - Date: 2026-11-09
 - Related plan: [0030 GPU portal](../plans/0030-gpu-portal.md)
 - Amends: [ADR 0008](0008-comfyui-b60-timeshare.md) (switching through `replicas` PRs is replaced); [ADR 0004](0004-llamacpp-sycl-b60-behind-litellm.md) (validated LLM configs may stay stopped in Git)
+- Amended by: [ADR 0010](0010-wolf-game-streaming-b60.md) (proposed: a Wolf game-streaming entry joins the catalog; `metrics` becomes optional)
 
 ## Context
 
