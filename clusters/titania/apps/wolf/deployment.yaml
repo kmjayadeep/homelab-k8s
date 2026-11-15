@@ -99,6 +99,9 @@ spec:
           # Wolf publishes rolling tags only; pinned to the digest of `stable` as of 2026-11-15.
           image: ghcr.io/games-on-whales/wolf:stable@sha256:47ce7a0b67ee6645d2c6fefd8fdda7fee49a00e327c39597a04e84a0cd052910
           env:
+            # The Wolf and app images default to Europe/London.
+            - name: TZ
+              value: Europe/Zurich
             - name: WOLF_DOCKER_SOCKET
               value: /run/dind/docker.sock
             # Wolf's API socket and the sockets for the virtual display and audio, shared with the
