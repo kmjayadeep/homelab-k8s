@@ -1,0 +1,20 @@
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: titania-master
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  disks:
+    default-disk-3d9ed4355da69325:
+      allowScheduling: true
+      diskDriver: ""
+      diskType: filesystem
+      evictionRequested: false
+      path: /var/lib/longhorn/
+      storageReserved: "50000000000"
+      tags: []
+  evictionRequested: false
+  instanceManagerCPURequest: 0
+  name: titania-master
+  tags: []
