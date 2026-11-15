@@ -1,6 +1,6 @@
 # Plan 0031: Home Assistant and kagent
 
-- Status: In progress (started 2026-11-14)
+- Status: Completed 2026-11-15 (started 2026-11-14)
 - Owner: Jayadeep KM
 - Related: [plan 0020](0020-kagent-sre-agent.md), [plan 0022](0022-kagent-scheduled-tasks.md), [plan 0028](0028-finance-curator.md)
 
@@ -49,4 +49,14 @@ The `/home` command needs a `kagent-telegram-bot` image with `HOME_AGENT` suppor
 
 ## Outcome
 
-To be recorded on completion.
+Completed 2026-11-15. All four gates passed:
+
+1. Vault: `homelab-iac#158` applied (2 added, 1 changed); the `kagent` policy reads `services/home-assistant/kagent` and the new `monitoring-home-assistant` role reads `services/home-assistant/prometheus`.
+2. #617 merged: both ExternalSecrets Ready, `RemoteMCPServer/home-assistant` accepted, Prometheus target `home-assistant` up, and `hass_sensor_power_w` returns the four socket series.
+3. `docker-images#23` (`/home`, JWT redaction) built as `kagent-telegram-bot:20261114212110` and deployed by #618. In Telegram, the agent reported the light's state, set the wake time, and refused to switch a homelab socket.
+4. A manual `home-briefing-note` job wrote `OK` to `input_text.briefing_homelab_note`.
+
+Changed in Home Assistant during the same work, outside Git:
+
+- Sockets renamed `jupiter`, `orion` (about 90 W; was `pluto_socket_*`), `mars` and `pluto` (was `hombli_smart_socket_4_*`), with a new Pluto daily meter. The Prometheus series changed labels with the rename, so history before 2026-11-15 sits under the old names.
+- Presence comes from an Nmap Tracker scan of the phone on Wi-Fi (`device_tracker.jd_s24_wifi`, phone set to use its device MAC), because the Companion app trackers stopped reporting location on 2026-10-28.
