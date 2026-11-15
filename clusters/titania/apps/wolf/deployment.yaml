@@ -79,6 +79,10 @@ spec:
               mountPath: /var/lib/docker
             - name: docker-socket
               mountPath: /run/dind
+            # Wolf's apps run with IpcMode host, so they share this container's /dev/shm. The
+            # Kubernetes default is 64Mi, which Steam's Chromium UI fills at once and then fails.
+            - name: dshm
+              mountPath: /dev/shm
             # Wolf hands Docker bind-mount paths as it sees them, so every path Wolf shares with
             # its apps is mounted at the same location in both containers.
             - name: state
@@ -182,6 +186,11 @@ spec:
           emptyDir: {}
         - name: sockets
           emptyDir: {}
+        - name: dshm
+          # Memory-backed, so what is used counts against the dind memory limit.
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi
         - name: dev
           hostPath:
             path: /dev
