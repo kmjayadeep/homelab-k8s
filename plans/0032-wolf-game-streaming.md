@@ -46,4 +46,7 @@ Approvals needed: merging the PR, and the first switch to Wolf in the portal, wh
 
 ## Outcome
 
-Not started.
+In progress.
+
+- 2026-11-15: merged (PR 623) and switched to Wolf. Steps 2 and 3 passed: the Service got `192.168.1.184`, the pod went `2/2` Ready 47 s after the switch, Docker-in-Docker runs under k3s with no TCP listener, and Wolf chose VA-API encoders for H.264, HEVC and AV1 with its zero-copy path on `renderD128`.
+- 2026-11-15: step 4 passed; a client paired and the built-in test ball streamed. Step 5 failed: Wolf UI showed a black screen and exited after about half a second. Cause: the dind entrypoint mounts a tmpfs over `/tmp`, hiding the shared `/tmp/sockets`, so app containers were given empty directories instead of the Wayland, PulseAudio and Wolf API sockets. Fixed by sharing `/run/user/wolf` instead. Steps 5 to 7 remain.
