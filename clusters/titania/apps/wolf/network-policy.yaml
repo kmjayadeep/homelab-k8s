@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: wolf
+  labels:
+    app.kubernetes.io/name: wolf
+    app.kubernetes.io/instance: wolf
+spec:
+  # The pod holds a privileged Docker daemon. Only the six GameStream ports are reachable, from
+  # any source: Moonlight clients are on the LAN, and pairing is Wolf's own access control.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: wolf
+      app.kubernetes.io/instance: wolf
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 47984
+        - protocol: TCP
+          port: 47989
+        - protocol: TCP
+          port: 48010
+        - protocol: UDP
+          port: 47999
+        - protocol: UDP
+          port: 48100
+        - protocol: UDP
+          port: 48200

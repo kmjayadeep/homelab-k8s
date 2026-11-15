@@ -1,0 +1,195 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wolf
+  labels:
+    app.kubernetes.io/name: wolf
+    app.kubernetes.io/instance: wolf
+    app.kubernetes.io/component: game-streaming
+    app.kubernetes.io/part-of: wolf
+spec:
+  # Wolf (Games on Whales) streams games from the sole B60 to Moonlight clients (ADR 0010, plan 0032).
+  # Flux overrides this value from the gpu-active ConfigMap, set by the GPU portal (ADR 0009).
+  # The pod requests gpu.intel.com/xe: 1 and the plugin advertises exactly one, so the scheduler
+  # prevents it from running beside an LLM or ComfyUI.
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wolf
+      app.kubernetes.io/instance: wolf
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wolf
+        app.kubernetes.io/instance: wolf
+        app.kubernetes.io/component: game-streaming
+        app.kubernetes.io/part-of: wolf
+    spec:
+      nodeSelector:
+        gpu.intel.com/product: arc-pro-b60
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
+      # No ServiceAccount token: nothing in this pod talks to the Kubernetes API, and both
+      # containers are privileged.
+      automountServiceAccountToken: false
+      initContainers:
+        # Wolf starts each app (Steam, Wolf UI, ...) as a container through a Docker socket, and
+        # k3s has none. This native sidecar is a Docker daemon private to the pod: it lives in the
+        # pod network namespace, so its bridge and iptables rules never touch the node's.
+        - name: dind
+          image: docker:29.9.3-dind@sha256:7bf70dcb85c822e3fa6f2d332143e474b99147b9d7b39102b0cfe8b04a7dd61b
+          restartPolicy: Always
+          # Naming "dockerd" explicitly matters: with no arguments the image entrypoint also opens
+          # the Docker API on TCP 2375/2376. The socket below is the only listener.
+          args:
+            - dockerd
+            - --host=unix:///run/dind/docker.sock
+          resources:
+            # Games run as children of this container, so their CPU and memory count here.
+            requests:
+              cpu: 2
+              memory: 6Gi
+            limits:
+              cpu: 6
+              # With Wolf's 2Gi this matches ComfyUI's 16Gi on a node with about 20 GiB allocatable.
+              memory: 14Gi
+          securityContext:
+            # Docker-in-Docker needs it, and it is how the nested containers reach /dev/dri.
+            privileged: true
+          startupProbe:
+            exec:
+              command: ["docker", "--host=unix:///run/dind/docker.sock", "info"]
+            failureThreshold: 30
+            periodSeconds: 2
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["docker", "--host=unix:///run/dind/docker.sock", "info"]
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: docker-data
+              mountPath: /var/lib/docker
+            - name: docker-socket
+              mountPath: /run/dind
+            # Wolf hands Docker bind-mount paths as it sees them, so every path Wolf shares with
+            # its apps is mounted at the same location in both containers.
+            - name: state
+              mountPath: /etc/wolf
+            - name: sockets
+              mountPath: /tmp/sockets
+            - name: wolf-api
+              mountPath: /var/run/wolf
+            - name: udev
+              mountPath: /run/udev
+              readOnly: true
+      containers:
+        - name: wolf
+          # Wolf publishes rolling tags only; pinned to the digest of `stable` as of 2026-11-15.
+          image: ghcr.io/games-on-whales/wolf:stable@sha256:47ce7a0b67ee6645d2c6fefd8fdda7fee49a00e327c39597a04e84a0cd052910
+          env:
+            - name: WOLF_DOCKER_SOCKET
+              value: /run/dind/docker.sock
+            # Sockets for the virtual display and audio, shared with the app containers.
+            - name: XDG_RUNTIME_DIR
+              value: /tmp/sockets
+            - name: HOST_APPS_STATE_FOLDER
+              value: /etc/wolf
+            # The address Moonlight is told to stream from: the LoadBalancer IP in service.yaml.
+            - name: WOLF_INTERNAL_IP
+              value: 192.168.1.184
+            # The image default. Plan 0032 checks that this node is the B60 before the first start.
+            - name: WOLF_RENDER_NODE
+              value: /dev/dri/renderD128
+          ports:
+            - name: https
+              containerPort: 47984
+              protocol: TCP
+            - name: http
+              containerPort: 47989
+              protocol: TCP
+            - name: rtsp
+              containerPort: 48010
+              protocol: TCP
+            - name: control
+              containerPort: 47999
+              protocol: UDP
+            - name: video
+              containerPort: 48100
+              protocol: UDP
+            - name: audio
+              containerPort: 48200
+              protocol: UDP
+          resources:
+            # Wolf itself only composites and encodes; the games are accounted to the dind sidecar.
+            requests:
+              cpu: 500m
+              memory: 512Mi
+              gpu.intel.com/xe: 1
+            limits:
+              cpu: 2
+              memory: 2Gi
+              gpu.intel.com/xe: 1
+          securityContext:
+            # Wolf creates virtual gamepads, keyboards and mice through /dev/uinput and /dev/uhid
+            # and injects them into the app containers with mknod. Upstream supports this only in
+            # a privileged container. The xe request above is kept for scheduling, not for access.
+            privileged: true
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            failureThreshold: 3
+          volumeMounts:
+            - name: state
+              mountPath: /etc/wolf
+            - name: docker-socket
+              mountPath: /run/dind
+            - name: sockets
+              mountPath: /tmp/sockets
+            - name: wolf-api
+              mountPath: /var/run/wolf
+            # The live host /dev and udev database, as upstream documents: virtual input devices
+            # appear after the container starts, so the static /dev of a privileged container is
+            # not enough.
+            - name: dev
+              mountPath: /dev
+            - name: udev
+              mountPath: /run/udev
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: wolf-state
+        - name: docker-data
+          persistentVolumeClaim:
+            claimName: wolf-docker
+        - name: docker-socket
+          emptyDir: {}
+        - name: sockets
+          emptyDir: {}
+        - name: wolf-api
+          emptyDir: {}
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
+        - name: udev
+          hostPath:
+            path: /run/udev
+            type: Directory

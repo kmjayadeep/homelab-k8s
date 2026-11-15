@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wolf-state
+  labels:
+    app.kubernetes.io/name: wolf
+    app.kubernetes.io/instance: wolf
+    app.kubernetes.io/component: state
+    app.kubernetes.io/part-of: wolf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # /etc/wolf: config.toml, the pairing certificates and each paired client's app homes,
+      # which include the Steam library. local-path does not enforce this size; the node disk
+      # (about 495 GiB, shared with the model caches) is the real limit.
+      storage: 150Gi
+  # local-path, not Longhorn: the pod is pinned to titania-gpu and games can be downloaded again.
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wolf-docker
+  labels:
+    app.kubernetes.io/name: wolf
+    app.kubernetes.io/instance: wolf
+    app.kubernetes.io/component: image-cache
+    app.kubernetes.io/part-of: wolf
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # /var/lib/docker of the dind sidecar: the app images Wolf pulls (Steam, Wolf UI, ...).
+      # Kept on a volume so a GPU switch does not pull them again.
+      storage: 40Gi
+  storageClassName: local-path
