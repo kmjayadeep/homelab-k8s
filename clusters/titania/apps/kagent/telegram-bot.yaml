@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261115130612
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261116060144
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
@@ -79,7 +79,15 @@ spec:
             # Merge policy (ADR 0007): deterministic, no model involved. Credentials come from the same
             # Secret the GitHub MCP server uses (kagent-github, Vault services/github/kagent-gitops).
             - name: GITHUB_REPOS
-              value: kmjayadeep/homelab-k8s
+              value: kmjayadeep/homelab-k8s,kmjayadeep/homelab-docker-stacks,kmjayadeep/docker-images
+            # homelab-docker-stacks (plan 0033): its ruleset requires linear history, and a merge to main
+            # deploys the changed stacks at once. Buttons only, one merge at a time, deploy result reported.
+            # docker-images has no PR checks, so nothing is merged automatically there either (the policy
+            # needs a green check); a merge only rebuilds images.
+            - name: SQUASH_MERGE_REPOS
+              value: kmjayadeep/homelab-docker-stacks
+            - name: DEPLOY_ON_MERGE_REPOS
+              value: kmjayadeep/homelab-docker-stacks
             - name: AUTOMERGE_UPDATE_TYPES
               value: patch,digest,pin,pinDigest
             - name: AUTOMERGE_BLOCK_LABELS

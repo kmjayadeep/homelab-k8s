@@ -29,3 +29,16 @@ Merging is a deterministic function of the Telegram bot, never a model tool. The
 - A wrong `merge` verdict on a patch bump merges a patch bump; the blast radius is the same as Renovate's own automerge, with the review comment as the audit trail and `git revert` as the rollback.
 - Minor and major bumps, critical infrastructure and all agent-authored changes still wait for a human, now as a one-tap decision instead of a terminal session.
 - Widening `AUTOMERGE_UPDATE_TYPES` (for example to `minor`) or adding `homelab-iac` to `GITHUB_REPOS` is a Git change to the bot Deployment and a conscious trust step; record it here when it happens.
+
+## Amendment 2026-11-16: homelab-docker-stacks, operator-approved merges only
+
+`kmjayadeep/homelab-docker-stacks` joins `GITHUB_REPOS` ([plan 0033](../plans/0033-kagent-docker-stacks-triage.md)). The decision above is unchanged; this repository gets a narrower version of it because a merge there is a deployment: the push to `main` restarts the changed Compose stacks on the Docker host, and pull requests have no checks.
+
+- No automatic merges, whatever the update type or verdict (`DEPLOY_ON_MERGE_REPOS`). Every reviewed pull request is a Merge/Skip question to the operator.
+- One merge at a time: a Merge press is refused while a workflow run on `main` has not finished, and the bot reports the deploy run of each merge commit. It never rolls back.
+- `homelab-gitops` reviews every open pull request there, not only Renovate's, and writes nothing but comments. Pull requests from forks are reported without a Merge button, so outside code is never one tap from a deployment.
+- Squash merges (`SQUASH_MERGE_REPOS`), because that ruleset requires linear history. The App still has no ruleset bypass.
+
+`kmjayadeep/docker-images` joins `GITHUB_REPOS` the same day with the unchanged policy. Its pull requests have no check runs, so the automatic path (which needs a green check) never applies and every reviewed pull request is a Merge/Skip question. A merge there only rebuilds images; deployment remains a tag bump in this repository.
+
+Evidence for the stricter rules: on 2026-11-16 a hand-run triage of ten open pull requests there produced two red deploy runs from a patch and a minor bump (a slow container start, and an Immich restart that exposed a pgvector extension mismatch on Helios), and one outside pull request that moved an image to an unknown publisher.
