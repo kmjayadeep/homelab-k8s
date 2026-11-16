@@ -25,6 +25,18 @@ data:
       "title": "Renovate review",
       "prompt": "Renovate pre-review (origin: schedule). List open pull requests in kmjayadeep/homelab-k8s authored by Renovate (author login app/renovate, head branch starting with renovate/). Take at most 3 of those that do not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), oldest first, do the review described in your Renovate review section and post one comment each. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words, plus how many unreviewed Renovate PRs are left for the next run. If every open Renovate PR is already reviewed, reply 'nothing new' only."
     }
+  docker-stacks-review.json: |
+    {
+      "agent": "homelab-gitops",
+      "title": "Docker stacks review",
+      "prompt": "Pull request review of kmjayadeep/homelab-docker-stacks (origin: schedule). List its open pull requests (all authors, not drafts). Take at most 3 that do not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), oldest first, do the review described in your homelab-docker-stacks review section and post one comment each. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words, plus how many unreviewed PRs are left for the next run. If every open PR is already reviewed, reply 'nothing new' only."
+    }
+  docker-images-review.json: |
+    {
+      "agent": "homelab-gitops",
+      "title": "Docker images review",
+      "prompt": "Pull request review of kmjayadeep/docker-images (origin: schedule). List its open pull requests (all authors, not drafts). Take at most 3 that do not yet have a comment from you (check issue_read get_comments for a comment containing 'kagent-renovate-review'), oldest first, do the review described in your docker-images review section and post one comment each. Then reply with one line per PR you commented on: number, verdict (merge, hold or needs human), and the reason in a few words, plus how many unreviewed PRs are left for the next run. If every open PR is already reviewed, reply 'nothing new' only."
+    }
   music-digest.json: |
     {
       "agent": "music-curator",
@@ -196,6 +208,126 @@ spec:
               image: curlimages/curl:8.23.0
               command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
                         "-H", "content-type: application/json", "-d", "@/prompts/renovate-review.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-docker-stacks-review
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: docker-stacks-review
+spec:
+  schedule: "45 */6 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.23.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/docker-stacks-review.json",
+                        "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              volumeMounts:
+                - name: prompts
+                  mountPath: /prompts
+                  readOnly: true
+          volumes:
+            - name: prompts
+              configMap:
+                name: kagent-scheduled-prompts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kagent-docker-images-review
+  labels:
+    app.kubernetes.io/name: kagent-scheduled-tasks
+    app.kubernetes.io/instance: kagent
+    app.kubernetes.io/component: docker-images-review
+spec:
+  schedule: "15 3-23/6 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: kagent-scheduled-tasks
+            app.kubernetes.io/instance: kagent
+            app.kubernetes.io/component: scheduled-task
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: task
+              image: curlimages/curl:8.23.0
+              command: ["curl", "-sS", "--fail-with-body", "--max-time", "1500", "-X", "POST",
+                        "-H", "content-type: application/json", "-d", "@/prompts/docker-images-review.json",
                         "http://kagent-telegram-bot.kagent.svc.cluster.local:8080/task"]
               securityContext:
                 allowPrivilegeEscalation: false
