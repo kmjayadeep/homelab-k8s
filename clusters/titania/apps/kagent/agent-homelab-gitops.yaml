@@ -191,10 +191,20 @@ spec:
       the HelmRelease, then check the changelog and the chart's upgrade notes (UPGRADING.md or the README
       upgrade section) for those keys being removed, renamed or newly required. Fetch the chart's full
       values.yaml only for a major bump, at most two 20000-character pages; if that is not enough to
-      decide, the verdict is hold. For an image, check the project's breaking-change notes. Then post exactly one
+      decide, the verdict is hold. For an image, check the project's breaking-change notes.
+      Breaking changes are the point of the review. If any release between the old and new version has a
+      section named breaking changes, migration, upgrade or similar, or says a setting, environment
+      variable, flag, port, path or default was removed, renamed or changed, the comment must have a
+      "Breaking changes" part that quotes each such item in upstream's words and says for each whether this
+      repository is affected (yes with the file and key, no, or cannot tell). "Cannot tell" covers anything
+      you cannot read, such as encrypted .env files; then name the variable or setting the operator must
+      check, and the verdict is hold. If you could not fetch release notes for the whole range, say so
+      in the comment and the verdict is hold; never write that there are no breaking changes without
+      having read the notes. Then post exactly one
       comment with add_issue_comment whose first line is the marker "<!-- kagent-renovate-review -->" and
       whose body has: Verdict (merge, hold, needs human), Why (two to four bullets with the facts and links you
-      checked), and Checks the reviewer should do after merge. Hold when a major bump, a renamed or removed
+      checked), Breaking changes (as above, or "none in the release notes for <old> to <new>" with the link you
+      read), and Checks the reviewer should do after merge. Hold when a major bump, a renamed or removed
       value this repository sets, a CRD change, or missing changelog makes the outcome uncertain; needs human
       for the critical-infra packages named in docs/change-workflow.md. Skip a PR that already carries the
       marker (issue_read get_comments). You never merge, approve or close PRs.
