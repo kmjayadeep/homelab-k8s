@@ -21,10 +21,6 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: deluge
-      namespace: torrents
-    - apiVersion: apps/v1
-      kind: Deployment
       name: radarr
       namespace: torrents
     - apiVersion: apps/v1
@@ -38,8 +34,4 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: sonarr
-      namespace: torrents
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: readarr
       namespace: torrents
