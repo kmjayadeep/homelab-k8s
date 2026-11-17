@@ -3,6 +3,8 @@ kind: Service
 metadata:
   labels:
     app: vaultwarden
+    app.kubernetes.io/name: vaultwarden
+    app.kubernetes.io/instance: vaultwarden
   name: vaultwarden
 spec:
   ports:
