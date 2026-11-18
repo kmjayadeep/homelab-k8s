@@ -18,7 +18,13 @@ spec:
   interval: 15m
   prune: true
   wait: true
-  timeout: 2m
+  # 5m, not 2m: the health-check timeout equals spec.timeout, and with
+  # wait: true the ImageRepository (ghcr.io scan) counts as part of the health
+  # check. On 2026-11-18 slow cluster egress to ghcr.io left it InProgress and
+  # the reconcile failed at exactly 2m while Deployment/taskplanner stayed
+  # 1/1 Running. 5m covers one ImageRepository interval (5m) so a single slow
+  # scan no longer fails the whole Kustomization.
+  timeout: 5m
   sourceRef:
     kind: GitRepository
     name: flux-system
