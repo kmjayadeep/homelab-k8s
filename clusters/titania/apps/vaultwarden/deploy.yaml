@@ -4,6 +4,8 @@ metadata:
   name: vaultwarden
   labels:
     app: vaultwarden
+    app.kubernetes.io/name: vaultwarden
+    app.kubernetes.io/instance: vaultwarden
 spec:
   selector:
     matchLabels:
@@ -11,7 +13,9 @@ spec:
   template:
     metadata:
       labels:
+        app: vaultwarden
         app.kubernetes.io/name: vaultwarden
+        app.kubernetes.io/instance: vaultwarden
     spec:
       containers:
         - name: vaultwarden
