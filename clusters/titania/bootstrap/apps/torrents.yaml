@@ -13,11 +13,18 @@ spec:
   interval: 15m
   prune: true
   wait: true
-  timeout: 2m
+  # 4m, not 2m: the health-check timeout equals spec.timeout. One slow
+  # ghcr.io image scan (the ImageRepositories are health-checked through
+  # wait: true) was enough to fail the whole Kustomization at 2m while every
+  # Deployment in the namespace stayed 1/1 Ready.
+  timeout: 4m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  # Deliberately absent: Deployment/deluge (the deluge workloads are
+  # deluge-openvpn and deluge-wireguard) and Deployment/readarr (removed).
+  # A healthChecks entry for a missing Deployment fails every reconcile.
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
@@ -34,4 +41,12 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: sonarr
+      namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: lidarr
+      namespace: torrents
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: seerr
       namespace: torrents
