@@ -1,0 +1,22 @@
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: titania-master
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  # Git-managed Node CR so the per-disk storageReserved is declared state, not
+  # untracked drift. Longhorn's longhorn_node_storage_usage_bytes is
+  # capacity - available, i.e. whole-root-filesystem usage, so a 95 GiB
+  # reservation made the disk look ~30% fuller than the real replica data
+  # (4.2 GB on this node) and tripped LonghornNodeStorageWarning. 50 GiB keeps
+  # a real write-refusal margin and matches titania-worker1. Do not set this
+  # through the Helm default storage-reserved-percentage-for-default-disk: an
+  # existing per-disk value already overrides that setting and only a
+  # Git-managed Node CR stops the drift.
+  disks:
+    default-disk-3d9ed4355da69325:
+      path: /var/lib/longhorn/
+      diskType: filesystem
+      allowScheduling: true
+      storageReserved: 53687091200
