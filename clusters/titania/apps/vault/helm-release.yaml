@@ -41,7 +41,11 @@ spec:
               summary: "Vault server is down or unreachable"
               description: "Vault server has been down for more than 5 minutes."
             
-          - alert: VaultUnsealed
+          # Alert name must start with the metric it tests: Alertmanager routes Flux events
+          # by alertname =~ "^Flux", so "VaultSealed" here would be the first non-Flux alert
+          # matching "^Flux" and turn the flux-changes route into "anything starting with Flux
+          # plus VaultSealed".
+          - alert: VaultCoreUnsealed
             expr: vault_core_unsealed == 0
             for: 5m
             annotations:
