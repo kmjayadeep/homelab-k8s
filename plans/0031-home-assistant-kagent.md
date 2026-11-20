@@ -59,4 +59,4 @@ Completed 2026-11-15. All four gates passed:
 Changed in Home Assistant during the same work, outside Git:
 
 - Sockets renamed `jupiter`, `orion` (about 90 W; was `pluto_socket_*`), `mars` and `pluto` (was `hombli_smart_socket_4_*`), with a new Pluto daily meter. The Prometheus series changed labels with the rename, so history before 2026-11-15 sits under the old names.
-- Presence comes from an Nmap Tracker scan of the phone on Wi-Fi (`device_tracker.jd_s24_wifi`, phone set to use its device MAC), because the Companion app trackers stopped reporting location on 2026-10-28.
+- Presence: an Nmap Tracker scan of the phone on Wi-Fi was tried from 2026-11-15 and removed on 2026-11-20, together with the arrive-home and leave-home light automations. The sleeping phone dropped off Wi-Fi for minutes at a time, and each return counted as an arrival that switched the light on at night. `person.jayadeep` is `unknown` again (the Companion app trackers stopped reporting location on 2026-10-28) and nothing acts on presence. The light now follows only the PC webhooks, the weekday wake-up light and manual control.
