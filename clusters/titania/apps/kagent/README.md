@@ -81,13 +81,13 @@ To change one agent's policy, set its `spec.modelConfig` (in `agent-*.yaml`) to 
 
 1. Create a new virtual key in the LiteLLM Admin UI and import it with `../homelab-iac/vault-config/import-litellm-kagent-key.sh` (stdin only).
 2. Wait for the `ExternalSecret` to refresh (1h) or annotate it with `force-sync`.
-3. Agent pods are created by the controller and are not watched by Reloader. Restart them with operator approval:
+3. Agent pods are created by the controller and are not watched by Reloader. They all carry the label `app=kagent`, so restart every agent at once with operator approval:
 
    ```bash
-   kubectl -n kagent rollout restart deployment/k8s-agent
+   kubectl -n kagent rollout restart deployment -l app=kagent
    ```
 
-   The Deployment is named after the `Agent`; check with `kubectl -n kagent get deploy`.
+   That is `homelab-sre`, `homelab-gitops`, `music-curator`, `movie-curator`, `finance-curator`, `home` and `vartha-editor`; check with `kubectl -n kagent get deploy -l app=kagent`. The chart-default agents, including `k8s-agent`, are disabled in `helm-release.yaml` and have no Deployment. A single agent can be restarted by name (`deployment/<agent>`).
 4. Revoke the old key in LiteLLM.
 
 ## Risks
