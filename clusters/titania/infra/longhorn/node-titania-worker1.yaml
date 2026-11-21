@@ -1,0 +1,18 @@
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: titania-worker1
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  # Was 95053889126 (95 GiB / 30%) until now and only ever existed live, so it
+  # kept flapping LonghornNodeStorageWarning at ~71% while the real replica
+  # data was 6.5 GB. 50 GiB (~16%) matches titania-master; see that file for
+  # why the Helm default storage-reserved-percentage-for-default-disk cannot
+  # be the fix while a per-disk value exists.
+  disks:
+    default-disk-3d9ed4355da69325:
+      path: /var/lib/longhorn/
+      diskType: filesystem
+      allowScheduling: true
+      storageReserved: 53687091200
