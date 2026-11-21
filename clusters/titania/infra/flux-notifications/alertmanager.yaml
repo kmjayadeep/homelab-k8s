@@ -51,6 +51,9 @@ spec:
       namespace: cert-manager
     - kind: Kustomization
       name: "*"
+      namespace: comfyui
+    - kind: Kustomization
+      name: "*"
       namespace: external-dns
     - kind: Kustomization
       name: "*"
@@ -61,6 +64,9 @@ spec:
     - kind: Kustomization
       name: "*"
       namespace: glance
+    - kind: Kustomization
+      name: "*"
+      namespace: gpu-portal
     - kind: Kustomization
       name: "*"
       namespace: homer
@@ -96,6 +102,9 @@ spec:
       namespace: otpcloud
     - kind: Kustomization
       name: "*"
+      namespace: postgres-restore-drill
+    - kind: Kustomization
+      name: "*"
       namespace: reflector
     - kind: Kustomization
       name: "*"
@@ -124,6 +133,9 @@ spec:
     - kind: Kustomization
       name: "*"
       namespace: wallabag
+    - kind: Kustomization
+      name: "*"
+      namespace: wolf
     - kind: HelmRelease
       name: "*"
       namespace: actions-runner-system
