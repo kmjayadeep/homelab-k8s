@@ -4,7 +4,14 @@ kind: Kustomization
 namespace: metallb-system
 
 resources:
-- github.com/metallb/metallb/config/native?ref=v0.16.2
+# Pinned to the immutable commit that v0.16.2 points to (annotated tag
+# d3684040055973b1735a98b31e597943541aa761 -> commit 37f0586) instead of the
+# mutable tag. The remote base is re-fetched by kustomize-controller on every
+# reconcile, and the tag form failed with a 27s `git fetch` timeout
+# (BuildFailed, 2026-11-18T19:28Z and 19:44:01Z). A SHA makes the build
+# reproducible. This does not remove the fetch itself: if the timeouts persist,
+# vendor the native config into this directory or move to the metallb chart.
+- github.com/metallb/metallb/config/native?ref=37f058643f74370e53f2c66220b11da9d37f1141
 - l2advertisement.yaml
 - public-pool.yaml
 
