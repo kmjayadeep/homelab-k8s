@@ -43,7 +43,7 @@ spec:
         # k3s has none. This native sidecar is a Docker daemon private to the pod: it lives in the
         # pod network namespace, so its bridge and iptables rules never touch the node's.
         - name: dind
-          image: docker:29.9.3-dind@sha256:7bf70dcb85c822e3fa6f2d332143e474b99147b9d7b39102b0cfe8b04a7dd61b
+          image: docker:29.10.0-dind@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c
           restartPolicy: Always
           # Naming "dockerd" explicitly matters: with no arguments the image entrypoint also opens
           # the Docker API on TCP 2375/2376. The socket below is the only listener.
