@@ -12,6 +12,12 @@ spec:
   # replace the pod instead, like the other single-PVC apps here (bookorbit, uptime, wolf).
   strategy:
     type: Recreate
+    # Explicit null: kustomize-controller applies with a strategic merge patch, which does not
+    # drop keys this manifest omits. The live object still carries maxSurge/maxUnavailable from
+    # its RollingUpdate days, and the merged result is rejected by the API server
+    # ("spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is
+    # 'Recreate'"). Nulling the field removes it from the applied object. Revert with the type.
+    rollingUpdate: null
   selector:
     matchLabels:
       app.kubernetes.io/name: vaultwarden
