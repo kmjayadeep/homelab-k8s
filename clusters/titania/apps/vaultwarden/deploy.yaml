@@ -7,6 +7,11 @@ metadata:
     app.kubernetes.io/name: vaultwarden
     app.kubernetes.io/instance: vaultwarden
 spec:
+  # The single ReadWriteOnce Longhorn volume cannot attach to a second pod. With the default
+  # RollingUpdate the surge pod stays Pending on a Multi-Attach error and the rollout hangs, so
+  # replace the pod instead, like the other single-PVC apps here (bookorbit, uptime, wolf).
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: vaultwarden
