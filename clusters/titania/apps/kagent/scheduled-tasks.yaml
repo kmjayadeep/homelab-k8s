@@ -179,7 +179,7 @@ metadata:
     app.kubernetes.io/instance: kagent
     app.kubernetes.io/component: renovate-review
 spec:
-  schedule: "15 */6 * * *"
+  schedule: "15 6,18 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/instance: kagent
     app.kubernetes.io/component: docker-stacks-review
 spec:
-  schedule: "45 */6 * * *"
+  schedule: "45 5,17 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 0
@@ -299,7 +299,7 @@ metadata:
     app.kubernetes.io/instance: kagent
     app.kubernetes.io/component: docker-images-review
 spec:
-  schedule: "15 3-23/6 * * *"
+  schedule: "15 9,21 * * *"
   timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 0

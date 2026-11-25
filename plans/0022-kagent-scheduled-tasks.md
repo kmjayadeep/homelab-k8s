@@ -9,7 +9,7 @@
 Move four chores that dominate the operator's interactive agent sessions (mined from the Codex, pi and Claude Code transcripts on 2026-10-28) onto the agents that already run in the cluster, without a new ingress or a second notification path:
 
 1. **Post-merge verification** ("merged, is reconcile done, all good?"): Flux notification-controller sends its events to the existing Alertmanager through the `alertmanager` Provider; a dedicated route delivers them to the Telegram bot's new `POST /flux` webhook, which asks `homelab-sre` for a short verdict on the changed namespace.
-2. **Renovate pre-review**: every six hours `homelab-gitops` reviews open Renovate PRs that it has not commented on yet (changelog, chart values diff, risk) and leaves one marked comment with a merge/hold/needs-human verdict. It never merges.
+2. **Renovate pre-review**: twice a day (every six hours until 2026-11-25) `homelab-gitops` reviews open Renovate PRs that it has not commented on yet (changelog, chart values diff, risk) and leaves one marked comment with a merge/hold/needs-human verdict. It never merges.
 3. **Daily summary** at 07:30 Europe/Zurich from `homelab-sre`, hard-capped at 600 characters.
 4. **Daily repository review**: `homelab-gitops` opens at most one small `kagent/review-*` PR per day; if one is open, it does nothing.
 
