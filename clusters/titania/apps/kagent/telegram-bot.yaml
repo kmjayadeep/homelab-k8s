@@ -58,7 +58,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bot
-          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261116060144
+          image: ghcr.io/kmjayadeep/kagent-telegram-bot:20261125170240
           env:
             - name: KAGENT_A2A_URL
               value: http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/homelab-sre/
@@ -82,7 +82,7 @@ spec:
               value: "86400"
             # Alertmanager repeats of a firing group with no new alert: one reminder a day. Failed agent runs
             # (model down, provider out of credit) on unattended paths: one post an hour. Scheduled-task
-            # answers of only "nothing new" are logged. Needs a bot image from 2026-11-25 or later.
+            # answers of only "nothing new" are logged. Needs a bot image from 2026-11-25 or later (docker-images#27).
             - name: ALERT_REPEAT_NOTIFY_SECONDS
               value: "86400"
             - name: AGENT_ERROR_NOTIFY_SECONDS
