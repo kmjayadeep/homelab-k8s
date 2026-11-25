@@ -75,7 +75,18 @@ spec:
             - name: FLUX_VERIFY_DELAY_SECONDS
               value: "120"
             - name: FLUX_DEDUP_SECONDS
-              value: "600"
+              value: "1800"
+            # The same Flux failure (commit ids ignored) is investigated once a day at most. Until 2026-11-25
+            # a stuck vaultwarden Kustomization re-fired every 15 min and each event started an investigation.
+            - name: FLUX_REPEAT_SECONDS
+              value: "86400"
+            # Alertmanager repeats of a firing group with no new alert: one reminder a day. Failed agent runs
+            # (model down, provider out of credit) on unattended paths: one post an hour. Scheduled-task
+            # answers of only "nothing new" are logged. Needs a bot image from 2026-11-25 or later.
+            - name: ALERT_REPEAT_NOTIFY_SECONDS
+              value: "86400"
+            - name: AGENT_ERROR_NOTIFY_SECONDS
+              value: "3600"
             # Merge policy (ADR 0007): deterministic, no model involved. Credentials come from the same
             # Secret the GitHub MCP server uses (kagent-github, Vault services/github/kagent-gitops).
             - name: GITHUB_REPOS
