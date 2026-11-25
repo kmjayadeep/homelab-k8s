@@ -7,17 +7,16 @@ metadata:
     app.kubernetes.io/name: vaultwarden
     app.kubernetes.io/instance: vaultwarden
 spec:
-  # The single ReadWriteOnce Longhorn volume cannot attach to a second pod. With the default
-  # RollingUpdate the surge pod stays Pending on a Multi-Attach error and the rollout hangs, so
-  # replace the pod instead, like the other single-PVC apps here (bookorbit, uptime, wolf).
+  # The single ReadWriteOnce Longhorn volume cannot attach to a second pod, so the old pod must stop
+  # before the new one starts. RollingUpdate with maxSurge 0 does that. `type: Recreate` cannot be
+  # applied here (PRs #653/#654 blocked the Kustomization from 2026-11-23): the live object's
+  # maxSurge/maxUnavailable are owned by the `k3s` field manager, so Flux's server-side apply cannot
+  # remove them, not even with `rollingUpdate: null`, and the API server rejects Recreate with them.
   strategy:
-    type: Recreate
-    # Explicit null: kustomize-controller applies with a strategic merge patch, which does not
-    # drop keys this manifest omits. The live object still carries maxSurge/maxUnavailable from
-    # its RollingUpdate days, and the merged result is rejected by the API server
-    # ("spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is
-    # 'Recreate'"). Nulling the field removes it from the applied object. Revert with the type.
-    rollingUpdate: null
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: vaultwarden
