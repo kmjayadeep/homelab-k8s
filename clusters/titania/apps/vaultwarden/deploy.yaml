@@ -10,14 +10,15 @@ spec:
   # The single ReadWriteOnce Longhorn volume cannot attach to a second pod. With the default
   # RollingUpdate the surge pod stays Pending on a Multi-Attach error and the rollout hangs, so
   # replace the pod instead, like the other single-PVC apps here (bookorbit, uptime, wolf).
+  #
+  # $patch: replace replaces the whole strategy object rather than merging into it, so the
+  # applied object carries only `type: Recreate` and no rollingUpdate sibling. Neither an
+  # omitted key nor `rollingUpdate: null` removes the live maxSurge/maxUnavailable values,
+  # which made every dry-run fail with "spec.strategy.rollingUpdate: Forbidden: may not be
+  # specified when strategy `type` is 'Recreate''".
   strategy:
+    $patch: replace
     type: Recreate
-    # Explicit null: kustomize-controller applies with a strategic merge patch, which does not
-    # drop keys this manifest omits. The live object still carries maxSurge/maxUnavailable from
-    # its RollingUpdate days, and the merged result is rejected by the API server
-    # ("spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is
-    # 'Recreate'"). Nulling the field removes it from the applied object. Revert with the type.
-    rollingUpdate: null
   selector:
     matchLabels:
       app.kubernetes.io/name: vaultwarden

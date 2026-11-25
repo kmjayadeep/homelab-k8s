@@ -8,3 +8,16 @@ resources:
   - ingress.yaml
   - service.yaml
   - pvc.yaml
+
+# Replace (not merge) Deployment/vaultwarden's spec.strategy so the applied object carries only
+# `type: Recreate`. The live Deployment still has maxSurge/maxUnavailable from its RollingUpdate
+# days, and a merge keeps them, which the API server rejects for a Recreate strategy.
+patches:
+  - target:
+      kind: Deployment
+      name: vaultwarden
+    patch: |
+      - op: replace
+        path: /spec/strategy
+        value:
+          type: Recreate
